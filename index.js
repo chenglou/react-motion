@@ -112,6 +112,13 @@ let Spring = React.createClass({
     onValueChange: React.PropTypes.func,
   },
 
+  getDefaultProps: function() {
+    return {
+      tension: 60,
+      friction: 8,
+    };
+  },
+
   getInitialState: function() {
     return {
       v: 0,
@@ -171,7 +178,7 @@ var App = React.createClass({
       mouseX: 0,
       mouseY: 0,
       // springs: [[0, 0]],
-      springs: [[0, 0], [0, 0], [0, 0], [0, 0]],
+      springs: [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]],
       // springs: [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]],
     };
   },
@@ -230,8 +237,8 @@ var App = React.createClass({
         {springs.map(([x, y], i) => {
           let [destX, destY] = i === 0 ? [mouseX, mouseY] : springs[i - 1];
           return (
-            <Spring key={i} tension={60} friction={8} value={destX} onValueChange={this.handleValueChange.bind(null, i, 0)}>
-              <Spring tension={60} friction={8} value={destY} onValueChange={this.handleValueChange.bind(null, i, 1)}>
+            <Spring key={i}  value={destX} onValueChange={this.handleValueChange.bind(null, i, 0)}>
+              <Spring  value={destY} onValueChange={this.handleValueChange.bind(null, i, 1)}>
                 <div style={{
                   ...s,
                   WebkitTransform: `translate3d(${x}px, ${y}px, 0)`,
