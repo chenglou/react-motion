@@ -1,107 +1,5 @@
 let React = require('react');
-
-/* Block position and velocity. */
-var block = {
-  x: 100,
-  v: 0,
-  destX: 120,
-
-  y: 50,
-  destY: 100,
-  vy: 0
-};
-
-var block1 = {
-  x: 100,
-  v: 0,
-  destX: 120,
-
-  y: 50,
-  destY: 100,
-  vy: 0
-};
-
-var block2 = {
-  x: 100,
-  v: 0,
-  destX: 120,
-
-  y: 50,
-  destY: 100,
-  vy: 0
-};
-
-var frameRate = 1 / 60;
-
-var canvas;
-var ctx;
-var width = 500;
-var height = 600;
-
-function stepper(x, v, destX, mass, k, b) {
-  /* Spring stiffness, in kg / s^2 */
-  // destX is really string length (spring at rest)
-  var F_spring = -k * (x - destX);
-
-  /* Damping constant, in kg / s */
-  var F_damper = -b * v;
-
-  // var mass = 0.5;
-  var a = (F_spring + F_damper) / mass;
-
-  var newX = x + v * frameRate;
-  var newV = v + a * frameRate;
-
-  if (Math.abs(newV - v) < 0.001 && Math.abs(newX - x) < 0.001) {
-    return [destX, 0];
-  }
-
-  return [newX, newV];
-}
-
-// function loop() {
-//   [block.x, block.v] = stepper(block.x, block.v, block.destX);
-//   [block.y, block.vy] = stepper(block.y, block.vy, block.destY);
-
-//   [block1.x, block1.v] = stepper(block1.x, block1.v, block.x);
-//   [block1.y, block1.vy] = stepper(block1.y, block1.vy, block.y);
-
-//   [block2.x, block2.v] = stepper(block2.x, block2.v, block1.x);
-//   [block2.y, block2.vy] = stepper(block2.y, block2.vy, block1.y);
-
-//   /* Drawing */
-//   ctx.clearRect(0, 0, width, height);
-
-//   ctx.save();
-
-//   ctx.fillStyle = 'green';
-//   ctx.fillRect(block2.x, block2.y, 50, 50);
-//   ctx.fillStyle = 'red';
-//   ctx.fillRect(block1.x, block1.y, 50, 50);
-//   ctx.fillStyle = 'black';
-//   ctx.fillRect(block.x, block.y, 50, 50);
-
-//   ctx.restore();
-// };
-
-// canvas = document.getElementById('canvas');
-// ctx = canvas.getContext('2d');
-
-// canvas.onmousedown = canvas.onmousemove = function(e) {
-//   // mouse down
-//   if (e.which == 1) {
-//     block.destX = e.pageX - canvas.offsetLeft;
-//     block.destY = e.pageY - canvas.offsetTop;
-//   }
-// };
-
-// function raf() {
-//   requestAnimationFrame(function(a) {
-//     loop();
-//     raf();
-//   });
-// }
-// raf();
+let stepper = require('./stepper');
 
 let Spring = React.createClass({
   propTypes: {
@@ -114,8 +12,8 @@ let Spring = React.createClass({
 
   getDefaultProps: function() {
     return {
-      tension: 60,
-      friction: 8,
+      tension: 120,
+      friction: 16,
     };
   },
 
@@ -140,7 +38,7 @@ let Spring = React.createClass({
       let {tension, friction, value, onValueChange} = this.props;
 
       let [newCurrValue, newV] =
-        stepper(currValue == null ? value : currValue, v, value, 0.5, tension, friction);
+        stepper(currValue == null ? value : currValue, v, value, tension, friction);
 
       if (newV === v && newCurrValue === currValue) {
         this.setState({isRafing: false});
@@ -301,8 +199,8 @@ var App2 = React.createClass({
       let {springs} = this.state;
       let newSprings = springs.map(([x, y, vx, vy], i) => {
         let [destX, destY] = i === 0 ? [pageX, pageY] : springs[i - 1];
-        let [newX, newVx] = stepper(x, vx, destX, 0.5, 60, 8);
-        let [newY, newVy] = stepper(y, vy, destY, 0.5, 60, 8);
+        let [newX, newVx] = stepper(x, vx, destX, 120, 16);
+        let [newY, newVy] = stepper(y, vy, destY, 120, 16);
 
         return [newX, newY, newVx, newVy];
       });
@@ -325,8 +223,8 @@ var App2 = React.createClass({
   //       let {springs, mouseX, mouseY} = this.state;
   //       let newSprings = springs.map(([x, y, vx, vy], i) => {
   //         let [destX, destY] = i === 0 ? [mouseX, mouseY] : springs[i - 1];
-  //         let [newX, newVx] = stepper(x, vx, destX, 0.5, 60, 8);
-  //         let [newY, newVy] = stepper(y, vy, destY, 0.5, 60, 8);
+  //         let [newX, newVx] = stepper(x, vx, destX, 120, 16);
+  //         let [newY, newVy] = stepper(y, vy, destY, 120, 16);
 
   //         return [newX, newY, newVx, newVy];
   //       });
