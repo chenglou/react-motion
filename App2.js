@@ -16,32 +16,32 @@ var App = React.createClass({
     };
   },
 
-  rafId: null,
+  // rafId: null,
 
-  repeatSetState: function(f) {
-    if (this.rafId != null) {
-      cancelAnimationFrame(this.rafId);
-      this.rafId = null;
-    }
+  // repeatSetState: function(f) {
+  //   if (this.rafId != null) {
+  //     cancelAnimationFrame(this.rafId);
+  //     this.rafId = null;
+  //   }
 
-    var state = f();
-    if (!state) {
-      return;
-    }
+  //   var state = f();
+  //   if (!state) {
+  //     return;
+  //   }
 
-    this.setState(state);
-    let loop = () => {
-      this.rafId = requestAnimationFrame(() => {
-        let state = f();
-        if (state) {
-          this.setState(state);
-          loop();
-        }
-      });
-    };
+  //   this.setState(state);
+  //   let loop = () => {
+  //     this.rafId = requestAnimationFrame(() => {
+  //       let state = f();
+  //       if (state) {
+  //         this.setState(state);
+  //         loop();
+  //       }
+  //     });
+  //   };
 
-    loop();
-  },
+  //   loop();
+  // },
 
   // handleMouseMove: function(e) {
   //   if (e.nativeEvent.which === 0) {
