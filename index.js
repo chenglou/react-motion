@@ -49,7 +49,14 @@ function stepper(x, v, destX, mass, k, b) {
   // var mass = 0.5;
   var a = (F_spring + F_damper) / mass;
 
-  return [x + v * frameRate, v + a * frameRate];
+  var newX = x + v * frameRate;
+  var newV = v + a * frameRate;
+
+  if (Math.abs(newV - v) < 0.001 && Math.abs(newX - x) < 0.001) {
+    return [destX, 0];
+  }
+
+  return [newX, newV];
 }
 
 // function loop() {
@@ -109,30 +116,44 @@ let Spring = React.createClass({
     return {
       v: 0,
       currValue: this.props.value,
+      isRafing: true,
     };
   },
 
-  componentDidMount: function() {
-    let raf = () => {
-      requestAnimationFrame(() => {
-        let {currValue, v} = this.state;
-        let {tension, friction, value, onValueChange} = this.props;
-
-        let [newCurrValue, newV] =
-          stepper(currValue, v, value, 0.5, tension, friction);
-
-        this.setState(() => {
-          onValueChange && onValueChange(newCurrValue);
-          return {
-            currValue: newCurrValue,
-            v: newV,
-          };
-        });
-
-        raf();
-      });
+  componentWillReceiveProps: function(nextProps) {
+    if (!this.state.isRafing) {
+      this.setState({isRafing: true});
+      this.raf();
     }
-    raf();
+  },
+
+  raf: function() {
+    requestAnimationFrame(() => {
+      let {currValue, v} = this.state;
+      let {tension, friction, value, onValueChange} = this.props;
+
+      let [newCurrValue, newV] =
+        stepper(currValue == null ? value : currValue, v, value, 0.5, tension, friction);
+
+      if (newV === v && newCurrValue === currValue) {
+        this.setState({isRafing: false});
+        return;
+      }
+
+      this.setState(() => {
+        onValueChange && onValueChange(newCurrValue);
+        return {
+          currValue: newCurrValue,
+          v: newV,
+        };
+      });
+
+      this.raf();
+    });
+  },
+
+  componentDidMount: function() {
+    this.raf();
   },
 
   render: function() {
@@ -149,7 +170,9 @@ var App = React.createClass({
     return {
       mouseX: 0,
       mouseY: 0,
-      springs: [[0, 0], [0, 0], [0, 0]],
+      // springs: [[0, 0]],
+      springs: [[0, 0], [0, 0], [0, 0], [0, 0]],
+      // springs: [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]],
     };
   },
 
@@ -161,6 +184,21 @@ var App = React.createClass({
       });
     }
   },
+
+  // componentDidMount: function() {
+  //   let asd = () => {
+  //     let s = JSON.stringify(this.state);
+  //     requestAnimationFrame(() => {
+  //       // if (JSON.stringify(this.state) !== s) {
+  //         // console.log('up');
+  //         this.forceUpdate();
+  //       // }
+  //       asd();
+  //     });
+  //   }
+
+  //   asd();
+  // },
 
   handleValueChange: function(idx, pos, value) {
     this.state.springs[idx][pos] = value;
