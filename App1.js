@@ -138,7 +138,7 @@ var App = React.createClass({
         {springs.map(([x, y], i) => {
           let [destX, destY] = i === 0 ? [mouseX, mouseY] : springs[i - 1];
           return (
-            <Spring key={i}  value={destX} onValueChange={this.handleValueChange.bind(null, i, 0)}>
+            <Spring key={i} value={destX} onValueChange={this.handleValueChange.bind(null, i, 0)}>
               <Spring  value={destY} onValueChange={this.handleValueChange.bind(null, i, 1)}>
                 <div style={{
                   ...s,
