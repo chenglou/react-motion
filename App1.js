@@ -40,7 +40,7 @@ let Spring = React.createClass({
       let [newCurrValue, newV] =
         stepper(currValue == null ? value : currValue, v, value, tension, friction);
 
-      if (newV === v && newCurrValue === currValue) {
+      if (newV === 0 && newCurrValue === currValue) {
         this.setState({isRafing: false});
         return;
       }
