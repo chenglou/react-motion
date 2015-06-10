@@ -1,87 +1,84 @@
+// smarter component version with child function
+
 let React = require('react');
 let stepper = require('./stepper');
 
-let Spring = React.createClass({
-  propTypes: {
-    tension: React.PropTypes.number,
-    friction: React.PropTypes.number,
-    // initialValue: React.PropTypes.number,
-    value: React.PropTypes.number.isRequired,
-    onValueChange: React.PropTypes.func,
-  },
+function map3Tree(t1, t2, t3, f) {
+  if (Object.prototype.toString.call(t1) === '[object Array]') {
+    return t1.map((val, i) => map3Tree(val, t2[i], t3[i], f));
+  }
+  if (Object.prototype.toString.call(t1) === '[object Object]') {
+    let newTree = {};
+    Object.keys(t1).forEach(key => newTree[key] = map3Tree(t1[key], t2[key], t3[key], f));
+    return newTree;
+  }
+  return f(t1, t2, t3);
+}
 
-  getDefaultProps: function() {
-    return {
-      tension: 140,
-      friction: 16,
-    };
-  },
-
+let Springs = React.createClass({
   getInitialState: function() {
+    let {initVals} = this.props;
     return {
-      v: 0,
-      currValue: this.props.value,
-      isRafing: true,
+      currVals: initVals,
+      currV: map3Tree(initVals, initVals, initVals, () => 0),
     };
   },
 
-  componentWillReceiveProps: function(nextProps) {
-    if (!this.state.isRafing) {
-      this.setState({isRafing: true});
-      this.raf();
-    }
-  },
-
-  raf: function() {
+  raf: function(isFirst) {
     requestAnimationFrame(() => {
-      let {currValue, v} = this.state;
-      let {tension, friction, value, onValueChange} = this.props;
+      let {currVals, currV} = this.state;
+      let {reduce, initVals} = this.props;
 
-      let [newCurrValue, newV] =
-        stepper(currValue == null ? value : currValue, v, value, tension, friction);
+      let newFinalVals = currVals.reduce((finalVals, val, i) => {
+        return reduce(currVals, finalVals, i)
+      }, []);
 
-      if (newV === 0 && newCurrValue === currValue) {
-        this.setState({isRafing: false});
-        return;
-      }
+      let newCurrVals = map3Tree(
+        newFinalVals,
+        currVals,
+        currV,
+        (destX, x, vx) => stepper(x, vx, destX, 120, 16)[0],
+      );
+      let newCurrV = map3Tree(
+        newFinalVals,
+        currVals,
+        currV,
+        (destX, x, vx) => stepper(x, vx, destX, 120, 16)[1],
+      );
 
       this.setState(() => {
-        onValueChange && onValueChange(newCurrValue);
         return {
-          currValue: newCurrValue,
-          v: newV,
+          currVals: newCurrVals,
+          currV: newCurrV,
         };
       });
 
-      this.raf();
+      this.raf(false);
     });
   },
 
   componentDidMount: function() {
-    this.raf();
+    this.raf(true);
   },
 
   render: function() {
     return (
       <div>
-        {this.props.children}
+        {this.props.children(this.state.currVals)}
       </div>
     );
   }
 });
+
+function clone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
 
 var App = React.createClass({
   getInitialState: function() {
     return {
       mouseX: 0,
       mouseY: 0,
-      springs: [
-        [0, 0],
-        [0, 0],
-        [0, 0],
-        [0, 0],
-        [0, 0],
-      ],
     };
   },
 
@@ -92,28 +89,6 @@ var App = React.createClass({
         mouseY: e.pageY,
       });
     }
-  },
-
-  // componentDidMount: function() {
-  //   let asd = () => {
-  //     let s = JSON.stringify(this.state);
-  //     requestAnimationFrame(() => {
-  //       // if (JSON.stringify(this.state) !== s) {
-  //         // console.log('up');
-  //         this.forceUpdate();
-  //       // }
-  //       asd();
-  //     });
-  //   }
-
-  //   asd();
-  // },
-
-  handleValueChange: function(idx, pos, value) {
-    this.state.springs[idx][pos] = value;
-    this.setState({
-      springs: this.state.springs,
-    });
   },
 
   render: function() {
@@ -133,22 +108,40 @@ var App = React.createClass({
       backgroundColor: 'red',
     };
 
+    let initVals = [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+    ];
+
     return (
       <div onMouseMove={this.handleMouseMove} onMouseDown={this.handleMouseMove} style={box}>
-        {springs.map(([x, y], i) => {
-          let [destX, destY] = i === 0 ? [mouseX, mouseY] : springs[i - 1];
-          return (
-            <Spring key={i} value={destX} onValueChange={this.handleValueChange.bind(null, i, 0)}>
-              <Spring  value={destY} onValueChange={this.handleValueChange.bind(null, i, 1)}>
-                <div style={{
-                  ...s,
-                  WebkitTransform: `translate3d(${x}px, ${y}px, 0)`,
-                  zIndex: springs.length - i,
-                }} />
-              </Spring>
-            </Spring>
-          );
-        })}
+        <Springs initVals={initVals} reduce={(prevVals, finalVals, i) => {
+          finalVals = clone(finalVals);
+          if (i === 0) {
+            finalVals[i] = [mouseX, mouseY];
+          } else {
+            finalVals[i] = prevVals[i - 1];
+          }
+          return finalVals;
+        }}>
+          {currVals => currVals.map(([x, y], i) => (
+            <div key={i} style={{
+              ...s,
+              WebkitTransform: `translate3d(${x}px, ${y}px, 0)`,
+              zIndex: currVals.length - i,
+            }} />
+          ))}
+        </Springs>
       </div>
     );
   }
