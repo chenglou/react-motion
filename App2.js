@@ -1,3 +1,5 @@
+// smart but might need mixin
+
 let React = require('react');
 let stepper = require('./stepper');
 
@@ -7,6 +9,13 @@ var App = React.createClass({
       mouseX: 0,
       mouseY: 0,
       springs: [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0],

@@ -1,3 +1,5 @@
+// twitter card interpolate layout
+
 let React = require('react');
 let computeLayout = require('css-layout');
 let stepper = require('./stepper');
@@ -27,7 +29,7 @@ function map3Tree({width, height, top, left, children}, b, c, f) {
   }
 }
 
-let layout1 = {
+let layout1 = computeLayout({
   style: {width: 500, height: 300, padding: 20, flexDirection: 'column'},
   children: [
     {
@@ -45,9 +47,9 @@ let layout1 = {
       style: {flex: 1}
     },
   ],
-};
+});
 
-let layout2 = {
+let layout2 = computeLayout({
   style: {width: 500, height: 500, padding: 20, flexDirection: 'column'},
   children: [
     {
@@ -65,17 +67,15 @@ let layout2 = {
       style: {flex: 1}
     },
   ],
-};
+});
 
 let App = React.createClass({
   getInitialState: function() {
-    let layout = computeLayout(layout1);
-
     return {
       // in-flight, animated. values computed with spring
-      layout: layout,
-      destLayout: layout,
-      v: genVTree(layout),
+      layout: layout1,
+      destLayout: layout1,
+      v: genVTree(layout1),
       toggle: false,
     };
   },
@@ -104,7 +104,7 @@ let App = React.createClass({
   handleClick: function() {
     let toggle = this.state.toggle;
     this.setState({
-      destLayout: toggle ? computeLayout(layout1) : computeLayout(layout2),
+      destLayout: toggle ? layout1 : layout2,
       toggle: !toggle,
     });
   },

@@ -25,12 +25,6 @@ let layout1 = computeLayout({
     {
       style: {flex: 1},
     },
-    // {
-    //   style: {flex: 1},
-    // },
-    // {
-    //   style: {flex: 1},
-    // },
   ],
 });
 
@@ -43,12 +37,6 @@ let layout2 = computeLayout({
     {
       style: {flex: 2},
     },
-    // {
-    //   style: {flex: 1},
-    // },
-    // {
-    //   style: {flex: 1},
-    // },
   ],
 });
 
