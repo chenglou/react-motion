@@ -24,7 +24,7 @@ let Springs = React.createClass({
     };
   },
 
-  raf: function(isFirst) {
+  raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV} = this.state;
       let {reduce, initVals} = this.props;
@@ -53,12 +53,12 @@ let Springs = React.createClass({
         };
       });
 
-      this.raf(false);
+      this.raf();
     });
   },
 
   componentDidMount: function() {
-    this.raf(true);
+    this.raf();
   },
 
   render: function() {
