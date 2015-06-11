@@ -1,13 +1,6 @@
 let React = require('react');
-let computeLayout = require('css-layout');
-let stepper = require('./stepper');
-
-let fuck = 0;
 
 function _epicMergeduce(collA, collB, isRemove, accum) {
-  // if (fuck++ > 999) {
-  //   throw 'fuck1'
-  // }
   let [a, ...aa] = collA;
   let [b, ...bb] = collB;
 
@@ -64,51 +57,23 @@ assert.deepEqual(epicMergeduce([1, 3], [1, 2], () => false), [1, 3, 2]);
 assert.deepEqual(epicMergeduce([1, 2, 3], [2], (val) => val === 1), [2, 3]);
 assert.deepEqual(epicMergeduce([1, 2, 3], [2], (val) => val === 3), [1, 2]);
 
-
-let layout1 = computeLayout({
-  style: {width: 300, height: 500, padding: 20, flexDirection: 'column'},
-  children: [
-    {
-      style: {flex: 1},
-    },
-    {
-      style: {flex: 1},
-    },
-    {
-      style: {flex: 1},
-    },
-  ],
-});
-
-let layout2 = computeLayout({
-  style: {width: 300, height: 500, padding: 20, flexDirection: 'column'},
-  children: [
-    {
-      style: {flex: 1},
-    },
-    {
-      style: {flex: 1},
-    },
-  ],
-});
-
-let layouts = [layout1, layout2];
-
 function clone(a) {
   return JSON.parse(JSON.stringify(a));
 }
 
-function deepEqual(a, b) {
-  return JSON.stringify(a) === JSON.stringify(b);
+function clamp(val, min, max) {
+  return val < min ? min :
+    val > max ? max :
+    val;
 }
 
 let App = React.createClass({
   getInitialState: function() {
-    let items = [1, 2, 3];
+    let items = ['1', '2', '3'];
     let anims = {
-      1: 1,
-      2: 1,
-      3: 1,
+      1: 0,
+      2: 0,
+      3: 0,
     };
     return {
       items,
@@ -122,15 +87,15 @@ let App = React.createClass({
       // j = 74, k = 75
       if (e.which === 74) {
         this.setState({
-          items: [1, 2, 3],
+          items: ['1', '2', '3'],
         });
       } else if (e.which === 75) {
         this.setState({
-          items: [2],
+          items: ['2'],
         });
       } else if (e.which === 76) {
         this.setState({
-          items: [1, 2, 4],
+          items: ['1', '2', '4'],
         });
       }
     });
@@ -140,28 +105,35 @@ let App = React.createClass({
 
       requestAnimationFrame(() => {
         let {items, anims, currItems} = this.state;
+
         anims = clone(anims);
-        // if (!deepEqual(items, currItems)) {
-          let shouldDelete = currItems.map(() => false);
-          let beingDeleted = currItems.filter(key => items.indexOf(key) === -1);
-          beingDeleted.forEach(key => {
-            if(anims[key] > 0.01) anims[key] -= 0.01;
-            else delete anims[key]
-            shouldDelete[key] = anims[key] <= 0.01;
-          });
 
-          items.forEach(key => {
-            if(!anims.hasOwnProperty(key)) anims[key] = 0;
-            if(anims[key] < 1) anims[key] += 0.01;
-          });
+        // remove dead anims
+        Object.keys(anims).forEach(key => {
+          if (anims[key] <= 0) {
+            delete anims[key];
+          }
+        });
+        let newCurrItems = epicMergeduce(currItems, items, key => anims[key] == null);
+        // add new anims
+        items.forEach(key => {
+          if (anims[key] == null) {
+            anims[key] = 0;
+          }
+        });
+        // progress animation
+        Object.keys(anims).forEach(key => {
+          if (items.indexOf(key) === -1) {
+            anims[key] = clamp(anims[key] - 0.02, 0, 1);
+          } else {
+            anims[key] = clamp(anims[key] + 0.02, 0, 1);
+          }
+        });
 
-          let newCurrItems = epicMergeduce(currItems, items, (key) => shouldDelete[key]);
-          let newAnims = epicMergeduceObj(oldAnims, anims, (key) => shouldDelete[key]);
-          this.setState({
-            currItems: newCurrItems,
-            anims: newAnims,
-          })
-        // }
+        this.setState({
+          currItems: newCurrItems,
+          anims: anims,
+        })
 
         loop();
       });
@@ -183,7 +155,7 @@ let App = React.createClass({
       <div style={{width: 100, height: 400, outline: '1px solid black', position: 'relative'}}>
         {currItems.map((num, i) => {
           return (
-            <div style={{...s, top: i * 100, opacity: anims[num]}}>
+            <div key={num} style={{...s, top: i * 100, opacity: anims[num]}}>
               {num}
             </div>
           );
