@@ -245,7 +245,20 @@ let App = React.createClass({
 
         // patch trees to mold shape
         let newAnimsShaped = meltGoldIntoMold(destAnims, anims, (path, val) => {
-          return val;
+          if (path.length === 2 && path[0] === 'children') {
+            return map3TreeKeyVal(val, val, val, (path, val) => {
+              if (path[path.length - 1] === 'left') {
+                return -300;
+              }
+
+              if (path[path.length - 1] === 'height') {
+                return 0;
+              }
+
+              return val;
+            });
+          }
+          throw 'wtf3';
         });
         let newVShaped = meltGoldIntoMold(destAnims, v, (path, val) => {
           return map3TreeKeyVal(val, val, val, () => 0);
