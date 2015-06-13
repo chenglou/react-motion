@@ -1,3 +1,4 @@
+// initial list diffing test
 let React = require('react');
 
 function _epicMergeduce(collA, collB, isRemove, accum) {

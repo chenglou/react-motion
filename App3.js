@@ -1,4 +1,5 @@
 // twitter card interpolate layout
+// animate arbitrary nested data structure (css-layout output)
 
 let React = require('react');
 let computeLayout = require('css-layout');

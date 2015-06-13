@@ -1,3 +1,5 @@
+// layout + spring + diffing
+
 let React = require('react');
 let computeLayout = require('css-layout');
 let stepper = require('./stepper');

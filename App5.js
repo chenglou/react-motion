@@ -1,4 +1,5 @@
-// swapping items!
+// swapping items! modularized with Springs component
+// no unmounting animation yet
 
 let React = require('react');
 let computeLayout = require('css-layout');
