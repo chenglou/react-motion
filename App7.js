@@ -1,4 +1,5 @@
 let React = require('react');
+let computeLayout = require('css-layout');
 let stepper = require('./stepper');
 
 function _epicMergeduce(collA, collB, isRemove, accum) {
@@ -48,39 +49,105 @@ function clone(a) {
   return JSON.parse(JSON.stringify(a));
 }
 
-function clamp(val, min, max) {
-  return val < min ? min :
-    val > max ? max :
-    val;
-}
-
-function _map3TreeKeyVal(key, t1, t2, t3, f) {
+function _map3TreeKeyVal(path, t1, t2, t3, f) {
   if (Object.prototype.toString.call(t1) === '[object Array]') {
-    return t1.map((val, i) => _map3TreeKeyVal(i, val, t2[i], t3[i], f));
+    return t1.map((val, i) => _map3TreeKeyVal([...path, i], val, t2[i], t3[i], f));
   }
   if (Object.prototype.toString.call(t1) === '[object Object]') {
     let newTree = {};
-    Object.keys(t1).forEach(key => newTree[key] = _map3TreeKeyVal(key, t1[key], t2[key], t3[key], f));
+    Object.keys(t1).forEach(key => {
+      newTree[key] = _map3TreeKeyVal([...path, key], t1[key], t2[key], t3[key], f)
+    });
     return newTree;
   }
-  return f(key, t1, t2, t3);
+  return f(path, t1, t2, t3);
 }
 
 function map3TreeKeyVal(t1, t2, t3, f) {
-  return _map3TreeKeyVal(null, t1, t2, t3, f);
+  return _map3TreeKeyVal([], t1, t2, t3, f);
 }
+
+function superMerge(a, b, f) {
+
+}
+
+let destAnims = {
+  top: 1,
+  width: 2,
+  children: {
+    1: {top: 1, left: 2},
+    2: {top: 1, left: 20},
+    4: {top: 9, left: 20},
+  },
+};
+
+let anims = {
+  top: 10,
+  width: 20,
+  children: {
+    1: {top: 1, left: 20},
+    3: {top: 10, left: 200},
+  },
+};
+
+// caution with null. Don't have a tree with existing field pointing to null for
+// now
+function _meltGoldIntoMold(path, a, b, f) {
+  if (a == null) {
+    throw 'wtf2';
+  }
+
+  if (b == null) {
+    return f(path, a);
+  }
+
+  if (Object.prototype.toString.call(a) === '[object Array]') {
+    return a.map((val, i) => _meltGoldIntoMold([...path, i], val, b[i], f));
+  }
+  if (Object.prototype.toString.call(a) === '[object Object]') {
+    let newTree = {};
+    Object.keys(a).forEach(key => {
+      newTree[key] = _meltGoldIntoMold([...path, key], a[key], b[key], f);
+    });
+    return newTree;
+  }
+
+  return b;
+}
+
+function meltGoldIntoMold(a, b, f) {
+  return _meltGoldIntoMold([], a, b, f);
+}
+
+let layoutSkeleton = {
+  style: {width: 300, padding: 20, flexDirection: 'column'},
+};
 
 let App = React.createClass({
   getInitialState: function() {
     let items = ['1', '2', '3'];
-    let anims = {
-      1: 0,
-      2: 0,
-      3: 0,
-    };
+
+    let layout = computeLayout({
+      ...layoutSkeleton,
+      children: items.map((_, i) => {
+        return {
+          style: {height: 20 * (i + 1)}
+        };
+      })
+    });
+
+    let childrenAnims = {};
+    layout.children.forEach((config, i) => {
+      childrenAnims[items[i]] = {
+        ...config,
+        opacity: 1,
+      };
+    });
+    let anims = {...layout, children: childrenAnims};
+
     return {
-      items,
-      anims,
+      items: items,
+      anims: anims,
       v: map3TreeKeyVal(anims, anims, anims, () => 0),
       currItems: items
     };
@@ -105,34 +172,89 @@ let App = React.createClass({
     });
 
     let loop = () => {
+      let {items: oldItems} = this.state;
+
       requestAnimationFrame(() => {
         let {items, anims, v, currItems} = this.state;
-
         anims = clone(anims);
 
         // remove dead anims
-        Object.keys(anims).forEach(key => {
-          if (items[key] == null && anims[key] === 0 && v[key] === 0) {
-            delete anims[key];
-            delete v[key];
+        let oldDestAnims = computeLayout({
+          ...layoutSkeleton,
+          children: currItems.map((key, i) => {
+            if (oldItems.indexOf(key) === -1) {
+              // doesnt exist anymore, i.e. unmounting
+              return {
+                style: {height: 0, left: 300}
+              };
+            }
+            return {style: {height: 20 * (oldItems.indexOf(key) + 1)}}
+          })
+        });
+
+        let mary = {};
+        oldDestAnims.children.forEach((config, i) => {
+          let key = currItems[i];
+          mary[key] = {
+            ...config,
+            opacity: oldItems.indexOf(key) === -1 ? 0 : 1,
+          };
+        });
+        oldDestAnims = {...oldDestAnims, children: mary};
+
+        Object.keys(anims.children).forEach(key => {
+          if (items[key] != null) {
+            return;
+          }
+
+          let removeNow = Object.keys(anims.children[key]).every(prop => {
+            return anims.children[key][prop] === oldDestAnims.children[key][prop] && v.children[key][prop] === 0;
+          });
+
+          if (removeNow) {
+            delete anims.children[key];
+            delete v.children[key];
           }
         });
-        let newCurrItems = epicMergeduce(currItems, items, key => anims[key] == null);
+
+        let newCurrItems = epicMergeduce(currItems, items, key => anims.children[key] == null);
+
         // add new anims
-        items.forEach(key => {
-          if (anims[key] == null) {
-            anims[key] = 0;
-            v[key] = 0;
-          }
+        let destAnims = computeLayout({
+          ...layoutSkeleton,
+          children: newCurrItems.map((key, i) => {
+            if (items.indexOf(key) === -1) {
+              // doesnt exist anymore, i.e. unmounting
+              return {
+                style: {height: 0, left: 300}
+              };
+            }
+            return {style: {height: 20 * (items.indexOf(key) + 1)}}
+          })
         });
-        // progress animation
-        let destAnims = map3TreeKeyVal(anims, anims, anims, key => {
-          return items.indexOf(key) === -1 ? 0 : 1;
+
+        let childrenAnims = {};
+        destAnims.children.forEach((config, i) => {
+          let key = newCurrItems[i];
+          childrenAnims[key] = {
+            ...config,
+            opacity: items.indexOf(key) === -1 ? 0 : 1,
+          };
         });
-        let newAnims = map3TreeKeyVal(anims, v, destAnims, (_, x, vx, destX) => {
+        destAnims = {...destAnims, children: childrenAnims};
+
+        // patch trees to mold shape
+        let newAnimsShaped = meltGoldIntoMold(destAnims, anims, (path, val) => {
+          return val;
+        });
+        let newVShaped = meltGoldIntoMold(destAnims, v, (path, val) => {
+          return map3TreeKeyVal(val, val, val, () => 0);
+        });
+
+        let newAnims = map3TreeKeyVal(newAnimsShaped, newVShaped, destAnims, (_, x, vx, destX) => {
           return stepper(x, vx, destX, 120, 16)[0];
         })
-        let newV = map3TreeKeyVal(anims, v, destAnims, (_, x, vx, destX) => {
+        let newV = map3TreeKeyVal(newAnimsShaped, newVShaped, destAnims, (_, x, vx, destX) => {
           return stepper(x, vx, destX, 120, 16)[1];
         })
 
@@ -150,20 +272,20 @@ let App = React.createClass({
   },
 
   render: function() {
-    let {currItems, anims} = this.state;
+    let {currItems, anims: {children, ...container}} = this.state;
     let s = {
       outline: '1px solid black',
       position: 'absolute',
-      height: 100,
-      width: 100,
     };
 
     return (
-      <div style={{width: 100, height: 400, outline: '1px solid black', position: 'relative'}}>
-        {currItems.map((num, i) => {
+      <div style={{...container, outline: '1px solid black', position: 'relative'}}>
+        {currItems.map((key, i) => {
+          // children[key] includes top, left, width, height, opacity, as seen in
+          // getInitialState
           return (
-            <div key={num} style={{...s, top: i * 100, opacity: anims[num]}}>
-              {num}
+            <div key={key} style={{...children[key], ...s}}>
+              {key}
             </div>
           );
         })}
