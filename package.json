@@ -1,12 +1,11 @@
 {
-  "name": "asd",
+  "name": "react-animation",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
     "css-layout": "0.0.2",
-    "react": "^0.13.2",
-    "rebound": "0.0.13"
+    "react": "^0.13.2"
   },
   "devDependencies": {
     "babel-core": "^5.2.17",

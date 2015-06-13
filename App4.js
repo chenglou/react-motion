@@ -68,7 +68,6 @@ let App = React.createClass({
     return {
       // in-flight, animated. values computed with spring
       layout: layout,
-      prevLayout: layout,
       destLayout: layout,
       v: map3Tree(layout, layout, layout, () => 0),
       ab: true,
@@ -81,13 +80,11 @@ let App = React.createClass({
       if (e.which === 74) {
         this.setState({
           ab: false,
-          prevLayout: this.state.destLayout,
           destLayout: yofuck(layout2, false),
         });
       } else if (e.which === 75) {
         this.setState({
           ab: true,
-          prevLayout: this.state.destLayout,
           destLayout: yofuck(layout1, true),
         });
       }
