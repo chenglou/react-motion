@@ -209,9 +209,19 @@ let App = React.createClass({
             return;
           }
 
-          let removeNow = Object.keys(anims.children[key]).every(prop => {
-            return anims.children[key][prop] === oldDestAnims.children[key][prop] && v.children[key][prop] === 0;
-          });
+          // usually we'd wait for every animation to finish, but since it might
+          // never finish (e.g. top value still changing bc other items are
+          // constantly moving around), we should call it done when a certain
+          // property of the node that's not influenced by the siblings is done.
+          // In this case, opacity will do
+
+          // let removeNow = Object.keys(anims.children[key]).every(prop => {
+          //   return anims.children[key][prop] === oldDestAnims.children[key][prop] && v.children[key][prop] === 0;
+          // });
+
+          let removeNow =
+            anims.children[key].opacity === oldDestAnims.children[key].opacity
+            && v.children[key].opacity === 0;
 
           if (removeNow) {
             delete anims.children[key];
