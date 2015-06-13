@@ -203,7 +203,7 @@ let App = React.createClass({
         oldDestAnims = {...oldDestAnims, children: mary};
 
         Object.keys(anims.children).forEach(key => {
-          if (items[key] != null) {
+          if (oldItems.indexOf(key) >= 0) {
             return;
           }
 
@@ -253,10 +253,10 @@ let App = React.createClass({
 
         let newAnims = map3TreeKeyVal(newAnimsShaped, newVShaped, destAnims, (_, x, vx, destX) => {
           return stepper(x, vx, destX, 120, 16)[0];
-        })
+        });
         let newV = map3TreeKeyVal(newAnimsShaped, newVShaped, destAnims, (_, x, vx, destX) => {
           return stepper(x, vx, destX, 120, 16)[1];
-        })
+        });
 
         this.setState({
           currItems: newCurrItems,
