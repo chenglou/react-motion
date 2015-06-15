@@ -154,6 +154,7 @@ var App = React.createClass({
               <div style={{
                 ...s,
                 WebkitTransform: `translate3d(${x}px, ${y}px, 0)`,
+                transform: `translate3d(${x}px, ${y}px, 0)`,
                 zIndex: springs.length - i,
               }} />
             </div>
