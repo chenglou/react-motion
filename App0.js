@@ -1,4 +1,5 @@
 // dumb component version
+// warning: intentionally very slow
 
 let React = require('react');
 let stepper = require('./stepper');
@@ -148,7 +149,7 @@ var App = React.createClass({
           return (
             <div>
               <Spring key={i} value={destX} onValueChange={this.handleValueChange.bind(null, i, 0)} />
-              <Spring  value={destY} onValueChange={this.handleValueChange.bind(null, i, 1)} />
+              <Spring value={destY} onValueChange={this.handleValueChange.bind(null, i, 1)} />
 
               <div style={{
                 ...s,

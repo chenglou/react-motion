@@ -1,4 +1,5 @@
 // layout + spring + diffing
+'use strict';
 
 let React = require('react');
 let computeLayout = require('css-layout');
@@ -36,17 +37,6 @@ function epicMergeduce(a, b, isRemove) {
   return _epicMergeduce(a, b, isRemove, []);
 }
 
-function epicMergeduceObj(collA, collB, isRemove) {
-  let ret = {...collA, ...collB};
-  for (var key in collA) {
-    if (!collB.hasOwnProperty(key) && isRemove(key)) {
-      delete ret[key];
-    }
-  }
-
-  return ret;
-}
-
 function clone(a) {
   return JSON.parse(JSON.stringify(a));
 }
@@ -58,7 +48,7 @@ function _map3TreeKeyVal(path, t1, t2, t3, f) {
   if (Object.prototype.toString.call(t1) === '[object Object]') {
     let newTree = {};
     Object.keys(t1).forEach(key => {
-      newTree[key] = _map3TreeKeyVal([...path, key], t1[key], t2[key], t3[key], f)
+      newTree[key] = _map3TreeKeyVal([...path, key], t1[key], t2[key], t3[key], f);
     });
     return newTree;
   }
@@ -68,29 +58,6 @@ function _map3TreeKeyVal(path, t1, t2, t3, f) {
 function map3TreeKeyVal(t1, t2, t3, f) {
   return _map3TreeKeyVal([], t1, t2, t3, f);
 }
-
-function superMerge(a, b, f) {
-
-}
-
-let destAnims = {
-  top: 1,
-  width: 2,
-  children: {
-    1: {top: 1, left: 2},
-    2: {top: 1, left: 20},
-    4: {top: 9, left: 20},
-  },
-};
-
-let anims = {
-  top: 10,
-  width: 20,
-  children: {
-    1: {top: 1, left: 20},
-    3: {top: 10, left: 200},
-  },
-};
 
 // caution with null. Don't have a tree with existing field pointing to null for
 // now
@@ -183,14 +150,14 @@ let App = React.createClass({
         // remove dead anims
         let oldDestAnims = computeLayout({
           ...layoutSkeleton,
-          children: currItems.map((key, i) => {
+          children: currItems.map(key => {
             if (oldItems.indexOf(key) === -1) {
               // doesnt exist anymore, i.e. unmounting
               return {
                 style: {height: 0, left: 300}
               };
             }
-            return {style: {height: 20 * (oldItems.indexOf(key) + 1)}}
+            return {style: {height: 20 * (oldItems.indexOf(key) + 1)}};
           })
         });
 
@@ -234,14 +201,14 @@ let App = React.createClass({
         // add new anims
         let destAnims = computeLayout({
           ...layoutSkeleton,
-          children: newCurrItems.map((key, i) => {
+          children: newCurrItems.map(key => {
             if (items.indexOf(key) === -1) {
               // doesnt exist anymore, i.e. unmounting
               return {
                 style: {height: 0, left: 300}
               };
             }
-            return {style: {height: 20 * (items.indexOf(key) + 1)}}
+            return {style: {height: 20 * (items.indexOf(key) + 1)}};
           })
         });
 
@@ -287,7 +254,7 @@ let App = React.createClass({
           currItems: newCurrItems,
           anims: newAnims,
           v: newV,
-        })
+        });
 
         loop();
       });
@@ -305,7 +272,7 @@ let App = React.createClass({
 
     return (
       <div style={{...container, outline: '1px solid black', position: 'relative'}}>
-        {currItems.map((key, i) => {
+        {currItems.map(key => {
           // children[key] includes top, left, width, height, opacity, as seen in
           // getInitialState
           return (
@@ -319,4 +286,4 @@ let App = React.createClass({
   }
 });
 
-module.exports = App
+module.exports = App;

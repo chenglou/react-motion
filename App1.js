@@ -1,4 +1,5 @@
 // smarter component version with child function
+// faster than 0
 
 let React = require('react');
 let stepper = require('./stepper');
