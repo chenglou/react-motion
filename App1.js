@@ -138,6 +138,7 @@ var App = React.createClass({
             <div key={i} style={{
               ...s,
               WebkitTransform: `translate3d(${x}px, ${y}px, 0)`,
+              transform: `translate3d(${x}px, ${y}px, 0)`,
               zIndex: currVals.length - i,
             }} />
           ))}
