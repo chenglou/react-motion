@@ -28,11 +28,9 @@ let Springs = React.createClass({
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV} = this.state;
-      let {reduce, initVals} = this.props;
+      let {newFinalValsF, initVals} = this.props;
 
-      let newFinalVals = currVals.reduce((finalVals, val, i) => {
-        return reduce(currVals, finalVals, i)
-      }, []);
+      let newFinalVals = newFinalValsF(currVals);
 
       let newCurrVals = map3Tree(
         newFinalVals,
@@ -126,14 +124,13 @@ var App = React.createClass({
 
     return (
       <div onMouseMove={this.handleMouseMove} onMouseDown={this.handleMouseMove} style={box}>
-        <Springs initVals={initVals} reduce={(prevVals, finalVals, i) => {
-          finalVals = clone(finalVals);
-          if (i === 0) {
-            finalVals[i] = [mouseX, mouseY];
-          } else {
-            finalVals[i] = prevVals[i - 1];
-          }
-          return finalVals;
+        <Springs initVals={initVals} newFinalValsF={currVals => {
+          return currVals.reduce((accum, val, i) => {
+            if (i === 0) {
+              return [[mouseX, mouseY]];
+            }
+            return [...accum, currVals[i - 1]];
+          }, []);
         }}>
           {currVals => currVals.map(([x, y], i) => (
             <div key={i} style={{

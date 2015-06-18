@@ -29,11 +29,9 @@ let Springs = React.createClass({
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV} = this.state;
-      let {reduce, initVals} = this.props;
+      let {newFinalValsF, initVals} = this.props;
 
-      let newFinalVals = currVals.reduce((finalVals, val, i) => {
-        return reduce(currVals, finalVals, i)
-      }, []);
+      let newFinalVals = newFinalValsF(currVals);
 
       let newCurrVals = map3Tree(
         newFinalVals,
@@ -179,7 +177,7 @@ let App = React.createClass({
 
     return (
       <div style={{...container, outline: '1px solid black', position: 'relative'}}>
-        <Springs initVals={[yofuck(children, configNum)]} reduce={() => [yofuck(children, configNum)]}>
+        <Springs initVals={[yofuck(children, configNum)]} newFinalValsF={() => [yofuck(children, configNum)]}>
           {([currVals]) => {
             return configs[configNum].map(key => {
               return (
