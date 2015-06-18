@@ -100,7 +100,7 @@ let Springs = React.createClass({
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV} = this.state;
-      let {reduce, initVals} = this.props;
+      let {reduce, initVals, defaultNewTreeVal} = this.props;
 
       currVals = clone(currVals);
       currV = clone(currV);
@@ -110,22 +110,7 @@ let Springs = React.createClass({
       }, []);
 
       // patch trees to mold shape
-      let newFinalValsShaped = meltGoldIntoMold(newFinalVals, currVals, (path, val) => {
-        if (path.length === 3 && path[1] === 'children') {
-          return map3TreeKeyVal(val, val, val, (path, val) => {
-            if (path[path.length - 1] === 'left') {
-              return -300;
-            }
-
-            if (path[path.length - 1] === 'height') {
-              return 0;
-            }
-
-            return val;
-          });
-        }
-        throw 'wtf3';
-      });
+      let newFinalValsShaped = meltGoldIntoMold(newFinalVals, currVals, defaultNewTreeVal || ((_, val) => val));
       let newVShaped = meltGoldIntoMold(newFinalVals, currV, (path, val) => {
         return map3TreeKeyVal(val, val, val, () => 0);
       });
@@ -418,15 +403,25 @@ let App = React.createClass({
     });
     destAnims = {...destAnims, children: childrenAnims};
 
+    let defaultNewTreeVal = (path, val) => {
+      if (path.length === 3 && path[1] === 'children') {
+        return map3TreeKeyVal(val, val, val, (path, val) => {
+          if (path[path.length - 1] === 'left') {
+            return -300;
+          }
 
+          if (path[path.length - 1] === 'height') {
+            return 0;
+          }
 
-
-
-
-
+          return val;
+        });
+      }
+      throw 'wtf3';
+   };
 
     return (
-      <Springs initVals={[destAnims]} reduce={() => [destAnims]}>
+      <Springs initVals={[destAnims]} reduce={() => [destAnims]} gold={defaultNewTreeVal}>
         {([{children, ...container}]) => {
           return (
             <div style={{...container, outline: '1px solid black', position: 'relative'}}>
