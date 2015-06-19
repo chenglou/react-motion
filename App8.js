@@ -93,50 +93,43 @@ let Springs = React.createClass({
     let {initVals, items} = this.props;
     return {
       currVals: initVals,
-      prevCurrVals: initVals,
       currV: map3TreeKeyVal(initVals, initVals, initVals, () => 0),
-      prevCurrV: map3TreeKeyVal(initVals, initVals, initVals, () => 0),
       currItems: items,
       prevCurrItems: items,
-
-      prevItems: items,
     };
   },
 
   raf: function() {
     requestAnimationFrame(() => {
-      let {currVals, currV, prevCurrVals, prevCurrV, currItems, prevCurrItems, prevItems} = this.state;
-      let {newDestAnimsF, initVals, defaultNewTreeVal, items, mergeducer} = this.props;
+      let {currVals, currV, currItems, prevCurrItems} = this.state;
+      let {destValsF, initVals, defaultNewTreeVal, items, mergeducer} = this.props;
 
       currVals = clone(currVals);
       currV = clone(currV);
 
-      let newCurrItems = epicMergeduce(currItems, items, key => mergeducer(key, prevCurrVals, currVals, prevCurrItems, prevItems, currV));
+      let newCurrItems = epicMergeduce(currItems, items, key => mergeducer(key, currVals, prevCurrItems, currV));
 
-      let newFinalVals = newDestAnimsF(newCurrItems);
+      let destVals = destValsF(newCurrItems);
 
       // patch trees to mold shape
-      let newFinalValsShaped = meltGoldIntoMold(newFinalVals, currVals, defaultNewTreeVal || ((_, val) => val));
-      let newVShaped = meltGoldIntoMold(newFinalVals, currV, (path, val) => {
+      let newFinalValsShaped = meltGoldIntoMold(destVals, currVals, defaultNewTreeVal || ((_, val) => val));
+      let newVShaped = meltGoldIntoMold(destVals, currV, (path, val) => {
         return map3TreeKeyVal(val, val, val, () => 0);
       });
 
-      let newCurrVals = map3TreeKeyVal(newFinalValsShaped, newVShaped, newFinalVals, (_, x, vx, destX) => {
+      let newCurrVals = map3TreeKeyVal(newFinalValsShaped, newVShaped, destVals, (_, x, vx, destX) => {
         return stepper(x, vx, destX, 120, 16)[0];
       });
-      let newCurrV = map3TreeKeyVal(newFinalValsShaped, newVShaped, newFinalVals, (_, x, vx, destX) => {
+      let newCurrV = map3TreeKeyVal(newFinalValsShaped, newVShaped, destVals, (_, x, vx, destX) => {
         return stepper(x, vx, destX, 120, 16)[1];
       });
 
       this.setState(() => {
         return {
           currVals: newCurrVals,
-          prevCurrVals: currVals,
           currV: newCurrV,
-          prevCurrV: currV,
           currItems: newCurrItems,
           prevCurrItems: currItems,
-          prevItems: items,
         };
       });
 
@@ -189,17 +182,27 @@ function compDestAnim(currItems, items, layoutSkeleton) {
   return destAnims;
 }
 
+function defaultNewTreeVal(path, val) {
+  if (path.length === 3 && path[1] === 'children') {
+    return map3TreeKeyVal(val, val, val, (path, val) => {
+      if (path[path.length - 1] === 'left') {
+        return -300;
+      }
+
+      if (path[path.length - 1] === 'height') {
+        return 0;
+      }
+
+      return val;
+    });
+  }
+  throw 'wtf3';
+}
+
 let App = React.createClass({
   getInitialState: function() {
-    let items = ['1', '2', '3'];
-    let anims = compDestAnim(items, items, layoutSkeleton);
-
     return {
-      items: items,
-      anims: anims,
-      v: map3TreeKeyVal(anims, anims, anims, () => 0),
-      currItems: items,
-      prevItems: items,
+      items: ['1', '2', '3'],
     };
   },
 
@@ -223,57 +226,23 @@ let App = React.createClass({
   },
 
   render: function() {
-    let {currItems, items, anims, v, prevItems} = this.state;
-    let {children, ...container} = anims;
+    let {items} = this.state;
     let s = {
       outline: '1px solid black',
       position: 'absolute',
     };
 
-    let defaultNewTreeVal = (path, val) => {
-      if (path.length === 3 && path[1] === 'children') {
-        return map3TreeKeyVal(val, val, val, (path, val) => {
-          if (path[path.length - 1] === 'left') {
-            return -300;
-          }
-
-          if (path[path.length - 1] === 'height') {
-            return 0;
-          }
-
-          return val;
-        });
-      }
-      throw 'wtf3';
-    };
-
-    let mergeducer = (key, [prevCurrVals], [currVals], prevCurrItems, prevItems, [currV]) => {
-      clone(currVals);
-      clone(currV);
-      let oldDestAnims = compDestAnim(prevCurrItems, items);
-      Object.keys(currVals.children).forEach(key => {
-        if (prevItems.indexOf(key) >= 0) {
-          return;
-        }
-
-        let removeNow =
-          currVals.children[key].opacity === oldDestAnims.children[key].opacity
-          && currV.children[key].opacity === 0;
-
-        if (removeNow) {
-          delete currVals.children[key];
-          delete currV.children[key];
-        }
-      });
-
-      return currVals.children[key] == null;
+    let mergeducer = (key, [currVals], prevCurrItems, [currV]) => {
+      let prevDestVals = compDestAnim(prevCurrItems, items);
+      return currVals.children[key].opacity === prevDestVals.children[key].opacity
+        && currV.children[key].opacity === 0;
     };
 
     return (
       <Springs
         items={items}
         mergeducer={mergeducer}
-        newDestAnimsF={currItemsFromAboveMergeducer => [compDestAnim(currItemsFromAboveMergeducer, items, layoutSkeleton)]}
+        destValsF={currItemsFromAboveMergeducer => [compDestAnim(currItemsFromAboveMergeducer, items, layoutSkeleton)]}
         initVals={[compDestAnim(items, items, layoutSkeleton)]}
         defaultNewTreeVal={defaultNewTreeVal}>
         {
