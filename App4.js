@@ -1,4 +1,5 @@
 // swapping items!
+'use strict';
 
 let React = require('react');
 let computeLayout = require('css-layout');
@@ -105,7 +106,7 @@ let App = React.createClass({
         this.setState({
           layout: newLayout,
           v: newV,
-        })
+        });
 
         loop();
       });
@@ -141,11 +142,11 @@ let App = React.createClass({
     }
 
     return (
-      <div style={{...container, outline: '1px solid black', position: 'relative'}}>
+      <div style={{...container, outline: '1px solid black'}}>
         {comps}
       </div>
     );
   }
 });
 
-module.exports = App
+module.exports = App;

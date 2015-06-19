@@ -1,5 +1,6 @@
 // swapping items! modularized with Springs component
 // no unmounting animation yet
+'use strict';
 
 let React = require('react');
 let computeLayout = require('css-layout');
@@ -176,7 +177,7 @@ let App = React.createClass({
     };
 
     return (
-      <div style={{...container, outline: '1px solid black', position: 'relative'}}>
+      <div style={{...container, outline: '1px solid black'}}>
         <Springs initVals={[yofuck(children, configNum)]} newFinalValsF={() => [yofuck(children, configNum)]}>
           {([currVals]) => {
             return configs[configNum].map(key => {
@@ -191,4 +192,4 @@ let App = React.createClass({
   }
 });
 
-module.exports = App
+module.exports = App;

@@ -271,7 +271,7 @@ let App = React.createClass({
     };
 
     return (
-      <div style={{...container, outline: '1px solid black', position: 'relative'}}>
+      <div style={{...container, outline: '1px solid black'}}>
         {currItems.map(key => {
           // children[key] includes top, left, width, height, opacity, as seen in
           // getInitialState

@@ -1,5 +1,6 @@
 // dumb component version
 // warning: intentionally very slow
+'use strict';
 
 let React = require('react');
 let stepper = require('./stepper');
@@ -28,7 +29,7 @@ let Spring = React.createClass({
     };
   },
 
-  componentWillReceiveProps: function(nextProps) {
+  componentWillReceiveProps: function() {
     if (!this.state.isRafing) {
       this.setState({isRafing: true});
       this.raf();
@@ -103,21 +104,6 @@ var App = React.createClass({
     }
   },
 
-  // componentDidMount: function() {
-  //   let asd = () => {
-  //     let s = JSON.stringify(this.state);
-  //     requestAnimationFrame(() => {
-  //       // if (JSON.stringify(this.state) !== s) {
-  //         // console.log('up');
-  //         this.forceUpdate();
-  //       // }
-  //       asd();
-  //     });
-  //   }
-
-  //   asd();
-  // },
-
   handleValueChange: function(idx, pos, value) {
     this.state.springs[idx][pos] = value;
     this.setState({
@@ -159,17 +145,6 @@ var App = React.createClass({
               }} />
             </div>
           );
-          // return (
-          //   <Spring key={i} value={destX} onValueChange={this.handleValueChange.bind(null, i, 0)}>
-          //     <Spring  value={destY} onValueChange={this.handleValueChange.bind(null, i, 1)}>
-          //       <div style={{
-          //         ...s,
-          //         WebkitTransform: `translate3d(${x}px, ${y}px, 0)`,
-          //         zIndex: springs.length - i,
-          //       }} />
-          //     </Spring>
-          //   </Spring>
-          // );
         })}
       </div>
     );

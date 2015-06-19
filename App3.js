@@ -1,5 +1,6 @@
 // twitter card interpolate layout
 // animate arbitrary nested data structure (css-layout output)
+'use strict';
 
 let React = require('react');
 let computeLayout = require('css-layout');
@@ -7,7 +8,7 @@ let stepper = require('./stepper');
 
 // given a css-layout output tree, generate a homoiconic tree with values being
 // speed (for spring) rather than the x values
-function genVTree({width, height, top, left, children}) {
+function genVTree({children}) {
   return {
     width: 0,
     height: 0,
@@ -27,7 +28,7 @@ function map3Tree({width, height, top, left, children}, b, c, f) {
     children: children
       ? children.map((child, i) => map3Tree(child, b.children[i], c.children[i], f))
       : undefined,
-  }
+  };
 }
 
 let layout1 = computeLayout({
@@ -93,7 +94,7 @@ let App = React.createClass({
         this.setState({
           layout: newLayout,
           v: newV,
-        })
+        });
 
         loop();
       });
@@ -128,7 +129,7 @@ let App = React.createClass({
     };
 
     return (
-      <div onClick={this.handleClick} style={{...container, outline: '1px solid black', position: 'relative'}}>
+      <div onClick={this.handleClick} style={{...container, outline: '1px solid black'}}>
         <div style={{...firstRow, ...s}}>
           <div style={{...name, ...s}}>
             @_chenglou

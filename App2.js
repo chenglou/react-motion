@@ -1,5 +1,7 @@
 // smart but might need mixin
-// regression over 1
+// regression over 1 in terms of API
+// leaving the commented section out bc it's a spitirual state stream
+'use strict';
 
 let React = require('react');
 let stepper = require('./stepper');

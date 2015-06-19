@@ -1,4 +1,5 @@
 // initial list diffing test
+'use strict';
 let React = require('react');
 
 function _epicMergeduce(collA, collB, isRemove, accum) {
@@ -36,17 +37,6 @@ function _epicMergeduce(collA, collB, isRemove, accum) {
 
 function epicMergeduce(a, b, isRemove) {
   return _epicMergeduce(a, b, isRemove, []);
-}
-
-function epicMergeduceObj(collA, collB, isRemove) {
-  let ret = {...collA, ...collB};
-  for (var key in collA) {
-    if (!collB.hasOwnProperty(key) && isRemove(key)) {
-      delete ret[key];
-    }
-  }
-
-  return ret;
 }
 
 let assert = require('assert');
@@ -134,7 +124,7 @@ let App = React.createClass({
         this.setState({
           currItems: newCurrItems,
           anims: anims,
-        })
+        });
 
         loop();
       });
@@ -153,7 +143,7 @@ let App = React.createClass({
     };
 
     return (
-      <div style={{width: 100, height: 400, outline: '1px solid black', position: 'relative'}}>
+      <div style={{width: 100, height: 400, outline: '1px solid black'}}>
         {currItems.map((num, i) => {
           return (
             <div key={num} style={{...s, top: i * 100, opacity: anims[num]}}>
@@ -166,4 +156,4 @@ let App = React.createClass({
   }
 });
 
-module.exports = App
+module.exports = App;

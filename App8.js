@@ -247,7 +247,7 @@ let App = React.createClass({
         defaultNewTreeVal={defaultNewTreeVal}>
         {
           (currItems, [{children, ...container}]) =>
-            <div style={{...container, outline: '1px solid black', position: 'relative'}}>
+            <div style={{...container, outline: '1px solid black'}}>
               {currItems.map(key =>
                 <div key={key} style={{...children[key], ...s}}>{key}</div>
               )}

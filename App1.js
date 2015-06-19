@@ -1,5 +1,6 @@
 // smarter component version with child function
 // faster than 0
+'use strict';
 
 let React = require('react');
 let stepper = require('./stepper');
@@ -68,10 +69,6 @@ let Springs = React.createClass({
     );
   }
 });
-
-function clone(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
 
 var App = React.createClass({
   getInitialState: function() {
