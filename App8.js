@@ -90,24 +90,30 @@ function meltGoldIntoMold(a, b, f) {
 
 let Springs = React.createClass({
   getInitialState: function() {
-    let {initVals} = this.props;
+    let {initVals, items} = this.props;
     return {
       currVals: initVals,
+      prevCurrVals: initVals,
       currV: map3TreeKeyVal(initVals, initVals, initVals, () => 0),
+      prevCurrV: map3TreeKeyVal(initVals, initVals, initVals, () => 0),
+      currItems: items,
+      prevCurrItems: items,
+
+      prevItems: items,
     };
   },
 
   raf: function() {
     requestAnimationFrame(() => {
-      let {currVals, currV} = this.state;
-      let {reduce, initVals, defaultNewTreeVal} = this.props;
+      let {currVals, currV, prevCurrVals, prevCurrV, currItems, prevCurrItems, prevItems} = this.state;
+      let {newDestAnimsF, initVals, defaultNewTreeVal, items, mergeducer} = this.props;
 
       currVals = clone(currVals);
       currV = clone(currV);
 
-      let newFinalVals = currVals.reduce((finalVals, val, i) => {
-        return reduce(currVals, finalVals, i);
-      }, []);
+      let newCurrItems = epicMergeduce(currItems, items, key => mergeducer(key, prevCurrVals, currVals, prevCurrItems, prevItems, currV));
+
+      let newFinalVals = newDestAnimsF(newCurrItems);
 
       // patch trees to mold shape
       let newFinalValsShaped = meltGoldIntoMold(newFinalVals, currVals, defaultNewTreeVal || ((_, val) => val));
@@ -122,11 +128,15 @@ let Springs = React.createClass({
         return stepper(x, vx, destX, 120, 16)[1];
       });
 
-
       this.setState(() => {
         return {
           currVals: newCurrVals,
+          prevCurrVals: currVals,
           currV: newCurrV,
+          prevCurrV: currV,
+          currItems: newCurrItems,
+          prevCurrItems: currItems,
+          prevItems: items,
         };
       });
 
@@ -139,9 +149,10 @@ let Springs = React.createClass({
   },
 
   render: function() {
+    let {currItems, currVals} = this.state;
     return (
       <div>
-        {this.props.children(this.state.currVals)}
+        {this.props.children(currItems, currVals)}
       </div>
     );
   }
@@ -151,27 +162,37 @@ let layoutSkeleton = {
   style: {width: 300, padding: 20, flexDirection: 'column'},
 };
 
+function compDestAnim(currItems, items, layoutSkeleton) {
+  let destAnims = computeLayout({
+    ...layoutSkeleton,
+    children: currItems.map(key => {
+      if (items.indexOf(key) === -1) {
+        // doesnt exist anymore, i.e. unmounting
+        return {
+          style: {height: 0, left: 300}
+        };
+      }
+      return {style: {height: 20 * (items.indexOf(key) + 1)}};
+    })
+  });
+
+  let childrenAnims = {};
+  destAnims.children.forEach((config, i) => {
+    let key = currItems[i];
+    childrenAnims[key] = {
+      ...config,
+      opacity: items.indexOf(key) === -1 ? 0 : 1,
+    };
+  });
+  destAnims = {...destAnims, children: childrenAnims};
+
+  return destAnims;
+}
+
 let App = React.createClass({
   getInitialState: function() {
     let items = ['1', '2', '3'];
-
-    let layout = computeLayout({
-      ...layoutSkeleton,
-      children: items.map((_, i) => {
-        return {
-          style: {height: 20 * (i + 1)}
-        };
-      })
-    });
-
-    let childrenAnims = {};
-    layout.children.forEach((config, i) => {
-      childrenAnims[items[i]] = {
-        ...config,
-        opacity: 1,
-      };
-    });
-    let anims = {...layout, children: childrenAnims};
+    let anims = compDestAnim(items, items, layoutSkeleton);
 
     return {
       items: items,
@@ -199,128 +220,6 @@ let App = React.createClass({
         });
       }
     });
-
-    let loop = () => {
-      requestAnimationFrame(() => {
-        let {items, anims, v, currItems, prevItems} = this.state;
-        anims = clone(anims);
-        v = clone(v);
-
-        // remove dead anims
-        let oldDestAnims = computeLayout({
-          ...layoutSkeleton,
-          children: currItems.map(key => {
-            if (prevItems.indexOf(key) === -1) {
-              // doesnt exist anymore, i.e. unmounting
-              return {
-                style: {height: 0, left: 300}
-              };
-            }
-            return {style: {height: 20 * (prevItems.indexOf(key) + 1)}};
-          })
-        });
-
-        let mary = {};
-        oldDestAnims.children.forEach((config, i) => {
-          let key = currItems[i];
-          mary[key] = {
-            ...config,
-            opacity: prevItems.indexOf(key) === -1 ? 0 : 1,
-          };
-        });
-        oldDestAnims = {...oldDestAnims, children: mary};
-
-        Object.keys(anims.children).forEach(key => {
-          if (prevItems.indexOf(key) >= 0) {
-            return;
-          }
-
-          // usually we'd wait for every animation to finish, but since it might
-          // never finish (e.g. top value still changing bc other items are
-          // constantly moving around), we should call it done when a certain
-          // property of the node that's not influenced by the siblings is done.
-          // In this case, opacity will do
-
-          // let removeNow = Object.keys(anims.children[key]).every(prop => {
-          //   return anims.children[key][prop] === oldDestAnims.children[key][prop] && v.children[key][prop] === 0;
-          // });
-
-          let removeNow =
-            anims.children[key].opacity === oldDestAnims.children[key].opacity
-            && v.children[key].opacity === 0;
-
-          if (removeNow) {
-            delete anims.children[key];
-            delete v.children[key];
-          }
-        });
-
-        let newCurrItems = epicMergeduce(currItems, items, key => anims.children[key] == null);
-
-        // add new anims
-        let destAnims = computeLayout({
-          ...layoutSkeleton,
-          children: newCurrItems.map(key => {
-            if (items.indexOf(key) === -1) {
-              // doesnt exist anymore, i.e. unmounting
-              return {
-                style: {height: 0, left: 300}
-              };
-            }
-            return {style: {height: 20 * (items.indexOf(key) + 1)}};
-          })
-        });
-
-        let childrenAnims = {};
-        destAnims.children.forEach((config, i) => {
-          let key = newCurrItems[i];
-          childrenAnims[key] = {
-            ...config,
-            opacity: items.indexOf(key) === -1 ? 0 : 1,
-          };
-        });
-        destAnims = {...destAnims, children: childrenAnims};
-
-        // patch trees to mold shape
-        let newAnimsShaped = meltGoldIntoMold(destAnims, anims, (path, val) => {
-          if (path.length === 2 && path[0] === 'children') {
-            return map3TreeKeyVal(val, val, val, (path, val) => {
-              if (path[path.length - 1] === 'left') {
-                return -300;
-              }
-
-              if (path[path.length - 1] === 'height') {
-                return 0;
-              }
-
-              return val;
-            });
-          }
-          throw 'wtf3';
-        });
-        let newVShaped = meltGoldIntoMold(destAnims, v, (path, val) => {
-          return map3TreeKeyVal(val, val, val, () => 0);
-        });
-
-        let newAnims = map3TreeKeyVal(newAnimsShaped, newVShaped, destAnims, (_, x, vx, destX) => {
-          return stepper(x, vx, destX, 120, 16)[0];
-        });
-        let newV = map3TreeKeyVal(newAnimsShaped, newVShaped, destAnims, (_, x, vx, destX) => {
-          return stepper(x, vx, destX, 120, 16)[1];
-        });
-
-        this.setState({
-          currItems: newCurrItems,
-          anims: newAnims,
-          v: newV,
-          prevItems: items,
-        });
-
-        loop();
-      });
-    };
-
-    loop();
   },
 
   render: function() {
@@ -330,78 +229,6 @@ let App = React.createClass({
       outline: '1px solid black',
       position: 'absolute',
     };
-
-
-
-
-
-    anims = clone(anims);
-    v = clone(v);
-
-    // remove dead anims
-    let oldDestAnims = computeLayout({
-      ...layoutSkeleton,
-      children: currItems.map(key => {
-        if (prevItems.indexOf(key) === -1) {
-          // doesnt exist anymore, i.e. unmounting
-          return {
-            style: {height: 0, left: 300}
-          };
-        }
-        return {style: {height: 20 * (prevItems.indexOf(key) + 1)}};
-      })
-    });
-
-    let mary = {};
-    oldDestAnims.children.forEach((config, i) => {
-      let key = currItems[i];
-      mary[key] = {
-        ...config,
-        opacity: prevItems.indexOf(key) === -1 ? 0 : 1,
-      };
-    });
-    oldDestAnims = {...oldDestAnims, children: mary};
-
-    Object.keys(anims.children).forEach(key => {
-      if (prevItems.indexOf(key) >= 0) {
-        return;
-      }
-
-      let removeNow =
-        anims.children[key].opacity === oldDestAnims.children[key].opacity
-        && v.children[key].opacity === 0;
-
-      if (removeNow) {
-        delete anims.children[key];
-        delete v.children[key];
-      }
-    });
-
-    let newCurrItems = epicMergeduce(currItems, items, key => anims.children[key] == null);
-
-    // add new anims
-    let destAnims = computeLayout({
-      ...layoutSkeleton,
-      children: newCurrItems.map(key => {
-        if (items.indexOf(key) === -1) {
-          // doesnt exist anymore, i.e. unmounting
-          return {
-            style: {height: 0, left: 300}
-          };
-        }
-        return {style: {height: 20 * (items.indexOf(key) + 1)}};
-      })
-    });
-
-    let childrenAnims = {};
-    destAnims.children.forEach((config, i) => {
-      let key = newCurrItems[i];
-      childrenAnims[key] = {
-        ...config,
-        opacity: items.indexOf(key) === -1 ? 0 : 1,
-      };
-    });
-    destAnims = {...destAnims, children: childrenAnims};
 
     let defaultNewTreeVal = (path, val) => {
       if (path.length === 3 && path[1] === 'children') {
@@ -418,23 +245,45 @@ let App = React.createClass({
         });
       }
       throw 'wtf3';
-   };
+    };
+
+    let mergeducer = (key, [prevCurrVals], [currVals], prevCurrItems, prevItems, [currV]) => {
+      clone(currVals);
+      clone(currV);
+      let oldDestAnims = compDestAnim(prevCurrItems, items);
+      Object.keys(currVals.children).forEach(key => {
+        if (prevItems.indexOf(key) >= 0) {
+          return;
+        }
+
+        let removeNow =
+          currVals.children[key].opacity === oldDestAnims.children[key].opacity
+          && currV.children[key].opacity === 0;
+
+        if (removeNow) {
+          delete currVals.children[key];
+          delete currV.children[key];
+        }
+      });
+
+      return currVals.children[key] == null;
+    };
 
     return (
-      <Springs initVals={[destAnims]} reduce={() => [destAnims]} gold={defaultNewTreeVal}>
-        {([{children, ...container}]) => {
-          return (
+      <Springs
+        items={items}
+        mergeducer={mergeducer}
+        newDestAnimsF={currItemsFromAboveMergeducer => [compDestAnim(currItemsFromAboveMergeducer, items, layoutSkeleton)]}
+        initVals={[compDestAnim(items, items, layoutSkeleton)]}
+        defaultNewTreeVal={defaultNewTreeVal}>
+        {
+          (currItems, [{children, ...container}]) =>
             <div style={{...container, outline: '1px solid black', position: 'relative'}}>
-              {currItems.map(key => {
-                return (
-                  <div key={key} style={{...children[key], ...s}}>
-                    {key}
-                  </div>
-                );
-              })}
+              {currItems.map(key =>
+                <div key={key} style={{...children[key], ...s}}>{key}</div>
+              )}
             </div>
-          );
-        }}
+        }
       </Springs>
     );
   }
