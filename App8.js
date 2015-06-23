@@ -33,6 +33,14 @@ function _epicMergeduce(collA, collB, isRemove, accum) {
   return _epicMergeduce(aa, collB, isRemove, accum);
 }
 
+function partial(fn) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return function() {
+    return fn.apply(this, args.concat(
+      Array.prototype.slice.call(arguments)));
+  };
+}
+
 function epicMergeduce(a, b, isRemove) {
   return _epicMergeduce(a, b, isRemove, []);
 }
@@ -88,28 +96,54 @@ function meltGoldIntoMold(a, b, f) {
   return _meltGoldIntoMold([], a, b, f);
 }
 
+var EpicMerger = React.createClass({
+  getInitialState: function() {
+    let {items} = this.props;
+    return {
+      currItems: items,
+      prevCurrItems: items
+    };
+  },
+  render: function() {
+    let {items, isRemove} = this.props;
+    let {currItems, prevCurrItems} = this.state;
+
+    return (
+      <div>
+        {this.props.children(currItems, (destValsF, isRemove) => {
+          let newCurrItems = epicMergeduce(currItems, items, isRemove);
+          this.setState({
+            currItems: newCurrItems,
+            prevCurrItems: currItems
+          });
+          return destValsF(newCurrItems);
+        }, partial(isRemove, prevCurrItems, items))}
+      </div>
+    );
+  }
+});
+
 let Springs = React.createClass({
   getInitialState: function() {
-    let {initVals, items} = this.props;
+    let {initVals, updateItems} = this.props;
+    let currVals = initVals;
+    let currV = map3TreeKeyVal(initVals, initVals, initVals, () => 0);
+
     return {
-      currVals: initVals,
-      currV: map3TreeKeyVal(initVals, initVals, initVals, () => 0),
-      currItems: items,
-      prevCurrItems: items,
+      currVals: currVals,
+      currV: currV,
     };
   },
 
   raf: function() {
     requestAnimationFrame(() => {
-      let {currVals, currV, currItems, prevCurrItems} = this.state;
-      let {destValsF, initVals, defaultNewTreeVal, items, mergeducer} = this.props;
+      let {currVals, currV} = this.state;
+      let {destValsF, defaultNewTreeVal, getDestVals, isRemove} = this.props;
 
+      let destVals = getDestVals(destValsF, partial(isRemove, currVals, currV));
       currVals = clone(currVals);
       currV = clone(currV);
 
-      let newCurrItems = epicMergeduce(currItems, items, key => mergeducer(key, currVals, prevCurrItems, currV));
-
-      let destVals = destValsF(newCurrItems);
 
       // patch trees to mold shape
       let newFinalValsShaped = meltGoldIntoMold(destVals, currVals, defaultNewTreeVal || ((_, val) => val));
@@ -128,12 +162,43 @@ let Springs = React.createClass({
         return {
           currVals: newCurrVals,
           currV: newCurrV,
-          currItems: newCurrItems,
-          prevCurrItems: currItems,
         };
       });
 
       this.raf();
+
+      // let {currVals, currV, currItems, prevCurrItems} = this.state;
+      // let {destValsF, initVals, defaultNewTreeVal, epicMergeduce2} = this.props;
+
+      // currVals = clone(currVals);
+      // currV = clone(currV);
+
+      // let newCurrItems = epicMergeduce2(currItems, currVals, prevCurrItems, currV);
+      // let destVals = destValsF(newCurrItems);
+
+      // // patch trees to mold shape
+      // let newFinalValsShaped = meltGoldIntoMold(destVals, currVals, defaultNewTreeVal || ((_, val) => val));
+      // let newVShaped = meltGoldIntoMold(destVals, currV, (path, val) => {
+      //   return map3TreeKeyVal(val, val, val, () => 0);
+      // });
+
+      // let newCurrVals = map3TreeKeyVal(newFinalValsShaped, newVShaped, destVals, (_, x, vx, destX) => {
+      //   return stepper(x, vx, destX, 120, 16)[0];
+      // });
+      // let newCurrV = map3TreeKeyVal(newFinalValsShaped, newVShaped, destVals, (_, x, vx, destX) => {
+      //   return stepper(x, vx, destX, 120, 16)[1];
+      // });
+
+      // this.setState(() => {
+      //   return {
+      //     currVals: newCurrVals,
+      //     currV: newCurrV,
+      //     currItems: newCurrItems,
+      //     prevCurrItems: currItems,
+      //   };
+      // });
+
+      // this.raf();
     });
   },
 
@@ -142,10 +207,10 @@ let Springs = React.createClass({
   },
 
   render: function() {
-    let {currItems, currVals} = this.state;
+    let {currVals} = this.state;
     return (
       <div>
-        {this.props.children(currItems, currVals)}
+        {this.props.children(currVals)}
       </div>
     );
   }
@@ -199,6 +264,7 @@ function defaultNewTreeVal(path, val) {
   throw 'wtf3';
 }
 
+
 let App = React.createClass({
   getInitialState: function() {
     return {
@@ -232,28 +298,37 @@ let App = React.createClass({
       position: 'absolute',
     };
 
-    let mergeducer = (key, [currVals], prevCurrItems, [currV]) => {
-      let prevDestVals = compDestAnim(prevCurrItems, items);
-      return currVals.children[key].opacity === prevDestVals.children[key].opacity
-        && currV.children[key].opacity === 0;
+    // let isRemove = (prevCurrItems, items, [currVals], [currV], key) => {
+    //   let prevDestVals = compDestAnim(prevCurrItems, items, layoutSkeleton);
+    //   return currVals.children[key].opacity === prevDestVals.children[key].opacity
+    //     && currV.children[key].opacity === 0;
+    // };
+
+    let isRemove = (a, b, c, d, e) => {
+      console.log(a, b, c, d, e);
+      return false;
     };
 
     return (
-      <Springs
-        items={items}
-        mergeducer={mergeducer}
-        destValsF={currItemsFromAboveMergeducer => [compDestAnim(currItemsFromAboveMergeducer, items, layoutSkeleton)]}
-        initVals={[compDestAnim(items, items, layoutSkeleton)]}
-        defaultNewTreeVal={defaultNewTreeVal}>
-        {
-          (currItems, [{children, ...container}]) =>
-            <div style={{...container, outline: '1px solid black'}}>
-              {currItems.map(key =>
-                <div key={key} style={{...children[key], ...s}}>{key}</div>
-              )}
-            </div>
+      <EpicMerger items={items} isRemove={isRemove}>
+        {(currItems, getDestVals, isRemove) =>
+          <Springs
+            isRemove={isRemove}
+            getDestVals={getDestVals}
+            destValsF={currItemsFromAboveMergeducer => [compDestAnim(currItemsFromAboveMergeducer, items, layoutSkeleton)]}
+            initVals={[compDestAnim(items, items, layoutSkeleton)]}
+            defaultNewTreeVal={defaultNewTreeVal}>
+            {
+              ([{children, ...container}]) =>
+                <div style={{...container, outline: '1px solid black'}}>
+                  {currItems.map(key =>
+                    <div key={key} style={{...children[key], ...s}}>{key}</div>
+                  )}
+                </div>
+            }
+          </Springs>
         }
-      </Springs>
+      </EpicMerger>
     );
   }
 });
