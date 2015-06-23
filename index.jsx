@@ -8,6 +8,7 @@ let App5 = require('./App5');
 let App6 = require('./App6');
 let App7 = require('./App7');
 let App8 = require('./App8');
+let App9 = require('./App9');
 
 // React.render(<App0 />, document.querySelector('#content'));
 // React.render(<App1 />, document.querySelector('#content'));
@@ -17,4 +18,5 @@ let App8 = require('./App8');
 // React.render(<App5 />, document.querySelector('#content'));
 // React.render(<App6 />, document.querySelector('#content'));
 // React.render(<App7 />, document.querySelector('#content'));
-React.render(<App8 />, document.querySelector('#content'));
+// React.render(<App8 />, document.querySelector('#content'));
+React.render(<App9 />, document.querySelector('#content'));
