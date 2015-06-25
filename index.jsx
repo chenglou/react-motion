@@ -18,5 +18,5 @@ let App9 = require('./App9');
 // React.render(<App5 />, document.querySelector('#content'));
 // React.render(<App6 />, document.querySelector('#content'));
 // React.render(<App7 />, document.querySelector('#content'));
-React.render(<App8 />, document.querySelector('#content'));
-// React.render(<App9 />, document.querySelector('#content'));
+// React.render(<App8 />, document.querySelector('#content'));
+React.render(<App9 />, document.querySelector('#content'));
