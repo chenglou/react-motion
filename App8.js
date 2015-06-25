@@ -108,18 +108,14 @@ var EpicMerger = React.createClass({
     let {items, isRemove} = this.props;
     let {currItems, prevCurrItems} = this.state;
 
-    return (
-      <div>
-        {this.props.children(currItems, (destValsF, isRemove) => {
-          let newCurrItems = epicMergeduce(currItems, items, isRemove);
-          this.setState({
-            currItems: newCurrItems,
-            prevCurrItems: currItems
-          });
-          return destValsF(newCurrItems);
-        }, partial(isRemove, prevCurrItems, items))}
-      </div>
-    );
+    return this.props.children(currItems, (isRemove) => {
+            let newCurrItems = epicMergeduce(currItems, items, isRemove);
+            this.setState({
+              currItems: newCurrItems,
+              prevCurrItems: currItems
+            });
+            return newCurrItems;
+          }, partial(isRemove, prevCurrItems, items));
   }
 });
 
@@ -140,10 +136,9 @@ let Springs = React.createClass({
       let {currVals, currV} = this.state;
       let {destValsF, defaultNewTreeVal, getDestVals, isRemove} = this.props;
 
-      let destVals = getDestVals(destValsF, partial(isRemove, currVals, currV));
+      let destVals = destValsF(getDestVals(partial(isRemove, currVals, currV)));
       currVals = clone(currVals);
       currV = clone(currV);
-
 
       // patch trees to mold shape
       let newFinalValsShaped = meltGoldIntoMold(destVals, currVals, defaultNewTreeVal || ((_, val) => val));
@@ -298,15 +293,10 @@ let App = React.createClass({
       position: 'absolute',
     };
 
-    // let isRemove = (prevCurrItems, items, [currVals], [currV], key) => {
-    //   let prevDestVals = compDestAnim(prevCurrItems, items, layoutSkeleton);
-    //   return currVals.children[key].opacity === prevDestVals.children[key].opacity
-    //     && currV.children[key].opacity === 0;
-    // };
-
-    let isRemove = (a, b, c, d, e) => {
-      console.log(a, b, c, d, e);
-      return false;
+    let isRemove = (prevCurrItems, items, [currVals], [currV], key) => {
+      let prevDestVals = compDestAnim(prevCurrItems, items, layoutSkeleton);
+      return currVals.children[key].opacity === prevDestVals.children[key].opacity
+        && currV.children[key].opacity <= 0.1;
     };
 
     return (
