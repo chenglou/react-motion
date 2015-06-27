@@ -2,7 +2,7 @@
 'use strict';
 
 let React = require('react');
-let stepper = require('./stepper');
+let stepper = require('../stepper');
 
 function map3Tree(t1, t2, t3, f) {
   if (Object.prototype.toString.call(t1) === '[object Array]') {

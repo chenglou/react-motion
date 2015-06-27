@@ -4,7 +4,7 @@
 
 let React = require('react');
 let computeLayout = require('css-layout');
-let stepper = require('./stepper');
+let stepper = require('../stepper');
 
 // given a css-layout output tree, generate a homoiconic tree with values being
 // speed (for spring) rather than the x values

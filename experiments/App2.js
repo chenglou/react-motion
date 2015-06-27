@@ -4,7 +4,7 @@
 'use strict';
 
 let React = require('react');
-let stepper = require('./stepper');
+let stepper = require('../stepper');
 
 var App = React.createClass({
   getInitialState: function() {

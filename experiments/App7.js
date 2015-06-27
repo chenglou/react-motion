@@ -3,7 +3,7 @@
 
 let React = require('react');
 let computeLayout = require('css-layout');
-let stepper = require('./stepper');
+let stepper = require('../stepper');
 
 function _epicMergeduce(collA, collB, isRemove, accum) {
   let [a, ...aa] = collA;
