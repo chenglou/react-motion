@@ -1,24 +1,4 @@
-let React = require('react');
-// let App0 = require('./experiments/App0');
-// let App1 = require('./experiments/App1');
-// let App2 = require('./experiments/App2');
-// let App3 = require('./experiments/App3');
-// let App4 = require('./experiments/App4');
-// let App5 = require('./experiments/App5');
-// let App6 = require('./experiments/App6');
-// let App7 = require('./experiments/App7');
-// let App8 = require('./experiments/App8');
-// let App9 = require('./experiments/App9');
-let App10 = require('./experiments/App10');
+import React from 'react';
+import Demo1 from './Demo1';
 
-// React.render(<App0 />, document.querySelector('#content'));
-// React.render(<App1 />, document.querySelector('#content'));
-// React.render(<App2 />, document.querySelector('#content'));
-// React.render(<App3 />, document.querySelector('#content'));
-// React.render(<App4 />, document.querySelector('#content'));
-// React.render(<App5 />, document.querySelector('#content'));
-// React.render(<App6 />, document.querySelector('#content'));
-// React.render(<App7 />, document.querySelector('#content'));
-// React.render(<App8 />, document.querySelector('#content'));
-// React.render(<App9 />, document.querySelector('#content'));
-React.render(<App10 />, document.querySelector('#content'));
+React.render(<Demo1 />, document.querySelector('#content'));
