@@ -109,19 +109,19 @@ function meltGoldIntoMold(a, b, f) {
 
 let Springs = React.createClass({
   getInitialState: function() {
-    let {initVals} = this.props;
+    let {defaultVals} = this.props;
     return {
-      currVals: initVals,
-      currV: map3TreeKeyVal(initVals, initVals, initVals, () => 0),
+      currVals: defaultVals,
+      currV: map3TreeKeyVal(defaultVals, defaultVals, defaultVals, () => 0),
     };
   },
 
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV} = this.state;
-      let {stop, defaultNewTreeVal} = this.props;
+      let {nextDestVals, defaultNewTreeVal} = this.props;
 
-      let destVals = stop(currVals, currV);
+      let destVals = nextDestVals(currVals, currV);
       let patchedCurrV = meltGoldIntoMold(
         destVals,
         currV,
@@ -256,8 +256,8 @@ let App = React.createClass({
 
     return (
       <Springs
-        initVals={compDestAnim(keys, keys)}
-        stop={(currVals, currV) => {
+        defaultVals={compDestAnim(keys, keys)}
+        nextDestVals={(currVals, currV) => {
           let destValsChildren = {};
           keys.forEach((key, i) => {
             destValsChildren[key] = {
