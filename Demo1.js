@@ -85,6 +85,8 @@ export default React.createClass({
       width: 50,
       height: 50,
       backgroundColor: 'red',
+      display: 'table',
+      textAlign: 'center'
     };
 
     return (
@@ -120,8 +122,11 @@ export default React.createClass({
                   WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
                   transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
                   zIndex: key === lastPressedComp ? 99 : 1,
+                  WebkitBoxShadow: `${(x - (3 * CELLX - 50) / 2) / 15}px 5px 5px 0px rgba(0,0,0,0.50)`,
+                  MozBoxShadow: `${(x - (3 * CELLX - 50) / 2) / 15}px 5px 5px 0px rgba(0,0,0,0.50)`,
+                  boxShadow: `${(x - (3 * CELLX - 50) / 2) / 15}px 5px 5px 0px rgba(0,0,0,0.50)`
                 }
-              }>{key}</div>
+              }><span style={{display: 'table-cell', verticalAlign: 'middle'}}>{key}</span></div>
             );
           });}
           }
