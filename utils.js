@@ -76,6 +76,14 @@ export function toOj(vals, keys) {
 
 export function toArr(obj) {
   let keys = Object.keys(obj);
-  let vals = keys.map(obj);
+  let vals = keys.map(k => obj[k]);
   return [keys, vals];
+}
+
+export function reinsert(arr, from, to) {
+  arr = clone(arr);
+  let val = arr[from];
+  arr.splice(from, 1);
+  arr.splice(to, 0, val);
+  return arr;
 }
