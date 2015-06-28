@@ -67,7 +67,7 @@ function stripNothingButMarks(tree) {
 }
 
 // see stepper for constant k, b usage
-function updateVals(currVals, currV, destVals, k, b) {
+function updateVals(currVals, currV, destVals, k = -1, b = -1) {
   if (destVals != null && destVals.__springK != null) {
     return updateVals(currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
   }
@@ -81,11 +81,14 @@ function updateVals(currVals, currV, destVals, k, b) {
     });
     return newTree;
   }
-  // scalar
+  // haven't received any update from parent yet
+  if (k === -1 || b === -1) {
+    return destVals;
+  }
   return stepper(currVals, currV, destVals, k, b)[0];
 }
 
-function updateV(currVals, currV, destVals, k, b) {
+function updateV(currVals, currV, destVals, k = -1, b = -1) {
   if (destVals != null && destVals.__springK != null) {
     return updateV(currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
   }
@@ -99,7 +102,10 @@ function updateV(currVals, currV, destVals, k, b) {
     });
     return newTree;
   }
-  // scalar
+  // haven't received any update from parent yet
+  if (k === -1 || b === -1) {
+    return currV;
+  }
   return stepper(currVals, currV, destVals, k, b)[1];
 }
 
@@ -126,8 +132,8 @@ export default React.createClass({
       // return mark-less current values tree
       let markedDestVals = finalVals(currVals, update);
 
-      let newCurrVals = updateVals(currVals, currV, markedDestVals, 120, 16);
-      let newCurrV = updateV(currVals, currV, markedDestVals, 120, 16);
+      let newCurrVals = updateVals(currVals, currV, markedDestVals);
+      let newCurrV = updateV(currVals, currV, markedDestVals);
 
 
 

@@ -24,7 +24,8 @@ export default React.createClass({
     return {
       mouseX: 0,
       mouseY: 0,
-      pressedComp: null,
+      lastPressedComp: null,
+      isPressed: false,
       // index: visual position. value: component key/id
       order: range(11),
     };
@@ -32,12 +33,12 @@ export default React.createClass({
 
   handleMouseMove: function(e) {
     let {pageX, pageY} = e;
-    let {order, pressedComp} = this.state;
-    if (pressedComp != null) {
+    let {order, lastPressedComp, isPressed} = this.state;
+    if (isPressed) {
       let col = Math.min(Math.floor(pageX / 70), 2);
       let row = Math.min(Math.floor(pageY / 90), Math.floor(Object.keys(order).length / 3));
       let index = row * 3 + col;
-      let newOrder = reinsert(order, order.indexOf(pressedComp), index);
+      let newOrder = reinsert(order, order.indexOf(lastPressedComp), index);
       this.setState({mouseX: pageX, mouseY: pageY, order: newOrder});
     } else {
       this.setState({mouseX: pageX, mouseY: pageY});
@@ -45,15 +46,15 @@ export default React.createClass({
   },
 
   handleMouseDown: function(key) {
-    this.setState({pressedComp: key});
+    this.setState({lastPressedComp: key, isPressed: true});
   },
 
   handleMouseUp: function() {
-    this.setState({pressedComp: null});
+    this.setState({isPressed: false});
   },
 
   render: function() {
-    let {mouseX, mouseY, order, pressedComp} = this.state;
+    let {mouseX, mouseY, order, lastPressedComp, isPressed} = this.state;
     let box = {
       width: 500,
       height: 600,
@@ -73,31 +74,34 @@ export default React.createClass({
         <Springs finalVals={(_, update) => {
           return {
             order: update(order.map((_, key) => {
-              if (key === pressedComp) {
-                // nested (children) update takes priority. k=0, b=1 makes
-                // spring infinitely rigid
-                return update([mouseX, mouseY], 0, 1);
+              if (key === lastPressedComp && isPressed) {
+                // nested (children) update takes priority. k=-1 or b=-11
+                // cancels spring (act as "un-update"ing a subtree)
+                return update([mouseX, mouseY], -1, -1);
               }
               let visualPosition = order.indexOf(key);
               return layout[visualPosition];
             })),
-            scale: update(range(11).map((_, key) => pressedComp === key ? 1.2 : 1), 180, 10),
+            scale: update(
+              range(11).map((_, key) => lastPressedComp === key && isPressed ? 1.2 : 1),
+              180,
+              10
+            ),
+            // talk about lifting do you even constant lift
           };
         }}>
           {data => {
             return data.order.map(([x, y], key) => {
-              if (key === 4) {
-                // console.log(x, y, data.scale[key]);
-              }
+              let scale = data.scale[key];
             return (
               <div
                 key={key}
                 onMouseDown={this.handleMouseDown.bind(null, key)}
                 style={{
                   ...s,
-                  WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${data.scale[key]})`,
-                  transform: `translate3d(${x}px, ${y}px, 0) scale(${data.scale[key]})`,
-                  zIndex: key === pressedComp ? 99 : 1,
+                  WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
+                  transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
+                  zIndex: key === lastPressedComp ? 99 : 1,
                 }
               }>{key}</div>
             );
