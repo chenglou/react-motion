@@ -5,11 +5,14 @@ import Springs from './Springs';
 import {range, clone} from './utils';
 
 let COUNT = 11;
+let CELLX = 70;
+let CELLY = 90;
+
 // indexed by visual position
 let layout = range(COUNT).map(n => {
   let row = Math.floor(n / 3);
   let col = n % 3;
-  return [70 * col, 90 * row];
+  return [CELLX * col, CELLY * row];
 });
 
 function reinsert(arr, from, to) {
@@ -29,33 +32,47 @@ export default React.createClass({
       isPressed: false,
       // index: visual position. value: component key/id
       order: range(COUNT),
+      diffX: 0,
+      diffY: 0
     };
   },
 
   handleMouseMove: function(e) {
     let {pageX, pageY} = e;
-    let {order, lastPressedComp, isPressed} = this.state;
+    let {order, lastPressedComp, isPressed, diffX, diffY} = this.state;
     if (isPressed) {
-      let col = Math.min(Math.floor(pageX / 70), 2);
-      let row = Math.min(Math.floor(pageY / 90), Math.floor(Object.keys(order).length / 3));
+      let col = Math.min(Math.floor(pageX / CELLX), 2);
+      let row = Math.min(Math.floor(pageY / CELLY), Math.floor(Object.keys(order).length / 3));
       let index = row * 3 + col;
       let newOrder = reinsert(order, order.indexOf(lastPressedComp), index);
-      this.setState({mouseX: pageX, mouseY: pageY, order: newOrder});
+      this.setState({mouseX: pageX - diffX, mouseY: pageY - diffY, order: newOrder});
     } else {
       this.setState({mouseX: pageX, mouseY: pageY});
     }
   },
 
-  handleMouseDown: function(key) {
-    this.setState({lastPressedComp: key, isPressed: true});
+  handleMouseDown: function(key, e) {
+    let {pageX, pageY} = e;
+    let col = Math.min(Math.floor(pageX / CELLX), 2);
+    let row = Math.min(Math.floor(pageY / CELLY), Math.floor(Object.keys(this.state.order).length / 3));
+    let [diffX, diffY] = [pageX - col * CELLX, pageY - row * CELLY];
+
+    this.setState({
+      lastPressedComp: key,
+      isPressed: true,
+      diffX: diffX,
+      diffY: diffY,
+      mouseX: pageX - diffX,
+      mouseY: pageY - diffY,
+    });
   },
 
   handleMouseUp: function() {
-    this.setState({isPressed: false});
+    this.setState({isPressed: false, diffX: 0, diffY: 0});
   },
 
   render: function() {
-    let {mouseX, mouseY, order, lastPressedComp, isPressed} = this.state;
+    let {mouseX, mouseY, diffX, diffY, order, lastPressedComp, isPressed} = this.state;
     let box = {
       width: 500,
       height: 600,
