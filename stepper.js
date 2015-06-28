@@ -1,12 +1,13 @@
 'use strict';
 
 let errorMargin = 0.001;
+
+let hackOn = false;
 window.frameRate = 1 / 60;
 window.addEventListener('keypress', e => {
   if (e.which === 115) {
-    window.frameRate = 1 / 1000;
-  } else {
-    window.frameRate = 1 / 60;
+    hackOn = !hackOn;
+    window.frameRate = hackOn ? 1 / 1000 : 1 / 60;
   }
 });
 

@@ -3,12 +3,12 @@ import React from 'react';
 import {mapTree, reshapeTree} from './utils';
 import stepper from './stepper';
 
+let hackOn = false;
 window.interval = 1000 / 60;
 window.addEventListener('keypress', e => {
   if (e.which === 100) {
-    window.interval = 1000;
-  } else {
-    window.interval = 1000 / 60;
+    hackOn = !hackOn;
+    window.interval = hackOn ? 1000 : 1000 / 60;
   }
 });
 
