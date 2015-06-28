@@ -4,8 +4,9 @@ import React from 'react';
 import Springs from './Springs';
 import {range, clone} from './utils';
 
+let COUNT = 11;
 // indexed by visual position
-let layout = range(11).map(n => {
+let layout = range(COUNT).map(n => {
   let row = Math.floor(n / 3);
   let col = n % 3;
   return [70 * col, 90 * row];
@@ -27,7 +28,7 @@ export default React.createClass({
       lastPressedComp: null,
       isPressed: false,
       // index: visual position. value: component key/id
-      order: range(11),
+      order: range(COUNT),
     };
   },
 
@@ -75,7 +76,7 @@ export default React.createClass({
           return {
             order: update(order.map((_, key) => {
               if (key === lastPressedComp && isPressed) {
-                // nested (children) update takes priority. k=-1 or b=-11
+                // nested (children) update takes priority. k=-1 or b=-1
                 // cancels spring (act as "un-update"ing a subtree)
                 return update([mouseX, mouseY], -1, -1);
               }
@@ -83,7 +84,7 @@ export default React.createClass({
               return layout[visualPosition];
             })),
             scale: update(
-              range(11).map((_, key) => lastPressedComp === key && isPressed ? 1.2 : 1),
+              range(COUNT).map((_, key) => lastPressedComp === key && isPressed ? 1.2 : 1),
               180,
               10
             ),

@@ -3,6 +3,19 @@ import React from 'react';
 import {mapTree, reshapeTree} from './utils';
 import stepper from './stepper';
 
+window.interval = 1000 / 60;
+window.addEventListener('keypress', e => {
+  if (e.which === 100) {
+    window.interval = 1000;
+  } else {
+    window.interval = 1000 / 60;
+  }
+});
+
+function requestAnimationFrame(f) {
+  setTimeout(f, window.interval);
+}
+
 function zero() {
   return 0;
 }
