@@ -4,6 +4,8 @@ import React from 'react';
 import Springs from './Springs';
 import {range, clone} from './utils';
 
+let ALLCOLORS = ['#EF767A', '#456990', '#49BEAA', '#49DCB1', '#EEB868', '#EF767A', '#456990', '#49BEAA', '#49DCB1', '#EEB868', '#EF767A'];
+
 let COUNT = 11;
 let CELLX = 70;
 let CELLY = 90;
@@ -84,7 +86,6 @@ export default React.createClass({
       borderRadius: 99,
       width: 50,
       height: 50,
-      backgroundColor: 'red',
       display: 'table',
       textAlign: 'center'
     };
@@ -119,6 +120,7 @@ export default React.createClass({
                 onMouseDown={this.handleMouseDown.bind(null, key)}
                 style={{
                   ...s,
+                  backgroundColor: ALLCOLORS[key],
                   WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
                   transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
                   zIndex: key === lastPressedComp ? 99 : 1,
@@ -126,7 +128,7 @@ export default React.createClass({
                   MozBoxShadow: `${(x - (3 * CELLX - 50) / 2) / 15}px 5px 5px 0px rgba(0,0,0,0.50)`,
                   boxShadow: `${(x - (3 * CELLX - 50) / 2) / 15}px 5px 5px 0px rgba(0,0,0,0.50)`
                 }
-              }><span style={{display: 'table-cell', verticalAlign: 'middle'}}>{key}</span></div>
+              }></div>
             );
           });}
           }
