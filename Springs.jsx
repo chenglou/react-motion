@@ -1,6 +1,6 @@
 'use strict';
-import React from 'react';
-import {mapTree, reshapeTree} from './utils';
+import React, {PropTypes} from 'react';
+import {mapTree, clone} from './utils';
 import stepper from './stepper';
 
 let hackOn = false;
@@ -39,7 +39,7 @@ function zero() {
 // fv={cur? => obj}
 
 // see stepper for constant k, b usage
-function update(tree, k = 120, b = 16) {
+function tween(tree, k = 120, b = 16) {
   return {
     __springK: k,
     __springB: b,
@@ -49,22 +49,6 @@ function update(tree, k = 120, b = 16) {
 
 function stripMarks(tree) {
   if (tree != null && tree.__springK != null) {
-    return stripMarks(tree.value);
-  }
-  if (Object.prototype.toString.call(tree) === '[object Array]') {
-    return tree.map(stripMarks);
-  }
-  if (Object.prototype.toString.call(tree) === '[object Object]') {
-    let newTree = {};
-    Object.keys(tree).forEach(key => newTree[key] = stripMarks(tree[key]));
-    return newTree;
-  }
-  // scalar
-  return tree;
-}
-
-function stripNothingButMarks(tree) {
-  if (tree != null && tree.__spring) {
     return stripMarks(tree.value);
   }
   if (Object.prototype.toString.call(tree) === '[object Array]') {
@@ -94,7 +78,7 @@ function updateVals(currVals, currV, destVals, k = -1, b = -1) {
     });
     return newTree;
   }
-  // haven't received any update from parent yet
+  // haven't received any tween from parent yet
   if (k === -1 || b === -1) {
     return destVals;
   }
@@ -115,18 +99,67 @@ function updateV(currVals, currV, destVals, k = -1, b = -1) {
     });
     return newTree;
   }
-  // haven't received any update from parent yet
+  // haven't received any tween from parent yet
   if (k === -1 || b === -1) {
     return currV;
   }
   return stepper(currVals, currV, destVals, k, b)[1];
 }
 
+function mergeDiff(collA, collB, shouldRemove, accum) {
+  let [a, ...aa] = collA;
+  let [b, ...bb] = collB;
+
+  if (collA.length === 0 && collB.length === 0) {
+    return accum;
+  }
+  if (collA.length === 0) {
+    return accum.concat(collB);
+  }
+  if (collB.length === 0) {
+    if (shouldRemove(a)) {
+      return mergeDiff(aa, collB, shouldRemove, accum);
+    }
+    return mergeDiff(aa, collB, shouldRemove, accum.concat(a));
+  }
+  if (a === b) { // fails for ([undefined], [], () => true). but don't do that
+    return mergeDiff(aa, bb, shouldRemove, accum.concat(a));
+  }
+  if (collB.indexOf(a) === -1) {
+    if (shouldRemove(a)) {
+      return mergeDiff(aa, collB, shouldRemove, accum);
+    }
+    return mergeDiff(aa, collB, shouldRemove, accum.concat(a));
+  }
+  return mergeDiff(aa, collB, shouldRemove, accum);
+}
+
+function mergeDiffObj(a, b, shouldRemove) {
+  let keys = mergeDiff(Object.keys(a), Object.keys(b), a => !shouldRemove(a), []);
+  let ret = {};
+  keys.forEach(key => {
+    if (b.hasOwnProperty(key)) {
+      ret[key] = b[key];
+    } else {
+      ret[key] = shouldRemove(key);
+    }
+  });
+
+  return ret;
+}
+
 export default React.createClass({
+  propTypes: {
+    startVal: PropTypes.func,
+    finalVals: PropTypes.func.isRequired,
+    missingCurrentKey: PropTypes.func,
+    shouldRemove: PropTypes.func,
+  },
+
   getInitialState: function() {
     let {startVal, finalVals} = this.props;
     let defaultVals = stripMarks(
-      (startVal && startVal(null, update)) || finalVals(null, update)
+      (startVal && startVal(null, tween)) || finalVals(null, tween)
     );
     return {
       currVals: defaultVals,
@@ -137,49 +170,36 @@ export default React.createClass({
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV} = this.state;
-      let {finalVals, defaultNewTreeVal} = this.props;
+      let {finalVals, missingCurrentKey, shouldRemove} = this.props;
 
-      // marked up update()s
-      // use this exact tree with its annotation
-      // interpolate
-      // return mark-less current values tree
-      let markedDestVals = finalVals(currVals, update);
+      // TODO: lol, refactor
+      let markedDestVals = finalVals(currVals, tween);
+      let mary = markedDestVals.__springK == null ? markedDestVals : markedDestVals.value;
 
-      let newCurrVals = updateVals(currVals, currV, markedDestVals);
-      let newCurrV = updateV(currVals, currV, markedDestVals);
+      let strippedDestVals = stripMarks(markedDestVals);
 
+      let unwrappedMergedDestVals = mergeDiffObj(
+        currVals,
+        mary,
+        key => shouldRemove(key, tween, strippedDestVals, currVals, currV),
+      );
 
+      let rewrappedMergedDestVals = markedDestVals.__springK == null ?
+        unwrappedMergedDestVals :
+        tween(unwrappedMergedDestVals, markedDestVals.__springK, markedDestVals.__springB);
 
-      // let patchedCurrV = reshapeTree(
-      //   destVals,
-      //   currV,
-      //   // TODO: expose
-      //   (_, val) => mapTree(zero, val),
-      // );
-      // let patchedCurrVals = reshapeTree(
-      //   destVals,
-      //   currVals,
-      //   // TODO: le expose
-      //   defaultNewTreeVal || ((_, val) => mapTree(zero, val)),
-      // );
+      currVals = clone(currVals);
+      currV = clone(currV);
+      Object.keys(unwrappedMergedDestVals)
+        .filter(key => !currVals.hasOwnProperty(key))
+        .forEach(key => {
+          currVals[key] = missingCurrentKey(key, strippedDestVals);
+          currV[key] = mapTree(zero, currVals[key]);
+        });
 
-      // patchedCurrVals = currVals;
-      // patchedCurrV = currV;
+      let newCurrVals = updateVals(currVals, currV, rewrappedMergedDestVals);
+      let newCurrV = updateV(currVals, currV, rewrappedMergedDestVals);
 
-      // let newCurrVals = mapTree(
-      //   // TODO: expose spring params
-      //   (_, x, vx, destX) => stepper(x, vx, destX, 120, 16)[0],
-      //   patchedCurrVals,
-      //   patchedCurrV,
-      //   destVals,
-      // );
-      // let newCurrV = mapTree(
-      //   // TODO: expose spring params
-      //   (_, x, vx, destX) => stepper(x, vx, destX, 120, 16)[1],
-      //   patchedCurrVals,
-      //   patchedCurrV,
-      //   destVals,
-      // );
 
       this.setState(() => {
         return {

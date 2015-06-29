@@ -58,6 +58,26 @@ export default React.createClass({
     this.setState({isPressed: false, dx: 0, dy: 0});
   },
 
+  getFinalVals: function(_, tween) {
+    let {order, lastPress, isPressed, mouse} = this.state;
+    return {
+      order: tween(order.map((_, key) => {
+        if (key === lastPress && isPressed) {
+          // children tween takes priority. k=-1 or b=-1 cancels spring
+          // (act as "un-tween"ing a subtree)
+          return tween(mouse, -1, -1);
+        }
+        let visualPosition = order.indexOf(key);
+        return layout[visualPosition];
+      })),
+      scales: tween(
+        range(count).map((_, key) => lastPress === key && isPressed ? 1.2 : 1),
+        180,
+        10
+      ),
+    };
+  },
+
   render: function() {
     let {mouse, order, lastPress, isPressed} = this.state;
     return (
@@ -65,24 +85,7 @@ export default React.createClass({
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.handleMouseUp}
         className="demo1">
-        <Springs finalVals={(_, update) => {
-          return {
-            order: update(order.map((_, key) => {
-              if (key === lastPress && isPressed) {
-                // children update takes priority. k=-1 or b=-1 cancels spring
-                // (act as "un-update"ing a subtree)
-                return update(mouse, -1, -1);
-              }
-              let visualPosition = order.indexOf(key);
-              return layout[visualPosition];
-            })),
-            scales: update(
-              range(count).map((_, key) => lastPress === key && isPressed ? 1.2 : 1),
-              180,
-              10
-            ),
-          };
-        }}>
+        <Springs finalVals={this.getFinalVals}>
           {({order, scales}) => order.map(([x, y], key) =>
             <div
               key={key}
