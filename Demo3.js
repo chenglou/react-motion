@@ -24,6 +24,7 @@ export default React.createClass({
     let {items} = this.state;
     return (
       <Springs
+        className="demo2"
         finalVals={(currVals, tween) => {
           let configs = {};
           items.forEach((key, i) => {
@@ -39,35 +40,21 @@ export default React.createClass({
         shouldRemove={(key, tween, destVals, currVals, currV) => {
           return currVals[key].opacity === 0 && currV[key].opacity === 0 ?
             null :
-            tween({
-              x: 300,
-              height: 0,
-              opacity: 0,
-            });
+            tween({x: 300, height: 0, opacity: 0});
         }}
         // TODO: default: destVals[key]
         // lifttable
-        missingCurrentKey={(key, destVals) => {
-          return {
-            x: -300,
-            height: 0,
-            opacity: 1,
-          };
-        }}>
-        {configs =>
-          <div style={{width: 300, padding: 20, outline: '1px solid black'}}>
-            {Object.keys(configs).map(key => {
-              let {x, ...rest} = configs[key];
-              return (
-                <div key={key} style={{
-                  ...rest,
-                  transform: `translate3d(${x}px, 0, 0)`,
-                  outline: '1px solid black',
-                }}>{key}</div>
-              );
-            })}
-          </div>
-        }
+        missingCurrentKey={() => ({x: -300, height: 0, opacity: 1})}>
+        {configs => Object.keys(configs).map(key => {
+          let {x, ...rest} = configs[key];
+          return (
+            <div key={key} style={{
+              ...rest,
+              transform: `translate3d(${x}px, 0, 0)`,
+              outline: '1px solid black',
+            }}>{key}</div>
+          );
+        })}
       </Springs>
     );
   }
