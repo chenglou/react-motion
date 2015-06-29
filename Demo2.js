@@ -3,12 +3,6 @@
 import React from 'react';
 import Springs from './Springs';
 
-if (!String.prototype.includes) {
-  String.prototype.includes = function() {'use strict';
-    return String.prototype.indexOf.apply(this, arguments) !== -1;
-  };
-}
-
 export default React.createClass({
   getInitialState: function() {
     return {
@@ -54,7 +48,7 @@ export default React.createClass({
           let configs = {};
           Object.keys(todos)
             .filter(date => {
-              return todos[date].toUpperCase().includes(value.toUpperCase());
+              return todos[date].toUpperCase().indexOf(value.toUpperCase()) >= 0;
             })
             .forEach(date => {
               configs[date] = {height: 40, opacity: 1};
