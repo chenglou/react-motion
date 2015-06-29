@@ -27,8 +27,7 @@ export default React.createClass({
     };
   },
 
-  handleMouseMove: function(e) {
-    let {pageX, pageY} = e;
+  handleMouseMove: function({pageX, pageY}) {
     let {order, lastPress, isPressed, delta: [dx, dy]} = this.state;
     if (isPressed) {
       let col = Math.min(Math.floor(pageX / width), 2);
@@ -39,13 +38,9 @@ export default React.createClass({
     }
   },
 
-  handleMouseDown: function(key, e) {
-    let {pageX, pageY} = e;
-    let col = Math.min(Math.floor(pageX / width), 2);
-    let row = Math.min(Math.floor(pageY / height), Math.floor(count / 3));
-    let dx = pageX - col * width;
-    let dy = pageY - row * height;
-
+  handleMouseDown: function(key, [pressX, pressY], {pageX, pageY}) {
+    let dx = pageX - pressX;
+    let dy = pageY - pressY;
     this.setState({
       lastPress: key,
       isPressed: true,
@@ -81,27 +76,26 @@ export default React.createClass({
   render: function() {
     let {mouse, order, lastPress, isPressed} = this.state;
     return (
-      <div
+      <Springs
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.handleMouseUp}
-        className="demo1">
-        <Springs finalVals={this.getFinalVals}>
-          {({order, scales}) => order.map(([x, y], key) =>
-            <div
-              key={key}
-              onMouseDown={this.handleMouseDown.bind(null, key)}
-              className="demo1-circle"
-              style={{
-                backgroundColor: allColors[key],
-                WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
-                transform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
-                zIndex: key === lastPress ? 99 : 1,
-                boxShadow: `${(x - (3 * width - 50) / 2) / 15}px 5px 5px rgba(0,0,0,0.5)`,
-              }}
-            />
-          )}
-        </Springs>
-      </div>
+        className="demo1"
+        finalVals={this.getFinalVals}>
+        {({order: currOrder, scales}) => currOrder.map(([x, y], key) =>
+          <div
+            key={key}
+            onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
+            className="demo1-circle"
+            style={{
+              backgroundColor: allColors[key],
+              WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
+              transform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
+              zIndex: key === lastPress ? 99 : order.indexOf(key),
+              boxShadow: `${(x - (3 * width - 50) / 2) / 15}px 5px 5px rgba(0,0,0,0.5)`,
+            }}
+          />
+        )}
+      </Springs>
     );
   }
 });

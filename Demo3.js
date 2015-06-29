@@ -54,20 +54,19 @@ export default React.createClass({
             opacity: 1,
           };
         }}>
-        {
-          configs =>
-            <div style={{width: 300, padding: 20, outline: '1px solid black'}}>
-              {Object.keys(configs).map(key => {
-                let {x, ...rest} = configs[key];
-                return (
-                  <div key={key} style={{
-                    ...rest,
-                    transform: `translate3d(${x}px, 0, 0)`,
-                    outline: '1px solid black',
-                  }}>{key}</div>
-                );
-              })}
-            </div>
+        {configs =>
+          <div style={{width: 300, padding: 20, outline: '1px solid black'}}>
+            {Object.keys(configs).map(key => {
+              let {x, ...rest} = configs[key];
+              return (
+                <div key={key} style={{
+                  ...rest,
+                  transform: `translate3d(${x}px, 0, 0)`,
+                  outline: '1px solid black',
+                }}>{key}</div>
+              );
+            })}
+          </div>
         }
       </Springs>
     );
