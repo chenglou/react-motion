@@ -3,6 +3,12 @@
 import React from 'react';
 import Springs from './Springs';
 
+if (!String.prototype.includes) {
+  String.prototype.includes = function() {'use strict';
+    return String.prototype.indexOf.apply(this, arguments) !== -1;
+  };
+}
+
 export default React.createClass({
   getInitialState: function() {
     return {
