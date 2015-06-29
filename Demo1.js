@@ -27,6 +27,15 @@ export default React.createClass({
     };
   },
 
+  handleTouchStart: function(key, pressLocation, event) {
+    this.handleMouseDown(key, pressLocation, event.touches[0]);
+  },
+
+  handleTouchMove: function(event) {
+    event.preventDefault();
+    this.handleMouseMove(event.touches[0]);
+  },
+
   handleMouseMove: function({pageX, pageY}) {
     let {order, lastPress, isPressed, delta: [dx, dy]} = this.state;
     if (isPressed) {
@@ -77,6 +86,8 @@ export default React.createClass({
     let {mouse, order, lastPress, isPressed} = this.state;
     return (
       <Springs
+        onTouchMove={this.handleTouchMove}
+        onTouchEnd={this.handleMouseUp}
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.handleMouseUp}
         className="demo1"
@@ -85,6 +96,7 @@ export default React.createClass({
           <div
             key={key}
             onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
+            onTouchStart={this.handleTouchStart.bind(null, key, [x, y])}
             className="demo1-circle"
             style={{
               backgroundColor: allColors[key],
