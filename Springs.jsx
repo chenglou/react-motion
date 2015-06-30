@@ -106,7 +106,7 @@ function updateV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
   return stepper(frameRate, currVals, currV, destVals, k, b)[1];
 }
 
-function mergeDiff(collA, collB, shouldRemove, accum) {
+function mergeDiff(collA, collB, onRemove, accum) {
   let [a, ...aa] = collA;
   let [b, ...bb] = collB;
 
@@ -117,31 +117,31 @@ function mergeDiff(collA, collB, shouldRemove, accum) {
     return accum.concat(collB);
   }
   if (collB.length === 0) {
-    if (shouldRemove(a)) {
-      return mergeDiff(aa, collB, shouldRemove, accum);
+    if (onRemove(a)) {
+      return mergeDiff(aa, collB, onRemove, accum);
     }
-    return mergeDiff(aa, collB, shouldRemove, accum.concat(a));
+    return mergeDiff(aa, collB, onRemove, accum.concat(a));
   }
   if (a === b) { // fails for ([undefined], [], () => true). but don't do that
-    return mergeDiff(aa, bb, shouldRemove, accum.concat(a));
+    return mergeDiff(aa, bb, onRemove, accum.concat(a));
   }
   if (collB.indexOf(a) === -1) {
-    if (shouldRemove(a)) {
-      return mergeDiff(aa, collB, shouldRemove, accum);
+    if (onRemove(a)) {
+      return mergeDiff(aa, collB, onRemove, accum);
     }
-    return mergeDiff(aa, collB, shouldRemove, accum.concat(a));
+    return mergeDiff(aa, collB, onRemove, accum.concat(a));
   }
-  return mergeDiff(aa, collB, shouldRemove, accum);
+  return mergeDiff(aa, collB, onRemove, accum);
 }
 
-function mergeDiffObj(a, b, shouldRemove) {
-  let keys = mergeDiff(Object.keys(a), Object.keys(b), a => !shouldRemove(a), []);
+function mergeDiffObj(a, b, onRemove) {
+  let keys = mergeDiff(Object.keys(a), Object.keys(b), a => !onRemove(a), []);
   let ret = {};
   keys.forEach(key => {
     if (b.hasOwnProperty(key)) {
       ret[key] = b[key];
     } else {
-      ret[key] = shouldRemove(key);
+      ret[key] = onRemove(key);
     }
   });
 
@@ -150,16 +150,16 @@ function mergeDiffObj(a, b, shouldRemove) {
 
 export default React.createClass({
   propTypes: {
-    startVal: PropTypes.func,
+    startVals: PropTypes.func,
     finalVals: PropTypes.func.isRequired,
-    missingCurrentKey: PropTypes.func,
-    shouldRemove: PropTypes.func,
+    onAdd: PropTypes.func,
+    onRemove: PropTypes.func,
   },
 
   getInitialState: function() {
-    let {startVal, finalVals} = this.props;
+    let {startVals, finalVals} = this.props;
     let defaultVals = stripMarks(
-      (startVal && startVal(null, tween)) || finalVals(null, tween)
+      (startVals && startVals(null, tween)) || finalVals(null, tween)
     );
     return {
       currVals: defaultVals,
@@ -171,7 +171,7 @@ export default React.createClass({
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
-      let {finalVals, missingCurrentKey, shouldRemove} = this.props;
+      let {finalVals, onAdd, onRemove} = this.props;
 
       // TODO: lol, refactor
       let markedDestVals = finalVals(currVals, tween);
@@ -182,7 +182,7 @@ export default React.createClass({
       let unwrappedMergedDestVals = mergeDiffObj(
         currVals,
         mary,
-        key => shouldRemove(key, tween, strippedDestVals, currVals, currV),
+        key => onRemove(key, tween, strippedDestVals, currVals, currV),
       );
 
       let rewrappedMergedDestVals = markedDestVals.__springK == null ?
@@ -194,14 +194,13 @@ export default React.createClass({
       Object.keys(unwrappedMergedDestVals)
         .filter(key => !currVals.hasOwnProperty(key))
         .forEach(key => {
-          currVals[key] = missingCurrentKey(key, strippedDestVals);
+          currVals[key] = onAdd(key, strippedDestVals);
           currV[key] = mapTree(zero, currVals[key]);
         });
 
       let frameRate = (now ? Date.now() - now : 16) / 1000;
       let newCurrVals = updateVals(frameRate, currVals, currV, rewrappedMergedDestVals);
       let newCurrV = updateV(frameRate, currVals, currV, rewrappedMergedDestVals);
-
 
       this.setState(() => {
         return {
