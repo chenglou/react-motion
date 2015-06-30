@@ -28,6 +28,7 @@ export default React.createClass({
         11: {text: 'Go home', isDone: false},
       },
       value: '',
+      selected: 'all'
     };
   },
 
@@ -71,8 +72,14 @@ export default React.createClass({
     this.setState({todos: newTodos});
   },
 
+  handleSelect: function(selected) {
+    this.setState({
+      selected: selected
+    });
+  },
+
   render: function() {
-    let {todos, value} = this.state;
+    let {todos, value, selected} = this.state;
     return (
       <section className="todoapp">
         <header className="header">
@@ -89,7 +96,10 @@ export default React.createClass({
               let configs = {};
               Object.keys(todos)
                 .filter(date => {
-                  return todos[date].text.toUpperCase().includes(value.toUpperCase());
+                  return todos[date].text.toUpperCase().includes(value.toUpperCase()) &&
+                         (selected === 'completed' && todos[date].isDone ||
+                          selected === 'active' && !todos[date].isDone ||
+                          selected === 'all');
                 })
                 .forEach(date => {
                   configs[date] = {height: 60, opacity: 1};
@@ -123,16 +133,15 @@ export default React.createClass({
           <span className="todo-count"><strong>{Object.keys(todos).filter(key => !todos[key].isDone).length}</strong> item left</span>
           <ul className="filters">
             <li>
-              <a className="selected" href="#/">All</a>
+              <a className={selected === 'all' ? 'selected' : ''} href="#/" onClick={this.handleSelect.bind(null, 'all')}>All</a>
             </li>
             <li>
-              <a href="#/active">Active</a>
+              <a className={selected === 'active' ? 'selected' : ''} href='#/active' onClick={this.handleSelect.bind(null, 'active')}>Active</a>
             </li>
             <li>
-              <a href="#/completed">Completed</a>
+              <a className={selected === 'completed' ? 'selected' : ''} href="#/completed" onClick={this.handleSelect.bind(null, 'completed')}>Completed</a>
             </li>
           </ul>
-          <button className="clear-completed">Clear completed</button>
         </footer>
       </section>
     );
