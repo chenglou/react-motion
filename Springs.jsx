@@ -8,7 +8,7 @@ window.interval = 1000 / 60;
 window.addEventListener('keypress', e => {
   if (e.which === 100) {
     hackOn = !hackOn;
-    window.interval = hackOn ? 100000 : 1000 / 60;
+    window.interval = hackOn ? 10000 : 1000 / 60;
   }
 });
 

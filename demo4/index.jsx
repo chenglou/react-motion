@@ -52,7 +52,7 @@ let Demo = React.createClass({
 
     return (
       <Springs
-        style={{width: 1650, overflow: 'hidden', outline: '1px solid black'}}
+        // style={{overflow: 'hidden', outline: '1px solid black'}}
         className="demo4"
         finalVals={(currVals, tween) => {
           let [width, height] = photos[currKey];
@@ -95,33 +95,47 @@ let Demo = React.createClass({
         onAdd={(key, destVals, currVals) => {
           if (direction === 'right') {
             let [width, height] = photos[key];
-            let initHeight = photos[this.next(key)][1];
+            let initHeight = currVals[this.next(key)].height;
             let initWidth = initHeight / height * width;
             return {
-              left: -initWidth,
+              left: currVals[this.next(key)].left - initWidth,
               height: initHeight,
               width: initWidth,
             };
           } else if (direction === 'left') {
             let [width, height] = photos[key];
-            let initHeight = photos[this.prev(key)][1];
+            let initHeight = currVals[this.prev(key)].height;
             let initWidth = initHeight / height * width;
             return {
-              left: currVals[this.prev(key)].width,
+              left: currVals[this.prev(key)].left + currVals[this.prev(key)].width,
               height: initHeight,
               width: initWidth,
             };
           }
         }}>
         {configs => {
-          return Object.keys(configs).map(key => {
-            let s = {
-              position: 'absolute',
-            };
-            return (
-              <img src={key} style={{...s, ...configs[key]}}/>
-            );
-          });
+          // height: configs[Object.keys(configs)[0]].height,
+          // width: configs[Object.keys(configs)[0]].width,
+          let [width, height] = photos[currKey];
+          let s = {
+            width: width,
+            height: 999,
+            overflow: 'hidden',
+            // outline: '1px solid black',
+            position: 'relative',
+          };
+          return (
+            <div style={s}>
+              {Object.keys(configs).map(key => {
+                let s = {
+                  position: 'absolute',
+                };
+                return (
+                  <img src={key} style={{...s, ...configs[key]}}/>
+                );
+              })}
+            </div>
+          );
         }}
       </Springs>
     );
