@@ -92,17 +92,21 @@ export default React.createClass({
   render: function() {
     let {todos, value, selected} = this.state;
     return (
-      <section className="todoapp">
-        <header className="header">
+      <section className='todoapp'>
+        <header className='header'>
           <h1>todos</h1>
           <form onSubmit={this.handleSubmit}>
-            <input className="new-todo" placeholder="What needs to be done?" autoFocus={true} value={value} onChange={this.handleChange}/>
+            <input className='new-todo'
+                   placeholder='What needs to be done?'
+                   autoFocus={true}
+                   value={value}
+                   onChange={this.handleChange}/>
           </form>
         </header>
-        <section className="main">
-          <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll}/>
+        <section className='main'>
+          <input className='toggle-all' type='checkbox' onChange={this.handleToggleAll}/>
           <Springs
-            className="demo2"
+            className='demo2'
             finalVals={(currVals, tween) => {
               let configs = {};
               Object.keys(todos)
@@ -143,14 +147,17 @@ export default React.createClass({
             }}>
             {configs => {
               return (
-                <ul className="todo-list">
+                <ul className='todo-list'>
                   {Object.keys(configs).map(date => {
                     return (
                       <li key={date} style={configs[date]} className={configs[date].data.isDone ? 'completed' : ''}>
-                        <div className="view">
-                          <input className="toggle" type="checkbox" onChange={this.handleDone.bind(null, date)} checked={configs[date].data.isDone}/>
+                        <div className='view'>
+                          <input className='toggle'
+                                 type='checkbox'
+                                 onChange={this.handleDone.bind(null, date)}
+                                 checked={configs[date].data.isDone}/>
                           <label>{configs[date].data.text}</label>
-                          <button className="destroy" onClick={this.handleDestroy.bind(null, date)}></button>
+                          <button className='destroy' onClick={this.handleDestroy.bind(null, date)}></button>
                         </div>
                       </li>
                     );
@@ -162,21 +169,27 @@ export default React.createClass({
             }
           </Springs>
         </section>
-        <footer className="footer">
-          <span className="todo-count">
+        <footer className='footer'>
+          <span className='todo-count'>
             <strong>
               {Object.keys(todos).filter(key => !todos[key].isDone).length}
             </strong> item left
           </span>
-          <ul className="filters">
+          <ul className='filters'>
             <li>
-              <a className={selected === 'all' ? 'selected' : ''} href="#/" onClick={this.handleSelect.bind(null, 'all')}>All</a>
+              <a className={selected === 'all' ? 'selected' : ''}
+                 onClick={this.handleSelect.bind(null, 'all')}
+                 href='#/'>All</a>
             </li>
             <li>
-              <a className={selected === 'active' ? 'selected' : ''} href='#/active' onClick={this.handleSelect.bind(null, 'active')}>Active</a>
+              <a className={selected === 'active' ? 'selected' : ''}
+                 onClick={this.handleSelect.bind(null, 'active')}
+                 href='#/active'>Active</a>
             </li>
             <li>
-              <a className={selected === 'completed' ? 'selected' : ''} href="#/completed" onClick={this.handleSelect.bind(null, 'completed')}>Completed</a>
+              <a className={selected === 'completed' ? 'selected' : ''}
+                 onClick={this.handleSelect.bind(null, 'completed')}
+                 href='#/completed'>Completed</a>
             </li>
           </ul>
           <button className="clear-completed" onClick={this.handleClearCompleted}>Clear completed</button>
