@@ -64,17 +64,17 @@ function stripMarks(tree) {
 }
 
 // see stepper for constant k, b usage
-function updateVals(currVals, currV, destVals, k = -1, b = -1) {
+function updateVals(frameRate, currVals, currV, destVals, k = -1, b = -1) {
   if (destVals != null && destVals.__springK != null) {
-    return updateVals(currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
+    return updateVals(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
   }
   if (Object.prototype.toString.call(destVals) === '[object Array]') {
-    return destVals.map((val, i) => updateVals(currVals[i], currV[i], val, k, b));
+    return destVals.map((val, i) => updateVals(frameRate, currVals[i], currV[i], val, k, b));
   }
   if (Object.prototype.toString.call(destVals) === '[object Object]') {
     let newTree = {};
     Object.keys(destVals).forEach(key => {
-      newTree[key] = updateVals(currVals[key], currV[key], destVals[key], k, b);
+      newTree[key] = updateVals(frameRate, currVals[key], currV[key], destVals[key], k, b);
     });
     return newTree;
   }
@@ -82,20 +82,20 @@ function updateVals(currVals, currV, destVals, k = -1, b = -1) {
   if (k === -1 || b === -1) {
     return destVals;
   }
-  return stepper(currVals, currV, destVals, k, b)[0];
+  return stepper(frameRate, currVals, currV, destVals, k, b)[0];
 }
 
-function updateV(currVals, currV, destVals, k = -1, b = -1) {
+function updateV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
   if (destVals != null && destVals.__springK != null) {
-    return updateV(currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
+    return updateV(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
   }
   if (Object.prototype.toString.call(destVals) === '[object Array]') {
-    return destVals.map((val, i) => updateV(currVals[i], currV[i], val, k, b));
+    return destVals.map((val, i) => updateV(frameRate, currVals[i], currV[i], val, k, b));
   }
   if (Object.prototype.toString.call(destVals) === '[object Object]') {
     let newTree = {};
     Object.keys(destVals).forEach(key => {
-      newTree[key] = updateV(currVals[key], currV[key], destVals[key], k, b);
+      newTree[key] = updateV(frameRate, currVals[key], currV[key], destVals[key], k, b);
     });
     return newTree;
   }
@@ -103,7 +103,7 @@ function updateV(currVals, currV, destVals, k = -1, b = -1) {
   if (k === -1 || b === -1) {
     return currV;
   }
-  return stepper(currVals, currV, destVals, k, b)[1];
+  return stepper(frameRate, currVals, currV, destVals, k, b)[1];
 }
 
 function mergeDiff(collA, collB, shouldRemove, accum) {
@@ -164,12 +164,13 @@ export default React.createClass({
     return {
       currVals: defaultVals,
       currV: mapTree(zero, defaultVals),
+      now: null,
     };
   },
 
   raf: function() {
     requestAnimationFrame(() => {
-      let {currVals, currV} = this.state;
+      let {currVals, currV, now} = this.state;
       let {finalVals, missingCurrentKey, shouldRemove} = this.props;
 
       // TODO: lol, refactor
@@ -197,14 +198,16 @@ export default React.createClass({
           currV[key] = mapTree(zero, currVals[key]);
         });
 
-      let newCurrVals = updateVals(currVals, currV, rewrappedMergedDestVals);
-      let newCurrV = updateV(currVals, currV, rewrappedMergedDestVals);
+      let frameRate = (now ? Date.now() - now : 16) / 1000;
+      let newCurrVals = updateVals(frameRate, currVals, currV, rewrappedMergedDestVals);
+      let newCurrV = updateV(frameRate, currVals, currV, rewrappedMergedDestVals);
 
 
       this.setState(() => {
         return {
           currVals: newCurrVals,
           currV: newCurrV,
+          now: Date.now(),
         };
       });
 

@@ -4,12 +4,6 @@ import React from 'react';
 import Springs from './Springs';
 import {toArr, clone} from './utils';
 
-if (!String.prototype.includes) {
-  String.prototype.includes = function() {'use strict';
-    return String.prototype.indexOf.apply(this, arguments) !== -1;
-  };
-}
-
 export default React.createClass({
   getInitialState: function() {
     return {
@@ -96,41 +90,66 @@ export default React.createClass({
               let configs = {};
               Object.keys(todos)
                 .filter(date => {
-                  return todos[date].text.toUpperCase().includes(value.toUpperCase()) &&
-                         (selected === 'completed' && todos[date].isDone ||
-                          selected === 'active' && !todos[date].isDone ||
-                          selected === 'all');
+                  let todo = todos[date];
+                  return todo.text.toUpperCase().indexOf(value.toUpperCase()) >= 0 &&
+                    (selected === 'completed' && todo.isDone ||
+                    selected === 'active' && !todo.isDone ||
+                    selected === 'all');
                 })
                 .forEach(date => {
-                  configs[date] = {height: 60, opacity: 1};
+                  configs[date] = {
+                    data: tween(todos[date], -1, -1),
+                    height: 60,
+                    opacity: 1,
+                  };
                 });
               return tween(configs);
             }}
             // TODO: default: reached dest, v = 0
-            shouldRemove={(key, tween, destVals, currVals, currV) => {
-              return currVals[key].opacity <= 0 && currV[key].opacity <= 0 ?
+            shouldRemove={(date, tween, destVals, currVals, currV) => {
+              return currVals[date].opacity <= 0 && currV[date].opacity <= 0 ?
                 null :
-                tween({height: 0, opacity: 0});
+                tween({
+                  height: 0,
+                  opacity: 0,
+                  data: tween(todos[date], -1, -1),
+                });
             }}
             // TODO: default: destVals[key]
             // lifttable
-            missingCurrentKey={() => ({height: 0, opacity: 1})}>
-            {configs =>
-              <ul className="todo-list">
-                {Object.keys(configs).map(date =>
-                  <li key={date} style={configs[date]} className={todos[date].isDone ? 'completed' : ''}>
-                    <div className="view">
-                      <input className="toggle" type="checkbox" onChange={this.handleDone.bind(null, date)} checked={todos[date].isDone}/>
-                      <label>{todos[date].text}</label>
-                    </div>
-                  </li>
-                )}
-              </ul>
+            missingCurrentKey={date => {
+              return {
+                height: 0,
+                opacity: 1,
+                data: todos[date],
+              };
+            }}>
+            {configs => {
+              return (
+                <ul className="todo-list">
+                  {Object.keys(configs).map(date => {
+                    return (
+                      <li key={date} style={configs[date]} className={configs[date].data.isDone ? 'completed' : ''}>
+                        <div className="view">
+                          <input className="toggle" type="checkbox" onChange={this.handleDone.bind(null, date)} checked={configs[date].data.isDone}/>
+                          <label>{configs[date].data.text}</label>
+                        </div>
+                      </li>
+                    );
+                  }
+                  )}
+                </ul>
+              );
+            }
             }
           </Springs>
         </section>
         <footer className="footer">
-          <span className="todo-count"><strong>{Object.keys(todos).filter(key => !todos[key].isDone).length}</strong> item left</span>
+          <span className="todo-count">
+            <strong>
+              {Object.keys(todos).filter(key => !todos[key].isDone).length}
+            </strong> item left
+          </span>
           <ul className="filters">
             <li>
               <a className={selected === 'all' ? 'selected' : ''} href="#/" onClick={this.handleSelect.bind(null, 'all')}>All</a>
