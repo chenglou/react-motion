@@ -83,7 +83,7 @@ export default React.createClass({
   },
 
   render: function() {
-    let {mouse, order, lastPress, isPressed} = this.state;
+    let {order, lastPress} = this.state;
     return (
       <Springs
         onTouchMove={this.handleTouchMove}

@@ -10,7 +10,7 @@ export default React.createClass({
         // creation date => task name
         1: 'Board the plane',
         2: 'Sleep',
-        3: 'Try to finish coneference slides',
+        3: 'Try to finish conference slides',
         4: 'Eat cheese and drink wine',
         5: 'Go around in Uber',
         6: 'Talk with conf attendees',
