@@ -16,13 +16,13 @@ let Demo = React.createClass({
     };
   },
 
-  next (curr) {
+  next: function(curr) {
     let keys = Object.keys(this.state.photos);
     let idx = keys.indexOf(curr);
     return keys[(idx + 1) % keys.length];
   },
 
-  prev (curr) {
+  prev: function(curr) {
     let keys = Object.keys(this.state.photos);
     let idx = keys.indexOf(curr);
     return keys[(idx - 1 + keys.length) % keys.length];
@@ -31,8 +31,6 @@ let Demo = React.createClass({
   componentWillMount: function() {
     document.addEventListener('keydown', ({which}) => {
       let {photos, currKey} = this.state;
-      let keys = Object.keys(photos);
-
       if(which === 39) { // right
         this.setState({
           currKey: this.next(currKey),
@@ -49,11 +47,8 @@ let Demo = React.createClass({
 
   render: function() {
     let {photos, currKey, direction} = this.state;
-
     return (
       <Springs
-        // style={{overflow: 'hidden', outline: '1px solid black'}}
-        className="demo4"
         finalVals={(currVals, tween) => {
           let [width, height] = photos[currKey];
           let configs = {
@@ -61,11 +56,13 @@ let Demo = React.createClass({
               left: 0,
               height: height,
               width: width,
-            }
+            },
+            // will never be diffed
+            containerWidth: photos[currKey][0],
           };
-          return tween(configs);
+          return tween(configs, 150, 23);
         }}
-        onRemove={(key, tween, destVals, currVals, currV) => {
+        onRemove={(key, tween, destVals, currVals) => {
           if (direction === 'left') {
             let [width, height] = photos[key];
             let destHeight = photos[this.next(key)][1];
@@ -77,63 +74,51 @@ let Demo = React.createClass({
                 left: -destWidth,
                 height: destHeight,
                 width: destWidth,
-              });
+              }, 150, 23);
           } else if (direction === 'right') {
             let [width, height] = photos[key];
-            let destHeight = photos[this.prev(key)][1];
+            let prevPhoto = photos[this.prev(key)];
+            let destHeight = prevPhoto[1];
             let destWidth = destHeight / height * width;
             let currLeftEdge = currVals[key].left;
-            return currLeftEdge >= photos[this.prev(key)][0] ?
+            return currLeftEdge >= prevPhoto[0] ?
               null :
               tween({
-                left: photos[this.prev(key)][0],
+                left: prevPhoto[0],
                 height: destHeight,
                 width: destWidth,
-              });
+              }, 150, 23);
           }
         }}
         onAdd={(key, destVals, currVals) => {
           if (direction === 'right') {
             let [width, height] = photos[key];
-            let initHeight = currVals[this.next(key)].height;
+            let currNextPhoto = currVals[this.next(key)];
+            let initHeight = currNextPhoto.height;
             let initWidth = initHeight / height * width;
             return {
-              left: currVals[this.next(key)].left - initWidth,
+              left: currNextPhoto.left - initWidth,
               height: initHeight,
               width: initWidth,
             };
           } else if (direction === 'left') {
             let [width, height] = photos[key];
-            let initHeight = currVals[this.prev(key)].height;
+            let currPrevPhoto = currVals[this.prev(key)];
+            let initHeight = currPrevPhoto.height;
             let initWidth = initHeight / height * width;
             return {
-              left: currVals[this.prev(key)].left + currVals[this.prev(key)].width,
+              left: currPrevPhoto.left + currPrevPhoto.width,
               height: initHeight,
               width: initWidth,
             };
           }
         }}>
-        {configs => {
-          // height: configs[Object.keys(configs)[0]].height,
-          // width: configs[Object.keys(configs)[0]].width,
-          let [width, height] = photos[currKey];
-          let s = {
-            width: width,
-            height: 999,
-            overflow: 'hidden',
-            // outline: '1px solid black',
-            position: 'relative',
-          };
+        {({containerWidth, ...rest}) => {
           return (
-            <div style={s}>
-              {Object.keys(configs).map(key => {
-                let s = {
-                  position: 'absolute',
-                };
-                return (
-                  <img src={key} style={{...s, ...configs[key]}}/>
-                );
-              })}
+            <div className="demo4" style={{width: containerWidth}}>
+              {Object.keys(rest).map(key =>
+                <img className="demo4-photo" src={key} style={rest[key]} />
+              )}
             </div>
           );
         }}
