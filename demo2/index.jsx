@@ -1,10 +1,10 @@
 'use strict';
 
 import React from 'react';
-import Springs from './Springs';
-import {clone} from './utils';
+import Springs from '../Springs';
+import {clone} from '../utils';
 
-export default React.createClass({
+let Demo = React.createClass({
   getInitialState: function() {
     return {
       todos: {
@@ -185,3 +185,5 @@ export default React.createClass({
     );
   }
 });
+
+React.render(<Demo />, document.querySelector('#content'));

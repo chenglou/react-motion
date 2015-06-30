@@ -1,8 +1,8 @@
 'use strict';
 
 import React from 'react';
-import Springs from './Springs';
-import {range, reinsert} from './utils';
+import Springs from '../Springs';
+import {range, reinsert} from '../utils';
 
 let allColors = [
   '#EF767A', '#456990', '#49BEAA', '#49DCB1', '#EEB868', '#EF767A', '#456990',
@@ -16,7 +16,7 @@ let layout = range(count).map(n => {
   return [width * col, height * row];
 });
 
-export default React.createClass({
+let Demo = React.createClass({
   getInitialState: function() {
     return {
       mouse: [0, 0],
@@ -111,3 +111,5 @@ export default React.createClass({
     );
   }
 });
+
+React.render(<Demo />, document.querySelector('#content'));
