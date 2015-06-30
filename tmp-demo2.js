@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Springs from './Springs';
-import {toArr, clone} from './utils';
+import {clone} from './utils';
 
 export default React.createClass({
   getInitialState: function() {
@@ -72,6 +72,23 @@ export default React.createClass({
     });
   },
 
+  handleClearCompleted: function() {
+    let {todos} = this.state;
+    let newTodos = {};
+    for(var prop in todos) {
+      if(!todos[prop].isDone) newTodos[prop] = todos[prop];
+    }
+
+    this.setState({todos: newTodos});
+  },
+
+  handleDestroy: function(date) {
+    let {todos} = this.state;
+    let newTodos = clone(todos);
+    delete newTodos[date];
+    this.setState({todos: newTodos});
+  },
+
   render: function() {
     let {todos, value, selected} = this.state;
     return (
@@ -112,7 +129,7 @@ export default React.createClass({
                 tween({
                   height: 0,
                   opacity: 0,
-                  data: tween(todos[date], -1, -1),
+                  data: tween(currVals[date].data, -1, -1),
                 });
             }}
             // TODO: default: destVals[key]
@@ -133,6 +150,7 @@ export default React.createClass({
                         <div className="view">
                           <input className="toggle" type="checkbox" onChange={this.handleDone.bind(null, date)} checked={configs[date].data.isDone}/>
                           <label>{configs[date].data.text}</label>
+                          <button className="destroy" onClick={this.handleDestroy.bind(null, date)}></button>
                         </div>
                       </li>
                     );
@@ -161,6 +179,7 @@ export default React.createClass({
               <a className={selected === 'completed' ? 'selected' : ''} href="#/completed" onClick={this.handleSelect.bind(null, 'completed')}>Completed</a>
             </li>
           </ul>
+          <button className="clear-completed" onClick={this.handleClearCompleted}>Clear completed</button>
         </footer>
       </section>
     );
