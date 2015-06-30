@@ -194,7 +194,7 @@ export default React.createClass({
       Object.keys(unwrappedMergedDestVals)
         .filter(key => !currVals.hasOwnProperty(key))
         .forEach(key => {
-          currVals[key] = onAdd(key, strippedDestVals);
+          currVals[key] = onAdd(key, strippedDestVals, currVals);
           currV[key] = mapTree(zero, currVals[key]);
         });
 

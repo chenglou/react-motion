@@ -4,6 +4,7 @@ module.exports = {
   entry: {
     demo1: './demo1/index.jsx',
     demo2: './demo2/index.jsx',
+    demo4: './demo4/index.jsx',
   },
   output: {
     // path: './[name]/',
