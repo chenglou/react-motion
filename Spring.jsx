@@ -8,13 +8,16 @@ window.interval = 1000 / 60;
 window.addEventListener('keypress', e => {
   if (e.which === 100) {
     hackOn = !hackOn;
-    window.interval = hackOn ? 10000 : 1000 / 60;
+    window.interval = hackOn ? 3000 : 1000 / 60;
   }
 });
 
 function requestAnimationFrame(f) {
   setTimeout(f, window.interval);
 }
+
+// ---------
+let FRAME_RATE = 1 / 60;
 
 function zero() {
   return 0;
@@ -150,17 +153,62 @@ function mergeDiffObj(a, b, onRemove) {
 
 export default React.createClass({
   propTypes: {
-    startVals: PropTypes.func,
+    values: PropTypes.func.isRequired,
+  },
+
+  getInitialState: function() {
+    let {values} = this.props;
+    let defaultVals = stripMarks(values(tween));
+    return {
+      currVals: defaultVals,
+      currV: mapTree(zero, defaultVals),
+      now: null,
+    };
+  },
+
+  raf: function() {
+    requestAnimationFrame(() => {
+      let {currVals, currV, now} = this.state;
+      let {values} = this.props;
+
+      // TODO: lol, refactor
+      let annotatedVals = values(tween, currVals);
+      let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
+      let newCurrVals = updateVals(frameRate, currVals, currV, annotatedVals);
+      let newCurrV = updateV(frameRate, currVals, currV, annotatedVals);
+
+      this.setState(() => {
+        return {
+          currVals: newCurrVals,
+          currV: newCurrV,
+          now: Date.now(),
+        };
+      });
+
+      this.raf();
+    });
+  },
+
+  componentDidMount: function() {
+    this.raf();
+  },
+
+  render: function() {
+    let {currVals} = this.state;
+    return <div {...this.props}>{this.props.children(currVals)}</div>;
+  }
+});
+
+export let TransitionSprings = React.createClass({
+  propTypes: {
     finalVals: PropTypes.func.isRequired,
     onAdd: PropTypes.func,
     onRemove: PropTypes.func,
   },
 
   getInitialState: function() {
-    let {startVals, finalVals} = this.props;
-    let defaultVals = stripMarks(
-      (startVals && startVals(null, tween)) || finalVals(null, tween)
-    );
+    let {finalVals} = this.props;
+    let defaultVals = stripMarks(finalVals(null, tween));
     return {
       currVals: defaultVals,
       currV: mapTree(zero, defaultVals),
@@ -191,12 +239,14 @@ export default React.createClass({
 
       currVals = clone(currVals);
       currV = clone(currV);
-      Object.keys(unwrappedMergedDestVals)
-        .filter(key => !currVals.hasOwnProperty(key))
-        .forEach(key => {
-          currVals[key] = onAdd(key, strippedDestVals, currVals);
-          currV[key] = mapTree(zero, currVals[key]);
-        });
+      if (onAdd) {
+        Object.keys(unwrappedMergedDestVals)
+          .filter(key => !currVals.hasOwnProperty(key))
+          .forEach(key => {
+            currVals[key] = onAdd(key, strippedDestVals, currVals);
+            currV[key] = mapTree(zero, currVals[key]);
+          });
+      }
 
       let frameRate = (now ? Date.now() - now : 16) / 1000;
       let newCurrVals = updateVals(frameRate, currVals, currV, rewrappedMergedDestVals);
