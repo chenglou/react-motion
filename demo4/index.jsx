@@ -202,14 +202,12 @@ let Demo = React.createClass({
 
             let deltaX = mouseX / currWidth;
 
-            let dir = direction === 'right' ? 1 : -1;
-
+            // Set those velocities depending on how fast you flick
             newCurrV[currKey] = {
               left: 0,
               width: 0,
               height: 0,
             };
-
             newCurrV[prev] = {
               left: 0,
               width: 0,
@@ -221,21 +219,39 @@ let Demo = React.createClass({
               height: 0,
             };
 
-            newCurrVals[prev] = {
-              left: mouseX - dir * prevWidth,
-              width: prevWidth,
-              height: currHeight + dir * (prevHeight - currHeight) * deltaX
-            };
-            newCurrVals[next] = {
-              left: mouseX + dir * currWidth,
-              width: nextWidth,
-              height: currHeight - dir * (nextHeight - currHeight) * deltaX,
-            };
-            newCurrVals[currKey] = {
-              left: mouseX,
-              width: currWidth,
-              height: currHeight + dir * (prevHeight - currHeight) * deltaX,
-            };
+            if(direction === 'right') {
+              newCurrVals[prev] = {
+                left: mouseX - prevWidth,
+                width: prevWidth,
+                height: currHeight + (prevHeight - currHeight) * deltaX
+              };
+              newCurrVals[next] = {
+                left: mouseX + currWidth,
+                width: nextWidth,
+                height: currHeight - (nextHeight - currHeight) * deltaX,
+              };
+              newCurrVals[currKey] = {
+                left: mouseX,
+                width: currWidth,
+                height: currHeight + (prevHeight - currHeight) * deltaX,
+              };
+            } else if(direction === 'left') {
+              newCurrVals[next] = {
+                left: mouseX + currWidth,
+                width: nextWidth,
+                height: currHeight - (nextHeight - currHeight) * deltaX,
+              };
+              newCurrVals[prev] = {
+                left: mouseX - prevWidth,
+                width: prevWidth,
+                height: currHeight + (prevHeight - currHeight) * deltaX
+              };
+              newCurrVals[currKey] = {
+                left: mouseX,
+                width: currWidth,
+                height: currHeight - (nextHeight - currHeight) * deltaX,
+              };
+            }
 
             return [newCurrVals, newCurrV];
           }
