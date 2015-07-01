@@ -171,7 +171,7 @@ export default React.createClass({
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
-      let {finalVals, onAdd, onRemove} = this.props;
+      let {finalVals, onAdd, onRemove, changeCurr} = this.props;
 
       // TODO: lol, refactor
       let markedDestVals = finalVals(currVals, tween);
@@ -202,6 +202,17 @@ export default React.createClass({
       let newCurrVals = updateVals(frameRate, currVals, currV, rewrappedMergedDestVals);
       let newCurrV = updateV(frameRate, currVals, currV, rewrappedMergedDestVals);
 
+      if(changeCurr) {
+        [newCurrVals, newCurrV] = changeCurr(newCurrVals, newCurrV);
+      }
+
+      // if(reduceCurrVals) {
+      //   let prev = null;
+      //   for(var key in newCurrVals) {
+      //     newCurrVals[key] = reduceCurrVals(prev, newCurrVals[key], key);
+      //     prev = newCurrVals[key];
+      //   }
+      // }
       this.setState(() => {
         return {
           currVals: newCurrVals,
