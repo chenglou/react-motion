@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import Springs from '../Springs';
+import Spring from '../Spring';
 
 let Demo = React.createClass({
   getInitialState: function() {
@@ -48,7 +48,7 @@ let Demo = React.createClass({
   render: function() {
     let {photos, currKey, direction} = this.state;
     return (
-      <Springs
+      <Spring
         finalVals={(currVals, tween) => {
           let [width, height] = photos[currKey];
           let configs = {
@@ -122,7 +122,7 @@ let Demo = React.createClass({
             </div>
           );
         }}
-      </Springs>
+      </Spring>
     );
   }
 });

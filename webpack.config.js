@@ -4,6 +4,7 @@ module.exports = {
   entry: {
     demo1: './demo1/index.jsx',
     demo2: './demo2/index.jsx',
+    demo3: './demo3/index.jsx',
     demo4: './demo4/index.jsx',
   },
   output: {
@@ -18,10 +19,10 @@ module.exports = {
   resolve: {
     extensions: ['', '.js', '.jsx']
   },
-  plugins: [new webpack.DefinePlugin({
-    'process.env': {
-      NODE_ENV: JSON.stringify('production'),
-    }
-  })],
+  // plugins: [new webpack.DefinePlugin({
+  //   'process.env': {
+  //     NODE_ENV: JSON.stringify('production'),
+  //   }
+  // })],
 };
 
