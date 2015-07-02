@@ -1,4 +1,5 @@
 'use strict';
+
 import React, {PropTypes} from 'react';
 import {mapTree, clone} from './utils';
 import stepper from './stepper';
@@ -143,90 +144,6 @@ animated. You might as well directly pass the value.`
   }
 }
 
-function wrapAgain(prevTree, newTree) {
-  if (prevTree != null && prevTree.__springK != null) {
-    return tween(wrapAgain(prevTree.value, newTree), prevTree.__springK, prevTree.__springB);
-  }
-
-  if (newTree != null && newTree.__springK != null) {
-    return tween(wrapAgain(prevTree, newTree.value), newTree.__springK, newTree.__springB);
-  }
-
-  if (Object.prototype.toString.call(prevTree) === '[object Array]') {
-    // TODO: what if the two arrays aren't of the same length....?
-    return prevTree.map((v, i) => wrapAgain(v, newTree[i]));
-  }
-  if (Object.prototype.toString.call(prevTree) === '[object Object]') {
-    let cur = {};
-    Object.keys(prevTree).forEach(key => cur[key] = wrapAgain(prevTree[key], newTree[key]));
-    Object.keys(newTree).forEach(key => cur[key] = cur.hasOwnProperty(key) ? cur[key] : wrapAgain(prevTree[key], newTree[key]));
-    return cur;
-  }
-
-  return newTree;
-}
-
-export let funcDiffer = (values, onRemove, currVals, currV) => {
-  let markedDestVals = values(tween, currVals, currV);
-  if(!currVals || !currV) {
-    return markedDestVals;
-  }
-
-  if(Object.prototype.toString.call(markedDestVals) !== '[object Object]') {
-    return markedDestVals;
-  }
-
-  let strippedDestVals = stripMarks(markedDestVals);
-
-  let unwrappedMergedDestVals = mergeDiffObj(
-    currVals,
-    strippedDestVals,
-    key => onRemove(key, tween, strippedDestVals, currVals, currV),
-  );
-
-  return wrapAgain(markedDestVals, unwrappedMergedDestVals);
-};
-
-export let Differ = Springs => React.createClass({
-  propTypes: {
-    onAdd: PropTypes.func.isRequired,
-    onRemove: PropTypes.func.isRequired,
-  },
-
-  mergeDestVals: function(strippedDestVals, currVals, currV) {
-    let {onRemove} = this.props;
-
-    let unwrappedMergedDestVals = mergeDiffObj(
-      currVals,
-      strippedDestVals,
-      key => onRemove(key, tween, strippedDestVals, currVals, currV),
-    );
-
-    return unwrappedMergedDestVals;
-  },
-
-  values: function(tween, currVals, currV) {
-    let {values} = this.props;
-    let markedDestVals = values(tween, currVals, currV);
-    if(!currVals || !currV) {
-      return markedDestVals;
-    }
-
-    if(Object.prototype.toString.call(markedDestVals) !== '[object Object]') {
-      return markedDestVals;
-    }
-
-    let strippedDestVals = stripMarks(markedDestVals);
-    let unwrappedMergedDestVals = this.mergeDestVals(strippedDestVals, currVals, currV);
-    let rewrappedMergedDestVals = wrapAgain(markedDestVals, unwrappedMergedDestVals);
-    return rewrappedMergedDestVals;
-  },
-
-  render() {
-    return <Springs {...this.props} values={this.values}/>;
-  }
-});
-
 export default React.createClass({
   propTypes: {
     values: PropTypes.oneOfType([
@@ -256,28 +173,16 @@ export default React.createClass({
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
-      let {values, onAdd} = this.props;
+      let {values} = this.props;
 
       // TODO: lol, refactor
       let annotatedVals;
       if (typeof values === 'function') {
         checkValuesFunc(values);
-        annotatedVals = values(tween, currVals, currV);
+        annotatedVals = values(tween, currVals);
       } else {
         annotatedVals = tween(values);
       }
-
-      currVals = clone(currVals);
-      currV = clone(currV);
-      let unwrappedMergedDestVals = annotatedVals;
-      if(annotatedVals.__springB !== null) unwrappedMergedDestVals = annotatedVals.value;
-      Object.keys(unwrappedMergedDestVals)
-        .filter(key => !currVals.hasOwnProperty(key))
-        .forEach(key => {
-          currVals[key] = onAdd(key, annotatedVals, currVals);
-          currV[key] = mapTree(zero, currVals[key]);
-        });
-
       let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
       let newCurrVals = updateVals(frameRate, currVals, currV, annotatedVals);
       let newCurrV = updateV(frameRate, currVals, currV, annotatedVals);
@@ -304,16 +209,35 @@ export default React.createClass({
   }
 });
 
-export let TransitionSprings = React.createClass({
+export let TransitionSpring = React.createClass({
   propTypes: {
-    finalVals: PropTypes.func.isRequired,
-    onAdd: PropTypes.func,
-    onRemove: PropTypes.func,
+    values: PropTypes.oneOfType([
+      PropTypes.func,
+      // TODO: better warning
+      PropTypes.object,
+    ]).isRequired,
+    willLeave: PropTypes.oneOfType([
+      PropTypes.func,
+      // TODO: better warning
+      PropTypes.object,
+    ]),
+    willEnter: PropTypes.oneOfType([
+      PropTypes.func,
+      // TODO: better warning
+      PropTypes.object,
+    ]),
   },
 
   getInitialState: function() {
-    let {finalVals} = this.props;
-    let defaultVals = stripMarks(finalVals(null, tween));
+    let {values} = this.props;
+    let vals;
+    if (typeof values === 'function') {
+      checkValuesFunc(values);
+      vals = values(tween);
+    } else {
+      vals = values;
+    }
+    let defaultVals = stripMarks(vals);
     return {
       currVals: defaultVals,
       currV: mapTree(zero, defaultVals),
@@ -324,50 +248,49 @@ export let TransitionSprings = React.createClass({
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
-      let {finalVals, onAdd, onRemove, changeCurr} = this.props;
+      let {
+        values,
+        willEnter = (key, currVals) => currVals[key],
+        willLeave = () => null,
+      } = this.props;
 
       // TODO: lol, refactor
-      let markedDestVals = finalVals(currVals, tween);
-      let mary = markedDestVals.__springK == null ? markedDestVals : markedDestVals.value;
+      let annotatedVals;
+      if (typeof values === 'function') {
+        checkValuesFunc(values);
+        annotatedVals = values(tween, currVals);
+      } else {
+        annotatedVals = tween(values);
+      }
 
-      let strippedDestVals = stripMarks(markedDestVals);
+      let strippedVals = stripMarks(annotatedVals);
+      let shallowStrippedVals = annotatedVals.__springK == null ?
+        annotatedVals :
+        annotatedVals.value;
 
-      let unwrappedMergedDestVals = mergeDiffObj(
+      let shallowStrippedMergedVals = mergeDiffObj(
         currVals,
-        mary,
-        key => onRemove(key, tween, strippedDestVals, currVals, currV),
+        shallowStrippedVals,
+        key => willLeave(key, tween, strippedVals, currVals, currV),
       );
 
-      let rewrappedMergedDestVals = markedDestVals.__springK == null ?
-        unwrappedMergedDestVals :
-        tween(unwrappedMergedDestVals, markedDestVals.__springK, markedDestVals.__springB);
+      let mergedVals = annotatedVals.__springK == null ?
+        shallowStrippedMergedVals :
+        tween(shallowStrippedMergedVals, annotatedVals.__springK, annotatedVals.__springB);
 
       currVals = clone(currVals);
       currV = clone(currV);
-      if (onAdd) {
-        Object.keys(unwrappedMergedDestVals)
-          .filter(key => !currVals.hasOwnProperty(key))
-          .forEach(key => {
-            currVals[key] = onAdd(key, strippedDestVals, currVals);
-            currV[key] = mapTree(zero, currVals[key]);
-          });
-      }
+      Object.keys(shallowStrippedMergedVals)
+        .filter(key => !currVals.hasOwnProperty(key))
+        .forEach(key => {
+          currVals[key] = willEnter(key, strippedVals, currVals);
+          currV[key] = mapTree(zero, currVals[key]);
+        });
 
-      let frameRate = (now ? Date.now() - now : 16) / 1000;
-      let newCurrVals = updateVals(frameRate, currVals, currV, rewrappedMergedDestVals);
-      let newCurrV = updateV(frameRate, currVals, currV, rewrappedMergedDestVals);
+      let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
+      let newCurrVals = updateVals(frameRate, currVals, currV, mergedVals);
+      let newCurrV = updateV(frameRate, currVals, currV, mergedVals);
 
-      if(changeCurr) {
-        [newCurrVals, newCurrV] = changeCurr(newCurrVals, newCurrV);
-      }
-
-      // if(reduceCurrVals) {
-      //   let prev = null;
-      //   for(var key in newCurrVals) {
-      //     newCurrVals[key] = reduceCurrVals(prev, newCurrVals[key], key);
-      //     prev = newCurrVals[key];
-      //   }
-      // }
       this.setState(() => {
         return {
           currVals: newCurrVals,
@@ -386,10 +309,6 @@ export let TransitionSprings = React.createClass({
 
   render: function() {
     let {currVals} = this.state;
-    return (
-      <div {...this.props}>
-        {this.props.children(currVals)}
-      </div>
-    );
-  }
+    return <div {...this.props}>{this.props.children(currVals)}</div>;
+  },
 });

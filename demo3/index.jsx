@@ -1,10 +1,7 @@
 'use strict';
 
 import React from 'react';
-import Spring, {Differ, funcDiffer} from '../Spring';
-import {range} from '../utils';
-
-// let Spring = Differ(SpringWithoutDiff);
+import {TransitionSpring} from '../Spring';
 
 let Demo = React.createClass({
   getInitialState: function() {
@@ -74,7 +71,7 @@ let Demo = React.createClass({
     this.forceUpdate();
   },
 
-  getValues: function(tween, currVals, currV) {
+  getValues: function(tween) {
     let {todos, value, selected} = this.state;
     let configs = {};
     Object.keys(todos)
@@ -92,10 +89,10 @@ let Demo = React.createClass({
           opacity: 1,
         };
       });
-    return funcDiffer(() => tween(configs), this.onRemove, currVals, currV);
+    return tween(configs);
   },
 
-  onAdd: function(date) {
+  willEnter: function(date) {
     return {
       height: 0,
       opacity: 1,
@@ -103,7 +100,7 @@ let Demo = React.createClass({
     };
   },
 
-  onRemove: function(date, tween, destVals, currVals, currV) {
+  willLeave: function(date, tween, destVals, currVals, currV) {
     if (currVals[date].opacity > 0 || currV[date].opacity > 0) {
       return tween({
         height: 0,
@@ -131,7 +128,7 @@ let Demo = React.createClass({
         </header>
         <section className="main">
           <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll}/>
-          <Spring values={this.getValues} onRemove={this.onRemove} onAdd={this.onAdd}>
+          <TransitionSpring values={this.getValues} willLeave={this.willLeave} willEnter={this.willEnter}>
             {configs =>
               <ul className="todo-list">
                 {Object.keys(configs).map(date => {
@@ -157,7 +154,7 @@ let Demo = React.createClass({
                 })}
               </ul>
             }
-          </Spring>
+          </TransitionSpring>
         </section>
         <footer className="footer">
           <span className="todo-count">
