@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import Springs from '../Springs';
+import Spring from '../Spring';
 import {clone} from '../utils';
 
 let Demo = React.createClass({
@@ -110,7 +110,7 @@ let Demo = React.createClass({
   render: function() {
     let {photos, currKey, direction, mouseX, isPressed} = this.state;
     return (
-      <Springs
+      <Spring
         onTouchMove={this.onTouchMove}
         onTouchEnd={this.onMouseUp}
         onMouseMove={this.onMouseMove}
@@ -272,7 +272,7 @@ let Demo = React.createClass({
             </div>
           );
         }}
-      </Springs>
+      </Spring>
     );
   }
 });
