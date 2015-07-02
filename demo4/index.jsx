@@ -1,8 +1,7 @@
 'use strict';
 
 import React from 'react';
-import Spring from '../Spring';
-import {clone} from '../utils';
+import Spring, {TransitionSpring} from '../Spring';
 
 let Demo = React.createClass({
   getInitialState: function() {
@@ -12,8 +11,7 @@ let Demo = React.createClass({
         './download2.jpeg': [800, 400],
         './download3.jpeg': [700, 500],
       },
-      currKey: './download1.jpeg',
-      direction: null,
+      currPhoto: 0,
     };
   },
 
@@ -29,250 +27,68 @@ let Demo = React.createClass({
     return keys[(idx - 1 + keys.length) % keys.length];
   },
 
-  componentWillMount: function() {
-    document.addEventListener('keydown', ({which}) => {
-      let {photos, currKey} = this.state;
-      if(which === 39) { // right
-        this.setState({
-          currKey: this.next(currKey),
-          direction: 'left',
-        });
-      } else if (which === 37) { // left
-        this.setState({
-          currKey: this.prev(currKey),
-          direction: 'right',
-        });
-      }
+  handleChange: function({target: {value}}) {
+    this.setState({currPhoto: value});
+  },
+
+  getValues: function(tween) {
+    let {photos, currPhoto} = this.state;
+    let keys = Object.keys(photos);
+    let currKey = keys[currPhoto];
+    let [width, height] = photos[currKey];
+    let widths = keys.map(key => {
+      let [origW, origH] = photos[key];
+      return height / origH * origW;
     });
-  },
-
-  onMouseMove: function(e) {
-    e.preventDefault();
-    let {pageX} = e;
-    let {isPressed, mouseX, diffX, currKey} = this.state;
-    if(isPressed) {
-      if(pageX - diffX > mouseX) { // moving to the right
-        this.setState({
-          direction: 'right',
-          mouseX: pageX - diffX
-        });
-      } else {
-        this.setState({
-          direction: 'left',
-          mouseX: pageX - diffX
-        });
+    let offset = 0;
+    for (var i = 0; i < widths.length; i++) {
+      if (keys[i] === currKey) {
+        break;
       }
+      offset -= widths[i];
     }
-  },
-
-  onTouchMove: function(e) {
-    e.preventDefault();
-    this.onMouseMove(e.touches[0]);
-  },
-
-  onMouseDown: function(left, e) {
-    e.preventDefault();
-    let {pageX} = e;
-    let diffX = pageX - left;
-    this.setState({
-      diffX: diffX,
-      isPressed: true,
-      mouseX: pageX - diffX,
-      direction: 'right'
-    });
-  },
-
-  onTouchStart: function(left, {touches: [first]}) {
-    this.onMouseDown(left, first);
-  },
-
-  onMouseUp: function() {
-    let {mouseX, currKey, photos} = this.state;
-    if(mouseX + photos[currKey][0] < document.body.clientWidth * 2 / 3) { // some sort of middle point
-      this.setState({
-        isPressed: false,
-        currKey: this.next(currKey),
-        direction: 'left'
-      });
-    } else if (mouseX > document.body.clientWidth * 1 / 3) {
-      this.setState({
-        isPressed: false,
-        currKey: this.prev(currKey),
-        direction: 'right'
-      });
-    } else {
-      this.setState({
-        isPressed: false,
-      });
-    }
+    let configs = {};
+    keys.reduce((prevLeft, key, i) => {
+      let [origW, origH] = photos[key];
+      configs[key] = {
+        left: prevLeft,
+        height: height,
+        width: height / origH * origW,
+      };
+      return prevLeft + widths[i];
+    }, offset);
+    configs.container = {
+      height: height,
+      width: width,
+    };
+    return tween(configs, 150, 23);
   },
 
   render: function() {
-    let {photos, currKey, direction, mouseX, isPressed} = this.state;
+    let {photos, currPhoto} = this.state;
     return (
-      <Spring
-        onTouchMove={this.onTouchMove}
-        onTouchEnd={this.onMouseUp}
-        onMouseMove={this.onMouseMove}
-        onMouseUp={this.onMouseUp}
-        finalVals={(currVals, tween) => {
-          let [width, height] = photos[currKey];
-          let configs = {
-            [currKey]: {
-              left: 0,
-              height: height,
-              width: width,
-            },
-            // will never be diffed
-            containerWidth: photos[currKey][0],
-          };
-          return tween(configs, 150, 23);
-        }}
-        onRemove={(key, tween, destVals, currVals) => {
-          if (direction === 'left') {
-            let [width, height] = photos[key];
-            let destHeight = photos[this.next(key)][1];
-            let destWidth = destHeight / height * width;
-            let currLeftEdge = currVals[key].left;
-            return currLeftEdge <= -destWidth ?
-              null :
-              tween({
-                left: -destWidth,
-                height: destHeight,
-                width: destWidth,
-              }, 150, 23);
-          } else if (direction === 'right') {
-            let [width, height] = photos[key];
-            let prevPhoto = photos[this.prev(key)];
-            let destHeight = prevPhoto[1];
-            let destWidth = destHeight / height * width;
-            let currLeftEdge = currVals[key].left;
-            return currLeftEdge >= prevPhoto[0] ?
-              null :
-              tween({
-                left: prevPhoto[0],
-                height: destHeight,
-                width: destWidth,
-              }, 150, 23);
-          }
-        }}
-        onAdd={(key, destVals, currVals) => {
-          if (direction === 'right') {
-            let [width, height] = photos[key];
-            let currNextPhoto = currVals[this.next(key)];
-            let initHeight = currNextPhoto.height;
-            let initWidth = initHeight / height * width;
-            return {
-              left: currNextPhoto.left - initWidth,
-              height: initHeight,
-              width: initWidth,
-            };
-          } else if (direction === 'left') {
-            let [width, height] = photos[key];
-            let currPrevPhoto = currVals[this.prev(key)];
-            let initHeight = currPrevPhoto.height;
-            let initWidth = initHeight / height * width;
-            return {
-              left: currPrevPhoto.left + currPrevPhoto.width,
-              height: initHeight,
-              width: initWidth,
-            };
-          }
-        }}
-        changeCurr={(currVals, currV) => {
-          // 3 possibilities is currKey === 2
-          // [1, 2] ----> if 2 is moving right
-          // [2, 3] ----> if 2 is moving left
-          // [1, 2, 3] ---> ?????
-          if(isPressed) {
-            let newCurrVals = clone(currVals);
-            let newCurrV = clone(currV);
-
-            let prev = this.prev(currKey);
-            let next = this.next(currKey);
-
-            let currWidth = photos[currKey][0];
-            let currHeight = photos[currKey][1];
-
-            let prevWidth = photos[prev][0];
-            let prevHeight = photos[prev][1];
-
-            let nextWidth = photos[next][0];
-            let nextHeight = photos[next][1];
-
-            let deltaX = mouseX / currWidth;
-
-            // Set those velocities depending on how fast you flick
-            newCurrV[currKey] = {
-              left: 0,
-              width: 0,
-              height: 0,
-            };
-            newCurrV[prev] = {
-              left: 0,
-              width: 0,
-              height: 0,
-            };
-            newCurrV[next] = {
-              left: 0,
-              width: 0,
-              height: 0,
-            };
-
-            if(direction === 'right') {
-              newCurrVals[prev] = {
-                left: mouseX - prevWidth,
-                width: prevWidth,
-                height: currHeight + (prevHeight - currHeight) * deltaX
-              };
-              newCurrVals[next] = {
-                left: mouseX + currWidth,
-                width: nextWidth,
-                height: currHeight - (nextHeight - currHeight) * deltaX,
-              };
-              newCurrVals[currKey] = {
-                left: mouseX,
-                width: currWidth,
-                height: currHeight + (prevHeight - currHeight) * deltaX,
-              };
-            } else if(direction === 'left') {
-              newCurrVals[next] = {
-                left: mouseX + currWidth,
-                width: nextWidth,
-                height: currHeight - (nextHeight - currHeight) * deltaX,
-              };
-              newCurrVals[prev] = {
-                left: mouseX - prevWidth,
-                width: prevWidth,
-                height: currHeight + (prevHeight - currHeight) * deltaX
-              };
-              newCurrVals[currKey] = {
-                left: mouseX,
-                width: currWidth,
-                height: currHeight - (nextHeight - currHeight) * deltaX,
-              };
-            }
-
-            return [newCurrVals, newCurrV];
-          }
-
-          return [currVals, currV];
-        }}>
-        {({containerWidth, ...rest}) => {
-          return (
-            <div className="demo4" style={{width: containerWidth}}>
+      <div>
+        <input
+          type="range"
+          min={0}
+          max={Object.keys(photos).length - 1}
+          value={currPhoto}
+          onChange={this.handleChange} />
+        {currPhoto}
+        <Spring className="demo4" values={this.getValues}>
+          {({container, ...rest}) =>
+            <div className="demo4-inner" style={container}>
               {Object.keys(rest).map(key =>
                 <img
                   className="demo4-photo"
+                  key={key}
                   src={key}
-                  style={rest[key]}
-                  onMouseDown={this.onMouseDown.bind(null, rest[key].left)}
-                  onTouchStart={this.onTouchStart.bind(null, rest[key].left)}/>
+                  style={rest[key]} />
               )}
             </div>
-          );
-        }}
-      </Spring>
+          }
+        </Spring>
+      </div>
     );
   }
 });
