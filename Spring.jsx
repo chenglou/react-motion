@@ -23,24 +23,6 @@ function zero() {
   return 0;
 }
 
-// dv = defaultValue
-// iv = initialValue, used each frame, power user modification to curr vals
-// fv = finalValue
-
-// dv={obj}
-// iv={cur => obj}
-// fv={cur => obj}
-// 1. no anim
-// 2. has anim
-// a. dv, iv, fv
-// b. iv, fv
-
-// 1a.
-// 1b.
-
-// iv={cur? => obj}
-// fv={cur? => obj}
-
 // see stepper for constant k, b usage
 function tween(tree, k = 120, b = 16) {
   return {
@@ -151,14 +133,35 @@ function mergeDiffObj(a, b, onRemove) {
   return ret;
 }
 
+function checkValuesFunc(f) {
+  if (f.length === 0) {
+    console.warn(
+      `You're passing a function to Spring prop \`values\` which doesn't \
+receive \`tween\` as the first argument. In this case, nothing will be \
+animated. You might as well directly pass the value.`
+    );
+  }
+}
+
 export default React.createClass({
   propTypes: {
-    values: PropTypes.func.isRequired,
+    values: PropTypes.oneOfType([
+      PropTypes.func,
+      PropTypes.object,
+      PropTypes.number,
+    ]).isRequired,
   },
 
   getInitialState: function() {
     let {values} = this.props;
-    let defaultVals = stripMarks(values(tween));
+    let vals;
+    if (typeof values === 'function') {
+      checkValuesFunc(values);
+      vals = values(tween);
+    } else {
+      vals = values;
+    }
+    let defaultVals = stripMarks(vals);
     return {
       currVals: defaultVals,
       currV: mapTree(zero, defaultVals),
@@ -172,7 +175,13 @@ export default React.createClass({
       let {values} = this.props;
 
       // TODO: lol, refactor
-      let annotatedVals = values(tween, currVals);
+      let annotatedVals;
+      if (typeof values === 'function') {
+        checkValuesFunc(values);
+        annotatedVals = values(tween, currVals);
+      } else {
+        annotatedVals = tween(values);
+      }
       let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
       let newCurrVals = updateVals(frameRate, currVals, currV, annotatedVals);
       let newCurrV = updateV(frameRate, currVals, currV, annotatedVals);

@@ -24,12 +24,12 @@ let Demo = React.createClass({
 
   render: function() {
     return (
-      <Spring className="demo2" values={this.getValues} onMouseMove={this.handleMouseMove}>
+      <Spring className="demo1" values={this.getValues} onMouseMove={this.handleMouseMove}>
         {currentValues => currentValues.map(([x, y], i) => {
           return (
             <div
               key={i}
-              className={`demo2-ball ball-${i}`}
+              className={`demo1-ball ball-${i}`}
               style={{
                 WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
                 transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
