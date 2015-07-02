@@ -1,4 +1,5 @@
 'use strict';
+
 import React, {PropTypes} from 'react';
 import {mapTree, clone} from './utils';
 import stepper from './stepper';
@@ -8,7 +9,7 @@ window.interval = 1000 / 60;
 window.addEventListener('keypress', e => {
   if (e.which === 100) {
     hackOn = !hackOn;
-    window.interval = hackOn ? 3000 : 1000 / 60;
+    window.interval = hackOn ? 10000 : 1000 / 60;
   }
 });
 
@@ -16,12 +17,27 @@ function requestAnimationFrame(f) {
   setTimeout(f, window.interval);
 }
 
-// ---------
-let FRAME_RATE = 1 / 60;
-
 function zero() {
   return 0;
 }
+
+// dv = defaultValue
+// iv = initialValue, used each frame, power user modification to curr vals
+// fv = finalValue
+
+// dv={obj}
+// iv={cur => obj}
+// fv={cur => obj}
+// 1. no anim
+// 2. has anim
+// a. dv, iv, fv
+// b. iv, fv
+
+// 1a.
+// 1b.
+
+// iv={cur? => obj}
+// fv={cur? => obj}
 
 // see stepper for constant k, b usage
 function tween(tree, k = 120, b = 16) {
@@ -129,19 +145,81 @@ function mergeDiffObj(a, b, onRemove) {
       ret[key] = onRemove(key);
     }
   });
-
   return ret;
 }
 
-function checkValuesFunc(f) {
-  if (f.length === 0) {
-    console.warn(
-      `You're passing a function to Spring prop \`values\` which doesn't \
-receive \`tween\` as the first argument. In this case, nothing will be \
-animated. You might as well directly pass the value.`
+export let Diff = Springs => React.createClass({
+  propTypes: {
+    onAdd: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
+  },
+
+  mergeDestVals: function(strippedDestVals, currVals, currV) {
+    let {onAdd, onRemove} = this.props;
+
+    let unwrappedMergedDestVals = mergeDiffObj(
+      currVals,
+      strippedDestVals,
+      key => onRemove(key, tween, strippedDestVals, currVals, currV),
     );
+
+    return unwrappedMergedDestVals;
+  },
+
+  render() {
+    return <Springs
+              // differ={mergeDiffObj}
+              // onAdd={defaultOnAdd}
+              // onRemove={defaultOnRemove}
+              {...this.props}
+              mergeDestVals={this.mergeDestVals}/>;
   }
-}
+});
+
+// tween({
+//   a: {
+//     x: 50,
+//     y: 100
+//   },
+//   b: {
+//     x: 0,
+//     y: 0
+//   },
+// });
+
+// let a = {
+//   __springB: 16,
+//   __springK: 100,
+//   value: {
+//     a: {
+//       x: 50,
+//       y: 100
+//     },
+//     b: {
+//       x: 0,
+//       y: 0
+//     },
+//   }
+// };
+
+// let b = {
+//   a: {
+//     x: 50,
+//     y: 100
+//   },
+//   b: {
+//     __springK: 0,
+//     __springB: 0,
+//     value: {
+//       x: 0,
+//       y: 0
+//     }
+//   },
+// };
+
+// let [s, wrapAgain] = stripAndSave(a);
+// let asd = wrapAgain(b);
+// console.log(s, asd);
 
 function wrapAgain(prevTree, newTree) {
   if (prevTree != null && prevTree.__springK != null) {
@@ -166,86 +244,19 @@ function wrapAgain(prevTree, newTree) {
   return newTree;
 }
 
-export let funcDiffer = (values, onRemove, currVals, currV) => {
-  let markedDestVals = values(tween, currVals, currV);
-  if(!currVals || !currV) {
-    return markedDestVals;
-  }
-
-  if(Object.prototype.toString.call(markedDestVals) !== '[object Object]') {
-    return markedDestVals;
-  }
-
-  let strippedDestVals = stripMarks(markedDestVals);
-
-  let unwrappedMergedDestVals = mergeDiffObj(
-    currVals,
-    strippedDestVals,
-    key => onRemove(key, tween, strippedDestVals, currVals, currV),
-  );
-
-  return wrapAgain(markedDestVals, unwrappedMergedDestVals);
-};
-
-export let Differ = Springs => React.createClass({
-  propTypes: {
-    onAdd: PropTypes.func.isRequired,
-    onRemove: PropTypes.func.isRequired,
-  },
-
-  mergeDestVals: function(strippedDestVals, currVals, currV) {
-    let {onRemove} = this.props;
-
-    let unwrappedMergedDestVals = mergeDiffObj(
-      currVals,
-      strippedDestVals,
-      key => onRemove(key, tween, strippedDestVals, currVals, currV),
-    );
-
-    return unwrappedMergedDestVals;
-  },
-
-  values: function(tween, currVals, currV) {
-    let {values} = this.props;
-    let markedDestVals = values(tween, currVals, currV);
-    if(!currVals || !currV) {
-      return markedDestVals;
-    }
-
-    if(Object.prototype.toString.call(markedDestVals) !== '[object Object]') {
-      return markedDestVals;
-    }
-
-    let strippedDestVals = stripMarks(markedDestVals);
-    let unwrappedMergedDestVals = this.mergeDestVals(strippedDestVals, currVals, currV);
-    let rewrappedMergedDestVals = wrapAgain(markedDestVals, unwrappedMergedDestVals);
-    return rewrappedMergedDestVals;
-  },
-
-  render() {
-    return <Springs {...this.props} values={this.values}/>;
-  }
-});
-
 export default React.createClass({
   propTypes: {
-    values: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.object,
-      PropTypes.number,
-    ]).isRequired,
+    startVals: PropTypes.func,
+    finalVals: PropTypes.func.isRequired,
+    onAdd: PropTypes.func,
+    // onRemove: PropTypes.func,
   },
 
   getInitialState: function() {
-    let {values} = this.props;
-    let vals;
-    if (typeof values === 'function') {
-      checkValuesFunc(values);
-      vals = values(tween);
-    } else {
-      vals = values;
-    }
-    let defaultVals = stripMarks(vals);
+    let {startVals, finalVals} = this.props;
+    let defaultVals = stripMarks(
+      (startVals && startVals(null, tween)) || finalVals(null, tween)
+    );
     return {
       currVals: defaultVals,
       currV: mapTree(zero, defaultVals),
@@ -256,102 +267,37 @@ export default React.createClass({
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
-      let {values, onAdd} = this.props;
+      let {finalVals, mergeDestVals, changeCurr, onAdd} = this.props;
+      // let {finalVals, onAdd, onRemove, changeCurr, differ} = this.props;
+      // if(!differ) differ = mergeDiffObj;
 
-      // TODO: lol, refactor
-      let annotatedVals;
-      if (typeof values === 'function') {
-        checkValuesFunc(values);
-        annotatedVals = values(tween, currVals, currV);
-      } else {
-        annotatedVals = tween(values);
-      }
+      let markedDestVals = finalVals(currVals, tween);
+      let strippedDestVals = stripMarks(markedDestVals);
+      // let mary = markedDestVals.__springK == null ? markedDestVals : markedDestVals.value;
+
+      // let strippedDestVals = stripMarks(markedDestVals);
+
+      // let unwrappedMergedDestVals = differ(
+      //   currVals,
+      //   mary,
+      //   key => onRemove(key, tween, strippedDestVals, currVals, currV),
+      // );
+      let unwrappedMergedDestVals = mergeDestVals(strippedDestVals, currVals, currV);
+
+      let rewrappedMergedDestVals = wrapAgain(markedDestVals, unwrappedMergedDestVals);
+
+      // let rewrappedMergedDestVals = markedDestVals.__springK == null ?
+      //     unwrappedMergedDestVals :
+      //     tween(unwrappedMergedDestVals, markedDestVals.__springK, markedDestVals.__springB);
 
       currVals = clone(currVals);
       currV = clone(currV);
-      let unwrappedMergedDestVals = annotatedVals;
-      if(annotatedVals.__springB !== null) unwrappedMergedDestVals = annotatedVals.value;
       Object.keys(unwrappedMergedDestVals)
         .filter(key => !currVals.hasOwnProperty(key))
         .forEach(key => {
-          currVals[key] = onAdd(key, annotatedVals, currVals);
+          currVals[key] = onAdd(key, strippedDestVals, currVals);
           currV[key] = mapTree(zero, currVals[key]);
         });
-
-      let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
-      let newCurrVals = updateVals(frameRate, currVals, currV, annotatedVals);
-      let newCurrV = updateV(frameRate, currVals, currV, annotatedVals);
-
-      this.setState(() => {
-        return {
-          currVals: newCurrVals,
-          currV: newCurrV,
-          now: Date.now(),
-        };
-      });
-
-      this.raf();
-    });
-  },
-
-  componentDidMount: function() {
-    this.raf();
-  },
-
-  render: function() {
-    let {currVals} = this.state;
-    return <div {...this.props}>{this.props.children(currVals)}</div>;
-  }
-});
-
-export let TransitionSprings = React.createClass({
-  propTypes: {
-    finalVals: PropTypes.func.isRequired,
-    onAdd: PropTypes.func,
-    onRemove: PropTypes.func,
-  },
-
-  getInitialState: function() {
-    let {finalVals} = this.props;
-    let defaultVals = stripMarks(finalVals(null, tween));
-    return {
-      currVals: defaultVals,
-      currV: mapTree(zero, defaultVals),
-      now: null,
-    };
-  },
-
-  raf: function() {
-    requestAnimationFrame(() => {
-      let {currVals, currV, now} = this.state;
-      let {finalVals, onAdd, onRemove, changeCurr} = this.props;
-
-      // TODO: lol, refactor
-      let markedDestVals = finalVals(currVals, tween);
-      let mary = markedDestVals.__springK == null ? markedDestVals : markedDestVals.value;
-
-      let strippedDestVals = stripMarks(markedDestVals);
-
-      let unwrappedMergedDestVals = mergeDiffObj(
-        currVals,
-        mary,
-        key => onRemove(key, tween, strippedDestVals, currVals, currV),
-      );
-
-      let rewrappedMergedDestVals = markedDestVals.__springK == null ?
-        unwrappedMergedDestVals :
-        tween(unwrappedMergedDestVals, markedDestVals.__springK, markedDestVals.__springB);
-
-      currVals = clone(currVals);
-      currV = clone(currV);
-      if (onAdd) {
-        Object.keys(unwrappedMergedDestVals)
-          .filter(key => !currVals.hasOwnProperty(key))
-          .forEach(key => {
-            currVals[key] = onAdd(key, strippedDestVals, currVals);
-            currV[key] = mapTree(zero, currVals[key]);
-          });
-      }
 
       let frameRate = (now ? Date.now() - now : 16) / 1000;
       let newCurrVals = updateVals(frameRate, currVals, currV, rewrappedMergedDestVals);

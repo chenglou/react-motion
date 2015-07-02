@@ -1,7 +1,10 @@
 'use strict';
 
 import React from 'react';
-import Spring from '../Spring';
+import Spring, {Differ, funcDiffer} from '../Spring';
+import {range} from '../utils';
+
+// let Spring = Differ(SpringWithoutDiff);
 
 let Demo = React.createClass({
   getInitialState: function() {
@@ -71,7 +74,7 @@ let Demo = React.createClass({
     this.forceUpdate();
   },
 
-  getValues: function(tween) {
+  getValues: function(tween, currVals, currV) {
     let {todos, value, selected} = this.state;
     let configs = {};
     Object.keys(todos)
@@ -89,7 +92,7 @@ let Demo = React.createClass({
           opacity: 1,
         };
       });
-    return tween(configs);
+    return funcDiffer(() => tween(configs), this.onRemove, currVals, currV);
   },
 
   onAdd: function(date) {
