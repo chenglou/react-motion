@@ -73,7 +73,7 @@ let Demo = React.createClass({
         }
         let visualPosition = order.indexOf(key);
         return layout[visualPosition];
-      })),
+      }), 120, 17),
       scales: tween(
         range(count).map((_, key) => lastPress === key && isPressed ? 1.2 : 1),
         180,

@@ -19,7 +19,7 @@ let Demo = React.createClass({
     }
     return tween(currentValues.reduce((acc, _, i) => {
       return i === 0 ? [this.state.mouse] : [...acc, currentValues[i - 1]];
-    }, []));
+    }, []), 120, 17);
   },
 
   render: function() {

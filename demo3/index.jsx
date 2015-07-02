@@ -89,7 +89,7 @@ let Demo = React.createClass({
           opacity: 1,
         };
       });
-    return tween(configs);
+    return tween(configs, 120, 17);
   },
 
   willEnter: function(date) {
@@ -100,13 +100,13 @@ let Demo = React.createClass({
     };
   },
 
-  willLeave: function(date, tween, destVals, currVals, currV) {
-    if (currVals[date].opacity > 0 || currV[date].opacity > 0) {
+  willLeave: function(date, tween, destVals, currVals) {
+    if (currVals[date].opacity > 0) {
       return tween({
         height: 0,
         opacity: 0,
         data: tween(currVals[date].data, -1, -1),
-      }, 160, 23);
+      });
     }
   },
 

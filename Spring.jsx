@@ -25,7 +25,7 @@ function zero() {
 }
 
 // see stepper for constant k, b usage
-function tween(tree, k = 120, b = 16) {
+function tween(tree, k = 170, b = 26) {
   return {
     __springK: k,
     __springB: b,

@@ -7,24 +7,15 @@ let Demo = React.createClass({
   getInitialState: function() {
     return {
       photos: {
-        './download1.jpeg': [800, 600],
-        './download2.jpeg': [800, 400],
-        './download3.jpeg': [700, 500],
+        './0.jpg': [500, 350],
+        './1.jpg': [800, 600],
+        './2.jpg': [800, 400],
+        './3.jpg': [700, 500],
+        './4.jpg': [200, 650],
+        './5.jpg': [600, 600],
       },
       currPhoto: 0,
     };
-  },
-
-  next: function(curr) {
-    let keys = Object.keys(this.state.photos);
-    let idx = keys.indexOf(curr);
-    return keys[(idx + 1) % keys.length];
-  },
-
-  prev: function(curr) {
-    let keys = Object.keys(this.state.photos);
-    let idx = keys.indexOf(curr);
-    return keys[(idx - 1 + keys.length) % keys.length];
   },
 
   handleChange: function({target: {value}}) {
@@ -57,11 +48,8 @@ let Demo = React.createClass({
       };
       return prevLeft + widths[i];
     }, offset);
-    configs.container = {
-      height: height,
-      width: width,
-    };
-    return tween(configs, 150, 23);
+    configs.container = {height, width};
+    return tween(configs, 170, 26);
   },
 
   render: function() {
