@@ -215,6 +215,10 @@ export let TransitionSpring = React.createClass({
       PropTypes.func,
       // TODO: better warning
       PropTypes.object,
+      PropTypes.arrayOf(PropTypes.shape({
+        key: PropTypes.any.isRequired,
+      })),
+      PropTypes.arrayOf(PropTypes.element),
     ]).isRequired,
     willLeave: PropTypes.oneOfType([
       PropTypes.func,
