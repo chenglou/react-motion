@@ -2,41 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Test template</title>
-  <meta name="viewport" content="width=device-width, scale=1">
+  <title>Chat Heads</title>
   <style>
-    /* reset */
-    * {
-      padding: 0;
-      margin: 0;
-      -webkit-user-select: none;
-    }
-    div, span {
-      box-sizing: border-box;
-      position: relative;
-
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      flex-shrink: 0;
-
-      border: 0 solid black;
-      margin: 0;
-      padding: 0;
-    }
-
-    .demo1 {
-      width: 500px;
-      height: 600px;
-      background-color: lightgray;
-    }
-    .demo1-circle {
-      position: absolute;
-      border: 1px solid black;
-      border-radius: 99px;
-      width: 50px;
-      height: 50px;
-    }
+  * {
+    margin: 0;
+  }
+  .demo1 {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: #f5f5f5;
+  }
+  .demo1-ball {
+    border-radius: 99px;
+    background-color: white;
+    width: 50px;
+    height: 50px;
+    border: 3px solid white;
+    position: absolute;
+    background-size: 50px;
+  }
+  .ball-0 {
+    background-image: url(0.jpg);
+  }
+  .ball-1 {
+    background-image: url(1.jpg);
+  }
+  .ball-2 {
+    background-image: url(2.jpg);
+  }
+  .ball-3 {
+    background-image: url(3.jpg);
+  }
+  .ball-4 {
+    background-image: url(4.jpg);
+  }
+  .ball-5 {
+    background-image: url(5.jpg);
+  }
   </style>
 </head>
 <body>
@@ -44,9 +47,6 @@
 <div id="content"></div>
 
 <script src="./all.js"></script>
-<!-- <script>
-  (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();stats.domElement.style.cssText='position:fixed;left:0;top:0;z-index:10000';document.body.appendChild(stats.domElement);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='http://rawgit.com/mrdoob/stats.js/master/build/stats.min.js';document.head.appendChild(script);})()
-</script>
- -->
+
 </body>
 </html>

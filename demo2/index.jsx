@@ -1,195 +1,113 @@
 'use strict';
 
 import React from 'react';
-import Springs from '../Springs';
+import Spring from '../Spring';
+import {range, reinsert} from '../utils';
+
+let allColors = [
+  '#EF767A', '#456990', '#49BEAA', '#49DCB1', '#EEB868', '#EF767A', '#456990',
+  '#49BEAA', '#49DCB1', '#EEB868', '#EF767A'
+];
+let [count, width, height] = [11, 70, 90];
+// indexed by visual position
+let layout = range(count).map(n => {
+  let row = Math.floor(n / 3);
+  let col = n % 3;
+  return [width * col, height * row];
+});
 
 let Demo = React.createClass({
   getInitialState: function() {
     return {
-      todos: {
-        // key is creation date
-        1: {text: 'Board the plane', isDone: false},
-        2: {text: 'Sleep', isDone: false},
-        3: {text: 'Try to finish coneference slides', isDone: false},
-        4: {text: 'Eat cheese and drink wine', isDone: false},
-        5: {text: 'Go around in Uber', isDone: false},
-        6: {text: 'Talk with conf attendees', isDone: false},
-        7: {text: 'Show Demo 1', isDone: false},
-        8: {text: 'Show Demo 2', isDone: false},
-        9: {text: 'Lament about the state of animation', isDone: false},
-        10: {text: 'Show Secret Demo', isDone: false},
-        11: {text: 'Go home', isDone: false},
-      },
-      value: '',
-      selected: 'all'
+      mouse: [0, 0],
+      delta: [0, 0], // difference between mouse and circle pos, for dragging
+      lastPress: null, // key of the last pressed component
+      isPressed: false,
+      order: range(count), // index: visual position. value: component key/id
     };
   },
 
-  handleChange: function({target: {value}}) {
-    this.setState({value});
+  handleTouchStart: function(key, pressLocation, e) {
+    this.handleMouseDown(key, pressLocation, e.touches[0]);
   },
 
-  handleSubmit: function(e) {
+  handleTouchMove: function(e) {
     e.preventDefault();
-    let {todos, value} = this.state;
-    todos[Date.now()] = {text: value, isDone: false};
-    this.forceUpdate();
+    this.handleMouseMove(e.touches[0]);
   },
 
-  handleDone: function(key) {
-    let {todos} = this.state;
-    todos[key].isDone = !todos[key].isDone;
-    this.forceUpdate();
-  },
-
-  handleToggleAll: function() {
-    let {todos} = this.state;
-    let keys = Object.keys(todos);
-    let allDone = keys.every(date => todos[date].isDone);
-    keys.forEach(date => todos[date].isDone = !allDone);
-    this.forceUpdate();
-  },
-
-  handleSelect: function(selected) {
-    this.setState({selected});
-  },
-
-  handleClearCompleted: function() {
-    let {todos} = this.state;
-    let newTodos = {};
-    for (var prop in todos) {
-      if (!todos[prop].isDone) {
-        newTodos[prop] = todos[prop];
-      }
+  handleMouseMove: function({pageX, pageY}) {
+    let {order, lastPress, isPressed, delta: [dx, dy]} = this.state;
+    if (isPressed) {
+      let col = Math.min(Math.floor(pageX / width), 2);
+      let row = Math.min(Math.floor(pageY / height), Math.floor(count / 3));
+      let index = row * 3 + col;
+      let newOrder = reinsert(order, order.indexOf(lastPress), index);
+      this.setState({mouse: [pageX - dx, pageY - dy], order: newOrder});
     }
-    this.setState({todos: newTodos});
   },
 
-  handleDestroy: function(date) {
-    let {todos} = this.state;
-    delete todos[date];
-    this.forceUpdate();
+  handleMouseDown: function(key, [pressX, pressY], {pageX, pageY}) {
+    let dx = pageX - pressX;
+    let dy = pageY - pressY;
+    this.setState({
+      lastPress: key,
+      isPressed: true,
+      delta: [dx, dy],
+      mouse: [pageX - dx, pageY - dy],
+    });
   },
 
-  getFinalVals: function(_, tween) {
-    let {todos, value, selected} = this.state;
-    let configs = {};
-    Object.keys(todos)
-      .filter(date => {
-        let todo = todos[date];
-        return todo.text.toUpperCase().indexOf(value.toUpperCase()) >= 0 &&
-          (selected === 'completed' && todo.isDone ||
-            selected === 'active' && !todo.isDone ||
-            selected === 'all');
-      })
-      .forEach(date => {
-        configs[date] = {
-          data: tween(todos[date], -1, -1),
-          height: 60,
-          opacity: 1,
-        };
-      });
-    return tween(configs);
+  handleMouseUp: function() {
+    this.setState({isPressed: false, dx: 0, dy: 0});
   },
 
-  onAdd: function(date) {
+  getValues: function(tween) {
+    let {order, lastPress, isPressed, mouse} = this.state;
     return {
-      height: 0,
-      opacity: 1,
-      data: this.state.todos[date],
+      order: tween(order.map((_, key) => {
+        if (key === lastPress && isPressed) {
+          // children tween takes priority. k=-1 or b=-1 cancels spring
+          // (act as "un-tween"ing a subtree)
+          return tween(mouse, -1, -1);
+        }
+        let visualPosition = order.indexOf(key);
+        return layout[visualPosition];
+      })),
+      scales: tween(
+        range(count).map((_, key) => lastPress === key && isPressed ? 1.2 : 1),
+        180,
+        10
+      ),
     };
-  },
-
-  onRemove: function(date, tween, destVals, currVals, currV) {
-    if (currVals[date].opacity > 0 || currV[date].opacity > 0) {
-      return tween({
-        height: 0,
-        opacity: 0,
-        data: tween(currVals[date].data, -1, -1),
-      }, 160, 23);
-    }
   },
 
   render: function() {
-    let {todos, value, selected} = this.state;
+    let {order, lastPress} = this.state;
     return (
-      <section className="todoapp">
-        <header className="header">
-          <h1>todos</h1>
-          <form onSubmit={this.handleSubmit}>
-            <input
-              className="new-todo"
-              placeholder="What needs to be done?"
-              autoFocus={true}
-              value={value}
-              onChange={this.handleChange}
-            />
-          </form>
-        </header>
-        <section className="main">
-          <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll}/>
-          <Springs finalVals={this.getFinalVals} onRemove={this.onRemove} onAdd={this.onAdd}>
-            {configs =>
-              <ul className="todo-list">
-                {Object.keys(configs).map(date => {
-                  let config = configs[date];
-                  let {data: {isDone, text}, ...style} = config;
-                  return (
-                    <li key={date} style={style} className={isDone ? 'completed' : ''}>
-                      <div className="view">
-                        <input
-                          className="toggle"
-                          type="checkbox"
-                          onChange={this.handleDone.bind(null, date)}
-                          checked={isDone}
-                        />
-                        <label>{text}</label>
-                        <button
-                          className="destroy"
-                          onClick={this.handleDestroy.bind(null, date)}
-                        />
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            }
-          </Springs>
-        </section>
-        <footer className="footer">
-          <span className="todo-count">
-            <strong>
-              {Object.keys(todos).filter(key => !todos[key].isDone).length}
-            </strong> item left
-          </span>
-          <ul className="filters">
-            <li>
-              <a
-                className={selected === 'all' ? 'selected' : ''}
-                onClick={this.handleSelect.bind(null, 'all')}>
-                All
-              </a>
-            </li>
-            <li>
-              <a
-                className={selected === 'active' ? 'selected' : ''}
-                onClick={this.handleSelect.bind(null, 'active')}>
-                Active
-              </a>
-            </li>
-            <li>
-              <a
-                className={selected === 'completed' ? 'selected' : ''}
-                onClick={this.handleSelect.bind(null, 'completed')}>
-                Completed
-              </a>
-            </li>
-          </ul>
-          <button className="clear-completed" onClick={this.handleClearCompleted}>
-            Clear completed
-          </button>
-        </footer>
-      </section>
+      <Spring
+        className="demo2"
+        onTouchMove={this.handleTouchMove}
+        onTouchEnd={this.handleMouseUp}
+        onMouseMove={this.handleMouseMove}
+        onMouseUp={this.handleMouseUp}
+        values={this.getValues}>
+        {({order: currOrder, scales}) => currOrder.map(([x, y], key) =>
+          <div
+            key={key}
+            onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
+            onTouchStart={this.handleTouchStart.bind(null, key, [x, y])}
+            className="demo2-ball"
+            style={{
+              backgroundColor: allColors[key],
+              WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
+              transform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
+              zIndex: key === lastPress ? 99 : order.indexOf(key),
+              boxShadow: `${(x - (3 * width - 50) / 2) / 15}px 5px 5px rgba(0,0,0,0.5)`,
+            }}
+          />
+        )}
+      </Spring>
     );
   }
 });
