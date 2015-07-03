@@ -7,7 +7,7 @@ let React = require('react');
 let stepper = require('../stepper');
 
 var App = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       mouseX: 0,
       mouseY: 0,
@@ -30,7 +30,7 @@ var App = React.createClass({
 
   // rafId: null,
 
-  // repeatSetState: function(f) {
+  // repeatSetState(f) {
   //   if (this.rafId != null) {
   //     cancelAnimationFrame(this.rafId);
   //     this.rafId = null;
@@ -55,7 +55,7 @@ var App = React.createClass({
   //   loop();
   // },
 
-  // handleMouseMove: function(e) {
+  // handleMouseMove(e) {
   //   if (e.nativeEvent.which === 0) {
   //     return;
   //   }
@@ -83,7 +83,7 @@ var App = React.createClass({
   //   });
   // },
 
-  handleMouseMove: function(e) {
+  handleMouseMove(e) {
     if (e.nativeEvent.which === 0) {
       return;
     }
@@ -94,7 +94,7 @@ var App = React.createClass({
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     let loop = () => {
       requestAnimationFrame(() => {
         let {springs, mouseX, mouseY} = this.state;
@@ -116,7 +116,7 @@ var App = React.createClass({
     loop();
   },
 
-  render: function() {
+  render() {
     let {mouseX, mouseY, springs} = this.state;
     let box = {
       width: 500,

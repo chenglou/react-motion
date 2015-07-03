@@ -141,7 +141,7 @@ export default React.createClass({
     ]).isRequired,
   },
 
-  getInitialState: function() {
+  getInitialState() {
     let {endValue} = this.props;
     let vals;
     if (typeof endValue === 'function') {
@@ -158,7 +158,7 @@ export default React.createClass({
     };
   },
 
-  raf: function() {
+  raf() {
     requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
       let {endValue} = this.props;
@@ -184,11 +184,11 @@ export default React.createClass({
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.raf();
   },
 
-  render: function() {
+  render() {
     let {currVals, currV} = this.state;
     if(hackOn2 != null) {
       if(hackOn2.curr === hackOn2.data.length - 1) {
@@ -281,14 +281,14 @@ export let TransitionSpring = React.createClass({
     ]),
   },
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       willEnter: (key, currVals) => currVals[key],
       willLeave: () => null
     };
   },
 
-  getInitialState: function() {
+  getInitialState() {
     let {endValue} = this.props;
     let vals;
     if (typeof endValue === 'function') {
@@ -305,7 +305,7 @@ export let TransitionSpring = React.createClass({
     };
   },
 
-  raf: function() {
+  raf() {
     requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
       let {
@@ -361,11 +361,11 @@ export let TransitionSpring = React.createClass({
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.raf();
   },
 
-  render: function() {
+  render() {
     let {currVals} = this.state;
     return (<div {...this.props}>
       {this.props.children(currVals)}

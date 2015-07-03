@@ -19,7 +19,7 @@ function map3Tree(t1, t2, t3, f) {
 }
 
 let Springs = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     let {initVals} = this.props;
     return {
       currVals: initVals,
@@ -27,7 +27,7 @@ let Springs = React.createClass({
     };
   },
 
-  raf: function() {
+  raf() {
     requestAnimationFrame(() => {
       let {currVals, currV} = this.state;
       let {newFinalValsF, initVals} = this.props;
@@ -58,11 +58,11 @@ let Springs = React.createClass({
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.raf();
   },
 
-  render: function() {
+  render() {
     return (
       <div>
         {this.props.children(this.state.currVals)}
@@ -142,13 +142,13 @@ function yofuck(children, configNum) {
 }
 
 let App = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       configNum: 0,
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     window.addEventListener('keydown', e => {
       // j = 74, k = 75, l = 76
       if (e.which === 74) {
@@ -167,7 +167,7 @@ let App = React.createClass({
     });
   },
 
-  render: function() {
+  render() {
     let {configNum} = this.state;
     let {children, ...container} = layouts[configNum];
 

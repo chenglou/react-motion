@@ -64,7 +64,7 @@ function yofuck(layout, ab) {
 }
 
 let App = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     let layout = yofuck(layout1, true);
     return {
       // in-flight, animated. values computed with spring
@@ -75,7 +75,7 @@ let App = React.createClass({
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     window.addEventListener('keydown', e => {
       // j = 74, k = 75
       if (e.which === 74) {
@@ -115,7 +115,7 @@ let App = React.createClass({
     loop();
   },
 
-  render: function() {
+  render() {
     let {ab, layout} = this.state;
     let {
       children: {a, b},

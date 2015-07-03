@@ -3,19 +3,19 @@ import Spring from '../Spring';
 import {range} from '../utils';
 
 let Demo = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {mouse: [0, 0]};
   },
 
-  handleMouseMove: function({pageX, pageY}) {
+  handleMouseMove({pageX, pageY}) {
     this.setState({mouse: [pageX, pageY]});
   },
 
-  handleTouchMove: function({touches}) {
+  handleTouchMove({touches}) {
     this.handleMouseMove(touches[0]);
   },
 
-  getValues: function(tween, currentValues) {
+  getValues(tween, currentValues) {
     // currentValues of `null` means it's the first render for Spring
     if (currentValues == null) {
       return range(6).map(() => [0, 0]);
@@ -29,7 +29,7 @@ let Demo = React.createClass({
     return tween(endValue, 120, 17);
   },
 
-  render: function() {
+  render() {
     return (
       <Spring
         className="demo1"

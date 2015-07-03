@@ -2,7 +2,7 @@ import React from 'react';
 import Spring, {TransitionSpring} from '../Spring';
 
 let Demo = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       photos: {
         './0.jpg': [500, 350],
@@ -16,11 +16,11 @@ let Demo = React.createClass({
     };
   },
 
-  handleChange: function({target: {value}}) {
+  handleChange({target: {value}}) {
     this.setState({currPhoto: value});
   },
 
-  getValues: function(tween) {
+  getValues(tween) {
     let {photos, currPhoto} = this.state;
     let keys = Object.keys(photos);
     let currKey = keys[currPhoto];
@@ -50,7 +50,7 @@ let Demo = React.createClass({
     return tween(configs, 170, 26);
   },
 
-  render: function() {
+  render() {
     let {photos, currPhoto} = this.state;
     return (
       <div>

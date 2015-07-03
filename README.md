@@ -31,15 +31,15 @@ This library also provides an alternative, more powerful API for React's `Transi
 
 ```js
 let Demo = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {open: false};
   },
 
-  handleMouseDown: function() {
+  handleMouseDown() {
     this.setState({open: !this.state.open});
   },
 
-  render: function() {
+  render() {
     return (
       <div>
         <button onMouseDown={this.handleMouseDown}>Toggle</button>
@@ -65,7 +65,7 @@ Accepts a `endValue` prop that's a function `(tween, currVals) => finalVals`. It
 ```js
 let Demo = React.createClass({
   ...
-  endValue: function(tween, currVals) {
+  endValue(tween, currVals) {
     // The function `tween` given to you is for you to describe what you
     // want animated
     return tween({
@@ -74,7 +74,7 @@ let Demo = React.createClass({
     });
   },
 
-  render: function() {
+  render() {
     return (
       <Spring endValue={this.endValue}>
         {currVals => ...}

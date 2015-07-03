@@ -72,7 +72,7 @@ let layout2 = computeLayout({
 });
 
 let App = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       // in-flight, animated. values computed with spring
       layout: layout1,
@@ -82,7 +82,7 @@ let App = React.createClass({
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     let loop = () => {
       requestAnimationFrame(() => {
         let {layout, v, destLayout} = this.state;
@@ -103,7 +103,7 @@ let App = React.createClass({
     loop();
   },
 
-  handleClick: function() {
+  handleClick() {
     let toggle = this.state.toggle;
     this.setState({
       destLayout: toggle ? layout1 : layout2,
@@ -111,7 +111,7 @@ let App = React.createClass({
     });
   },
 
-  render: function() {
+  render() {
     let {
       children: [
         {
