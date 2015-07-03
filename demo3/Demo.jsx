@@ -1,27 +1,25 @@
-'use strict';
-
 import React from 'react';
 import {TransitionSpring} from '../Spring';
 
 let Demo = React.createClass({
   getInitialState: function() {
     return {
-      todos: [
+      todos: {
         // key is creation date
-        {key: 1, text: 'Board the plane', isDone: false},
-        {key: 2, text: 'Sleep', isDone: false},
-        {key: 3, text: 'Try to finish coneference slides', isDone: false},
-        {key: 4, text: 'Eat cheese and drink wine', isDone: false},
-        {key: 5, text: 'Go around in Uber', isDone: false},
-        {key: 6, text: 'Talk with conf attendees', isDone: false},
-        {key: 7, text: 'Show Demo 1', isDone: false},
-        {key: 8, text: 'Show Demo 2', isDone: false},
-        {key: 9, text: 'Lament about the state of animation', isDone: false},
-        {key: 10, text: 'Show Secret Demo', isDone: false},
-        {key: 11, text: 'Go home', isDone: false},
-      ],
+        't1': {text: 'Board the plane', isDone: false},
+        't2': {text: 'Sleep', isDone: false},
+        't3': {text: 'Try to finish coneference slides', isDone: false},
+        't4': {text: 'Eat cheese and drink wine', isDone: false},
+        't5': {text: 'Go around in Uber', isDone: false},
+        't6': {text: 'Talk with conf attendees', isDone: false},
+        't7': {text: 'Show Demo 1', isDone: false},
+        't8': {text: 'Show Demo 2', isDone: false},
+        't9': {text: 'Lament about the state of animation', isDone: false},
+        't10': {text: 'Show Secret Demo', isDone: false},
+        't11': {text: 'Go home', isDone: false},
+      },
       value: '',
-      selected: 'all'
+      selected: 'all',
     };
   },
 
@@ -33,23 +31,24 @@ let Demo = React.createClass({
     e.preventDefault();
     let {todos, value} = this.state;
     this.setState({
-      todos: [{text: value, isDone: false, key: Date.now()}, ...todos]
+      todos: {
+        ['t' + Date.now()]: {text: value, isDone: false},
+        ...todos,
+      }
     });
   },
 
   handleDone: function(key) {
     let {todos} = this.state;
-    todos.forEach((v, i) => {
-      if (v.key === key) todos[i].isDone = !todos[i].isDone;
-    });
+    todos[key].isDone = !todos[key].isDone;
     this.forceUpdate();
   },
 
   handleToggleAll: function() {
     let {todos} = this.state;
-
-    let allDone = todos.every(v => v.isDone);
-    todos.forEach((v, i) => todos[i].isDone = !allDone);
+    let keys = Object.keys(todos);
+    let allDone = keys.every(date => todos[date].isDone);
+    keys.forEach(date => todos[date].isDone = !allDone);
     this.forceUpdate();
   },
 
@@ -59,50 +58,56 @@ let Demo = React.createClass({
 
   handleClearCompleted: function() {
     let {todos} = this.state;
-    this.setState({todos: todos.filter(v => !v.isDone)});
+    let newTodos = {};
+    for (var prop in todos) {
+      if (!todos[prop].isDone) {
+        newTodos[prop] = todos[prop];
+      }
+    }
+    this.setState({todos: newTodos});
   },
 
-  handleDestroy: function(key) {
+  handleDestroy: function(date) {
     let {todos} = this.state;
-    this.setState({todos: todos.filter(v => v.key !== key)});
+    delete todos[date];
+    this.forceUpdate();
   },
 
   getValues: function(tween) {
     let {todos, value, selected} = this.state;
-    // let configs = {};
-    return tween(todos
-      .filter(todo => {
+    let configs = {};
+    Object.keys(todos)
+      .filter(date => {
+        let todo = todos[date];
         return todo.text.toUpperCase().indexOf(value.toUpperCase()) >= 0 &&
           (selected === 'completed' && todo.isDone ||
             selected === 'active' && !todo.isDone ||
             selected === 'all');
       })
-      .map(todo => {
-        return {
-          key: todo.key,
-          data: tween(todo, -1, -1),
+      .forEach(date => {
+        configs[date] = {
+          data: tween(todos[date], -1, -1),
           height: 60,
           opacity: 1,
         };
-      }));
+      });
+    return tween(configs, 120, 17);
   },
 
-  willEnter: function(currTodo) {
+  willEnter: function(date) {
     return {
-      key: currTodo.key,
       height: 0,
       opacity: 1,
-      data: currTodo.data,
+      data: this.state.todos[date],
     };
   },
 
-  willLeave: function(currTodo, tween) {
-    if (currTodo.opacity > 0) {
+  willLeave: function(date, tween, destVals, currVals) {
+    if (currVals[date].opacity > 0) {
       return tween({
-        key: currTodo.key,
         height: 0,
         opacity: 0,
-        data: tween(currTodo.data, -1, -1),
+        data: tween(currVals[date].data, -1, -1),
       });
     }
   },
@@ -128,21 +133,22 @@ let Demo = React.createClass({
           <TransitionSpring values={this.getValues} willLeave={this.willLeave} willEnter={this.willEnter}>
             {configs =>
               <ul className="todo-list">
-                {configs.map(config => {
+                {Object.keys(configs).map(date => {
+                  let config = configs[date];
                   let {data: {isDone, text}, ...style} = config;
                   return (
-                    <li key={config.key} style={style} className={isDone ? 'completed' : ''}>
+                    <li key={date} style={style} className={isDone ? 'completed' : ''}>
                       <div className="view">
                         <input
                           className="toggle"
                           type="checkbox"
-                          onChange={this.handleDone.bind(null, config.key)}
+                          onChange={this.handleDone.bind(null, date)}
                           checked={isDone}
                         />
                         <label>{text}</label>
                         <button
                           className="destroy"
-                          onClick={this.handleDestroy.bind(null, config.key)}
+                          onClick={this.handleDestroy.bind(null, date)}
                         />
                       </div>
                     </li>
