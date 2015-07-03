@@ -8,6 +8,7 @@ var plugins = [
   })
 ];
 var entry = {
+  demo0: './demo0/index.jsx',
   demo1: './demo1/index.jsx',
   demo2: './demo2/index.jsx',
   demo3: './demo3/index.jsx',

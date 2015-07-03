@@ -1,82 +1,63 @@
-React-animation
----
-_Official documentation coming tonight!_
+# React-Animation
 
-Declarative animation for React. 
+__Rushed to get the library out in time for the React-Europe talk. More polished codebase coming tonight!__
 
-##Install
+```js
+<Spring values={10}>
+  {currentValues => <div>{currentValues}</div>}
+</Spring>
+```
+
+Animate a counter to `10`, from whatever value it currently is. For more advanced usage, see below.
+
+Will provide npm package soon. For now, please use:
+
 ```sh
 git clone https://github.com/chenglou/react-animation.git
 cd react-animation
-npm i
+npm install
+npm run build
 ```
 
-##Build and Watch
+Then, check out the `index.html`s in the demo folders.
 
-```sh
-npm start
-```
+## What does this library try to solve?
 
-##API
-Example usage (look at [demo2](https://github.com/chenglou/react-animation/tree/master/demo2), [demo3](https://github.com/chenglou/react-animation/tree/master/demo3), [demo4](https://github.com/chenglou/react-animation/tree/master/demo4) for more)
+I believe that for 95% of use-cases of animating components, we don't have to resort to using hard-coded easing curves and duration. Set up a stiffness and damping constant for your UI element, and let the magic of physics take care of the rest. This way, you don't have to worry about the more petty questions such as "what if the item's currently animating and is a position `x`? How do I adjust my time and curve?".
+
+This library also provides an alternative, more powerful API for React's `TransitionGroup`.
+
+## API Usage
 
 ```js
-import React from 'react';
-import Spring from 'react-animation';
-import {range} from '../utils';
-
 let Demo = React.createClass({
-  displayName: 'Demo',
-
   getInitialState: function() {
-    return {mouse: [0, 0]};
+    return {open: false};
   },
 
-  handleMouseMove: function({pageX, pageY}) {
-    this.setState({mouse: [pageX, pageY]});
-  },
-
-  values: function(tween, currVals) {
-    if (currVals == null) {
-      return range(6).map(() => [0, 0]);
-    }
-    
-    // The function `tween` given to you is for you to describe what you  
-    // want animated
-    return tween(currVals.reduce((acc, _, i) => {
-      return i === 0 ? [this.state.mouse] : [...acc, currVals[i - 1]];
-    }, []), 120, 17);
+  handleMouseDown: function() {
+    this.setState({open: !this.state.open});
   },
 
   render: function() {
     return (
-      <Spring 
-        className="demo1" 
-        values={this.values} 
-        onMouseMove={this.handleMouseMove}>
-        
-        // `this.values` returns an array, so currVals is an array
-        {currVals => currVals.map(([x, y], i) => {
-          return (
-            <div
-              key={i}
-              style={{
-                backgroundColor: 'red',
-                WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                zIndex: currVals.length - i,
-              }} />
-          );
-        })}
-      </Spring>
+      <div>
+        <button onMouseDown={this.handleMouseDown}>Toggle</button>
+        <Spring className="demo0" values={this.state.open ? 400 : 0}>
+          {x =>
+            <div className="demo0-block" style={{
+              WebkitTransform: `translate3d(${x}px, 0, 0)`,
+              transform: `translate3d(${x}px, 0, 0)`,
+            }} />
+          }
+        </Spring>
+      </div>
     );
   }
 });
-
-React.render(<Demo />, document.querySelector('#content'));
 ```
 
-The API exports Spring by default, but also comes with TransitionSpring. 
+--- **README work in progress** ---
 
 #### Spring
 Accepts a `values` prop that's a function `(tween, currVals) => finalVals`. It takes `tween` and `currVals` and returns a data structure representing the final values. `currVals` will always be the same shape as what `values` returns. The Spring will automatically tween between the current value and the final value returned by `values`.
@@ -85,7 +66,7 @@ Accepts a `values` prop that's a function `(tween, currVals) => finalVals`. It t
 let Demo = React.createClass({
   ...
   values: function(tween, currVals) {
-    // The function `tween` given to you is for you to describe what you  
+    // The function `tween` given to you is for you to describe what you
     // want animated
     return tween({
         stuff: tween(10) // you can nest tweens,
@@ -106,10 +87,10 @@ let Demo = React.createClass({
 
 ```js
 let currVals = {
-    stuff: 10, // somewhere between where it started and the destination which 
+    stuff: 10, // somewhere between where it started and the destination which
                // is 10
     importantData: {
-        data: "won't animate", 
+        data: "won't animate",
         number: 1
     }
 }
