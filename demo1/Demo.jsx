@@ -13,6 +13,11 @@ let Demo = React.createClass({
     this.setState({mouse: [pageX, pageY]});
   },
 
+  handleTouchMove: function({touches}) {
+    let {pageX, pageY} = touches[0];
+    this.setState({mouse: [pageX, pageY]});
+  },
+
   getValues: function(tween, currentValues) {
     if (currentValues == null) {
       return range(6).map(() => [0, 0]);
@@ -24,7 +29,7 @@ let Demo = React.createClass({
 
   render: function() {
     return (
-      <Spring className="demo1" values={this.getValues} onMouseMove={this.handleMouseMove}>
+      <Spring className="demo1" values={this.getValues} onMouseMove={this.handleMouseMove} onTouchMove={this.handleTouchMove}>
         {currentValues => currentValues.map(([x, y], i) => {
           return (
             <div
