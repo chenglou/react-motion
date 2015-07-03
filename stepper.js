@@ -4,7 +4,7 @@ let errorMargin = 0.001;
 
 let hackOn = false;
 window.addEventListener('keypress', e => {
-  if (e.which === 115) {
+  if (e.which === 49) {
     hackOn = !hackOn;
   }
 });

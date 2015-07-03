@@ -190,4 +190,4 @@ let Demo = React.createClass({
   }
 });
 
-React.render(<Demo />, document.querySelector('#content'));
+export default Demo;

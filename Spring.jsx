@@ -2,19 +2,6 @@ import React, {PropTypes} from 'react';
 import {mapTree, clone} from './utils';
 import stepper from './stepper';
 
-let hackOn = false;
-window.interval = 1000 / 60;
-window.addEventListener('keypress', e => {
-  if (e.which === 100) {
-    hackOn = !hackOn;
-    window.interval = hackOn ? 3000 : 1000 / 60;
-  }
-});
-
-function requestAnimationFrame(f) {
-  setTimeout(f, window.interval);
-}
-
 // ---------
 let FRAME_RATE = 1 / 60;
 
@@ -241,16 +228,6 @@ function mergeDiffObj(a, b, onRemove) {
   return ret;
 }
 
-function checkValuesFunc(f) {
-  if (f.length === 0) {
-    console.warn(
-      `You're passing a function to Spring prop \`values\` which doesn't \
-receive \`tween\` as the first argument. In this case, nothing will be \
-animated. You might as well directly pass the value.`
-    );
-  }
-}
-
 export default React.createClass({
   propTypes: {
     values: PropTypes.oneOfType([
@@ -264,7 +241,6 @@ export default React.createClass({
     let {values} = this.props;
     let vals;
     if (typeof values === 'function') {
-      checkValuesFunc(values);
       vals = values(tween);
     } else {
       vals = values;
@@ -285,7 +261,6 @@ export default React.createClass({
       // TODO: lol, refactor
       let annotatedVals;
       if (typeof values === 'function') {
-        checkValuesFunc(values);
         annotatedVals = values(tween, currVals);
       } else {
         annotatedVals = tween(values);
@@ -350,7 +325,6 @@ export let TransitionSpring = React.createClass({
     let {values} = this.props;
     let vals;
     if (typeof values === 'function') {
-      checkValuesFunc(values);
       vals = values(tween);
     } else {
       vals = values;
@@ -380,7 +354,6 @@ export let TransitionSpring = React.createClass({
       // TODO: lol, refactor
       let annotatedVals;
       if (typeof values === 'function') {
-        checkValuesFunc(values);
         annotatedVals = values(tween, currVals);
       } else {
         annotatedVals = tween(values);
