@@ -5,9 +5,13 @@ import {range, mapTree, clone} from './utils';
 import stepper from './stepper';
 
 let hackOn = null;
+let hackOn2 = null;
 window.addEventListener('keypress', ({which}) => {
   if (which === 50) {
     hackOn = hackOn == null ? 10 : null;
+  }
+  if(which === 51) {
+    hackOn2 = hackOn2 == null ? {data: [], curr: -1} : null;
   }
 });
 
@@ -185,8 +189,22 @@ export default React.createClass({
   },
 
   render: function() {
+    let {currVals} = this.state;
+    if(hackOn2 != null) {
+      let {currV} = this.state;
+      if(hackOn2.curr === hackOn2.data.length - 1) {
+        hackOn2.data.push([currVals, currV]);
+        hackOn2.curr = hackOn2.data.length - 1;
+      }
+      currVals = hackOn2.data[hackOn2.curr][0];
+
+      // Dirty mutations for the sake of time travel
+      this.state.currVals = currVals;
+      this.state.currV = currV;
+    }
+
     if(hackOn != null) {
-      let {currVals, currV} = this.state;
+      let {currV} = this.state;
       let {values} = this.props;
       return <div {...this.props}>{
         range(hackOn)
@@ -206,13 +224,38 @@ export default React.createClass({
         }, [[currVals, currV]])
         .map(([currVals]) => {
           return (
-            <span style={{opacity: 0.2}}>{this.props.children(currVals)}</span>
+            <span style={{opacity: 0.2}}>
+              {hackOn2 != null &&
+                <div style={{position: 'absolute', left: 300, zIndex: 100, top: 0}}><input
+                    type="range"
+                    min={0}
+                    max={hackOn2.data.length - 1}
+                    value={hackOn2.curr}
+                    onChange={({target: {value}}) => {
+                      hackOn2.curr = parseInt(value);
+                    }} />
+                    {hackOn2.curr}
+                </div>}
+              {this.props.children(currVals)}
+            </span>
           );
         })}</div>;
     }
 
-    let {currVals} = this.state;
-    return <div {...this.props}>{this.props.children(currVals)}</div>;
+    return (<div {...this.props}>
+      {hackOn2 != null &&
+        <div style={{position: 'absolute', left: 300, zIndex: 100, top: 0}}><input
+            type="range"
+            min={0}
+            max={hackOn2.data.length - 1}
+            value={hackOn2.curr}
+            onChange={({target: {value}}) => {
+              hackOn2.curr = parseInt(value);
+            }} />
+            {hackOn2.curr}
+        </div>}
+      {this.props.children(currVals)}
+    </div>);
   }
 });
 
@@ -325,6 +368,8 @@ export let TransitionSpring = React.createClass({
 
   render: function() {
     let {currVals} = this.state;
-    return <div {...this.props}>{this.props.children(currVals)}</div>;
+    return (<div {...this.props}>
+      {this.props.children(currVals)}
+    </div>);
   },
 });
