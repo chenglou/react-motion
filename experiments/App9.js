@@ -17,7 +17,7 @@ function map3Tree(t1, t2, t3, f) {
 }
 
 let Springs = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     let {initVals} = this.props;
     return {
       currVals: initVals,
@@ -25,7 +25,7 @@ let Springs = React.createClass({
     };
   },
 
-  raf: function() {
+  raf() {
     requestAnimationFrame(() => {
       let {currVals, currV} = this.state;
       let {newFinalValsF, initVals} = this.props;
@@ -63,11 +63,11 @@ let Springs = React.createClass({
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.raf();
   },
 
-  render: function() {
+  render() {
     return (
       <div>
         {this.props.children(this.state.currVals)}
@@ -77,7 +77,7 @@ let Springs = React.createClass({
 });
 
 var App = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       mouseX: 0,
       mouseY: 0,
@@ -85,7 +85,7 @@ var App = React.createClass({
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     window.addEventListener('keydown', () => {
       this.setState({keyPressed: true});
     });
@@ -94,7 +94,7 @@ var App = React.createClass({
     });
   },
 
-  handleMouseMove: function(e) {
+  handleMouseMove(e) {
     if (e.nativeEvent.which === 1) {
       this.setState({
         mouseX: e.pageX,
@@ -103,7 +103,7 @@ var App = React.createClass({
     }
   },
 
-  render: function() {
+  render() {
     let {mouseX, mouseY, springs, keyPressed} = this.state;
     let box = {
       width: 500,

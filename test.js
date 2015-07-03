@@ -154,7 +154,7 @@ export let Diff = Springs => React.createClass({
     onRemove: PropTypes.func.isRequired,
   },
 
-  mergeDestVals: function(strippedDestVals, currVals, currV) {
+  mergeDestVals(strippedDestVals, currVals, currV) {
     let {onAdd, onRemove} = this.props;
 
     let unwrappedMergedDestVals = mergeDiffObj(
@@ -252,7 +252,7 @@ export default React.createClass({
     // onRemove: PropTypes.func,
   },
 
-  getInitialState: function() {
+  getInitialState() {
     let {startVals, finalVals} = this.props;
     let defaultVals = stripMarks(
       (startVals && startVals(null, tween)) || finalVals(null, tween)
@@ -264,7 +264,7 @@ export default React.createClass({
     };
   },
 
-  raf: function() {
+  raf() {
     requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
       let {finalVals, mergeDestVals, changeCurr, onAdd} = this.props;
@@ -326,11 +326,11 @@ export default React.createClass({
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.raf();
   },
 
-  render: function() {
+  render() {
     let {currVals} = this.state;
     return (
       <div {...this.props}>

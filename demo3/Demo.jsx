@@ -2,7 +2,7 @@ import React from 'react';
 import {TransitionSpring} from '../Spring';
 
 let Demo = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       todos: {
         // key is creation date
@@ -23,11 +23,11 @@ let Demo = React.createClass({
     };
   },
 
-  handleChange: function({target: {value}}) {
+  handleChange({target: {value}}) {
     this.setState({value});
   },
 
-  handleSubmit: function(e) {
+  handleSubmit(e) {
     e.preventDefault();
     let {todos, value} = this.state;
     this.setState({
@@ -38,13 +38,13 @@ let Demo = React.createClass({
     });
   },
 
-  handleDone: function(key) {
+  handleDone(key) {
     let {todos} = this.state;
     todos[key].isDone = !todos[key].isDone;
     this.forceUpdate();
   },
 
-  handleToggleAll: function() {
+  handleToggleAll() {
     let {todos} = this.state;
     let keys = Object.keys(todos);
     let allDone = keys.every(date => todos[date].isDone);
@@ -52,11 +52,11 @@ let Demo = React.createClass({
     this.forceUpdate();
   },
 
-  handleSelect: function(selected) {
+  handleSelect(selected) {
     this.setState({selected});
   },
 
-  handleClearCompleted: function() {
+  handleClearCompleted() {
     let {todos} = this.state;
     let newTodos = {};
     for (var prop in todos) {
@@ -67,13 +67,13 @@ let Demo = React.createClass({
     this.setState({todos: newTodos});
   },
 
-  handleDestroy: function(date) {
+  handleDestroy(date) {
     let {todos} = this.state;
     delete todos[date];
     this.forceUpdate();
   },
 
-  getValues: function(tween) {
+  getValues(tween) {
     let {todos, value, selected} = this.state;
     let configs = {};
     Object.keys(todos)
@@ -94,7 +94,7 @@ let Demo = React.createClass({
     return tween(configs, 120, 17);
   },
 
-  willEnter: function(date) {
+  willEnter(date) {
     return {
       height: 0,
       opacity: 1,
@@ -102,7 +102,7 @@ let Demo = React.createClass({
     };
   },
 
-  willLeave: function(date, tween, destVals, currVals) {
+  willLeave(date, tween, destVals, currVals) {
     if (currVals[date].opacity > 0) {
       return tween({
         height: 0,
@@ -112,7 +112,7 @@ let Demo = React.createClass({
     }
   },
 
-  render: function() {
+  render() {
     let {todos, value, selected} = this.state;
     return (
       <section className="todoapp">

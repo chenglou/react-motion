@@ -2,15 +2,15 @@ import React from 'react';
 import Spring from '../Spring';
 
 let Demo = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {open: false};
   },
 
-  handleMouseDown: function() {
+  handleMouseDown() {
     this.setState({open: !this.state.open});
   },
 
-  render: function() {
+  render() {
     return (
       <div>
         <button onMouseDown={this.handleMouseDown}>Toggle</button>

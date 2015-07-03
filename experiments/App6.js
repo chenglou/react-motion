@@ -59,7 +59,7 @@ function clamp(val, min, max) {
 }
 
 let App = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     let items = ['1', '2', '3'];
     let anims = {
       1: 0,
@@ -73,7 +73,7 @@ let App = React.createClass({
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     window.addEventListener('keydown', e => {
       // j = 74, k = 75
       if (e.which === 74) {
@@ -133,7 +133,7 @@ let App = React.createClass({
     loop();
   },
 
-  render: function() {
+  render() {
     let {currItems, anims} = this.state;
     let s = {
       outline: '1px solid black',

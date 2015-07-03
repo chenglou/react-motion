@@ -15,7 +15,7 @@ let layout = range(count).map(n => {
 });
 
 let Demo = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       mouse: [0, 0],
       delta: [0, 0], // difference between mouse and circle pos, for dragging
@@ -25,16 +25,16 @@ let Demo = React.createClass({
     };
   },
 
-  handleTouchStart: function(key, pressLocation, e) {
+  handleTouchStart(key, pressLocation, e) {
     this.handleMouseDown(key, pressLocation, e.touches[0]);
   },
 
-  handleTouchMove: function(e) {
+  handleTouchMove(e) {
     e.preventDefault();
     this.handleMouseMove(e.touches[0]);
   },
 
-  handleMouseMove: function({pageX, pageY}) {
+  handleMouseMove({pageX, pageY}) {
     let {order, lastPress, isPressed, delta: [dx, dy]} = this.state;
     if (isPressed) {
       let col = Math.min(Math.floor(pageX / width), 2);
@@ -45,7 +45,7 @@ let Demo = React.createClass({
     }
   },
 
-  handleMouseDown: function(key, [pressX, pressY], {pageX, pageY}) {
+  handleMouseDown(key, [pressX, pressY], {pageX, pageY}) {
     let dx = pageX - pressX;
     let dy = pageY - pressY;
     this.setState({
@@ -56,11 +56,11 @@ let Demo = React.createClass({
     });
   },
 
-  handleMouseUp: function() {
+  handleMouseUp() {
     this.setState({isPressed: false, dx: 0, dy: 0});
   },
 
-  getValues: function(tween) {
+  getValues(tween) {
     let {order, lastPress, isPressed, mouse} = this.state;
     return {
       order: tween(order.map((_, key) => {
@@ -80,7 +80,7 @@ let Demo = React.createClass({
     };
   },
 
-  render: function() {
+  render() {
     let {order, lastPress} = this.state;
     return (
       <Spring

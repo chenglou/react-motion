@@ -108,7 +108,7 @@ function meltGoldIntoMold(a, b, f) {
 }
 
 let Springs = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     let {defaultVals} = this.props;
     return {
       currVals: defaultVals,
@@ -116,7 +116,7 @@ let Springs = React.createClass({
     };
   },
 
-  raf: function() {
+  raf() {
     requestAnimationFrame(() => {
       let {currVals, currV} = this.state;
       let {nextDestVals, defaultNewTreeVal} = this.props;
@@ -161,11 +161,11 @@ let Springs = React.createClass({
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.raf();
   },
 
-  render: function() {
+  render() {
     let {currVals} = this.state;
     return (
       <div>
@@ -222,13 +222,13 @@ let computeLayoutObjChildren = layout => {
 };
 
 let App = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       keys: ['1', '2', '3'],
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     window.addEventListener('keydown', e => {
       // j = 74, k = 75
       if (e.which === 74) {
@@ -247,7 +247,7 @@ let App = React.createClass({
     });
   },
 
-  render: function() {
+  render() {
     let {keys} = this.state;
     let s = {
       outline: '1px solid black',

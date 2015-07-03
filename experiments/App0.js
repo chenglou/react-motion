@@ -14,14 +14,14 @@ let Spring = React.createClass({
     onValueChange: React.PropTypes.func,
   },
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       tension: 140,
       friction: 16,
     };
   },
 
-  getInitialState: function() {
+  getInitialState() {
     return {
       v: 0,
       currValue: this.props.value,
@@ -29,14 +29,14 @@ let Spring = React.createClass({
     };
   },
 
-  componentWillReceiveProps: function() {
+  componentWillReceiveProps() {
     if (!this.state.isRafing) {
       this.setState({isRafing: true});
       this.raf();
     }
   },
 
-  raf: function() {
+  raf() {
     requestAnimationFrame(() => {
       let {currValue, v} = this.state;
       let {tension, friction, value, onValueChange} = this.props;
@@ -61,11 +61,11 @@ let Spring = React.createClass({
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.raf();
   },
 
-  render: function() {
+  render() {
     return (
       <div>
         {this.props.children}
@@ -75,7 +75,7 @@ let Spring = React.createClass({
 });
 
 var App = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       mouseX: 0,
       mouseY: 0,
@@ -95,7 +95,7 @@ var App = React.createClass({
     };
   },
 
-  handleMouseMove: function(e) {
+  handleMouseMove(e) {
     if (e.nativeEvent.which === 1) {
       this.setState({
         mouseX: e.pageX,
@@ -104,14 +104,14 @@ var App = React.createClass({
     }
   },
 
-  handleValueChange: function(idx, pos, value) {
+  handleValueChange(idx, pos, value) {
     this.state.springs[idx][pos] = value;
     this.setState({
       springs: this.state.springs,
     });
   },
 
-  render: function() {
+  render() {
     let {mouseX, mouseY, springs} = this.state;
     let box = {
       width: 500,
