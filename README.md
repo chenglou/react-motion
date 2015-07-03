@@ -99,10 +99,10 @@ let currVals = {
 #### TransitionSpring
 Same as the Spring but will transition things in and out when you need to unmount components. Takes two other props: `willEnter` and `willLeave`.
 
-__willEnter__: (key, finalVals, currVals) => defaultValForKey
+__willEnter__: `(key, finalVals, currVals) => defaultValForKey`
 
-`willEnter` should return the data structure to replace the missing `key` in currVals.
+`willEnter` should return the data structure to replace the missing `key` in `currVals`.
 
-__willLeave__: (key, tween, finalVals, currVals, currV) => nextFinalVals
+__willLeave__: `(key, tween, finalVals, currVals, currV) => nextFinalVals`
 
-`willLeave` should return a data structure representing the next final endValue to aim for.
+`willLeave` should return a data structure representing the next final `endValue` to aim for.
