@@ -43,48 +43,81 @@ function stripMarks(tree) {
   return tree;
 }
 
-// see stepper for constant k, b usage
-function updateVals(frameRate, currVals, currV, destVals, k = -1, b = -1) {
+function updateValsAndV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
   if (destVals != null && destVals.__springK != null) {
-    return updateVals(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
+    return updateValsAndV(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
   }
   if (Object.prototype.toString.call(destVals) === '[object Array]') {
-    return destVals.map((val, i) => updateVals(frameRate, currVals[i], currV[i], val, k, b));
+    let newCurrVals = new Array(destVals.length);
+    let newCurrV = new Array(destVals.length);
+    destVals.forEach((val, i) => {
+      let [nextCurVals, nextCurV] = updateValsAndV(frameRate, currVals[i], currV[i], val, k, b);
+      newCurrVals[i] = nextCurVals;
+      newCurrV[i] = nextCurV;
+    });
+
+    return [newCurrVals, newCurrV];
   }
   if (Object.prototype.toString.call(destVals) === '[object Object]') {
-    let newTree = {};
+    let newCurrVals = {};
+    let newCurrV = {};
     Object.keys(destVals).forEach(key => {
-      newTree[key] = updateVals(frameRate, currVals[key], currV[key], destVals[key], k, b);
+      let [nextCurVals, nextCurV] = updateValsAndV(frameRate, currVals[key], currV[key], destVals[key], k, b);
+      newCurrVals[key] = nextCurVals;
+      newCurrV[key] = nextCurV;
     });
-    return newTree;
+    return [newCurrVals, newCurrV];
   }
+
   // haven't received any tween from parent yet
   if (k === -1 || b === -1) {
-    return destVals;
+    return [destVals, currV];
   }
-  return stepper(frameRate, currVals, currV, destVals, k, b)[0];
+  return stepper(frameRate, currVals, currV, destVals, k, b);
 }
 
-function updateV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
-  if (destVals != null && destVals.__springK != null) {
-    return updateV(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
-  }
-  if (Object.prototype.toString.call(destVals) === '[object Array]') {
-    return destVals.map((val, i) => updateV(frameRate, currVals[i], currV[i], val, k, b));
-  }
-  if (Object.prototype.toString.call(destVals) === '[object Object]') {
-    let newTree = {};
-    Object.keys(destVals).forEach(key => {
-      newTree[key] = updateV(frameRate, currVals[key], currV[key], destVals[key], k, b);
-    });
-    return newTree;
-  }
-  // haven't received any tween from parent yet
-  if (k === -1 || b === -1) {
-    return currV;
-  }
-  return stepper(frameRate, currVals, currV, destVals, k, b)[1];
-}
+// see stepper for constant k, b usage
+// function updateVals(frameRate, currVals, currV, destVals, k = -1, b = -1) {
+//   if (destVals != null && destVals.__springK != null) {
+//     return updateVals(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
+//   }
+//   if (Object.prototype.toString.call(destVals) === '[object Array]') {
+//     return destVals.map((val, i) => updateVals(frameRate, currVals[i], currV[i], val, k, b));
+//   }
+//   if (Object.prototype.toString.call(destVals) === '[object Object]') {
+//     let newTree = {};
+//     Object.keys(destVals).forEach(key => {
+//       newTree[key] = updateVals(frameRate, currVals[key], currV[key], destVals[key], k, b);
+//     });
+//     return newTree;
+//   }
+//   // haven't received any tween from parent yet
+//   if (k === -1 || b === -1) {
+//     return destVals;
+//   }
+//   return stepper(frameRate, currVals, currV, destVals, k, b)[0];
+// }
+
+// function updateV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
+//   if (destVals != null && destVals.__springK != null) {
+//     return updateV(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
+//   }
+//   if (Object.prototype.toString.call(destVals) === '[object Array]') {
+//     return destVals.map((val, i) => updateV(frameRate, currVals[i], currV[i], val, k, b));
+//   }
+//   if (Object.prototype.toString.call(destVals) === '[object Object]') {
+//     let newTree = {};
+//     Object.keys(destVals).forEach(key => {
+//       newTree[key] = updateV(frameRate, currVals[key], currV[key], destVals[key], k, b);
+//     });
+//     return newTree;
+//   }
+//   // haven't received any tween from parent yet
+//   if (k === -1 || b === -1) {
+//     return currV;
+//   }
+//   return stepper(frameRate, currVals, currV, destVals, k, b)[1];
+// }
 
 function mergeDiff(collA, collB, onRemove, accum) {
   let [a, ...aa] = collA;
@@ -177,8 +210,7 @@ export default React.createClass({
       } else {
         annotatedVals = tween(values);
       }
-      let newCurrVals = updateVals(FRAME_RATE, currVals, currV, annotatedVals);
-      let newCurrV = updateV(FRAME_RATE, currVals, currV, annotatedVals);
+      let [newCurrVals, newCurrV] = updateValsAndV(FRAME_RATE, currVals, currV, annotatedVals);
 
       this.setState(() => {
         return {
@@ -214,8 +246,7 @@ export default React.createClass({
             annotatedVals = tween(values);
           }
 
-          let newCurrVals = updateVals(FRAME_RATE, currVals, currV, annotatedVals);
-          let newCurrV = updateV(FRAME_RATE, currVals, currV, annotatedVals);
+          let [newCurrVals, newCurrV] = updateValsAndV(FRAME_RATE, currVals, currV, annotatedVals);
 
           return [...acc, [newCurrVals, newCurrV]];
         }, [[currVals, currV]])
@@ -314,8 +345,8 @@ export let TransitionSpring = React.createClass({
         });
 
       let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
-      let newCurrVals = updateVals(frameRate, currVals, currV, mergedVals);
-      let newCurrV = updateV(frameRate, currVals, currV, mergedVals);
+
+      let [newCurrVals, newCurrV] = updateValsAndV(frameRate, currVals, currV, mergedVals);
 
       this.setState(() => {
         return {
