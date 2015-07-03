@@ -76,49 +76,6 @@ function updateValsAndV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
   return stepper(frameRate, currVals, currV, destVals, k, b);
 }
 
-// see stepper for constant k, b usage
-// function updateVals(frameRate, currVals, currV, destVals, k = -1, b = -1) {
-//   if (destVals != null && destVals.__springK != null) {
-//     return updateVals(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
-//   }
-//   if (Object.prototype.toString.call(destVals) === '[object Array]') {
-//     return destVals.map((val, i) => updateVals(frameRate, currVals[i], currV[i], val, k, b));
-//   }
-//   if (Object.prototype.toString.call(destVals) === '[object Object]') {
-//     let newTree = {};
-//     Object.keys(destVals).forEach(key => {
-//       newTree[key] = updateVals(frameRate, currVals[key], currV[key], destVals[key], k, b);
-//     });
-//     return newTree;
-//   }
-//   // haven't received any tween from parent yet
-//   if (k === -1 || b === -1) {
-//     return destVals;
-//   }
-//   return stepper(frameRate, currVals, currV, destVals, k, b)[0];
-// }
-
-// function updateV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
-//   if (destVals != null && destVals.__springK != null) {
-//     return updateV(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
-//   }
-//   if (Object.prototype.toString.call(destVals) === '[object Array]') {
-//     return destVals.map((val, i) => updateV(frameRate, currVals[i], currV[i], val, k, b));
-//   }
-//   if (Object.prototype.toString.call(destVals) === '[object Object]') {
-//     let newTree = {};
-//     Object.keys(destVals).forEach(key => {
-//       newTree[key] = updateV(frameRate, currVals[key], currV[key], destVals[key], k, b);
-//     });
-//     return newTree;
-//   }
-//   // haven't received any tween from parent yet
-//   if (k === -1 || b === -1) {
-//     return currV;
-//   }
-//   return stepper(frameRate, currVals, currV, destVals, k, b)[1];
-// }
-
 function mergeDiff(collA, collB, onRemove, accum) {
   let [a, ...aa] = collA;
   let [b, ...bb] = collB;
@@ -236,9 +193,6 @@ export default React.createClass({
         .reduce((acc) => {
           let [currVals, currV] = acc[acc.length - 1];
 
-          currVals = clone(currVals);
-          currV = clone(currV);
-
           let annotatedVals;
           if (typeof values === 'function') {
             annotatedVals = values(tween, currVals);
@@ -252,7 +206,7 @@ export default React.createClass({
         }, [[currVals, currV]])
         .map(([currVals]) => {
           return (
-            <span style={{opacity: 0.1}}>{this.props.children(currVals)}</span>
+            <span style={{opacity: 0.2}}>{this.props.children(currVals)}</span>
           );
         })}</div>;
     }
@@ -285,6 +239,13 @@ export let TransitionSpring = React.createClass({
     ]),
   },
 
+  getDefaultProps: function() {
+    return {
+      willEnter: (key, currVals) => currVals[key],
+      willLeave: () => null
+    };
+  },
+
   getInitialState: function() {
     let {values} = this.props;
     let vals;
@@ -307,11 +268,10 @@ export let TransitionSpring = React.createClass({
       let {currVals, currV, now} = this.state;
       let {
         values,
-        willEnter = (key, currVals) => currVals[key],
-        willLeave = () => null,
+        willEnter,
+        willLeave,
       } = this.props;
 
-      // TODO: lol, refactor
       let annotatedVals;
       if (typeof values === 'function') {
         checkValuesFunc(values);
@@ -345,7 +305,6 @@ export let TransitionSpring = React.createClass({
         });
 
       let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
-
       let [newCurrVals, newCurrV] = updateValsAndV(frameRate, currVals, currV, mergedVals);
 
       this.setState(() => {
