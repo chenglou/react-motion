@@ -22,7 +22,7 @@ Example usage (look at [demo2](https://github.com/chenglou/react-animation/tree/
 
 ```js
 import React from 'react';
-import Spring from 'react-aniamtion';
+import Spring from 'react-animation';
 import {range} from '../utils';
 
 let Demo = React.createClass({
