@@ -3,8 +3,6 @@ import Spring from '../Spring';
 import {range} from '../utils';
 
 let Demo = React.createClass({
-  displayName: 'Demo',
-
   getInitialState: function() {
     return {mouse: [0, 0]};
   },
@@ -14,34 +12,40 @@ let Demo = React.createClass({
   },
 
   handleTouchMove: function({touches}) {
-    let {pageX, pageY} = touches[0];
-    this.setState({mouse: [pageX, pageY]});
+    this.handleMouseMove(touches[0]);
   },
 
   getValues: function(tween, currentValues) {
+    // currentValues of `null` means it's the first render for Spring
     if (currentValues == null) {
       return range(6).map(() => [0, 0]);
     }
-    return tween(currentValues.reduce((acc, _, i) => {
+    let endValue = currentValues.reduce((acc, _, i) => {
       return i === 0 ? [this.state.mouse] : [...acc, currentValues[i - 1]];
-    }, []), 120, 17);
+    }, []);
+    // `tween` is a function passed to you for tweaking your collection's spring
+    // constants. 120 is the stiffness, 17 is the damping. This will tween every
+    // number in your collection.
+    return tween(endValue, 120, 17);
   },
 
   render: function() {
     return (
-      <Spring className="demo1" endValue={this.getValues} onMouseMove={this.handleMouseMove} onTouchMove={this.handleTouchMove}>
-        {currentValues => currentValues.map(([x, y], i) => {
-          return (
-            <div
-              key={i}
-              className={`demo1-ball ball-${i}`}
-              style={{
-                WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                zIndex: currentValues.length - i,
-              }} />
-          );
-        })}
+      <Spring
+        className="demo1"
+        endValue={this.getValues}
+        onMouseMove={this.handleMouseMove}
+        onTouchMove={this.handleTouchMove}>
+        {currentValues => currentValues.map(([x, y], i) =>
+          <div
+            key={i}
+            className={`demo1-ball ball-${i}`}
+            style={{
+              WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
+              transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
+              zIndex: currentValues.length - i,
+            }} />
+        )}
       </Spring>
     );
   }
