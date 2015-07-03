@@ -1,21 +1,15 @@
 'use strict';
 
 import React, {PropTypes} from 'react';
-import {mapTree, clone} from './utils';
+import {range, mapTree, clone} from './utils';
 import stepper from './stepper';
 
-let hackOn = false;
-window.interval = 1000 / 60;
-window.addEventListener('keypress', e => {
-  if (e.which === 100) {
-    hackOn = !hackOn;
-    window.interval = hackOn ? 3000 : 1000 / 60;
+let hackOn = null;
+window.addEventListener('keypress', ({which}) => {
+  if (which === 50) {
+    hackOn = hackOn == null ? 10 : null;
   }
 });
-
-function requestAnimationFrame(f) {
-  setTimeout(f, window.interval);
-}
 
 // ---------
 let FRAME_RATE = 1 / 60;
@@ -183,15 +177,13 @@ export default React.createClass({
       } else {
         annotatedVals = tween(values);
       }
-      let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
-      let newCurrVals = updateVals(frameRate, currVals, currV, annotatedVals);
-      let newCurrV = updateV(frameRate, currVals, currV, annotatedVals);
+      let newCurrVals = updateVals(FRAME_RATE, currVals, currV, annotatedVals);
+      let newCurrV = updateV(FRAME_RATE, currVals, currV, annotatedVals);
 
       this.setState(() => {
         return {
           currVals: newCurrVals,
-          currV: newCurrV,
-          now: Date.now(),
+          currV: newCurrV
         };
       });
 
@@ -204,6 +196,36 @@ export default React.createClass({
   },
 
   render: function() {
+    if(hackOn != null) {
+      let {currVals, currV} = this.state;
+      let {values} = this.props;
+      return <div {...this.props}>{
+        range(hackOn)
+        .reduce((acc) => {
+          let [currVals, currV] = acc[acc.length - 1];
+
+          currVals = clone(currVals);
+          currV = clone(currV);
+
+          let annotatedVals;
+          if (typeof values === 'function') {
+            annotatedVals = values(tween, currVals);
+          } else {
+            annotatedVals = tween(values);
+          }
+
+          let newCurrVals = updateVals(FRAME_RATE, currVals, currV, annotatedVals);
+          let newCurrV = updateV(FRAME_RATE, currVals, currV, annotatedVals);
+
+          return [...acc, [newCurrVals, newCurrV]];
+        }, [[currVals, currV]])
+        .map(([currVals]) => {
+          return (
+            <span style={{opacity: 0.1}}>{this.props.children(currVals)}</span>
+          );
+        })}</div>;
+    }
+
     let {currVals} = this.state;
     return <div {...this.props}>{this.props.children(currVals)}</div>;
   }

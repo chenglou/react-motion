@@ -61,7 +61,7 @@ let Demo = React.createClass({
           value={currPhoto}
           onChange={this.handleChange} />
         {currPhoto}
-        <TransitionSpring className="demo4" values={this.getValues}>
+        <Spring className="demo4" values={this.getValues}>
           {({container, ...rest}) =>
             <div className="demo4-inner" style={container}>
               {Object.keys(rest).map(key =>
@@ -73,7 +73,7 @@ let Demo = React.createClass({
               )}
             </div>
           }
-        </TransitionSpring>
+        </Spring>
       </div>
     );
   }
