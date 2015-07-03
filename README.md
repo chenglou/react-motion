@@ -18,7 +18,8 @@ npm start
 ```
 
 ##API
-Example usage
+Example usage (look at [demo2](https://github.com/chenglou/react-animation/tree/master/demo2), [demo3](https://github.com/chenglou/react-animation/tree/master/demo3), [demo4](https://github.com/chenglou/react-animation/tree/master/demo4) for more)
+
 ```js
 import React from 'react';
 import Spring from 'react-aniamtion';
@@ -35,15 +36,15 @@ let Demo = React.createClass({
     this.setState({mouse: [pageX, pageY]});
   },
 
-  getValues: function(tween, currentValues) {
-    if (currentValues == null) {
+  values: function(tween, currVals) {
+    if (currVals == null) {
       return range(6).map(() => [0, 0]);
     }
     
     // The function `tween` given to you is for you to describe what you  
     // want animated
-    return tween(currentValues.reduce((acc, _, i) => {
-      return i === 0 ? [this.state.mouse] : [...acc, currentValues[i - 1]];
+    return tween(currVals.reduce((acc, _, i) => {
+      return i === 0 ? [this.state.mouse] : [...acc, currVals[i - 1]];
     }, []), 120, 17);
   },
 
@@ -51,9 +52,11 @@ let Demo = React.createClass({
     return (
       <Spring 
         className="demo1" 
-        values={this.getValues} 
+        values={this.values} 
         onMouseMove={this.handleMouseMove}>
-        {currentValues => currentValues.map(([x, y], i) => {
+        
+        // `this.values` returns an array, so currVals is an array
+        {currVals => currVals.map(([x, y], i) => {
           return (
             <div
               key={i}
@@ -61,7 +64,7 @@ let Demo = React.createClass({
                 backgroundColor: 'red',
                 WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
                 transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                zIndex: currentValues.length - i,
+                zIndex: currVals.length - i,
               }} />
           );
         })}
@@ -69,12 +72,14 @@ let Demo = React.createClass({
     );
   }
 });
+
+React.render(<Demo />, document.querySelector('#content'));
 ```
 
 The API exports Spring by default, but also comes with TransitionSpring. 
 
 #### Spring
-Accepts a `values` prop that's a function `(tween, currVals) => finalVals`. It takes `tween` and `currVals` and returns a data structure representing the final values. The Spring will automatically tween between the current value and the final value.
+Accepts a `values` prop that's a function `(tween, currVals) => finalVals`. It takes `tween` and `currVals` and returns a data structure representing the final values. `currVals` will always be the same shape as what `values` returns. The Spring will automatically tween between the current value and the final value returned by `values`.
 `tween` is a function for you to indicate what you want/don't want animated. You can use it like this:
 ```js
 let Demo = React.createClass({
