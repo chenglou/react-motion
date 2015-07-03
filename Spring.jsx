@@ -189,14 +189,14 @@ export default React.createClass({
   },
 
   render: function() {
-    let {currVals} = this.state;
+    let {currVals, currV} = this.state;
     if(hackOn2 != null) {
-      let {currV} = this.state;
       if(hackOn2.curr === hackOn2.data.length - 1) {
         hackOn2.data.push([currVals, currV]);
         hackOn2.curr = hackOn2.data.length - 1;
       }
       currVals = hackOn2.data[hackOn2.curr][0];
+      currV = hackOn2.data[hackOn2.curr][1];
 
       // Dirty mutations for the sake of time travel
       this.state.currVals = currVals;
@@ -204,7 +204,6 @@ export default React.createClass({
     }
 
     if(hackOn != null) {
-      let {currV} = this.state;
       let {values} = this.props;
       return <div {...this.props}>{
         range(hackOn)
