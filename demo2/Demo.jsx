@@ -89,7 +89,7 @@ let Demo = React.createClass({
         onTouchEnd={this.handleMouseUp}
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.handleMouseUp}
-        values={this.getValues}>
+        endValue={this.getValues}>
         {({order: currOrder, scales}) => currOrder.map(([x, y], key) =>
           <div
             key={key}

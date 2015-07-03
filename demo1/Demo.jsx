@@ -29,7 +29,7 @@ let Demo = React.createClass({
 
   render: function() {
     return (
-      <Spring className="demo1" values={this.getValues} onMouseMove={this.handleMouseMove} onTouchMove={this.handleTouchMove}>
+      <Spring className="demo1" endValue={this.getValues} onMouseMove={this.handleMouseMove} onTouchMove={this.handleTouchMove}>
         {currentValues => currentValues.map(([x, y], i) => {
           return (
             <div

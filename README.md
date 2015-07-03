@@ -3,7 +3,7 @@
 __Rushed to get the library out in time for the React-Europe talk. More polished codebase coming tonight!__
 
 ```js
-<Spring values={10}>
+<Spring endValue={10}>
   {currentValues => <div>{currentValues}</div>}
 </Spring>
 ```
@@ -43,7 +43,7 @@ let Demo = React.createClass({
     return (
       <div>
         <button onMouseDown={this.handleMouseDown}>Toggle</button>
-        <Spring className="demo0" values={this.state.open ? 400 : 0}>
+        <Spring className="demo0" endValue={this.state.open ? 400 : 0}>
           {x =>
             <div className="demo0-block" style={{
               WebkitTransform: `translate3d(${x}px, 0, 0)`,
@@ -60,12 +60,12 @@ let Demo = React.createClass({
 --- **README work in progress** ---
 
 #### Spring
-Accepts a `values` prop that's a function `(tween, currVals) => finalVals`. It takes `tween` and `currVals` and returns a data structure representing the final values. `currVals` will always be the same shape as what `values` returns. The Spring will automatically tween between the current value and the final value returned by `values`.
+Accepts a `endValue` prop that's a function `(tween, currVals) => finalVals`. It takes `tween` and `currVals` and returns a data structure representing the final endValue. `currVals` will always be the same shape as what `endValue` returns. The Spring will automatically tween between the current value and the final value returned by `endValue`.
 `tween` is a function for you to indicate what you want/don't want animated. You can use it like this:
 ```js
 let Demo = React.createClass({
   ...
-  values: function(tween, currVals) {
+  endValue: function(tween, currVals) {
     // The function `tween` given to you is for you to describe what you
     // want animated
     return tween({
@@ -76,7 +76,7 @@ let Demo = React.createClass({
 
   render: function() {
     return (
-      <Spring values={this.values}>
+      <Spring endValue={this.endValue}>
         {currVals => ...}
       </Spring>
     );
@@ -105,4 +105,4 @@ __willEnter__: (key, finalVals, currVals) => defaultValForKey
 
 __willLeave__: (key, tween, finalVals, currVals, currV) => nextFinalVals
 
-`willLeave` should return a data structure representing the next final values to aim for.
+`willLeave` should return a data structure representing the next final endValue to aim for.

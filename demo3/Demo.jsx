@@ -130,7 +130,7 @@ let Demo = React.createClass({
         </header>
         <section className="main">
           <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll}/>
-          <TransitionSpring values={this.getValues} willLeave={this.willLeave} willEnter={this.willEnter}>
+          <TransitionSpring endValue={this.getValues} willLeave={this.willLeave} willEnter={this.willEnter}>
             {configs =>
               <ul className="todo-list">
                 {Object.keys(configs).map(date => {

@@ -14,7 +14,7 @@ let Demo = React.createClass({
     return (
       <div>
         <button onMouseDown={this.handleMouseDown}>Toggle</button>
-        <Spring className="demo0" values={this.state.open ? 400 : 0}>
+        <Spring className="demo0" endValue={this.state.open ? 400 : 0}>
           {x =>
             <div className="demo0-block" style={{
               WebkitTransform: `translate3d(${x}px, 0, 0)`,

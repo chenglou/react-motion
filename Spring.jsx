@@ -125,7 +125,7 @@ function mergeDiffObj(a, b, onRemove) {
 function checkValuesFunc(f) {
 //   if (f.length === 0) {
 //     console.warn(
-//       `You're passing a function to Spring prop \`values\` which doesn't \
+//       `You're passing a function to Spring prop \`endValue\` which doesn't \
 // receive \`tween\` as the first argument. In this case, nothing will be \
 // animated. You might as well directly pass the value.`
 //     );
@@ -134,7 +134,7 @@ function checkValuesFunc(f) {
 
 export default React.createClass({
   propTypes: {
-    values: PropTypes.oneOfType([
+    endValue: PropTypes.oneOfType([
       PropTypes.func,
       PropTypes.object,
       PropTypes.number,
@@ -142,13 +142,13 @@ export default React.createClass({
   },
 
   getInitialState: function() {
-    let {values} = this.props;
+    let {endValue} = this.props;
     let vals;
-    if (typeof values === 'function') {
-      checkValuesFunc(values);
-      vals = values(tween);
+    if (typeof endValue === 'function') {
+      checkValuesFunc(endValue);
+      vals = endValue(tween);
     } else {
-      vals = values;
+      vals = endValue;
     }
     let defaultVals = stripMarks(vals);
     return {
@@ -161,15 +161,15 @@ export default React.createClass({
   raf: function() {
     requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
-      let {values} = this.props;
+      let {endValue} = this.props;
 
       // TODO: lol, refactor
       let annotatedVals;
-      if (typeof values === 'function') {
-        checkValuesFunc(values);
-        annotatedVals = values(tween, currVals);
+      if (typeof endValue === 'function') {
+        checkValuesFunc(endValue);
+        annotatedVals = endValue(tween, currVals);
       } else {
-        annotatedVals = tween(values);
+        annotatedVals = tween(endValue);
       }
       let [newCurrVals, newCurrV] = updateValsAndV(FRAME_RATE, currVals, currV, annotatedVals);
 
@@ -204,17 +204,17 @@ export default React.createClass({
     }
 
     if(hackOn != null) {
-      let {values} = this.props;
+      let {endValue} = this.props;
       return <div {...this.props}>{
         range(hackOn)
         .reduce((acc) => {
           let [currVals, currV] = acc[acc.length - 1];
 
           let annotatedVals;
-          if (typeof values === 'function') {
-            annotatedVals = values(tween, currVals);
+          if (typeof endValue === 'function') {
+            annotatedVals = endValue(tween, currVals);
           } else {
-            annotatedVals = tween(values);
+            annotatedVals = tween(endValue);
           }
 
           let [newCurrVals, newCurrV] = updateValsAndV(FRAME_RATE, currVals, currV, annotatedVals);
@@ -260,7 +260,7 @@ export default React.createClass({
 
 export let TransitionSpring = React.createClass({
   propTypes: {
-    values: PropTypes.oneOfType([
+    endValue: PropTypes.oneOfType([
       PropTypes.func,
       // TODO: better warning
       PropTypes.object,
@@ -289,13 +289,13 @@ export let TransitionSpring = React.createClass({
   },
 
   getInitialState: function() {
-    let {values} = this.props;
+    let {endValue} = this.props;
     let vals;
-    if (typeof values === 'function') {
-      checkValuesFunc(values);
-      vals = values(tween);
+    if (typeof endValue === 'function') {
+      checkValuesFunc(endValue);
+      vals = endValue(tween);
     } else {
-      vals = values;
+      vals = endValue;
     }
     let defaultVals = stripMarks(vals);
     return {
@@ -309,17 +309,17 @@ export let TransitionSpring = React.createClass({
     requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
       let {
-        values,
+        endValue,
         willEnter,
         willLeave,
       } = this.props;
 
       let annotatedVals;
-      if (typeof values === 'function') {
-        checkValuesFunc(values);
-        annotatedVals = values(tween, currVals);
+      if (typeof endValue === 'function') {
+        checkValuesFunc(endValue);
+        annotatedVals = endValue(tween, currVals);
       } else {
-        annotatedVals = tween(values);
+        annotatedVals = tween(endValue);
       }
 
       let strippedVals = stripMarks(annotatedVals);
