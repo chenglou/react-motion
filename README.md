@@ -2,6 +2,8 @@
 
 __Rushed to get the library out in time for the React-Europe talk. More polished codebase coming tonight!__
 
+**Warning: very unstable API**
+
 ```js
 <Spring endValue={10}>
   {currentValues => <div>{currentValues}</div>}
