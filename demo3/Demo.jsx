@@ -73,7 +73,7 @@ let Demo = React.createClass({
     this.forceUpdate();
   },
 
-  getValues(tween) {
+  getValues(update) {
     let {todos, value, selected} = this.state;
     let configs = {};
     Object.keys(todos)
@@ -86,12 +86,12 @@ let Demo = React.createClass({
       })
       .forEach(date => {
         configs[date] = {
-          data: tween(todos[date], -1, -1),
+          data: update(todos[date], -1, -1),
           height: 60,
           opacity: 1,
         };
       });
-    return tween(configs, 120, 17);
+    return update(configs, 120, 17);
   },
 
   willEnter(date) {
@@ -102,12 +102,12 @@ let Demo = React.createClass({
     };
   },
 
-  willLeave(date, tween, destVals, currVals) {
+  willLeave(date, update, destVals, currVals) {
     if (currVals[date].opacity > 0) {
-      return tween({
+      return update({
         height: 0,
         opacity: 0,
-        data: tween(currVals[date].data, -1, -1),
+        data: update(currVals[date].data, -1, -1),
       });
     }
   },

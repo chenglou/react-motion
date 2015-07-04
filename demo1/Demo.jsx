@@ -15,7 +15,7 @@ let Demo = React.createClass({
     this.handleMouseMove(touches[0]);
   },
 
-  getValues(tween, positions) {
+  getValues(update, positions) {
     // positions of `null` means it's the first render for Spring
     if (positions == null) {
       return range(6).map(() => [0, 0]);
@@ -23,10 +23,10 @@ let Demo = React.createClass({
     let endValue = positions.reduce((acc, _, i) => {
       return i === 0 ? [this.state.mouse] : [...acc, positions[i - 1]];
     }, []);
-    // `tween` is a function passed to you for tweaking your collection's spring
-    // constants. 120 is the stiffness, 17 is the damping. This will tween every
+    // `update` is a function passed to you for tweaking your collection's spring
+    // constants. 120 is the stiffness, 17 is the damping. This will update every
     // number in your collection.
-    return tween(endValue, 120, 17);
+    return update(endValue, 120, 17);
   },
 
   render() {

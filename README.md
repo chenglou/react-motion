@@ -60,17 +60,17 @@ let Demo = React.createClass({
 --- **README work in progress** ---
 
 #### Spring
-Accepts a `endValue` prop that's a function `(tween, currVals) => finalVals`. It takes `tween` and `currVals` and returns a data structure representing the final endValue. `currVals` will always be the same shape as what `endValue` returns. The Spring will automatically tween between the current value and the final value returned by `endValue`.
-`tween` is a function for you to indicate what you want/don't want animated. You can use it like this:
+Accepts a `endValue` prop that's a function `(update, currVals) => finalVals`. It takes `update` and `currVals` and returns a data structure representing the final endValue. `currVals` will always be the same shape as what `endValue` returns. The Spring will automatically update between the current value and the final value returned by `endValue`.
+`update` is a function for you to indicate what you want/don't want animated. You can use it like this:
 ```js
 let Demo = React.createClass({
   ...
-  endValue(tween, currVals) {
-    // The function `tween` given to you is for you to describe what you
+  endValue(update, currVals) {
+    // The function `update` given to you is for you to describe what you
     // want animated
-    return tween({
-        stuff: tween(10) // you can nest tweens,
-        importantData: tween({data: "won't animate", number: 1}, -1, -1) // Un-tween
+    return update({
+        stuff: update(10) // you can nest updates,
+        importantData: update({data: "won't animate", number: 1}, -1, -1) // Un-update
     });
   },
 
@@ -103,6 +103,6 @@ __willEnter__: `(key, finalVals, currVals) => defaultValForKey`
 
 `willEnter` should return the data structure to replace the missing `key` in `currVals`.
 
-__willLeave__: `(key, tween, finalVals, currVals, currV) => nextFinalVals`
+__willLeave__: `(key, update, finalVals, currVals, currV) => nextFinalVals`
 
 `willLeave` should return a data structure representing the next final `endValue` to aim for.

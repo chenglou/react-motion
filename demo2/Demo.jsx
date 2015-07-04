@@ -60,19 +60,19 @@ let Demo = React.createClass({
     this.setState({isPressed: false, dx: 0, dy: 0});
   },
 
-  getValues(tween) {
+  getValues(update) {
     let {order, lastPress, isPressed, mouse} = this.state;
     return {
-      order: tween(order.map((_, key) => {
+      order: update(order.map((_, key) => {
         if (key === lastPress && isPressed) {
-          // children tween takes priority. k=-1 or b=-1 cancels spring
-          // (act as "un-tween"ing a subtree)
-          return tween(mouse, -1, -1);
+          // children update takes priority. k=-1 or b=-1 cancels spring
+          // (act as "un-update"ing a subtree)
+          return update(mouse, -1, -1);
         }
         let visualPosition = order.indexOf(key);
         return layout[visualPosition];
       }), 120, 17),
-      scales: tween(
+      scales: update(
         range(count).map((_, key) => lastPress === key && isPressed ? 1.2 : 1),
         180,
         10

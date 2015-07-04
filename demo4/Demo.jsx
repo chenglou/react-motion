@@ -20,7 +20,7 @@ let Demo = React.createClass({
     this.setState({currPhoto: value});
   },
 
-  getValues(tween) {
+  getValues(update) {
     let {photos, currPhoto} = this.state;
     let keys = Object.keys(photos);
     let currKey = keys[currPhoto];
@@ -47,7 +47,7 @@ let Demo = React.createClass({
       return prevLeft + widths[i];
     }, offset);
     configs.container = {height, width};
-    return tween(configs, 170, 26);
+    return update(configs, 170, 26);
   },
 
   render() {

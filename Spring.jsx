@@ -21,7 +21,7 @@ function zero() {
 }
 
 // see stepper for constant k, b usage
-function tween(tree, k = 170, b = 26) {
+function update(tree, k = 170, b = 26) {
   return {
     __springK: k,
     __springB: b,
@@ -71,7 +71,7 @@ function updateValsAndV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
     return [newCurrVals, newCurrV];
   }
 
-  // haven't received any tween from parent yet
+  // haven't received any update from parent yet
   if (k === -1 || b === -1) {
     return [destVals, currV];
   }
@@ -135,9 +135,9 @@ function checkEndValues(endValue, component) {
     warnedOwners[ownerName] = true;
     console.warn(
       `You're passing a function to Spring prop \`endValue\` which doesn't \
-receive \`tween\` as the first argument. In this case, nothing will be \
+receive \`update\` as the first argument. In this case, nothing will be \
 animated. Were you trying to use the shorthand of directly passing a value \
-(which calls \`tween\` for you on the whole value under the hood)?. Check \
+(which calls \`update\` for you on the whole value under the hood)?. Check \
 the render of \`${ownerName}\`.`
     );
   }
@@ -156,7 +156,7 @@ export default React.createClass({
     let {endValue} = this.props;
     let vals;
     if (typeof endValue === 'function') {
-      vals = endValue(tween);
+      vals = endValue(update);
     } else {
       vals = endValue;
     }
@@ -192,9 +192,9 @@ export default React.createClass({
       // TODO: lol, refactor
       let annotatedVals;
       if (typeof endValue === 'function') {
-        annotatedVals = endValue(tween, currVals);
+        annotatedVals = endValue(update, currVals);
       } else {
-        annotatedVals = tween(endValue);
+        annotatedVals = update(endValue);
       }
       let [newCurrVals, newCurrV] = updateValsAndV(FRAME_RATE, currVals, currV, annotatedVals);
 
@@ -233,9 +233,9 @@ export default React.createClass({
 
           let annotatedVals;
           if (typeof endValue === 'function') {
-            annotatedVals = endValue(tween, currVals);
+            annotatedVals = endValue(update, currVals);
           } else {
-            annotatedVals = tween(endValue);
+            annotatedVals = update(endValue);
           }
 
           let [newCurrVals, newCurrV] = updateValsAndV(FRAME_RATE, currVals, currV, annotatedVals);
@@ -313,7 +313,7 @@ export let TransitionSpring = React.createClass({
     let {endValue} = this.props;
     let vals;
     if (typeof endValue === 'function') {
-      vals = endValue(tween);
+      vals = endValue(update);
     } else {
       vals = endValue;
     }
@@ -352,9 +352,9 @@ export let TransitionSpring = React.createClass({
       }
       let annotatedVals;
       if (typeof endValue === 'function') {
-        annotatedVals = endValue(tween, currVals);
+        annotatedVals = endValue(update, currVals);
       } else {
-        annotatedVals = tween(endValue);
+        annotatedVals = update(endValue);
       }
 
       let strippedVals = stripMarks(annotatedVals);
@@ -365,12 +365,12 @@ export let TransitionSpring = React.createClass({
       let shallowStrippedMergedVals = mergeDiffObj(
         currVals,
         shallowStrippedVals,
-        key => willLeave(key, tween, strippedVals, currVals, currV),
+        key => willLeave(key, update, strippedVals, currVals, currV),
       );
 
       let mergedVals = annotatedVals.__springK == null ?
         shallowStrippedMergedVals :
-        tween(shallowStrippedMergedVals, annotatedVals.__springK, annotatedVals.__springB);
+        update(shallowStrippedMergedVals, annotatedVals.__springK, annotatedVals.__springB);
 
       currVals = clone(currVals);
       currV = clone(currV);
