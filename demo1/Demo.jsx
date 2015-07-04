@@ -15,13 +15,13 @@ let Demo = React.createClass({
     this.handleMouseMove(touches[0]);
   },
 
-  getValues(tween, currentValues) {
-    // currentValues of `null` means it's the first render for Spring
-    if (currentValues == null) {
+  getValues(tween, positions) {
+    // positions of `null` means it's the first render for Spring
+    if (positions == null) {
       return range(6).map(() => [0, 0]);
     }
-    let endValue = currentValues.reduce((acc, _, i) => {
-      return i === 0 ? [this.state.mouse] : [...acc, currentValues[i - 1]];
+    let endValue = positions.reduce((acc, _, i) => {
+      return i === 0 ? [this.state.mouse] : [...acc, positions[i - 1]];
     }, []);
     // `tween` is a function passed to you for tweaking your collection's spring
     // constants. 120 is the stiffness, 17 is the damping. This will tween every
@@ -36,14 +36,14 @@ let Demo = React.createClass({
         endValue={this.getValues}
         onMouseMove={this.handleMouseMove}
         onTouchMove={this.handleTouchMove}>
-        {currentValues => currentValues.map(([x, y], i) =>
+        {positions => positions.map(([x, y], i) =>
           <div
             key={i}
             className={`demo1-ball ball-${i}`}
             style={{
               WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
               transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-              zIndex: currentValues.length - i,
+              zIndex: positions.length - i,
             }} />
         )}
       </Spring>

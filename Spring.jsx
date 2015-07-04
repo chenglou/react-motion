@@ -1,5 +1,3 @@
-'use strict';
-
 import React, {PropTypes} from 'react';
 import {range, mapTree, clone} from './utils';
 import stepper from './stepper';
@@ -158,8 +156,18 @@ export default React.createClass({
     };
   },
 
+  componentDidMount() {
+    this.raf();
+  },
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this._rafID);
+  },
+
+  _rafID: null,
+
   raf() {
-    requestAnimationFrame(() => {
+    this._rafID = requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
       let {endValue} = this.props;
 
@@ -182,10 +190,6 @@ export default React.createClass({
 
       this.raf();
     });
-  },
-
-  componentDidMount() {
-    this.raf();
   },
 
   render() {
@@ -305,8 +309,18 @@ export let TransitionSpring = React.createClass({
     };
   },
 
+  componentDidMount() {
+    this.raf();
+  },
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this._rafID);
+  },
+
+  _rafID: null,
+
   raf() {
-    requestAnimationFrame(() => {
+    this._rafID = requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
       let {
         endValue,
@@ -359,10 +373,6 @@ export let TransitionSpring = React.createClass({
 
       this.raf();
     });
-  },
-
-  componentDidMount() {
-    this.raf();
   },
 
   render() {
