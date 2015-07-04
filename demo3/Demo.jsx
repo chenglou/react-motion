@@ -89,6 +89,7 @@ let Demo = React.createClass({
           data: update(todos[date], -1, -1),
           height: 60,
           opacity: 1,
+          kek: 'dsa',
         };
       });
     return update(configs, 120, 17);

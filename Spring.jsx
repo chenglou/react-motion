@@ -78,6 +78,52 @@ function updateValsAndV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
   return stepper(frameRate, currVals, currV, destVals, k, b);
 }
 
+// assume a, b same shape
+// mutation, bc perf
+function prewalkAndMutatePosAndVTree(frameRate, pos, v, dest, k = -1, b = -1) {
+  if (dest == null) {
+    return;
+  }
+  if (dest.__springK != null) {
+    // mutation here!
+    k = dest.__springK;
+    b = dest.__springB;
+    dest = dest.value;
+  }
+  if (Object.prototype.toString.call(pos) === '[object Array]') {
+    for (let i = 0; i < pos.length; i++) {
+      // console.log(pos[i]);
+      if (typeof pos[i] === 'number') {
+        if (k === -1 || b === -1) {
+         pos[i] = dest[i];
+         v[i] = 0;
+        } else {
+          let [newPos, newV] = stepper(frameRate, pos[i], v[i], dest[i], k, b);
+          pos[i] = newPos;
+          v[i] = newV;
+        }
+      } else {
+        prewalkAndMutatePosAndVTree(frameRate, pos[i], v[i], dest[i], k, b, i === 0);
+      }
+    }
+  } else if (Object.prototype.toString.call(pos) === '[object Object]') {
+    for (let key in pos) {
+      if (typeof pos[key] === 'number') {
+        if (k === -1 || b === -1) {
+         pos[key] = dest[key];
+         v[key] = 0;
+        } else {
+          let [newPos, newV] = stepper(frameRate, pos[key], v[key], dest[key], k, b);
+          pos[key] = newPos;
+          v[key] = newV;
+        }
+      } else {
+        prewalkAndMutatePosAndVTree(frameRate, pos[key], v[key], dest[key], k, b);
+      }
+    }
+  }
+}
+
 function mergeDiff(collA, collB, onRemove, accum) {
   let [a, ...aa] = collA;
   let [b, ...bb] = collB;
@@ -196,12 +242,26 @@ export default React.createClass({
       } else {
         annotatedVals = update(endValue);
       }
-      let [newCurrVals, newCurrV] = updateValsAndV(FRAME_RATE, currVals, currV, annotatedVals);
+      currVals = clone(currVals);
+      currV = clone(currV);
+      // TODO: change frame rate
+      if (typeof currVals === 'number') {
+        [currVals, currV] = stepper(
+          FRAME_RATE,
+          currVals,
+          currV,
+          annotatedVals.value,
+          annotatedVals.__springK,
+          annotatedVals.__springB
+        );
+      } else {
+        prewalkAndMutatePosAndVTree(FRAME_RATE, currVals, currV, annotatedVals);
+      }
 
       this.setState(() => {
         return {
-          currVals: newCurrVals,
-          currV: newCurrV
+          currVals,
+          currV,
         };
       });
 
@@ -238,9 +298,22 @@ export default React.createClass({
             annotatedVals = update(endValue);
           }
 
-          let [newCurrVals, newCurrV] = updateValsAndV(FRAME_RATE, currVals, currV, annotatedVals);
+          currVals = clone(currVals);
+          currV = clone(currV);
+          if (typeof currVals === 'number') {
+            [currVals, currV] = stepper(
+              FRAME_RATE,
+              currVals,
+              currV,
+              annotatedVals.value,
+              annotatedVals.__springK,
+              annotatedVals.__springB
+            );
+          } else {
+            prewalkAndMutatePosAndVTree(FRAME_RATE, currVals, currV, annotatedVals);
+          }
 
-          return [...acc, [newCurrVals, newCurrV]];
+          return [...acc, [currVals, currV]];
         }, [[currVals, currV]])
         .map(([currVals]) => {
           return (
@@ -382,12 +455,24 @@ export let TransitionSpring = React.createClass({
         });
 
       let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
-      let [newCurrVals, newCurrV] = updateValsAndV(frameRate, currVals, currV, mergedVals);
+
+      if (typeof currVals === 'number') {
+        [currVals, currV] = stepper(
+          FRAME_RATE,
+          currVals,
+          currV,
+          annotatedVals.value,
+          annotatedVals.__springK,
+          annotatedVals.__springB
+        );
+      } else {
+        prewalkAndMutatePosAndVTree(FRAME_RATE, currVals, currV, mergedVals);
+      }
 
       this.setState(() => {
         return {
-          currVals: newCurrVals,
-          currV: newCurrV,
+          currVals,
+          currV,
           now: Date.now(),
         };
       });
