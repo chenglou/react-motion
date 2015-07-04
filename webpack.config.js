@@ -4,7 +4,7 @@ var devtool;
 var loaders = ['babel?stage=0'];
 var plugins = [
   new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+    '__DEV__': JSON.stringify(process.env.NODE_ENV === 'development')
   })
 ];
 var entry = {
@@ -12,7 +12,7 @@ var entry = {
   demo1: './demo1/index.jsx',
   demo2: './demo2/index.jsx',
   demo3: './demo3/index.jsx',
-  demo4: './demo4/index.jsx'
+  demo4: './demo4/index.jsx',
 };
 
 var DEV = process.env.NODE_ENV !== 'production';

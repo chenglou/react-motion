@@ -120,14 +120,27 @@ function mergeDiffObj(a, b, onRemove) {
   return ret;
 }
 
-function checkValuesFunc(f) {
-//   if (f.length === 0) {
-//     console.warn(
-//       `You're passing a function to Spring prop \`endValue\` which doesn't \
-// receive \`tween\` as the first argument. In this case, nothing will be \
-// animated. You might as well directly pass the value.`
-//     );
-//   }
+let warnedOwners = {};
+
+function checkEndValues(endValue, component) {
+  if (typeof endValue !== 'function') {
+    return;
+  }
+  if (endValue.length > 0) {
+    return;
+  }
+  let owner = component._reactInternalInstance._currentElement._owner;
+  let ownerName = owner && owner.getName();
+  if (!warnedOwners[ownerName]) {
+    warnedOwners[ownerName] = true;
+    console.warn(
+      `You're passing a function to Spring prop \`endValue\` which doesn't \
+receive \`tween\` as the first argument. In this case, nothing will be \
+animated. Were you trying to use the shorthand of directly passing a value \
+(which calls \`tween\` for you on the whole value under the hood)?. Check \
+the render of \`${ownerName}\`.`
+    );
+  }
 }
 
 export default React.createClass({
@@ -143,7 +156,6 @@ export default React.createClass({
     let {endValue} = this.props;
     let vals;
     if (typeof endValue === 'function') {
-      checkValuesFunc(endValue);
       vals = endValue(tween);
     } else {
       vals = endValue;
@@ -157,6 +169,9 @@ export default React.createClass({
   },
 
   componentDidMount() {
+    if (__DEV__) {
+      checkEndValues(this.props.endValue, this);
+    }
     this.raf();
   },
 
@@ -171,10 +186,12 @@ export default React.createClass({
       let {currVals, currV, now} = this.state;
       let {endValue} = this.props;
 
+      if (__DEV__) {
+        checkEndValues(endValue, this);
+      }
       // TODO: lol, refactor
       let annotatedVals;
       if (typeof endValue === 'function') {
-        checkValuesFunc(endValue);
         annotatedVals = endValue(tween, currVals);
       } else {
         annotatedVals = tween(endValue);
@@ -296,7 +313,6 @@ export let TransitionSpring = React.createClass({
     let {endValue} = this.props;
     let vals;
     if (typeof endValue === 'function') {
-      checkValuesFunc(endValue);
       vals = endValue(tween);
     } else {
       vals = endValue;
@@ -310,6 +326,9 @@ export let TransitionSpring = React.createClass({
   },
 
   componentDidMount() {
+    if (__DEV__) {
+      checkEndValues(this.props.endValue, this);
+    }
     this.raf();
   },
 
@@ -328,9 +347,11 @@ export let TransitionSpring = React.createClass({
         willLeave,
       } = this.props;
 
+      if (__DEV__) {
+        checkEndValues(endValue, this);
+      }
       let annotatedVals;
       if (typeof endValue === 'function') {
-        checkValuesFunc(endValue);
         annotatedVals = endValue(tween, currVals);
       } else {
         annotatedVals = tween(endValue);

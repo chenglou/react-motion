@@ -1,5 +1,3 @@
-'use strict';
-
 let errorMargin = 0.001;
 
 let hackOn = false;
