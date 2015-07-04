@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "css-layout": "0.0.2",
-    "react": "^0.13.2"
+    "react": ">=0.13.2"
   },
   "devDependencies": {
+    "css-layout": "0.0.2",
     "babel-core": "^5.2.17",
     "babel-loader": "^5.0.0",
     "react-hot-loader": "^1.2.7",
@@ -19,6 +19,6 @@
     "build": "NODE_ENV=production webpack -p",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "chenglou",
+  "license": "MIT"
 }
