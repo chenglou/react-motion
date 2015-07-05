@@ -2,9 +2,12 @@ var webpack = require('webpack');
 
 var devtool;
 var loaders = ['babel?stage=0'];
+var DEV = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+var PROD = process.env.NODE_ENV === 'production';
+
 var plugins = [
   new webpack.DefinePlugin({
-    '__DEV__': JSON.stringify(process.env.NODE_ENV === 'development')
+    '__DEV__': JSON.stringify(DEV)
   })
 ];
 var entry = {
@@ -15,7 +18,6 @@ var entry = {
   demo4: './demo4/index.jsx',
 };
 
-var DEV = process.env.NODE_ENV !== 'production';
 if (DEV) {
   devtool = 'eval';
   loaders = ['react-hot'].concat(loaders);
@@ -31,7 +33,7 @@ if (DEV) {
     ];
     return result;
   }, {});
-} else {
+} else if (PROD) {
   plugins = plugins.concat([
     new webpack.optimize.OccurenceOrderPlugin()
   ]);

@@ -15,8 +15,8 @@
     "webpack-dev-server": "^1.10.1"
   },
   "scripts": {
-    "start": "NODE_ENV=development node server.js",
-    "build": "NODE_ENV=production webpack -p",
+    "start": "node server.js",
+    "build": "webpack -p",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "chenglou",
