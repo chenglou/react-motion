@@ -20,12 +20,17 @@ let Demo = React.createClass({
     if (currentPositions == null) {
       return range(6).map(() => [0, 0]);
     }
-    let endValue = currentPositions.reduce((acc, _, i) => {
-      return i === 0 ? [this.state.mouse] : [...acc, currentPositions[i - 1]];
-    }, []);
+    let endValue = currentPositions.map((_, i) => {
+      // hack. We're getting the currentPositions of the previous ball, but in
+      // reality it's not really the "current" position. It's the last render's.
+      // If we want to get the real current position, we'd have to compute it
+      // now, then read into it now. This gets very tedious with this API.
+      return i === 0 ? this.state.mouse : currentPositions[i - 1];
+    });
     // `update` is a function passed to you for tweaking your collection's spring
     // constants. 120 is the stiffness, 17 is the damping. This will update every
     // number in your collection.
+    // return update(endValue, -1, -1);
     return update(endValue, 120, 17);
   },
 
