@@ -8,7 +8,7 @@ window.addEventListener('keypress', ({which}) => {
   if (which === 50) {
     hackOn = hackOn == null ? 10 : null;
   }
-  if(which === 51) {
+  if (which === 51) {
     hackOn2 = hackOn2 == null ? {data: [], curr: -1} : null;
   }
 });
@@ -45,6 +45,8 @@ function stripMarks(tree) {
   return tree;
 }
 
+/*
+// TODO: remove me? Never used function
 function updateValsAndV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
   if (destVals != null && destVals.__springK != null) {
     return updateValsAndV(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
@@ -77,6 +79,7 @@ function updateValsAndV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
   }
   return stepper(frameRate, currVals, currV, destVals, k, b);
 }
+*/
 
 // assume a, b same shape
 // mutation, bc perf
@@ -95,8 +98,8 @@ function prewalkAndMutatePosAndVTree(frameRate, pos, v, dest, k = -1, b = -1) {
       // console.log(pos[i]);
       if (typeof pos[i] === 'number') {
         if (k === -1 || b === -1) {
-         pos[i] = dest[i];
-         v[i] = 0;
+          pos[i] = dest[i];
+          v[i] = 0;
         } else {
           let [newPos, newV] = stepper(frameRate, pos[i], v[i], dest[i], k, b);
           pos[i] = newPos;
@@ -110,8 +113,8 @@ function prewalkAndMutatePosAndVTree(frameRate, pos, v, dest, k = -1, b = -1) {
     for (let key in pos) {
       if (typeof pos[key] === 'number') {
         if (k === -1 || b === -1) {
-         pos[key] = dest[key];
-         v[key] = 0;
+          pos[key] = dest[key];
+          v[key] = 0;
         } else {
           let [newPos, newV] = stepper(frameRate, pos[key], v[key], dest[key], k, b);
           pos[key] = newPos;
@@ -140,7 +143,8 @@ function mergeDiff(collA, collB, onRemove, accum) {
     }
     return mergeDiff(aa, collB, onRemove, accum.concat(a));
   }
-  if (a === b) { // fails for ([undefined], [], () => true). but don't do that
+  if (a === b) {
+    // fails for ([undefined], [], () => true). but don't do that
     return mergeDiff(aa, bb, onRemove, accum.concat(a));
   }
   if (collB.indexOf(a) === -1) {
@@ -153,7 +157,7 @@ function mergeDiff(collA, collB, onRemove, accum) {
 }
 
 function mergeDiffObj(a, b, onRemove) {
-  let keys = mergeDiff(Object.keys(a), Object.keys(b), a => !onRemove(a), []);
+  let keys = mergeDiff(Object.keys(a), Object.keys(b), _a => !onRemove(_a), []);
   let ret = {};
   keys.forEach(key => {
     if (b.hasOwnProperty(key)) {
@@ -196,6 +200,7 @@ export default React.createClass({
       PropTypes.object,
       PropTypes.number,
     ]).isRequired,
+    children: PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -215,7 +220,7 @@ export default React.createClass({
   },
 
   componentDidMount() {
-    if (__DEV__) {
+    if (process.env.NODE_ENV !== 'production') {
       checkEndValues(this.props.endValue, this);
     }
     this.raf();
@@ -229,10 +234,10 @@ export default React.createClass({
 
   raf() {
     this._rafID = requestAnimationFrame(() => {
-      let {currVals, currV, now} = this.state;
+      let {currVals, currV} = this.state;
       let {endValue} = this.props;
 
-      if (__DEV__) {
+      if (process.env.NODE_ENV !== 'production') {
         checkEndValues(endValue, this);
       }
       // TODO: lol, refactor
@@ -271,8 +276,8 @@ export default React.createClass({
 
   render() {
     let {currVals, currV} = this.state;
-    if(hackOn2 != null) {
-      if(hackOn2.curr === hackOn2.data.length - 1) {
+    if (hackOn2 != null) {
+      if (hackOn2.curr === hackOn2.data.length - 1) {
         hackOn2.data.push([currVals, currV]);
         hackOn2.curr = hackOn2.data.length - 1;
       }
@@ -284,38 +289,38 @@ export default React.createClass({
       this.state.currV = currV;
     }
 
-    if(hackOn != null) {
+    if (hackOn != null) {
       let {endValue} = this.props;
-      return <div {...this.props}>{
+      return (<div {...this.props}>{
         range(hackOn)
         .reduce((acc) => {
-          let [currVals, currV] = acc[acc.length - 1];
+          let [_currVals, _currV] = acc[acc.length - 1];
 
           let annotatedVals;
           if (typeof endValue === 'function') {
-            annotatedVals = endValue(update, currVals);
+            annotatedVals = endValue(update, _currVals);
           } else {
             annotatedVals = update(endValue);
           }
 
-          currVals = clone(currVals);
-          currV = clone(currV);
-          if (typeof currVals === 'number') {
-            [currVals, currV] = stepper(
+          _currVals = clone(_currVals);
+          _currV = clone(_currV);
+          if (typeof _currVals === 'number') {
+            [_currVals, _currV] = stepper(
               FRAME_RATE,
-              currVals,
-              currV,
+              _currVals,
+              _currV,
               annotatedVals.value,
               annotatedVals.__springK,
               annotatedVals.__springB
             );
           } else {
-            prewalkAndMutatePosAndVTree(FRAME_RATE, currVals, currV, annotatedVals);
+            prewalkAndMutatePosAndVTree(FRAME_RATE, _currVals, _currV, annotatedVals);
           }
 
-          return [...acc, [currVals, currV]];
+          return [...acc, [_currVals, _currV]];
         }, [[currVals, currV]])
-        .map(([currVals]) => {
+        .map(([_currVals]) => {
           return (
             <span style={{opacity: 0.2}}>
               {hackOn2 != null &&
@@ -325,14 +330,14 @@ export default React.createClass({
                     max={hackOn2.data.length - 1}
                     value={hackOn2.curr}
                     onChange={({target: {value}}) => {
-                      hackOn2.curr = parseInt(value);
+                      hackOn2.curr = parseInt(value, 10);
                     }} />
                     {hackOn2.curr}
                 </div>}
-              {this.props.children(currVals)}
+              {this.props.children(_currVals)}
             </span>
           );
-        })}</div>;
+        })}</div>);
     }
 
     return (<div {...this.props}>
@@ -343,13 +348,13 @@ export default React.createClass({
             max={hackOn2.data.length - 1}
             value={hackOn2.curr}
             onChange={({target: {value}}) => {
-              hackOn2.curr = parseInt(value);
+              hackOn2.curr = parseInt(value, 10);
             }} />
             {hackOn2.curr}
         </div>}
       {this.props.children(currVals)}
     </div>);
-  }
+  },
 });
 
 export let TransitionSpring = React.createClass({
@@ -373,12 +378,13 @@ export let TransitionSpring = React.createClass({
       // TODO: better warning
       PropTypes.object,
     ]),
+    children: PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
     return {
       willEnter: (key, currVals) => currVals[key],
-      willLeave: () => null
+      willLeave: () => null,
     };
   },
 
@@ -399,7 +405,7 @@ export let TransitionSpring = React.createClass({
   },
 
   componentDidMount() {
-    if (__DEV__) {
+    if (process.env.NODE_ENV !== 'production') {
       checkEndValues(this.props.endValue, this);
     }
     this.raf();
@@ -413,14 +419,14 @@ export let TransitionSpring = React.createClass({
 
   raf() {
     this._rafID = requestAnimationFrame(() => {
-      let {currVals, currV, now} = this.state;
+      let {currVals, currV} = this.state;
       let {
         endValue,
         willEnter,
         willLeave,
       } = this.props;
 
-      if (__DEV__) {
+      if (process.env.NODE_ENV !== 'production') {
         checkEndValues(endValue, this);
       }
       let annotatedVals;
@@ -438,7 +444,7 @@ export let TransitionSpring = React.createClass({
       let shallowStrippedMergedVals = mergeDiffObj(
         currVals,
         shallowStrippedVals,
-        key => willLeave(key, update, strippedVals, currVals, currV),
+        key => willLeave(key, update, strippedVals, currVals, currV)
       );
 
       let mergedVals = annotatedVals.__springK == null ?
@@ -454,7 +460,8 @@ export let TransitionSpring = React.createClass({
           currV[key] = mapTree(zero, currVals[key]);
         });
 
-      let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
+      // TODO: remove, unused.
+      // let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
 
       if (typeof currVals === 'number') {
         [currVals, currV] = stepper(

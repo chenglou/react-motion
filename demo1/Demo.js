@@ -1,6 +1,6 @@
 import React from 'react';
-import Spring from '../Spring';
-import {range} from '../utils';
+import {Spring, utils} from '../src';
+const {range} = utils;
 
 let Demo = React.createClass({
   getInitialState() {
@@ -53,7 +53,7 @@ let Demo = React.createClass({
         )}
       </Spring>
     );
-  }
+  },
 });
 
 export default Demo;

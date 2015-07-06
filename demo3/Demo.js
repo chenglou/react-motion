@@ -1,5 +1,6 @@
 import React from 'react';
-import {TransitionSpring} from '../Spring';
+import {TransitionSpring} from '../src';
+
 
 let Demo = React.createClass({
   getInitialState() {

@@ -1,2 +1,13 @@
 react-animation.sublime-*
 server.js
+coverage/
+example/
+src/
+test/
+.coveralls.yml
+.eslintrc
+.gitignore
+.npmignore
+circle.yml
+karma.conf.js
+webpack.config.js

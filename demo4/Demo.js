@@ -1,5 +1,6 @@
 import React from 'react';
-import Spring, {TransitionSpring} from '../Spring';
+import {Spring} from '../src';
+const {TransitionSpring} = Spring;
 
 let Demo = React.createClass({
   getInitialState() {

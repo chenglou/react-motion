@@ -1,6 +1,7 @@
 import React from 'react';
-import Spring from '../Spring';
-import {range, reinsert} from '../utils';
+import {Spring, utils} from '../src';
+const {range, reinsert} = utils;
+
 
 let allColors = [
   '#EF767A', '#456990', '#49BEAA', '#49DCB1', '#EEB868', '#EF767A', '#456990',

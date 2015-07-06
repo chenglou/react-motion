@@ -2,22 +2,64 @@
   "name": "react-animation",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chenglou/react-animation.git"
+  },
+  "keywords": [
+    "component",
+    "react-component",
+    "react",
+    "animation"
+  ],
+  "bugs": {
+    "url": "https://github.com/chenglou/react-animation/issues"
+  },
+  "homepage": "https://github.com/chenglou/react-animation",
   "dependencies": {
     "react": ">=0.13.2"
   },
   "devDependencies": {
+    "babel": "^5.6.14",
+    "babel-core": "^5.6.15",
+    "babel-loader": "^5.3.1",
+    "coveralls": "^2.11.2",
     "css-layout": "0.0.2",
-    "babel-core": "^5.2.17",
-    "babel-loader": "^5.0.0",
+    "eslint": "^0.24.0",
+    "eslint-loader": "^0.14.1",
+    "eslint-plugin-react": "^2.6.4",
+    "html-webpack-plugin": "^1.5.2",
+    "inject-loader": "^2.0.0",
+    "isparta-loader": "^0.2.0",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.12.37",
+    "karma-coverage": "^0.4.2",
+    "karma-jasmine": "^0.3.6",
+    "karma-junit-reporter": "^0.2.2",
+    "karma-nyan-reporter": "0.1.0",
+    "karma-phantomjs-launcher": "^0.2.0",
+    "karma-webpack": "^1.5.1",
+    "node-libs-browser": "^0.5.2",
+    "phantomjs": "^1.9.17",
     "react-hot-loader": "^1.2.7",
-    "webpack": "^1.8.11",
+    "webpack": "^1.10.1",
     "webpack-dev-server": "^1.10.1"
   },
   "scripts": {
-    "start": "node server.js",
-    "build": "webpack -p",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run build:clean && npm run build:lib && npm run build:demo",
+    "build:clean": "rm -rf lib",
+    "build:lib": "babel src --out-dir lib --source-maps",
+    "build:demo": "webpack",
+    "prepublish": "npm run build",
+    "start": "NODE_ENV=development node server.js",
+    "lint": "eslint *.js src test",
+    "karma": "karma start ./karma.conf.js",
+    "test": "npm run karma --  --single-run --reporters nyan",
+    "test:dev": "npm run karma -- --no-single-run --auto-watch --reporters nyan",
+    "test:cov": "COVERAGE=1 npm run karma -- --single-run --reporters coverage",
+    "check": "npm run lint && npm run test && npm run build",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "author": "chenglou",
   "license": "MIT"

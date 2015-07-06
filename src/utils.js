@@ -15,7 +15,7 @@ export function range(start, afterStop) {
     start = 0;
   }
   let ret = [];
-  for (var i = start; i < afterStop; i++) {
+  for (let i = start; i < afterStop; i++) {
     ret.push(i);
   }
   return ret;
