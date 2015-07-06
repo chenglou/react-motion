@@ -103,7 +103,7 @@ function prewalkAndMutatePosAndVTree(frameRate, pos, v, dest, k = -1, b = -1) {
           v[i] = newV;
         }
       } else {
-        prewalkAndMutatePosAndVTree(frameRate, pos[i], v[i], dest[i], k, b, i === 0);
+        prewalkAndMutatePosAndVTree(frameRate, pos[i], v[i], dest[i], k, b);
       }
     }
   } else if (Object.prototype.toString.call(pos) === '[object Object]') {
@@ -117,6 +117,9 @@ function prewalkAndMutatePosAndVTree(frameRate, pos, v, dest, k = -1, b = -1) {
           pos[key] = newPos;
           v[key] = newV;
         }
+      } else if(typeof pos[key] === 'string' || typeof pos[key] === 'boolean') {
+        pos[key] = dest[key];
+        v[key] = 0;
       } else {
         prewalkAndMutatePosAndVTree(frameRate, pos[key], v[key], dest[key], k, b);
       }
