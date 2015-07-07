@@ -20,113 +20,6 @@ function zero() {
   return 0;
 }
 
-// see stepper for constant k, b usage
-function update(tree, k = 170, b = 26) {
-  return {
-    __springK: k,
-    __springB: b,
-    value: tree,
-  };
-}
-
-function stripMarks(tree) {
-  if (tree != null && tree.__springK != null) {
-    return stripMarks(tree.value);
-  }
-  if (Object.prototype.toString.call(tree) === '[object Array]') {
-    return tree.map(stripMarks);
-  }
-  if (Object.prototype.toString.call(tree) === '[object Object]') {
-    let newTree = {};
-    Object.keys(tree).forEach(key => newTree[key] = stripMarks(tree[key]));
-    return newTree;
-  }
-  // scalar
-  return tree;
-}
-
-function updateValsAndV(frameRate, currVals, currV, destVals, k = -1, b = -1) {
-  if (destVals != null && destVals.__springK != null) {
-    return updateValsAndV(frameRate, currVals, currV, destVals.value, destVals.__springK, destVals.__springB);
-  }
-  if (Object.prototype.toString.call(destVals) === '[object Array]') {
-    let newCurrVals = new Array(destVals.length);
-    let newCurrV = new Array(destVals.length);
-    destVals.forEach((val, i) => {
-      let [nextCurVals, nextCurV] = updateValsAndV(frameRate, currVals[i], currV[i], val, k, b);
-      newCurrVals[i] = nextCurVals;
-      newCurrV[i] = nextCurV;
-    });
-
-    return [newCurrVals, newCurrV];
-  }
-  if (Object.prototype.toString.call(destVals) === '[object Object]') {
-    let newCurrVals = {};
-    let newCurrV = {};
-    Object.keys(destVals).forEach(key => {
-      let [nextCurVals, nextCurV] = updateValsAndV(frameRate, currVals[key], currV[key], destVals[key], k, b);
-      newCurrVals[key] = nextCurVals;
-      newCurrV[key] = nextCurV;
-    });
-    return [newCurrVals, newCurrV];
-  }
-
-  // haven't received any update from parent yet
-  if (k === -1 || b === -1) {
-    return [destVals, currV];
-  }
-  return stepper(frameRate, currVals, currV, destVals, k, b);
-}
-
-// assume a, b same shape
-// mutation, bc perf
-function prewalkAndMutatePosAndVTree(frameRate, pos, v, dest, k = -1, b = -1) {
-  if (dest == null) {
-    return;
-  }
-  if (dest.__springK != null) {
-    // mutation here!
-    k = dest.__springK;
-    b = dest.__springB;
-    dest = dest.value;
-  }
-  if (Object.prototype.toString.call(pos) === '[object Array]') {
-    for (let i = 0; i < pos.length; i++) {
-      // console.log(pos[i]);
-      if (typeof pos[i] === 'number') {
-        if (k === -1 || b === -1) {
-         pos[i] = dest[i];
-         v[i] = 0;
-        } else {
-          let [newPos, newV] = stepper(frameRate, pos[i], v[i], dest[i], k, b);
-          pos[i] = newPos;
-          v[i] = newV;
-        }
-      } else {
-        prewalkAndMutatePosAndVTree(frameRate, pos[i], v[i], dest[i], k, b);
-      }
-    }
-  } else if (Object.prototype.toString.call(pos) === '[object Object]') {
-    for (let key in pos) {
-      if (typeof pos[key] === 'number') {
-        if (k === -1 || b === -1) {
-         pos[key] = dest[key];
-         v[key] = 0;
-        } else {
-          let [newPos, newV] = stepper(frameRate, pos[key], v[key], dest[key], k, b);
-          pos[key] = newPos;
-          v[key] = newV;
-        }
-      } else if(typeof pos[key] === 'string' || typeof pos[key] === 'boolean') {
-        pos[key] = dest[key];
-        v[key] = 0;
-      } else {
-        prewalkAndMutatePosAndVTree(frameRate, pos[key], v[key], dest[key], k, b);
-      }
-    }
-  }
-}
-
 function mergeDiff(collA, collB, onRemove, accum) {
   let [a, ...aa] = collA;
   let [b, ...bb] = collB;
@@ -192,6 +85,67 @@ the render of \`${ownerName}\`.`
   }
 }
 
+function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
+  if (typeof endValue === 'number') {
+    return stepper(frameRate, currVals, currV, endValue, k, b)[0];
+  }
+  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
+    return endValue;
+  }
+  if (endValue.val != null) {
+    let [k, b] = endValue.config || [170, 26];
+    return {
+      val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, k, b),
+      config: endValue.config,
+    };
+  }
+  if (Object.prototype.toString.call(endValue) === '[object Array]') {
+    return endValue.map((_, i) => updateCurrVals(frameRate, currVals[i], currV[i], endValue[i], k, b));
+  }
+  if (Object.prototype.toString.call(endValue) === '[object Object]') {
+    let ret = {};
+    Object.keys(endValue).forEach(key => {
+      ret[key] = updateCurrVals(frameRate, currVals[key], currV[key], endValue[key], k, b);
+    });
+    return ret;
+  }
+  return endValue;
+}
+
+function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
+  if (typeof endValue === 'number') {
+    return stepper(frameRate, currVals, currV, endValue, k, b)[1];
+  }
+  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
+    return mapTree(zero, currV);
+  }
+  if (endValue.val != null) {
+    let [k, b] = endValue.config || [170, 26];
+    return {
+      val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, k, b),
+      config: endValue.config,
+    };
+  }
+  if (Object.prototype.toString.call(endValue) === '[object Array]') {
+    return endValue.map((_, i) => updateCurrV(frameRate, currVals[i], currV[i], endValue[i], k, b));
+  }
+  if (Object.prototype.toString.call(endValue) === '[object Object]') {
+    let ret = {};
+    Object.keys(endValue).forEach(key => {
+      ret[key] = updateCurrV(frameRate, currVals[key], currV[key], endValue[key], k, b);
+    });
+    return ret;
+  }
+  return mapTree(zero, currV);
+}
+
+// let a = {order: {val: [10]}};
+// let b = {order: {val: [0]}};
+// let c = {order: {val: [100]}};
+// // debugger;
+// let d = updateCurrVals(1/60, a, b, c);
+// console.log(d);
+
 export default React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
@@ -203,24 +157,17 @@ export default React.createClass({
 
   getInitialState() {
     let {endValue} = this.props;
-    let vals;
     if (typeof endValue === 'function') {
-      vals = endValue(update);
-    } else {
-      vals = endValue;
+      endValue = endValue();
     }
-    let defaultVals = stripMarks(vals);
     return {
-      currVals: defaultVals,
-      currV: mapTree(zero, defaultVals),
+      currVals: endValue,
+      currV: mapTree(zero, endValue),
       now: null,
     };
   },
 
   componentDidMount() {
-    if (__DEV__) {
-      checkEndValues(this.props.endValue, this);
-    }
     this.raf();
   },
 
@@ -235,36 +182,17 @@ export default React.createClass({
       let {currVals, currV, now} = this.state;
       let {endValue} = this.props;
 
-      if (__DEV__) {
-        checkEndValues(endValue, this);
-      }
-      // TODO: lol, refactor
-      let annotatedVals;
       if (typeof endValue === 'function') {
-        annotatedVals = endValue(update, currVals);
-      } else {
-        annotatedVals = update(endValue);
+        endValue = endValue(currVals);
       }
-      currVals = clone(currVals);
-      currV = clone(currV);
       // TODO: change frame rate
-      if (typeof currVals === 'number') {
-        [currVals, currV] = stepper(
-          FRAME_RATE,
-          currVals,
-          currV,
-          annotatedVals.value,
-          annotatedVals.__springK,
-          annotatedVals.__springB
-        );
-      } else {
-        prewalkAndMutatePosAndVTree(FRAME_RATE, currVals, currV, annotatedVals);
-      }
+      let newCurrVals = updateCurrVals(FRAME_RATE, currVals, currV, endValue);
+      let newCurrV = updateCurrV(FRAME_RATE, currVals, currV, endValue);
 
       this.setState(() => {
         return {
-          currVals,
-          currV,
+          currVals: newCurrVals,
+          currV: newCurrV,
         };
       });
 
@@ -355,6 +283,7 @@ export default React.createClass({
   }
 });
 
+
 export let TransitionSpring = React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
@@ -387,24 +316,17 @@ export let TransitionSpring = React.createClass({
 
   getInitialState() {
     let {endValue} = this.props;
-    let vals;
     if (typeof endValue === 'function') {
-      vals = endValue(update);
-    } else {
-      vals = endValue;
+      endValue = endValue();
     }
-    let defaultVals = stripMarks(vals);
     return {
-      currVals: defaultVals,
-      currV: mapTree(zero, defaultVals),
+      currVals: endValue,
+      currV: mapTree(zero, endValue),
       now: null,
     };
   },
 
   componentDidMount() {
-    if (__DEV__) {
-      checkEndValues(this.props.endValue, this);
-    }
     this.raf();
   },
 
@@ -417,65 +339,37 @@ export let TransitionSpring = React.createClass({
   raf() {
     this._rafID = requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
-      let {
-        endValue,
-        willEnter,
-        willLeave,
-      } = this.props;
+      let {endValue, willEnter, willLeave} = this.props;
 
-      if (__DEV__) {
-        checkEndValues(endValue, this);
-      }
-      let annotatedVals;
       if (typeof endValue === 'function') {
-        annotatedVals = endValue(update, currVals);
-      } else {
-        annotatedVals = update(endValue);
+        endValue = endValue(currVals);
       }
 
-      let strippedVals = stripMarks(annotatedVals);
-      let shallowStrippedVals = annotatedVals.__springK == null ?
-        annotatedVals :
-        annotatedVals.value;
-
-      let shallowStrippedMergedVals = mergeDiffObj(
+      let mergedVals = mergeDiffObj(
         currVals,
-        shallowStrippedVals,
-        key => willLeave(key, update, strippedVals, currVals, currV),
+        endValue,
+        key => willLeave(key, endValue, currVals, currV),
       );
-
-      let mergedVals = annotatedVals.__springK == null ?
-        shallowStrippedMergedVals :
-        update(shallowStrippedMergedVals, annotatedVals.__springK, annotatedVals.__springB);
 
       currVals = clone(currVals);
       currV = clone(currV);
-      Object.keys(shallowStrippedMergedVals)
+      Object.keys(mergedVals)
         .filter(key => !currVals.hasOwnProperty(key))
         .forEach(key => {
-          currVals[key] = willEnter(key, strippedVals, currVals);
+          currVals[key] = willEnter(key, endValue, currVals);
           currV[key] = mapTree(zero, currVals[key]);
         });
 
       let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
 
-      if (typeof currVals === 'number') {
-        [currVals, currV] = stepper(
-          FRAME_RATE,
-          currVals,
-          currV,
-          annotatedVals.value,
-          annotatedVals.__springK,
-          annotatedVals.__springB
-        );
-      } else {
-        prewalkAndMutatePosAndVTree(FRAME_RATE, currVals, currV, mergedVals);
-      }
+      // TODO: change frame rate
+      let newCurrVals = updateCurrVals(FRAME_RATE, currVals, currV, mergedVals);
+      let newCurrV = updateCurrV(FRAME_RATE, currVals, currV, mergedVals);
 
       this.setState(() => {
         return {
-          currVals,
-          currV,
+          currVals: newCurrVals,
+          currV: newCurrV,
           now: Date.now(),
         };
       });
