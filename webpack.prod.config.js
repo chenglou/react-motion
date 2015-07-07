@@ -3,7 +3,7 @@ var path = require('path');
 
 var config = {
   entry: {
-    index: './Spring.jsx'
+    index: './Spring.js'
   },
   output: {
     path: path.join(__dirname, 'lib'),
