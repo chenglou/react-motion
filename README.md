@@ -27,7 +27,9 @@ I believe that for 95% of use-cases of animating components, we don't have to re
 
 This library also provides an alternative, more powerful API for React's `TransitionGroup`.
 
-## API Usage
+## API
+
+### Sample Usage
 
 ```js
 let Demo = React.createClass({
@@ -56,7 +58,7 @@ let Demo = React.createClass({
 });
 ```
 
-#### &lt;Spring />
+### &lt;Spring />
 Exposes a single prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
 Type: `endValue: object | array | object -> (object | array)`.
 
@@ -152,6 +154,27 @@ But this is still slightly tedious. Here's an alternative:
 ```
 
 Explicitly setting a `config` of `[]` signals `Spring` not to drill down that collection and animate.
+
+Sometime, you want to rely on the currently interpolated value to calculate `endValue`. E.g. (demo 1) a chat head's final position is the current position of the leading chat head. `endValue` can also accept a function `(currentPositions) => yourEndValue`, where `currentPositions` is the same data structure you'd receive from the children callback.
+
+```jsx
+// ...Somewhere in your React class
+getEndValues: function(currentPositions) {
+  // currentPositions of `null` means it's the first render for Spring.
+  if (currentPositions == null) {
+    return {val: utils.range(6).map(() => [0, 0])};
+  }
+  // This is really the previous tick of currentPositions. In practice, it
+  // doesn't make much difference.
+  let endValue = currentPositions.val.map((_, i) => {
+    // First one follows the mouse
+    return i === 0 ? this.state.mousePosition : currentPositions.val[i - 1];
+  });
+  // Have fun adjusting config to make the chat heads bounce a little more!
+  return {val: endValue, config: [120, 17]};
+},
+
+```
 
 --- **README work in progress** ---
 

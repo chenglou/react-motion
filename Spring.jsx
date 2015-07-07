@@ -62,29 +62,6 @@ function mergeDiffObj(a, b, onRemove) {
   return ret;
 }
 
-let warnedOwners = {};
-
-function checkEndValues(endValue, component) {
-  if (typeof endValue !== 'function') {
-    return;
-  }
-  if (endValue.length > 0) {
-    return;
-  }
-  let owner = component._reactInternalInstance._currentElement._owner;
-  let ownerName = owner && owner.getName();
-  if (!warnedOwners[ownerName]) {
-    warnedOwners[ownerName] = true;
-    console.warn(
-      `You're passing a function to Spring prop \`endValue\` which doesn't \
-receive \`update\` as the first argument. In this case, nothing will be \
-animated. Were you trying to use the shorthand of directly passing a value \
-(which calls \`update\` for you on the whole value under the hood)?. Check \
-the render of \`${ownerName}\`.`
-    );
-  }
-}
-
 function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
   if (typeof endValue === 'number') {
     return stepper(frameRate, currVals, currV, endValue, k, b)[0];
