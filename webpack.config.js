@@ -2,8 +2,7 @@ var webpack = require('webpack');
 
 var devtool;
 var loaders = ['babel?stage=0'];
-var DEV = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
-var PROD = process.env.NODE_ENV === 'production';
+var DEV = process.env.NODE_ENV === 'development';
 
 var plugins = [
   new webpack.DefinePlugin({
@@ -19,7 +18,7 @@ var entry = {
 };
 
 if (DEV) {
-  devtool = 'eval';
+  devtool = 'eval-source-map';
   loaders = ['react-hot'].concat(loaders);
   plugins = plugins.concat([
     new webpack.HotModuleReplacementPlugin(),
@@ -33,7 +32,7 @@ if (DEV) {
     ];
     return result;
   }, {});
-} else if (PROD) {
+} else {
   plugins = plugins.concat([
     new webpack.optimize.OccurenceOrderPlugin()
   ]);
