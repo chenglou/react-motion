@@ -73,7 +73,8 @@ let Demo = React.createClass({
     this.forceUpdate();
   },
 
-  getValues(update) {
+  // actual animation-related logic
+  getValues() {
     let {todos, value, selected} = this.state;
     let configs = {};
     Object.keys(todos)
@@ -81,35 +82,34 @@ let Demo = React.createClass({
         let todo = todos[date];
         return todo.text.toUpperCase().indexOf(value.toUpperCase()) >= 0 &&
           (selected === 'completed' && todo.isDone ||
-            selected === 'active' && !todo.isDone ||
-            selected === 'all');
+          selected === 'active' && !todo.isDone ||
+          selected === 'all');
       })
       .forEach(date => {
         configs[date] = {
-          data: update(todos[date], -1, -1),
-          height: 60,
-          opacity: 1,
-          kek: 'dsa',
+          height: {val: 60, config: [120, 17]},
+          opacity: {val: 1, config: [120, 17]},
+          data: todos[date],
         };
       });
-    return update(configs, 120, 17);
+    return configs;
   },
 
   willEnter(date) {
     return {
-      height: 0,
-      opacity: 1,
+      height: {val: 0},
+      opacity: {val: 1},
       data: this.state.todos[date],
     };
   },
 
-  willLeave(date, update, destVals, currVals) {
-    if (currVals[date].opacity > 0) {
-      return update({
-        height: 0,
-        opacity: 0,
-        data: update(currVals[date].data, -1, -1),
-      });
+  willLeave(date, destVals, currVals) {
+    if (currVals[date].opacity.val > 0) {
+      return {
+        height: {val: 0},
+        opacity: {val: 0},
+        data: currVals[date].data,
+      };
     }
   },
 
@@ -136,7 +136,8 @@ let Demo = React.createClass({
               <ul className="todo-list">
                 {Object.keys(configs).map(date => {
                   let config = configs[date];
-                  let {data: {isDone, text}, ...style} = config;
+                  let {data: {isDone, text}, height, opacity} = config;
+                  let style = {height: height.val, opacity: opacity.val};
                   return (
                     <li key={date} style={style} className={isDone ? 'completed' : ''}>
                       <div className="view">

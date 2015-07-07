@@ -65,14 +65,14 @@ let Demo = React.createClass({
     return {
       order: order.map((_, key) => {
         if (key === lastPress && isPressed) {
-          return {val: mouse, configs: []};
+          return {val: mouse, config: []};
         }
         let visualPosition = order.indexOf(key);
-        return {val: layout[visualPosition], configs: [120, 17]};
+        return {val: layout[visualPosition], config: [120, 17]};
       }),
       scales: {
         val: range(count).map((_, key) => lastPress === key && isPressed ? 1.2 : 1),
-        configs: [180, 10],
+        config: [180, 10],
       }
     };
   },

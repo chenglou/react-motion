@@ -47,7 +47,7 @@ let Demo = React.createClass({
       return prevLeft + widths[i];
     }, offset);
     configs.container = {height, width};
-    return {val: configs, configs: [170, 26]};
+    return {val: configs, config: [170, 26]};
   },
 
   render() {

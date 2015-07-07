@@ -27,7 +27,7 @@ let Demo = React.createClass({
       // now, then read into it now. This gets very tedious with this API.
       return i === 0 ? this.state.mouse : currentPositions.val[i - 1];
     });
-    return {val: endValue, configs: [120, 17]};
+    return {val: endValue, config: [120, 17]};
   },
 
   render() {
