@@ -60,23 +60,20 @@ let Demo = React.createClass({
     this.setState({isPressed: false, dx: 0, dy: 0});
   },
 
-  getValues(update) {
+  getValues() {
     let {order, lastPress, isPressed, mouse} = this.state;
     return {
-      order: update(order.map((_, key) => {
+      order: order.map((_, key) => {
         if (key === lastPress && isPressed) {
-          // children update takes priority. k=-1 or b=-1 cancels spring
-          // (act as "un-update"ing a subtree)
-          return update(mouse, -1, -1);
+          return {val: mouse, configs: []};
         }
         let visualPosition = order.indexOf(key);
-        return layout[visualPosition];
-      }), 120, 17),
-      scales: update(
-        range(count).map((_, key) => lastPress === key && isPressed ? 1.2 : 1),
-        180,
-        10
-      ),
+        return {val: layout[visualPosition], configs: [120, 17]};
+      }),
+      scales: {
+        val: range(count).map((_, key) => lastPress === key && isPressed ? 1.2 : 1),
+        configs: [180, 10],
+      }
     };
   },
 
@@ -90,7 +87,7 @@ let Demo = React.createClass({
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.handleMouseUp}
         endValue={this.getValues}>
-        {({order: currOrder, scales}) => currOrder.map(([x, y], key) =>
+        {({order: currOrder, scales: {val: scales}}) => currOrder.map(({val: [x, y]}, key) =>
           <div
             key={key}
             onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}

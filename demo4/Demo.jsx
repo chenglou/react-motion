@@ -20,7 +20,7 @@ let Demo = React.createClass({
     this.setState({currPhoto: value});
   },
 
-  getValues(update) {
+  getValues() {
     let {photos, currPhoto} = this.state;
     let keys = Object.keys(photos);
     let currKey = keys[currPhoto];
@@ -47,7 +47,7 @@ let Demo = React.createClass({
       return prevLeft + widths[i];
     }, offset);
     configs.container = {height, width};
-    return update(configs, 170, 26);
+    return {val: configs, configs: [170, 26]};
   },
 
   render() {
@@ -62,7 +62,7 @@ let Demo = React.createClass({
           onChange={this.handleChange} />
         {currPhoto}
         <Spring className="demo4" endValue={this.getValues}>
-          {({container, ...rest}) =>
+          {({val: {container, ...rest}}) =>
             <div className="demo4-inner" style={container}>
               {Object.keys(rest).map(key =>
                 <img
