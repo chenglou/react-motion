@@ -2,11 +2,9 @@
 
 __Rushed to get the library out in time for the React-Europe talk. More polished codebase coming tonight!__
 
-**Warning: very unstable API**
-
 ```js
-<Spring endValue={10}>
-  {currentValues => <div>{currentValues}</div>}
+<Spring endValue={{val: 10}}>
+  {interpolated => <div>{interpolated.val}</div>}
 </Spring>
 ```
 
@@ -45,11 +43,10 @@ let Demo = React.createClass({
     return (
       <div>
         <button onMouseDown={this.handleMouseDown}>Toggle</button>
-        <Spring className="demo0" endValue={this.state.open ? 400 : 0}>
-          {x =>
+        <Spring endValue={{val: this.state.open ? 400 : 0}}>
+          {interpolated =>
             <div className="demo0-block" style={{
-              WebkitTransform: `translate3d(${x}px, 0, 0)`,
-              transform: `translate3d(${x}px, 0, 0)`,
+              transform: `translate3d(${interpolated.val}px, 0, 0)`,
             }} />
           }
         </Spring>
@@ -58,6 +55,103 @@ let Demo = React.createClass({
   }
 });
 ```
+
+#### &lt;Spring />
+Exposes a single prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
+Type: `endValue: object | array | object -> (object | array)`.
+
+`endValue` can be of an arbitrary shape. There are however 2 reserved keys: `val` and `config`. Say your initial data structure looks so:
+
+```js
+{size: 10, top: 20}
+```
+
+You only want to animate `size`. Indicate what value/entire sub-collection you want to animate by wrapping it:
+
+```js
+{size: {val: 10}, top: 20}
+```
+
+When you pass this to `endValue`, `Spring` will traverse your data structure and animate `size` based on its previous value, which is the data structure from the previous render. `top` will be kept untouched. You receive the interpolated data structure as an argument to your children function:
+
+```jsx
+<Spring endValue={{size: {val: 10}, top: 20}}>
+  {tweeningCollection => {
+    let style = {
+      width: tweeningCollection.size.val,
+      height: tweeningCollection.size.val,
+      top: tweeningCollection.top,
+    };
+    return <div style={style} />;
+  }}
+</Spring>
+```
+
+Where the value of `tweeningCollection` might be e.g. `{size: {val: 3.578}, top: 20}`.
+
+If, instead of passing a number to `val` (`{val: 10}`), you pass an array or an object, by default Spring will interpolate every number in it.
+
+But lots of times you don't want all the values to animate the same way. You can pass a `config` to specify the stiffness and the damping of the spring:
+
+```js
+{size: {val: 10, config: [120, 17]}, top: 20}
+```
+
+A stiffness of `120` and damping of `17` gives the spring a slight bounce effect. The default configuration, if you don't pass `config` alongside `val`, is `[170, 26]`.
+
+You can nest `val` wrappers; the innermost takes priority:
+
+```js
+{
+  val: {
+    size: {val: 10, config: [120, 17]},
+    top: 20,
+    left: 50
+  },
+  config: [100, 10]
+}
+```
+
+Here, `top` and `left` will be animated with [stiffness, damping] of [`100`, `10`], while `size` will use [`120`, `17`] instead.
+
+Sometimes you might have a data structure where you want to animate everything but one thing:
+
+```js
+{
+  val: {
+    top: 20,
+    left: 50,
+    opacity: 1,
+    itemID: 19230,
+  }
+}
+```
+
+This is wrong, since `itemID` would accidentally animate too. You can of course do this:
+
+```js
+{
+  top: {val: 20},
+  left: {val: 50},
+  opacity: {val: 1},
+  itemID: 19230,
+}
+```
+
+But this is still slightly tedious. Here's an alternative:
+
+```js
+{
+  val: {
+    top: 20,
+    left: 50,
+    opacity: 1,
+    itemID: {val: 19230, config: []},
+  }
+}
+```
+
+Explicitly setting a `config` of `[]` signals `Spring` not to drill down that collection and animate.
 
 --- **README work in progress** ---
 
