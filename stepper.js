@@ -1,4 +1,4 @@
-let errorMargin = 0.001;
+let errorMargin = 0.0001;
 
 let hackOn = false;
 window.addEventListener('keypress', e => {
