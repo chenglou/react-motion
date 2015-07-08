@@ -23,6 +23,7 @@ let Demo = React.createClass({
     };
   },
 
+  // logic from todo, unrelated to animation
   handleChange({target: {value}}) {
     this.setState({value});
   },

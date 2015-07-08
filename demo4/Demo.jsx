@@ -1,11 +1,9 @@
 import React from 'react';
-import Spring, {TransitionSpring} from '../Spring';
+import {TransitionSpring} from '../Spring';
 
-// TODO: infinitely load?
 let Demo = React.createClass({
   getInitialState() {
     return {
-      // TODO: array instead?
       photos: {
         './0.jpg': [500, 350],
         './1.jpg': [800, 600],
@@ -19,7 +17,26 @@ let Demo = React.createClass({
   },
 
   handleChange({target: {value}}) {
+    let {currPhoto, photos} = this.state;
     this.setState({currPhoto: value});
+    if (parseInt(value) === Object.keys(photos).length - 1) {
+      let w = Math.floor(Math.random() * 500 + 200);
+      let h = Math.floor(Math.random() * 500 + 200);
+      let hash = (Math.random() + '').slice(3);
+      this.setState({
+        photos: {
+          ...photos,
+          // What the hell are you doing chenglou?
+
+          // I'm loading pictures on the fly and using the default
+          // transitionless (!) `willEnter` to place the picture on the page.
+          // essentially, I'm abusing the diffing/merging algorithm to animate
+          // from one (more or less) arbitrary data structure to another, and It
+          // Just Works.
+          [`http://lorempixel.com/${w}/${h}/sports/a${hash}`]: [w, h],
+        },
+      });
+    }
   },
 
   getValues() {
@@ -42,14 +59,17 @@ let Demo = React.createClass({
     keys.reduce((prevLeft, key, i) => {
       let [origW, origH] = photos[key];
       configs[key] = {
-        left: prevLeft,
-        height: height,
-        width: height / origH * origW,
+        val: {
+          left: prevLeft,
+          height: height,
+          width: height / origH * origW,
+        },
+        config: [170, 26],
       };
       return prevLeft + widths[i];
     }, offset);
     configs.container = {height, width};
-    return {val: configs, config: [170, 26]};
+    return configs;
   },
 
   render() {
@@ -63,19 +83,19 @@ let Demo = React.createClass({
           value={currPhoto}
           onChange={this.handleChange} />
         {currPhoto}
-        <Spring className="demo4" endValue={this.getValues}>
-          {({val: {container, ...rest}}) =>
+        <TransitionSpring className="demo4"endValue={this.getValues}>
+          {({container, ...rest}) =>
             <div className="demo4-inner" style={container}>
-              {Object.keys(rest).map(key =>
+              {Object.keys(rest).map((key) =>
                 <img
                   className="demo4-photo"
                   key={key}
                   src={key}
-                  style={rest[key]} />
+                  style={rest[key].val} />
               )}
             </div>
           }
-        </Spring>
+        </TransitionSpring>
       </div>
     );
   }
