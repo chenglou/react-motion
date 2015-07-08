@@ -7,7 +7,7 @@ let allColors = [
   '#EF767A', '#456990', '#49BEAA', '#49DCB1', '#EEB868', '#EF767A', '#456990',
   '#49BEAA', '#49DCB1', '#EEB868', '#EF767A'
 ];
-let [count, width, height] = [11, 70, 90];
+let [count, width, height, top, left] = [11, 70, 90, 100, 150];
 // indexed by visual position
 let layout = range(count).map(n => {
   let row = Math.floor(n / 3);
@@ -38,8 +38,8 @@ let Demo = React.createClass({
   handleMouseMove({pageX, pageY}) {
     let {order, lastPress, isPressed, delta: [dx, dy]} = this.state;
     if (isPressed) {
-      let col = Math.min(Math.floor(pageX / width), 2);
-      let row = Math.min(Math.floor(pageY / height), Math.floor(count / 3));
+      let col = Math.min(Math.floor((pageX - left) / width), 2);
+      let row = Math.min(Math.floor((pageY - top) / height), Math.floor(count / 3));
       let index = row * 3 + col;
       let newOrder = reinsert(order, order.indexOf(lastPress), index);
       this.setState({mouse: [pageX - dx, pageY - dy], order: newOrder});
@@ -96,8 +96,8 @@ let Demo = React.createClass({
             className="demo2-ball"
             style={{
               backgroundColor: allColors[key],
-              WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
-              transform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
+              WebkitTransform: `translate3d(${x + left}px, ${y + top}px, 0) scale(${scales[key]})`,
+              transform: `translate3d(${x + left}px, ${y + top}px, 0) scale(${scales[key]})`,
               zIndex: key === lastPress ? 99 : order.indexOf(key),
               boxShadow: `${(x - (3 * width - 50) / 2) / 15}px 5px 5px rgba(0,0,0,0.5)`,
             }}
