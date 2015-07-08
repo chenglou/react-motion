@@ -4,7 +4,7 @@ import {range} from '../utils';
 
 let Demo = React.createClass({
   getInitialState() {
-    return {mouse: [0, 0]};
+    return {mouse: [250, 300]};
   },
 
   handleMouseMove({pageX, pageY}) {
@@ -18,7 +18,7 @@ let Demo = React.createClass({
   getValues(currentPositions) {
     // currentPositions of `null` means it's the first render for Spring
     if (currentPositions == null) {
-      return {val: range(6).map(() => [0, 0])};
+      return {val: range(6).map(() => [250, 300])};
     }
     let endValue = currentPositions.val.map((_, i) => {
       // hack. We're getting the currentPositions of the previous ball, but in
