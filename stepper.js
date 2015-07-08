@@ -11,7 +11,7 @@ export default function stepper(frameRate, x, v, destX, k, b) {
   // Spring stiffness, in kg / s^2
 
   // for animations, destX is really spring length (spring at rest). initial
-  // position is considered as the stretched/compressed posiiton of a spring
+  // position is considered as the stretched/compressed position of a spring
   let Fspring = -k * (x - destX);
 
   // Damping constant, in kg / s
