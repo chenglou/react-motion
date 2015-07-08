@@ -1,4 +1,4 @@
-# React-Animation
+# React-Motion
 
 __Rushed to get the library out in time for the React-Europe talk. More polished codebase coming tonight!__
 
@@ -13,8 +13,8 @@ Animate a counter to `10`, from whatever value it currently is. For more advance
 Will provide npm package soon. For now, please use:
 
 ```sh
-git clone https://github.com/chenglou/react-animation.git
-cd react-animation
+git clone https://github.com/chenglou/react-motion.git
+cd react-motion
 npm install
 npm run build
 ```
