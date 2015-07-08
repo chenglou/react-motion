@@ -348,13 +348,21 @@ export let TransitionSpring = React.createClass({
     this.raf();
   },
 
+  componentWillReceiveProps() {
+    this.raf(true);
+  },
+
   componentWillUnmount() {
     cancelAnimationFrame(this._rafID);
   },
 
   _rafID: null,
 
-  raf() {
+  raf(justStarted) {
+    if (justStarted && this._rafID != null) {
+      // already rafing
+      return;
+    }
     this._rafID = requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
       let {endValue, willEnter, willLeave} = this.props;
@@ -378,7 +386,7 @@ export let TransitionSpring = React.createClass({
           currV[key] = mapTree(zero, currVals[key]);
         });
 
-      let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
+      let frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
 
       let newCurrVals = updateCurrVals(frameRate, currVals, currV, mergedVals);
       let newCurrV = updateCurrV(frameRate, currVals, currV, mergedVals);
@@ -391,7 +399,12 @@ export let TransitionSpring = React.createClass({
         };
       });
 
-      this.raf();
+      let stop = noSpeed(newCurrV);
+      if (stop && !justStarted) {
+        this._rafID = null;
+      } else {
+        this.raf(false);
+      }
     });
   },
 
