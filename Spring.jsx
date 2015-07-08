@@ -2,17 +2,6 @@ import React, {PropTypes} from 'react';
 import {range, mapTree, clone} from './utils';
 import stepper from './stepper';
 
-let hackOn = null;
-let hackOn2 = null;
-window.addEventListener('keypress', ({which}) => {
-  if (which === 50) {
-    hackOn = hackOn == null ? 10 : null;
-  }
-  if(which === 51) {
-    hackOn2 = hackOn2 == null ? {data: [], curr: -1} : null;
-  }
-});
-
 // ---------
 let FRAME_RATE = 1 / 60;
 
@@ -232,84 +221,12 @@ export default React.createClass({
 
   render() {
     let {currVals, currV} = this.state;
-    if(hackOn2 != null) {
-      if(hackOn2.curr === hackOn2.data.length - 1) {
-        hackOn2.data.push([currVals, currV]);
-        hackOn2.curr = hackOn2.data.length - 1;
-      }
-      currVals = hackOn2.data[hackOn2.curr][0];
-      currV = hackOn2.data[hackOn2.curr][1];
 
-      // Dirty mutations for the sake of time travel
-      this.state.currVals = currVals;
-      this.state.currV = currV;
-    }
-
-    if(hackOn != null) {
-      let {endValue} = this.props;
-      return <div {...this.props}>{
-        range(hackOn)
-        .reduce((acc) => {
-          let [currVals, currV] = acc[acc.length - 1];
-
-          let annotatedVals;
-          if (typeof endValue === 'function') {
-            annotatedVals = endValue(update, currVals);
-          } else {
-            annotatedVals = update(endValue);
-          }
-
-          currVals = clone(currVals);
-          currV = clone(currV);
-          if (typeof currVals === 'number') {
-            [currVals, currV] = stepper(
-              FRAME_RATE,
-              currVals,
-              currV,
-              annotatedVals.value,
-              annotatedVals.__springK,
-              annotatedVals.__springB
-            );
-          } else {
-            prewalkAndMutatePosAndVTree(FRAME_RATE, currVals, currV, annotatedVals);
-          }
-
-          return [...acc, [currVals, currV]];
-        }, [[currVals, currV]])
-        .map(([currVals]) => {
-          return (
-            <span style={{opacity: 0.2}}>
-              {hackOn2 != null &&
-                <div style={{position: 'absolute', left: 300, zIndex: 100, top: 0}}><input
-                    type="range"
-                    min={0}
-                    max={hackOn2.data.length - 1}
-                    value={hackOn2.curr}
-                    onChange={({target: {value}}) => {
-                      hackOn2.curr = parseInt(value);
-                    }} />
-                    {hackOn2.curr}
-                </div>}
-              {this.props.children(currVals)}
-            </span>
-          );
-        })}</div>;
-    }
-
-    return (<div {...this.props}>
-      {hackOn2 != null &&
-        <div style={{position: 'absolute', left: 300, zIndex: 100, top: 0}}><input
-            type="range"
-            min={0}
-            max={hackOn2.data.length - 1}
-            value={hackOn2.curr}
-            onChange={({target: {value}}) => {
-              hackOn2.curr = parseInt(value);
-            }} />
-            {hackOn2.curr}
-        </div>}
-      {this.props.children(currVals)}
-    </div>);
+    return (
+      <div {...this.props}>
+        {this.props.children(currVals)}
+      </div>
+    );
   }
 });
 
