@@ -386,7 +386,7 @@ export let TransitionSpring = React.createClass({
       let mergedVals = mergeDiffObj(
         currVals,
         endValue,
-        key => willLeave(key, endValue, currVals, currV),
+        key => willLeave(key, endValue, currVals, currV)
       );
 
       currVals = clone(currVals);
