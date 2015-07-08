@@ -20,6 +20,7 @@ function zero() {
   return 0;
 }
 
+// TODO: test
 function mergeDiff(collA, collB, onRemove, accum) {
   let [a, ...aa] = collA;
   let [b, ...bb] = collB;
@@ -62,8 +63,11 @@ function mergeDiffObj(a, b, onRemove) {
   return ret;
 }
 
+// TODO: refactor common logic with updateCurrV
+// TODO: tests
 function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
   if (typeof endValue === 'number') {
+    // TODO: do something to stepper to make this not allocate (2 steppers?)
     return stepper(frameRate, currVals, currV, endValue, k, b)[0];
   }
   if (endValue.val != null && endValue.config && endValue.config.length === 0) {
@@ -123,12 +127,34 @@ function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
 // let d = updateCurrVals(1/60, a, b, c);
 // console.log(d);
 
+function noSpeed(coll) {
+  if (Object.prototype.toString.call(coll) === '[object Array]') {
+    return coll.every(noSpeed);
+  }
+  if (Object.prototype.toString.call(coll) === '[object Object]') {
+    return Object.keys(coll).every(key => key === 'config' ? true : noSpeed(coll[key]));
+  }
+  return coll === 0;
+}
+
+var coll = {
+  a: [1, 0],
+  b: {c: 4}
+};
+
+var coll = {
+  a: [0, 0],
+  b: {c: 0}
+};
+
+// console.log(noSpeed(v => v === 0, coll));
+
 export default React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
       PropTypes.func,
       PropTypes.object,
-      PropTypes.number,
+      PropTypes.array,
     ]).isRequired,
   },
 
@@ -145,7 +171,11 @@ export default React.createClass({
   },
 
   componentDidMount() {
-    this.raf();
+    this.raf(true);
+  },
+
+  componentWillReceiveProps() {
+    this.raf(true);
   },
 
   componentWillUnmount() {
@@ -154,7 +184,11 @@ export default React.createClass({
 
   _rafID: null,
 
-  raf() {
+  raf(justStarted) {
+    if (justStarted && this._rafID != null) {
+      // already rafing
+      return;
+    }
     this._rafID = requestAnimationFrame(() => {
       let {currVals, currV, now} = this.state;
       let {endValue} = this.props;
@@ -162,18 +196,25 @@ export default React.createClass({
       if (typeof endValue === 'function') {
         endValue = endValue(currVals);
       }
-      // TODO: change frame rate
-      let newCurrVals = updateCurrVals(FRAME_RATE, currVals, currV, endValue);
-      let newCurrV = updateCurrV(FRAME_RATE, currVals, currV, endValue);
+      let frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
+
+      let newCurrVals = updateCurrVals(frameRate, currVals, currV, endValue);
+      let newCurrV = updateCurrV(frameRate, currVals, currV, endValue);
 
       this.setState(() => {
         return {
           currVals: newCurrVals,
           currV: newCurrV,
+          now: Date.now(),
         };
       });
 
-      this.raf();
+      let stop = noSpeed(newCurrV);
+      if (stop && !justStarted) {
+        this._rafID = null;
+      } else {
+        this.raf(false);
+      }
     });
   },
 
@@ -265,29 +306,29 @@ export let TransitionSpring = React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
       PropTypes.func,
-      // TODO: better warning
       PropTypes.object,
-      PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.any.isRequired,
-      })),
-      PropTypes.arrayOf(PropTypes.element),
+      // coming soon
+      // PropTypes.arrayOf(PropTypes.shape({
+      //   key: PropTypes.any.isRequired,
+      // })),
+      // PropTypes.arrayOf(PropTypes.element),
     ]).isRequired,
     willLeave: PropTypes.oneOfType([
       PropTypes.func,
-      // TODO: better warning
       PropTypes.object,
+      PropTypes.array,
     ]),
     willEnter: PropTypes.oneOfType([
       PropTypes.func,
-      // TODO: better warning
       PropTypes.object,
+      PropTypes.array,
     ]),
   },
 
   getDefaultProps() {
     return {
       willEnter: (key, currVals) => currVals[key],
-      willLeave: () => null
+      willLeave: () => null,
     };
   },
 
@@ -339,9 +380,8 @@ export let TransitionSpring = React.createClass({
 
       let frameRate = now ? (Date.now() - now) / 1000 : FRAME_RATE;
 
-      // TODO: change frame rate
-      let newCurrVals = updateCurrVals(FRAME_RATE, currVals, currV, mergedVals);
-      let newCurrV = updateCurrV(FRAME_RATE, currVals, currV, mergedVals);
+      let newCurrVals = updateCurrVals(frameRate, currVals, currV, mergedVals);
+      let newCurrV = updateCurrV(frameRate, currVals, currV, mergedVals);
 
       this.setState(() => {
         return {

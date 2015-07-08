@@ -1,9 +1,11 @@
 import React from 'react';
 import Spring, {TransitionSpring} from '../Spring';
 
+// TODO: infinitely load?
 let Demo = React.createClass({
   getInitialState() {
     return {
+      // TODO: array instead?
       photos: {
         './0.jpg': [500, 350],
         './1.jpg': [800, 600],
