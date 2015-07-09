@@ -1,13 +1,13 @@
 {
   "name": "react-motion",
   "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
+  "description": "A spring that solves your animation problems.",
+  "main": "Spring.jsx",
   "dependencies": {
     "react": ">=0.13.2"
   },
   "devDependencies": {
-    "css-layout": "0.0.2",
+    "babel": "^5.6.14",
     "babel-core": "^5.2.17",
     "babel-loader": "^5.0.0",
     "react-hot-loader": "^1.2.7",
@@ -17,7 +17,8 @@
   "scripts": {
     "start": "NODE_ENV=development node server.js",
     "build": "NODE_ENV=production webpack -p",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prerelease": "babel Spring.jsx --out-dir=lib --modules umd --module-id Spring"
   },
   "author": "chenglou",
   "license": "MIT"

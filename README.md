@@ -51,6 +51,8 @@ let Demo = React.createClass({
 });
 ```
 
+The library exports a default `Spring`, a `TransitionSpring` and `utils`.
+
 ### &lt;Spring />
 Exposes a single prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
 Type: `endValue: object | array | object -> (object | array)`.
