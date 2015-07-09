@@ -63,9 +63,9 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
     return endValue;
   }
   if (endValue.val != null) {
-    let [k, b] = endValue.config || [170, 26];
+    const [_k, _b] = endValue.config || [170, 26];
     return {
-      val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, k, b),
+      val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
       config: endValue.config,
     };
   }
@@ -90,9 +90,9 @@ function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
     return mapTree(zero, currV);
   }
   if (endValue.val != null) {
-    let [k, b] = endValue.config || [170, 26];
+    const [_k, _b] = endValue.config || [170, 26];
     return {
-      val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, k, b),
+      val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
       config: endValue.config,
     };
   }
