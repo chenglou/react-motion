@@ -63,9 +63,9 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
     return endValue;
   }
   if (endValue.val != null) {
-    let [k, b] = endValue.config || [170, 26];
+    const [_k, _b] = endValue.config || [170, 26];
     return {
-      val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, k, b),
+      val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
       config: endValue.config,
     };
   }
@@ -90,9 +90,9 @@ function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
     return mapTree(zero, currV);
   }
   if (endValue.val != null) {
-    let [k, b] = endValue.config || [170, 26];
+    const [_k, _b] = endValue.config || [170, 26];
     return {
-      val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, k, b),
+      val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
       config: endValue.config,
     };
   }
@@ -109,12 +109,6 @@ function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
   return mapTree(zero, currV);
 }
 
-// let a = {order: {val: [10]}};
-// let b = {order: {val: [0]}};
-// let c = {order: {val: [100]}};
-// // debugger;
-// let d = updateCurrVals(1/60, a, b, c);
-// console.log(d);
 
 function noSpeed(coll) {
   if (Object.prototype.toString.call(coll) === '[object Array]') {
@@ -126,17 +120,6 @@ function noSpeed(coll) {
   return coll === 0;
 }
 
-var coll = {
-  a: [1, 0],
-  b: {c: 4}
-};
-
-var coll = {
-  a: [0, 0],
-  b: {c: 0}
-};
-
-// console.log(noSpeed(v => v === 0, coll));
 
 export default React.createClass({
   propTypes: {
@@ -220,7 +203,7 @@ export default React.createClass({
   },
 
   render() {
-    let {currVals, currV} = this.state;
+    const {currVals} = this.state;
 
     return (
       <div {...this.props}>
