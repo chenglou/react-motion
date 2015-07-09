@@ -87,3 +87,9 @@ export function reinsert(arr, from, to) {
   arr.splice(to, 0, val);
   return arr;
 }
+
+export function clamp(n, min, max) {
+  return n < min ? min
+    : n > max ? max
+    : n;
+}

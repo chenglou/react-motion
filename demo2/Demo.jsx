@@ -1,6 +1,6 @@
 import React from 'react';
 import Spring from '../Spring';
-import {range, reinsert} from '../utils';
+import {range, reinsert, clamp} from '../utils';
 
 // TODO: start at center, not upper left
 let allColors = [
@@ -38,8 +38,8 @@ let Demo = React.createClass({
   handleMouseMove({pageX, pageY}) {
     let {order, lastPress, isPressed, delta: [dx, dy]} = this.state;
     if (isPressed) {
-      let col = Math.min(Math.floor((pageX - left) / width), 2);
-      let row = Math.min(Math.floor((pageY - top) / height), Math.floor(count / 3));
+      let col = clamp(Math.floor((pageX - left) / width), 0, 2);
+      let row = clamp(Math.floor((pageY - top) / height), 0, Math.floor(count / 3));
       let index = row * 3 + col;
       let newOrder = reinsert(order, order.indexOf(lastPress), index);
       this.setState({mouse: [pageX - dx, pageY - dy], order: newOrder});
