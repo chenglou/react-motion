@@ -246,6 +246,7 @@ export let TransitionSpring = React.createClass({
       PropTypes.func,
       PropTypes.object,
       PropTypes.array,
+      // TODO: numbers? strings?
     ]),
     willEnter: PropTypes.oneOfType([
       PropTypes.func,
@@ -256,7 +257,7 @@ export let TransitionSpring = React.createClass({
 
   getDefaultProps() {
     return {
-      willEnter: (key, currVals) => currVals[key],
+      willEnter: (key, endValue) => endValue[key],
       willLeave: () => null,
     };
   },
@@ -311,7 +312,7 @@ export let TransitionSpring = React.createClass({
       Object.keys(mergedVals)
         .filter(key => !currVals.hasOwnProperty(key))
         .forEach(key => {
-          currVals[key] = willEnter(key, endValue, currVals);
+          currVals[key] = willEnter(key, endValue, currVals, currV);
           currV[key] = mapTree(zero, currVals[key]);
         });
 
@@ -348,3 +349,15 @@ export let TransitionSpring = React.createClass({
     </div>);
   },
 });
+
+function reorderKeys(obj, f) {
+  let ret = {};
+  f(Object.keys(obj)).forEach(key => {
+    ret[key] = obj[key];
+  });
+  return ret;
+}
+
+export let utils = {
+  reorderKeys,
+};

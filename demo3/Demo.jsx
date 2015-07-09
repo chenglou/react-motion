@@ -104,6 +104,7 @@ let Demo = React.createClass({
     };
   },
 
+  // TODO: change naming
   willLeave(date, destVals, currVals) {
     if (currVals[date].opacity.val > 0) {
       return {
