@@ -1,4 +1,4 @@
 .DS_Store
 node_modules
-all.*
+all.js.map
 lib
