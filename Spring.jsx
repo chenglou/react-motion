@@ -109,12 +109,6 @@ function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
   return mapTree(zero, currV);
 }
 
-// let a = {order: {val: [10]}};
-// let b = {order: {val: [0]}};
-// let c = {order: {val: [100]}};
-// // debugger;
-// let d = updateCurrVals(1/60, a, b, c);
-// console.log(d);
 
 function noSpeed(coll) {
   if (Object.prototype.toString.call(coll) === '[object Array]') {
@@ -126,17 +120,6 @@ function noSpeed(coll) {
   return coll === 0;
 }
 
-var coll = {
-  a: [1, 0],
-  b: {c: 4}
-};
-
-var coll = {
-  a: [0, 0],
-  b: {c: 0}
-};
-
-// console.log(noSpeed(v => v === 0, coll));
 
 export default React.createClass({
   propTypes: {
