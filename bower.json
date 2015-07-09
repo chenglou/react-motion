@@ -1,0 +1,31 @@
+{
+  "name": "react-motion",
+  "version": "0.0.2",
+  "homepage": "https://github.com/chenglou/react-motion",
+  "authors": [
+    "chenglou"
+  ],
+  "description": "A spring that solves your animation problems.",
+  "main": ["lib/Spring.js"],
+  "dependencies": {
+    "react": ">=0.13.2"
+  },
+  "keywords": [
+    "react",
+    "component",
+    "react-component",
+    "transitiongroup",
+    "spring",
+    "tween",
+    "motion",
+    "animation",
+    "transition",
+    "ui",
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "test"
+  ]
+}
