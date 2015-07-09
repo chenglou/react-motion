@@ -55,6 +55,9 @@ function mergeDiffObj(a, b, onRemove) {
 // TODO: refactor common logic with updateCurrV
 // TODO: tests
 function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
+  if (endValue === null) {
+    return null;
+  }
   if (typeof endValue === 'number') {
     // TODO: do something to stepper to make this not allocate (2 steppers?)
     return stepper(frameRate, currVals, currV, endValue, k, b)[0];
@@ -83,6 +86,9 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
 }
 
 function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
+  if (endValue === null) {
+    return null;
+  }
   if (typeof endValue === 'number') {
     return stepper(frameRate, currVals, currV, endValue, k, b)[1];
   }
