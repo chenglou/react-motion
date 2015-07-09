@@ -203,7 +203,7 @@ export default React.createClass({
   },
 
   render() {
-    let {currVals, currV} = this.state;
+    const {currVals} = this.state;
 
     return (
       <div {...this.props}>
