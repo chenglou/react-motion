@@ -1,6 +1,6 @@
 {
   "name": "react-motion",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "homepage": "https://github.com/chenglou/react-motion",
   "authors": [
     "chenglou"
@@ -26,6 +26,8 @@
   "ignore": [
     "**/.*",
     "node_modules",
-    "test"
+    "test",
+    "demo*",
+    "server.js"
   ]
 }
