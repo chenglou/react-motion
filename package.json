@@ -20,6 +20,18 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prerelease": "NODE_ENV=production webpack --config webpack.prod.config.js"
   },
+  "keywords": [
+    "react",
+    "component",
+    "react-component",
+    "transitiongroup",
+    "spring",
+    "tween",
+    "motion",
+    "animation",
+    "transition",
+    "ui"
+  ],
   "author": "chenglou",
   "license": "MIT"
 }
