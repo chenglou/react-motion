@@ -1,7 +1,5 @@
 # React-Motion
 
-__Rushed to get the library out in time for the React-Europe talk. More polished codebase coming tonight!__
-
 ```js
 <Spring endValue={{val: 10}}>
   {interpolated => <div>{interpolated.val}</div>}
@@ -10,20 +8,15 @@ __Rushed to get the library out in time for the React-Europe talk. More polished
 
 Animate a counter to `10`, from whatever value it currently is. For more advanced usage, see below.
 
-Will provide npm package soon. For now, please use:
-
 ```sh
-git clone https://github.com/chenglou/react-motion.git
-cd react-motion
-npm install
-npm run build
+npm install react-motion
 ```
 
-Then, check out the `index.html`s in the demo folders.
+[Check out the crazy demos.](?)
 
 ## What does this library try to solve?
 
-I believe that for 95% of use-cases of animating components, we don't have to resort to using hard-coded easing curves and duration. Set up a stiffness and damping constant for your UI element, and let the magic of physics take care of the rest. This way, you don't have to worry about the more petty questions such as "what if the item's currently animating and is a position `x`? How do I adjust my time and curve?".
+For 95% of use-cases of animating components, we don't have to resort to using hard-coded easing curves and duration. Set up a stiffness and damping constant for your UI element, and let the magic of physics take care of the rest. This way, you don't have to worry about the more petty questions such as "what if the item's currently animating and is a position `x`? How do I adjust my time and curve?". It also greatly simplifies an animation API since there's really not that much to set up.
 
 This library also provides an alternative, more powerful API for React's `TransitionGroup`.
 
@@ -62,7 +55,7 @@ let Demo = React.createClass({
 Exposes a single prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
 Type: `endValue: object | array | object -> (object | array)`.
 
-`endValue` can be of an arbitrary shape. There are however 2 reserved keys: `val` and `config`. Say your initial data structure looks so:
+`endValue` can be of an arbitrary shape (**but must stay the same shape from one render to the next**). There are however 2 reserved keys: `val` and `config`. Say your initial data structure looks so:
 
 ```js
 {size: 10, top: 20}
@@ -74,7 +67,7 @@ You only want to animate `size`. Indicate what value/entire sub-collection you w
 {size: {val: 10}, top: 20}
 ```
 
-When you pass this to `endValue`, `Spring` will traverse your data structure and animate `size` based on its previous value, which is the data structure from the previous render. `top` will be kept untouched. You receive the interpolated data structure as an argument to your children function:
+When you pass this to `endValue`, `Spring` will traverse your data structure and animate `size` based on the end value you provided and the speed/position. `top` will be kept untouched. You receive the interpolated data structure as an argument to your children function:
 
 ```jsx
 <Spring endValue={{size: {val: 10}, top: 20}}>
@@ -91,9 +84,9 @@ When you pass this to `endValue`, `Spring` will traverse your data structure and
 
 Where the value of `tweeningCollection` might be e.g. `{size: {val: 3.578}, top: 20}`.
 
-If, instead of passing a number to `val` (`{val: 10}`), you pass an array or an object, by default Spring will interpolate every number in it.
+If, instead of passing a number to `val` (`{val: 10}`), you pass an array or an object, by default `Spring` will interpolate every number in it.
 
-But lots of times you don't want all the values to animate the same way. You can pass a `config` to specify the stiffness and the damping of the spring:
+But lots of times you don't want all the values to animate the same way. You can pass a `config` to specify the stiffness and the damping of the `spring`:
 
 ```js
 {size: {val: 10, config: [120, 17]}, top: 20}
@@ -114,7 +107,7 @@ You can nest `val` wrappers; the innermost takes priority:
 }
 ```
 
-Here, `top` and `left` will be animated with [stiffness, damping] of [`100`, `10`], while `size` will use [`120`, `17`] instead.
+Here, `top` and `left` will be animated with [stiffness, damping] of `[100, 10]`, while `size` will use `[120, 17]` instead.
 
 Sometimes you might have a data structure where you want to animate everything but one thing:
 
@@ -176,52 +169,98 @@ getEndValues: function(currentPositions) {
 
 ```
 
---- **README work in progress** ---
+### &lt;TransitionSpring />
+Like `Spring`, but can takes two other props: `willEnter` and `willLeave`. Throughout this section, please remember that ""
 
-#### Spring
-Accepts a `endValue` prop that's a function `(update, currVals) => finalVals`. It takes `update` and `currVals` and returns a data structure representing the final endValue. `currVals` will always be the same shape as what `endValue` returns. The Spring will automatically update between the current value and the final value returned by `endValue`.
-`update` is a function for you to indicate what you want/don't want animated. You can use it like this:
-```js
+`endValue`: now constrained to an object of the shape `{key => yourStuff}` (the data is constrained to this shape, but that doesn't mean the way you use your interpolated value has to be). When your the `endValue` provide differs from the current interpolated value by an added/removed key:
+
+`willEnter`: a callback that's called **once** and is passed `(keyThatEnters, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration that'll serve as the starting value of that new key. That configuration will be merged into `endValue`. The default value of `willEnter` is `(key, endValue) => endValue[key]`. It returns the same configuration as the one you just specified in `endValue`. In other words, the start and end are the same: no animation.
+
+`willLeave`: a callback that's called **many** times and is passed `(keyThatLeaves, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration (which will serve as the new `endValue[keyThatLeaves]` and merged into `endValue`) to indicate you still want to keep the item around. Otherwise, return `null`.
+
+#### Sample Usage
+_(See the demo files for fuller ones.)_
+
+```jsx
 let Demo = React.createClass({
-  ...
-  endValue(update, currVals) {
-    // The function `update` given to you is for you to describe what you
-    // want animated
-    return update({
-        stuff: update(10) // you can nest updates,
-        importantData: update({data: "won't animate", number: 1}, -1, -1) // Un-update
+  getInitialState() {
+    return {
+      blocks: {
+        a: 'I am a',
+        b: 'I am b',
+        c: 'I am c',
+      },
+    };
+  },
+
+  getEndValue() {
+    let blocks = this.state.blocks;
+    let configs = {};
+    Object.keys(blocks).forEach(key => {
+      configs[key] = {
+        height: {val: 50},
+        opacity: {val: 1},
+        text: blocks[key], // interpolate the above 2 fields only
+      };
     });
+    return configs;
+  },
+
+  willEnter(key) {
+    return {
+      height: {val: 50},
+      opacity: {val: 1},
+      text: this.state.blocks[key],
+    };
+  },
+
+  willLeave(key, endValue, currentValue, currentSpeed) {
+    if (currentValue[key].opacity.val === 0 && currentSpeed[key].opacity.val === 0) {
+      return null; // kill component when opacity reaches 0
+    }
+    return {
+      height: {val: 0},
+      opacity: {val: 0},
+      text: currentValue[key].text,
+    };
+  },
+
+  handleClick(key) {
+    let {...newBlocks} = this.state.blocks;
+    delete newBlocks[key];
+    this.setState({blocks: newBlocks});
   },
 
   render() {
     return (
-      <Spring endValue={this.endValue}>
-        {currVals => ...}
-      </Spring>
+      <TransitionSpring
+        endValue={this.getEndValue}
+        willEnter={this.willEnter}
+        willLeave={this.willLeave}>
+        {currentValue => Object.keys(currentValue).map(key => {
+          let style = {
+            height: currentValue[key].height.val,
+            opacity: currentValue[key].opacity.val,
+          };
+          return (
+            <div onClick={this.handleClick.bind(null, key)} style={style}>
+              {currentValue[key].text}
+            </div>
+          );
+        })}
+      </TransitionSpring>
     );
   }
 });
 ```
-`currVals` is the current state of the Spring. In this case `currVals` would look like this:
 
-```js
-let currVals = {
-    stuff: 10, // somewhere between where it started and the destination which
-               // is 10
-    importantData: {
-        data: "won't animate",
-        number: 1
-    }
-}
-```
+### Little Extras
+_(You might not need this until later on.)_
+Since `TransitionSpring` dictates `endValue` to be an object, manipulating keys could be a little more tedious than manipulating arrays. Here are the common scenarios' solutions:
 
-#### TransitionSpring
-Same as the Spring but will transition things in and out when you need to unmount components. Takes two other props: `willEnter` and `willLeave`.
+- Insert at the beginning: `{newKey: myConfigForThisKey, ...oldConfigs}`.
+- Insert at the end: `{...oldConfigs, newKey: myConfigForThisKey}`.
+- Slice/splice/reverse/sort: this library exposes a `utils.reorderKeys` function.
 
-__willEnter__: `(key, finalVals, currVals) => defaultValForKey`
-
-`willEnter` should return the data structure to replace the missing `key` in `currVals`.
-
-__willLeave__: `(key, update, finalVals, currVals, currV) => nextFinalVals`
-
-`willLeave` should return a data structure representing the next final `endValue` to aim for.
+#### `utils.reorderKeys(object, newKeysFunction)`
+`newKeysFunction` will receive, as arguments, the array of keys in `object` and should return a new array of keys (with e.g. order changed and/or keys missing). `reorderKeys` will then return a new object similar to `object`, but with the keys in the order `newKeysFunction` dictated.
