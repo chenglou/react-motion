@@ -3,6 +3,7 @@ var webpack = require('webpack');
 var devtool;
 var loaders = ['babel?stage=0'];
 var DEV = process.env.NODE_ENV === 'development';
+var port = process.env.PORT || 3000;
 
 var plugins = [
   new webpack.DefinePlugin({
@@ -26,7 +27,7 @@ if (DEV) {
   ]);
   entry = Object.keys(entry).reduce(function (result, key) {
     result[key] = [
-      'webpack-dev-server/client?http://localhost:3000',
+      'webpack-dev-server/client?http://localhost:' + port,
       'webpack/hot/only-dev-server',
       entry[key]
     ];
