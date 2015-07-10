@@ -18,6 +18,8 @@ Bower:
 
 ## What does this library try to solve?
 
+[My React-Europe talk](https://www.youtube.com/watch?v=1tavDv5hXpo)
+
 For 95% of use-cases of animating components, we don't have to resort to using hard-coded easing curves and duration. Set up a stiffness and damping constant for your UI element, and let the magic of physics take care of the rest. This way, you don't have to worry about the more petty questions such as "what if the item's currently animating and is a position `x`? How do I adjust my time and curve?". It also greatly simplifies an animation API since there's really not that much to set up.
 
 This library also provides an alternative, more powerful API for React's `TransitionGroup`.
