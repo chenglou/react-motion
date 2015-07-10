@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "description": "A spring that solves your animation problems.",
   "main": "lib/Spring.js",
-  "dependencies": {
+  "peerDependencies": {
     "react": ">=0.13.2"
   },
   "devDependencies": {
