@@ -3,7 +3,7 @@ import {range, mapTree, clone} from './utils';
 import stepper from './stepper';
 
 // ---------
-let FRAME_RATE = 1 / 60;
+const FRAME_RATE = 1 / 60;
 
 function zero() {
   return 0;
@@ -11,8 +11,8 @@ function zero() {
 
 // TODO: test
 function mergeDiff(collA, collB, onRemove, accum) {
-  let [a, ...aa] = collA;
-  let [b, ...bb] = collB;
+  const [a, ...aa] = collA;
+  const [b, ...bb] = collB;
 
   if (collA.length === 0 && collB.length === 0) {
     return accum;
@@ -39,8 +39,8 @@ function mergeDiff(collA, collB, onRemove, accum) {
 }
 
 function mergeDiffObj(a, b, onRemove) {
-  let keys = mergeDiff(Object.keys(a), Object.keys(b), a => !onRemove(a), []);
-  let ret = {};
+  const keys = mergeDiff(Object.keys(a), Object.keys(b), a => !onRemove(a), []);
+  const ret = {};
   keys.forEach(key => {
     if (b.hasOwnProperty(key)) {
       ret[key] = b[key];
@@ -76,7 +76,7 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
     return endValue.map((_, i) => updateCurrVals(frameRate, currVals[i], currV[i], endValue[i], k, b));
   }
   if (Object.prototype.toString.call(endValue) === '[object Object]') {
-    let ret = {};
+    const ret = {};
     Object.keys(endValue).forEach(key => {
       ret[key] = updateCurrVals(frameRate, currVals[key], currV[key], endValue[key], k, b);
     });
@@ -106,7 +106,7 @@ function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
     return endValue.map((_, i) => updateCurrV(frameRate, currVals[i], currV[i], endValue[i], k, b));
   }
   if (Object.prototype.toString.call(endValue) === '[object Object]') {
-    let ret = {};
+    const ret = {};
     Object.keys(endValue).forEach(key => {
       ret[key] = updateCurrV(frameRate, currVals[key], currV[key], endValue[key], k, b);
     });
@@ -168,16 +168,16 @@ export default React.createClass({
       return;
     }
     this._rafID = requestAnimationFrame(() => {
-      let {currVals, currV, now} = this.state;
+      const {currVals, currV, now} = this.state;
       let {endValue} = this.props;
 
       if (typeof endValue === 'function') {
         endValue = endValue(currVals);
       }
-      let frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
+      const frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
 
-      let newCurrVals = updateCurrVals(frameRate, currVals, currV, endValue);
-      let newCurrV = updateCurrV(frameRate, currVals, currV, endValue);
+      const newCurrVals = updateCurrVals(frameRate, currVals, currV, endValue);
+      const newCurrV = updateCurrV(frameRate, currVals, currV, endValue);
 
       this.setState(() => {
         return {
@@ -187,7 +187,7 @@ export default React.createClass({
         };
       });
 
-      let stop = noSpeed(newCurrV);
+      const stop = noSpeed(newCurrV);
       if (stop && !justStarted) {
         // this flag is necessary, because in `endValue` callback, the user
         // might check that the current value has reached the destination, and
@@ -220,7 +220,7 @@ export default React.createClass({
 });
 
 
-export let TransitionSpring = React.createClass({
+export const TransitionSpring = React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
       PropTypes.func,
@@ -283,14 +283,16 @@ export let TransitionSpring = React.createClass({
       return;
     }
     this._rafID = requestAnimationFrame(() => {
-      let {currVals, currV, now} = this.state;
-      let {endValue, willEnter, willLeave} = this.props;
+      let {currVals, currV} = this.state;
+      const {now} = this.state;
+      let {endValue} = this.props;
+      const {willEnter, willLeave} = this.props;
 
       if (typeof endValue === 'function') {
         endValue = endValue(currVals);
       }
 
-      let mergedVals = mergeDiffObj(
+      const mergedVals = mergeDiffObj(
         currVals,
         endValue,
         key => willLeave(key, endValue, currVals, currV)
@@ -305,10 +307,10 @@ export let TransitionSpring = React.createClass({
           currV[key] = mapTree(zero, currVals[key]);
         });
 
-      let frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
+      const frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
 
-      let newCurrVals = updateCurrVals(frameRate, currVals, currV, mergedVals);
-      let newCurrV = updateCurrV(frameRate, currVals, currV, mergedVals);
+      const newCurrVals = updateCurrVals(frameRate, currVals, currV, mergedVals);
+      const newCurrV = updateCurrV(frameRate, currVals, currV, mergedVals);
 
       this.setState(() => {
         return {
@@ -318,7 +320,7 @@ export let TransitionSpring = React.createClass({
         };
       });
 
-      let stop = noSpeed(newCurrV);
+      const stop = noSpeed(newCurrV);
       if (stop && !justStarted) {
         if (isLastRaf) {
           this._rafID = null;
@@ -332,7 +334,7 @@ export let TransitionSpring = React.createClass({
   },
 
   render() {
-    let {currVals} = this.state;
+    const {currVals} = this.state;
     return (<div {...this.props}>
       {this.props.children(currVals)}
     </div>);
@@ -340,13 +342,13 @@ export let TransitionSpring = React.createClass({
 });
 
 function reorderKeys(obj, f) {
-  let ret = {};
+  const ret = {};
   f(Object.keys(obj)).forEach(key => {
     ret[key] = obj[key];
   });
   return ret;
 }
 
-export let utils = {
+export const utils = {
   reorderKeys,
 };

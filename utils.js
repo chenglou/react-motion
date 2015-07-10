@@ -14,8 +14,8 @@ export function range(start, afterStop) {
     afterStop = start;
     start = 0;
   }
-  let ret = [];
-  for (var i = start; i < afterStop; i++) {
+  const ret = [];
+  for (let i = start; i < afterStop; i++) {
     ret.push(i);
   }
   return ret;
@@ -23,12 +23,12 @@ export function range(start, afterStop) {
 
 // assume trees same are same
 function _mapTree(path, f, trees) {
-  let t1 = trees[0];
+  const t1 = trees[0];
   if (Object.prototype.toString.call(t1) === '[object Array]') {
     return t1.map((_, i) => _mapTree([...path, i], f, trees.map(val => val[i])));
   }
   if (Object.prototype.toString.call(t1) === '[object Object]') {
-    let newTree = {};
+    const newTree = {};
     Object.keys(t1).forEach(key => {
       newTree[key] = _mapTree([...path, key], f, trees.map(val => val[key]));
     });
@@ -54,7 +54,7 @@ function _reshapeTree(path, a, b, f) {
     return a.map((val, i) => _reshapeTree([...path, i], val, b[i], f));
   }
   if (Object.prototype.toString.call(a) === '[object Object]') {
-    let newTree = {};
+    const newTree = {};
     Object.keys(a).forEach(key => {
       newTree[key] = _reshapeTree([...path, key], a[key], b[key], f);
     });
@@ -69,20 +69,20 @@ export function reshapeTree(a, b, f) {
 }
 
 export function toOj(vals, keys) {
-  let ret = {};
+  const ret = {};
   vals.forEach((val, i) => ret[keys[i]] = val);
   return ret;
 }
 
 export function toArr(obj) {
-  let keys = Object.keys(obj);
-  let vals = keys.map(k => obj[k]);
+  const keys = Object.keys(obj);
+  const vals = keys.map(k => obj[k]);
   return [keys, vals];
 }
 
 export function reinsert(arr, from, to) {
   arr = clone(arr);
-  let val = arr[from];
+  const val = arr[from];
   arr.splice(from, 1);
   arr.splice(to, 0, val);
   return arr;
