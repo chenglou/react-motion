@@ -1,62 +1,48 @@
-var webpack = require('webpack');
+'use strict';
 
-var devtool;
-var loaders = ['babel?stage=0'];
-var DEV = process.env.NODE_ENV === 'development';
-var port = process.env.PORT || 3000;
+var webpack = require('webpack');
 
 var plugins = [
   new webpack.DefinePlugin({
-    '__DEV__': JSON.stringify(DEV)
-  })
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+  }),
+  new webpack.optimize.OccurenceOrderPlugin()
 ];
-var entry = {
-  demo0: './demo0/index.jsx',
-  demo1: './demo1/index.jsx',
-  demo2: './demo2/index.jsx',
-  demo3: './demo3/index.jsx',
-  demo4: './demo4/index.jsx',
-};
 
-if (DEV) {
-  devtool = 'eval-source-map';
-  loaders = ['react-hot'].concat(loaders);
-  plugins = plugins.concat([
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
-  ]);
-  entry = Object.keys(entry).reduce(function (result, key) {
-    result[key] = [
-      'webpack-dev-server/client?http://localhost:' + port,
-      'webpack/hot/only-dev-server',
-      entry[key]
-    ];
-    return result;
-  }, {});
-} else {
-  plugins = plugins.concat([
-    new webpack.optimize.OccurenceOrderPlugin()
-  ]);
+if (process.env.NODE_ENV === 'production') {
+  plugins.push(
+    new webpack.optimize.UglifyJsPlugin({
+      compressor: {
+        screw_ie8: true,
+        warnings: false
+      }
+    })
+  );
 }
 
-module.exports = {
-  devtool: devtool,
-  entry: entry,
-  output: {
-    filename: './[name]/all.js',
-    publicPath: '/',
-    path: __dirname
-  },
-  module: {
-    loaders: [{
-      test: /\.jsx?$/,
-      exclude: /build|node_modules/,
-      loaders: loaders
-    }]
-  },
-  resolve: {
-    extensions: ['', '.js', '.jsx']
-  },
-  plugins: plugins
+var reactExternal = {
+  root: 'React',
+  commonjs2: 'react',
+  commonjs: 'react',
+  amd: 'react'
 };
 
+module.exports = {
+  externals: {
+    'react': reactExternal,
+    'react-native': reactExternal
+  },
+  module: {
+    loaders: [
+      { test: /\.js$/, loaders: ['babel-loader'], exclude: /node_modules/ }
+    ]
+  },
+  output: {
+    library: 'ReactMotion',
+    libraryTarget: 'umd'
+  },
+  plugins: plugins,
+  resolve: {
+    extensions: ['', '.js']
+  }
+};

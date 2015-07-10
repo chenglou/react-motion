@@ -2,23 +2,36 @@
   "name": "react-motion",
   "version": "0.0.3",
   "description": "A spring that solves your animation problems.",
-  "main": "lib/Spring.js",
+  "main": "lib/index.js",
   "dependencies": {
+    "invariant": "^2.1.0",
     "react": ">=0.13.2"
   },
   "devDependencies": {
-    "babel": "^5.6.14",
-    "babel-core": "^5.2.17",
-    "babel-loader": "^5.0.0",
-    "react-hot-loader": "^1.2.7",
-    "webpack": "^1.8.11",
-    "webpack-dev-server": "^1.10.1"
+    "babel": "^5.5.8",
+    "babel-core": "^5.5.8",
+    "babel-eslint": "^3.1.15",
+    "babel-loader": "^5.1.4",
+    "eslint": "^0.23",
+    "eslint-config-airbnb": "0.0.6",
+    "eslint-plugin-react": "^2.3.0",
+    "expect": "^1.6.0",
+    "istanbul": "^0.3.15",
+    "mocha": "^2.2.5",
+    "react-hot-loader": "^1.2.8",
+    "webpack": "^1.9.6",
+    "webpack-dev-server": "^1.8.2"
   },
   "scripts": {
-    "start": "NODE_ENV=development node server.js",
-    "build": "NODE_ENV=production webpack -p",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prerelease": "NODE_ENV=production webpack --config webpack.prod.config.js"
+    "browser": ".bin/browser",
+    "build": ".bin/build",
+    "clean": ".bin/clean",
+    "lint": ".bin/lint",
+    "prepublish": ".bin/prepublish",
+    "start": ".bin/start",
+    "test": ".bin/test",
+    "test:watch": ".bin/test-watch",
+    "test:cov": ".bin/test-cov"
   },
   "keywords": [
     "react",

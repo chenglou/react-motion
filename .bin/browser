@@ -1,0 +1,11 @@
+#!/bin/sh -e
+
+WEBPACK_CMD=node_modules/.bin/webpack
+
+mkdir -p dist
+
+$WEBPACK_CMD src/umd.js dist/react-motion.js
+NODE_ENV=production $WEBPACK_CMD src/umd.js dist/react-motion.min.js
+
+# $WEBPACK_CMD src/umd-react.js dist/react-motion-react.js
+# NODE_ENV=production $WEBPACK_CMD src/umd-react.js dist/react-motion-react.min.js

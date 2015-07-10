@@ -1,0 +1,6 @@
+#!/bin/sh -e
+
+sh .bin/lint
+sh .bin/clean
+sh .bin/browser
+sh .bin/build

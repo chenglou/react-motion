@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+where=$1 || ./src
+tests=$1
+if [ -d $where ]; then
+  tests=`find $where -type f -name '*-test.*' -not -path './node_modules/*'`
+fi
+
+NODE_ENV=test `npm bin`/mocha $2 --compilers js:babel/register --recursive $tests
