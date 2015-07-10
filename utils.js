@@ -24,7 +24,7 @@ export function range(start, afterStop) {
 // assume trees same are same
 function _mapTree(path, f, trees) {
   const t1 = trees[0];
-  if (Object.prototype.toString.call(t1) === '[object Array]') {
+  if (Array.isArray(t1)) {
     return t1.map((_, i) => _mapTree([...path, i], f, trees.map(val => val[i])));
   }
   if (Object.prototype.toString.call(t1) === '[object Object]') {
@@ -50,7 +50,7 @@ function _reshapeTree(path, a, b, f) {
     return f(path, a);
   }
 
-  if (Object.prototype.toString.call(a) === '[object Array]') {
+  if (Array.isArray(a)) {
     return a.map((val, i) => _reshapeTree([...path, i], val, b[i], f));
   }
   if (Object.prototype.toString.call(a) === '[object Object]') {

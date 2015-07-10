@@ -72,7 +72,7 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
       config: endValue.config,
     };
   }
-  if (Object.prototype.toString.call(endValue) === '[object Array]') {
+  if (Array.isArray(endValue)) {
     return endValue.map((_, i) => updateCurrVals(frameRate, currVals[i], currV[i], endValue[i], k, b));
   }
   if (Object.prototype.toString.call(endValue) === '[object Object]') {
@@ -102,7 +102,7 @@ function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
       config: endValue.config,
     };
   }
-  if (Object.prototype.toString.call(endValue) === '[object Array]') {
+  if (Array.isArray(endValue)) {
     return endValue.map((_, i) => updateCurrV(frameRate, currVals[i], currV[i], endValue[i], k, b));
   }
   if (Object.prototype.toString.call(endValue) === '[object Object]') {
@@ -117,7 +117,7 @@ function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
 
 
 function noSpeed(coll) {
-  if (Object.prototype.toString.call(coll) === '[object Array]') {
+  if (Array.isArray(coll)) {
     return coll.every(noSpeed);
   }
   if (Object.prototype.toString.call(coll) === '[object Object]') {
