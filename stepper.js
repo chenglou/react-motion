@@ -15,8 +15,8 @@ export default function stepper(frameRate, x, v, destX, k, b) {
   // let a = (Fspring + Fdamper) / mass;
   const a = Fspring + Fdamper;
 
-  const newX = x + v * frameRate;
   const newV = v + a * frameRate;
+  const newX = x + newV * frameRate;
 
   if (Math.abs(newV - v) < errorMargin && Math.abs(newX - x) < errorMargin) {
     return [destX, 0];
