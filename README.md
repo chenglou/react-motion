@@ -1,5 +1,8 @@
 # React-Motion
 
+[![react-motion channel on slack](https://img.shields.io/badge/slack-react--motion%40reactiflux-61DAAA.svg?style=flat)](https://reactiflux.slack.com/messages/react-motion/)
+
+
 ```js
 <Spring endValue={{val: 10}}>
   {interpolated => <div>{interpolated.val}</div>}
