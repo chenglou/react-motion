@@ -58,7 +58,7 @@ let Demo = React.createClass({
 The library exports a default `Spring`, a `TransitionSpring` and `utils`.
 
 ### &lt;Spring />
-Exposes a single prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
+Exposes a single prop (other props you pass are transferred to the underlying `div` wrapper Spring uses), `endValue`, which takes either an object, an array or a function that returns an object or an array.
 Type: `endValue: object | array | object -> (object | array)`.
 
 `endValue` can be of an arbitrary shape (**but must stay the same shape from one render to the next**). There are however 2 reserved keys: `val` and `config`. Say your initial data structure looks so:
