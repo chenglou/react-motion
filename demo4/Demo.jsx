@@ -76,6 +76,7 @@ let Demo = React.createClass({
     let {photos, currPhoto} = this.state;
     return (
       <div>
+        <div>When you scroll to the end, wait for the images to load.</div>
         <input
           type="range"
           min={0}
@@ -83,16 +84,18 @@ let Demo = React.createClass({
           value={currPhoto}
           onChange={this.handleChange} />
         {currPhoto}
-        <TransitionSpring className="demo4"endValue={this.getValues}>
+        <TransitionSpring endValue={this.getValues}>
           {({container, ...rest}) =>
-            <div className="demo4-inner" style={container.val}>
-              {Object.keys(rest).map((key) =>
-                <img
-                  className="demo4-photo"
-                  key={key}
-                  src={key}
-                  style={rest[key].val} />
-              )}
+            <div className="demo4">
+              <div className="demo4-inner" style={container.val}>
+                {Object.keys(rest).map((key) =>
+                  <img
+                    className="demo4-photo"
+                    key={key}
+                    src={key}
+                    style={rest[key].val} />
+                )}
+              </div>
             </div>
           }
         </TransitionSpring>

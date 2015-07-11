@@ -147,6 +147,7 @@ export default React.createClass({
       PropTypes.object,
       PropTypes.array,
     ]).isRequired,
+    children: PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -223,12 +224,7 @@ export default React.createClass({
 
   render() {
     const {currVals} = this.state;
-
-    return (
-      <div {...this.props}>
-        {this.props.children(currVals)}
-      </div>
-    );
+    return React.Children.only(this.props.children(currVals));
   }
 });
 
@@ -255,6 +251,7 @@ export const TransitionSpring = React.createClass({
       PropTypes.object,
       PropTypes.array,
     ]),
+    children: PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
@@ -348,9 +345,7 @@ export const TransitionSpring = React.createClass({
 
   render() {
     const {currVals} = this.state;
-    return (<div {...this.props}>
-      {this.props.children(currVals)}
-    </div>);
+    return React.Children.only(this.props.children(currVals));
   },
 });
 

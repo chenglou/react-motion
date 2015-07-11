@@ -81,28 +81,31 @@ let Demo = React.createClass({
   render() {
     let {order, lastPress} = this.state;
     return (
-      <Spring
-        className="demo2"
-        onTouchMove={this.handleTouchMove}
-        onTouchEnd={this.handleMouseUp}
-        onMouseMove={this.handleMouseMove}
-        onMouseUp={this.handleMouseUp}
-        endValue={this.getValues}>
-        {({order: currOrder, scales: {val: scales}}) => currOrder.map(({val: [x, y]}, key) =>
+      <Spring endValue={this.getValues}>
+        {({order: currOrder, scales: {val: scales}}) =>
           <div
-            key={key}
-            onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
-            onTouchStart={this.handleTouchStart.bind(null, key, [x, y])}
-            className="demo2-ball"
-            style={{
-              backgroundColor: allColors[key],
-              WebkitTransform: `translate3d(${x + left}px, ${y + top}px, 0) scale(${scales[key]})`,
-              transform: `translate3d(${x + left}px, ${y + top}px, 0) scale(${scales[key]})`,
-              zIndex: key === lastPress ? 99 : order.indexOf(key),
-              boxShadow: `${(x - (3 * width - 50) / 2) / 15}px 5px 5px rgba(0,0,0,0.5)`,
-            }}
-          />
-        )}
+            className="demo2"
+            onTouchMove={this.handleTouchMove}
+            onTouchEnd={this.handleMouseUp}
+            onMouseMove={this.handleMouseMove}
+            onMouseUp={this.handleMouseUp}>
+              {currOrder.map(({val: [x, y]}, key) =>
+                <div
+                  key={key}
+                  onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
+                  onTouchStart={this.handleTouchStart.bind(null, key, [x, y])}
+                  className="demo2-ball"
+                  style={{
+                    backgroundColor: allColors[key],
+                    WebkitTransform: `translate3d(${x + left}px, ${y + top}px, 0) scale(${scales[key]})`,
+                    transform: `translate3d(${x + left}px, ${y + top}px, 0) scale(${scales[key]})`,
+                    zIndex: key === lastPress ? 99 : order.indexOf(key),
+                    boxShadow: `${(x - (3 * width - 50) / 2) / 15}px 5px 5px rgba(0,0,0,0.5)`,
+                  }}
+                />
+              )}
+          </div>
+        }
       </Spring>
     );
   }
