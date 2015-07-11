@@ -54,7 +54,7 @@ function mergeDiffObj(a, b, onRemove) {
 
 // TODO: refactor common logic with updateCurrV
 // TODO: tests
-function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
+function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
   if (endValue === null) {
     return null;
   }
@@ -62,6 +62,9 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
     return endValue;
   }
   if (typeof endValue === 'number') {
+    if (k == null || b == null) {
+      return endValue;
+    }
     // TODO: do something to stepper to make this not allocate (2 steppers?)
     return stepper(frameRate, currVals, currV, endValue, k, b)[0];
   }
@@ -88,7 +91,7 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k = 170, b = 26) {
   return endValue;
 }
 
-function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
+function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
   if (endValue === null) {
     return null;
   }
@@ -96,6 +99,10 @@ function updateCurrV(frameRate, currVals, currV, endValue, k = 170, b = 26) {
     return endValue;
   }
   if (typeof endValue === 'number') {
+    if (k == null || b == null) {
+      return mapTree(zero, currV);
+    }
+    // TODO: do something to stepper to make this not allocate (2 steppers?)
     return stepper(frameRate, currVals, currV, endValue, k, b)[1];
   }
   if (endValue.val != null && endValue.config && endValue.config.length === 0) {

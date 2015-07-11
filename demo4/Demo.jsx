@@ -68,7 +68,7 @@ let Demo = React.createClass({
       };
       return prevLeft + widths[i];
     }, offset);
-    configs.container = {height, width};
+    configs.container = {val: {height, width}};
     return configs;
   },
 
@@ -85,7 +85,7 @@ let Demo = React.createClass({
         {currPhoto}
         <TransitionSpring className="demo4"endValue={this.getValues}>
           {({container, ...rest}) =>
-            <div className="demo4-inner" style={container}>
+            <div className="demo4-inner" style={container.val}>
               {Object.keys(rest).map((key) =>
                 <img
                   className="demo4-photo"
