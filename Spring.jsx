@@ -142,6 +142,12 @@ export default React.createClass({
     ]).isRequired,
   },
 
+  getDefaultProps() {
+    return {
+      component: 'div'
+    }
+  },
+
   getInitialState() {
     let {endValue} = this.props;
     if (typeof endValue === 'function') {
@@ -217,10 +223,10 @@ export default React.createClass({
   render() {
     const {currVals} = this.state;
 
-    return (
-      <div {...this.props}>
-        {this.props.children(currVals)}
-      </div>
+    return React.createElement(
+      this.props.component,
+      this.props,
+      this.props.children(currVals)
     );
   }
 });
@@ -252,6 +258,7 @@ export const TransitionSpring = React.createClass({
 
   getDefaultProps() {
     return {
+      component: 'div',
       willEnter: (key, endValue) => endValue[key],
       willLeave: () => null,
     };
@@ -341,9 +348,12 @@ export const TransitionSpring = React.createClass({
 
   render() {
     const {currVals} = this.state;
-    return (<div {...this.props}>
-      {this.props.children(currVals)}
-    </div>);
+
+    return React.createElement(
+      this.props.component,
+      this.props,
+      this.props.children(currVals)
+    );
   },
 });
 

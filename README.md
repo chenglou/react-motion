@@ -1,7 +1,7 @@
 # React-Motion
 
 ```js
-<Spring endValue={{val: 10}}>
+<Spring component="div" endValue={{val: 10}}>
   {interpolated => <div>{interpolated.val}</div>}
 </Spring>
 ```
