@@ -20,6 +20,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prerelease": "NODE_ENV=production webpack --config webpack.prod.config.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chenglou/react-motion.git"
+  },
   "keywords": [
     "react",
     "component",
