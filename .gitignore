@@ -1,4 +1,13 @@
-.DS_Store
+logs
+*.log
+
+pids
+*.pid
+*.seed
+
+coverage
+
 node_modules
+
+.DS_Store
 all.js.map
-coverage/
