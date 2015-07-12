@@ -1,7 +1,7 @@
 var webpack = require('webpack');
 
 var devtool;
-var loaders = ['babel?stage=0'];
+var loaders = ['babel'];
 var DEV = process.env.NODE_ENV === 'development';
 var port = process.env.PORT || 3000;
 

@@ -16,7 +16,7 @@ var config = {
   module: {
     loaders: [{
       test: /\.(js|jsx)/,
-      loader: 'babel?stage=0'
+      loader: 'babel'
     }]
   },
   plugins: [],
@@ -36,7 +36,7 @@ var config = {
 module.exports = config;
 
 // var devtool;
-// var loaders = ['babel?stage=0'];
+// var loaders = ['babel'];
 // var DEV = process.env.NODE_ENV === 'development';
 
 // var plugins = [
