@@ -1,0 +1,52 @@
+{
+  "extends": "eslint-config-airbnb",
+  "env": {
+    "es6": true
+  },
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "comma-dangle": [2, "always-multiline"],
+
+    "react/jsx-no-undef": 2,
+    "react/jsx-quotes": [2, "double", "avoid-escape"],
+    "react/jsx-uses-react": 2,
+    "react/jsx-uses-vars": 2,
+    "react/no-did-mount-set-state": 2,
+    "react/no-did-update-set-state": 2,
+    "react/no-unknown-property": 2,
+    "react/prop-types": 2,
+    "react/react-in-jsx-scope": 2,
+    "react/self-closing-comp": 2,
+    "react/wrap-multilines": 2,
+    "react/sort-comp": [
+      2, {
+        "order": [
+          "displayName",
+          "propTypes",
+          "contextTypes",
+          "childContextTypes",
+          "mixins",
+          "statics",
+          "defaultProps",
+          "getDefaultProps",
+          "getInitialState",
+          "getChildContext",
+          "componentWillMount",
+          "componentDidMount",
+          "componentWillReceiveProps",
+          "shouldComponentUpdate",
+          "componentWillUpdate",
+          "componentDidUpdate",
+          "componentWillUnmount",
+          "/^on.+$/",
+          "/^get.+$/",
+          "/^render.+$/",
+          "/^.+$/", // All other methods go here
+          "render"
+        ]
+      }
+    ]
+  }
+}
