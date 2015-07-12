@@ -14,6 +14,9 @@
     "eslint": "^0.24.0",
     "eslint-config-airbnb": "0.0.6",
     "eslint-plugin-react": "^2.6.4",
+    "expect": "^1.6.0",
+    "isparta": "^3.0.3",
+    "mocha": "^2.2.5",
     "react-hot-loader": "^1.2.7",
     "webpack": "^1.8.11",
     "webpack-dev-server": "^1.10.1"
@@ -22,8 +25,10 @@
     "start": "NODE_ENV=development node server.js",
     "build": "NODE_ENV=production webpack -p",
     "lint": "eslint Spring.jsx stepper.js utils.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prerelease": "NODE_ENV=production webpack --config webpack.prod.config.js"
+    "prerelease": "NODE_ENV=production webpack --config webpack.prod.config.js",
+    "test": "mocha --compilers js:babel/register --recursive test",
+    "test:dev": "npm test -- --watch",
+    "test:cov": "`npm bin`/babel-node `npm bin`/isparta cover --report text --report html `npm bin`/_mocha -- --recursive"
   },
   "repository": {
     "type": "git",

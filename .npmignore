@@ -2,3 +2,9 @@ react-motion.sublime-*
 server.js
 demo*
 bower.json
+coverage/
+test/
+.eslintrc
+.gitignore
+.npmignore
+webpack.config.js
