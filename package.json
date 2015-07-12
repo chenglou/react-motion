@@ -8,17 +8,17 @@
   },
   "devDependencies": {
     "babel": "^5.6.14",
-    "babel-core": "^5.2.17",
+    "babel-core": "^5.6.18",
     "babel-eslint": "^3.1.23",
-    "babel-loader": "^5.0.0",
-    "eslint": "^0.24.0",
+    "babel-loader": "^5.3.1",
+    "eslint": "^0.24.1",
     "eslint-config-airbnb": "0.0.6",
-    "eslint-plugin-react": "^2.6.4",
+    "eslint-plugin-react": "^2.7.0",
     "expect": "^1.6.0",
     "isparta": "^3.0.3",
     "mocha": "^2.2.5",
-    "react-hot-loader": "^1.2.7",
-    "webpack": "^1.8.11",
+    "react-hot-loader": "^1.2.8",
+    "webpack": "^1.10.1",
     "webpack-dev-server": "^1.10.1"
   },
   "scripts": {
