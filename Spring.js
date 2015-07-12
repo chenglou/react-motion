@@ -1,9 +1,16 @@
 import React, {PropTypes} from 'react';
 import {mapTree, clone} from './utils';
 import stepper from './stepper';
+import createAnimationLoop from './src/animationLoop';
 
 // ---------
-const FRAME_RATE = 1 / 60;
+const animationLoop = createAnimationLoop({
+  timeStep: 1000 / 60, // ms
+  timeScale: 1,
+  maxSteps: 10,
+  getTime: performance.now.bind(performance),
+  ticker: window.requestAnimationFrame.bind(window),
+});
 
 function zero() {
   return 0;
@@ -52,82 +59,109 @@ function mergeDiffObj(a, b, onRemove) {
   return ret;
 }
 
-// TODO: refactor common logic with updateCurrV
 // TODO: tests
-function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
+function updateState(state, endValue, timeStep, k, b) {
+  const {currVals, currV} = state;
+
   if (endValue === null) {
-    return null;
-  }
-  if (endValue._isReactElement) {
-    return endValue;
-  }
-  if (typeof endValue === 'number') {
-    if (k == null || b == null) {
-      return endValue;
-    }
-    // TODO: do something to stepper to make this not allocate (2 steppers?)
-    return stepper(frameRate, currVals, currV, endValue, k, b)[0];
-  }
-  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
-    return endValue;
-  }
-  if (endValue.val != null) {
-    const [_k, _b] = endValue.config || [170, 26];
     return {
-      val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
-      config: endValue.config,
+      currVals: null,
+      currV: null,
     };
   }
-  if (Array.isArray(endValue)) {
-    return endValue.map((_, i) => updateCurrVals(frameRate, currVals[i], currV[i], endValue[i], k, b));
+
+  if (endValue._isReactElement) {
+    return {
+      currVals: endValue,
+      currV: endValue,
+    };
   }
+
+  if (typeof endValue === 'number') {
+    if (k == null || b == null) {
+      return {
+        currVals: endValue,
+        currV: mapTree(zero, currV),
+      };
+    }
+
+    const [x, v] = stepper(timeStep, currVals, currV, endValue, k, b);
+
+    return {
+      currVals: x,
+      currV: v,
+    };
+  }
+
+  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
+    return {
+      currVals: endValue,
+      currV: mapTree(zero, currV),
+    };
+  }
+
+  if (endValue.val != null) {
+    const [_k, _b] = endValue.config || [170, 26];
+
+    const tempState = updateState({
+      currVals: currVals.val,
+      currV: currV.val,
+    }, endValue.val, timeStep, _k, _b);
+
+    return {
+      currVals: {
+        val: tempState.currVals,
+        config: endValue.config,
+      },
+      currV: {
+        val: tempState.currV,
+        config: endValue.config,
+      },
+    };
+  }
+
+  if (Array.isArray(endValue)) {
+    return endValue.reduce(
+      (ret, _, i) => {
+        const tempState = updateState({
+          currVals: currVals[i],
+          currV: currV[i],
+        }, endValue[i], timeStep, k, b);
+
+        ret.currVals.push(tempState.currVals);
+        ret.currV.push(tempState.currV);
+
+        return ret;
+      },
+      {
+        currVals: [],
+        currV: [],
+      }
+    );
+  }
+
   if (Object.prototype.toString.call(endValue) === '[object Object]') {
-    const ret = {};
+    const ret = {
+      currVals: {},
+      currV: {},
+    };
     Object.keys(endValue).forEach(key => {
-      ret[key] = updateCurrVals(frameRate, currVals[key], currV[key], endValue[key], k, b);
+      const tempState = updateState({
+        currVals: currVals[key],
+        currV: currV[key],
+      }, endValue[key], timeStep, k, b);
+
+      ret.currVals[key] = tempState.currVals;
+      ret.currV[key] = tempState.currV;
     });
     return ret;
   }
-  return endValue;
-}
 
-function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
-  if (endValue === null) {
-    return null;
-  }
-  if (endValue._isReactElement) {
-    return endValue;
-  }
-  if (typeof endValue === 'number') {
-    if (k == null || b == null) {
-      return mapTree(zero, currV);
-    }
-    // TODO: do something to stepper to make this not allocate (2 steppers?)
-    return stepper(frameRate, currVals, currV, endValue, k, b)[1];
-  }
-  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
-    return mapTree(zero, currV);
-  }
-  if (endValue.val != null) {
-    const [_k, _b] = endValue.config || [170, 26];
-    return {
-      val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
-      config: endValue.config,
-    };
-  }
-  if (Array.isArray(endValue)) {
-    return endValue.map((_, i) => updateCurrV(frameRate, currVals[i], currV[i], endValue[i], k, b));
-  }
-  if (Object.prototype.toString.call(endValue) === '[object Object]') {
-    const ret = {};
-    Object.keys(endValue).forEach(key => {
-      ret[key] = updateCurrV(frameRate, currVals[key], currV[key], endValue[key], k, b);
-    });
-    return ret;
-  }
-  return mapTree(zero, currV);
+  return {
+    currVals: endValue,
+    currV: mapTree(zero, currV),
+  };
 }
-
 
 function noSpeed(coll) {
   if (Array.isArray(coll)) {
@@ -158,68 +192,54 @@ const Spring = React.createClass({
     return {
       currVals: endValue,
       currV: mapTree(zero, endValue),
-      now: null,
     };
   },
 
   componentDidMount() {
-    this.raf(true, false);
+    this.startAnimating();
   },
 
   componentWillReceiveProps() {
-    this.raf(true, false);
+    this.startAnimating();
   },
 
   componentWillUnmount() {
-    cancelAnimationFrame(this._rafID);
+    if (this.unsubscribeAnimation) {
+      this.unsubscribeAnimation();
+      this.unsubscribeAnimation = undefined;
+    }
   },
 
-  _rafID: null,
-
-  raf(justStarted, isLastRaf) {
-    if (justStarted && this._rafID != null) {
-      // already rafing
-      return;
+  startAnimating() {
+    if (!this.unsubscribeAnimation) {
+      this.unsubscribeAnimation = animationLoop.subscribe(
+        this.state, this.animationStep, this.animationRender
+      );
+      animationLoop.start();
     }
-    this._rafID = requestAnimationFrame(() => {
-      const {currVals, currV, now} = this.state;
-      let {endValue} = this.props;
+  },
 
-      if (typeof endValue === 'function') {
-        endValue = endValue(currVals);
-      }
-      const frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
+  animationStep(state, timeStep) {
+    const {currVals, currV} = state;
+    let {endValue} = this.props;
 
-      const newCurrVals = updateCurrVals(frameRate, currVals, currV, endValue);
-      const newCurrV = updateCurrV(frameRate, currVals, currV, endValue);
+    if (typeof endValue === 'function') {
+      endValue = endValue(currVals);
+    }
 
-      this.setState(() => {
-        return {
-          currVals: newCurrVals,
-          currV: newCurrV,
-          now: Date.now(),
-        };
-      });
+    const nextState = updateState(state, endValue, timeStep / 1000);
 
-      const stop = noSpeed(newCurrV);
-      if (stop && !justStarted) {
-        // this flag is necessary, because in `endValue` callback, the user
-        // might check that the current value has reached the destination, and
-        // decide to return a new destination value. However, since s/he's
-        // accessing the last tick's current value, and if we stop rafing after
-        // speed is 0, the next `endValue` is never called and we never detect
-        // the new chained animation. isLastRaf ensures that we raf a single
-        // more time in case the user wants to chain another animation at the
-        // end of this one
-        if (isLastRaf) {
-          this._rafID = null;
-        } else {
-          this.raf(false, true);
-        }
-      } else {
-        this.raf(false, false);
-      }
-    });
+    if (noSpeed(currV) && noSpeed(nextState.currV)) {
+      this.unsubscribeAnimation();
+      this.unsubscribeAnimation = undefined;
+    }
+
+    return nextState;
+  },
+
+  animationRender(state) {
+    // TODO: Interpolation
+    this.setState(state);
   },
 
   render() {
@@ -272,78 +292,70 @@ export const TransitionSpring = React.createClass({
     return {
       currVals: endValue,
       currV: mapTree(zero, endValue),
-      now: null,
     };
   },
 
   componentDidMount() {
-    this.raf(true, false);
+    this.startAnimating();
   },
 
   componentWillReceiveProps() {
-    this.raf(true, false);
+    this.startAnimating();
   },
 
   componentWillUnmount() {
-    cancelAnimationFrame(this._rafID);
+    if (this.unsubscribeAnimation) {
+      this.unsubscribeAnimation();
+      this.unsubscribeAnimation = undefined;
+    }
   },
 
-  _rafID: null,
-
-  raf(justStarted, isLastRaf) {
-    if (justStarted && this._rafID != null) {
-      // already rafing
-      return;
-    }
-    this._rafID = requestAnimationFrame(() => {
-      let {currVals, currV} = this.state;
-      const {now} = this.state;
-      let {endValue} = this.props;
-      const {willEnter, willLeave} = this.props;
-
-      if (typeof endValue === 'function') {
-        endValue = endValue(currVals);
-      }
-
-      const mergedVals = mergeDiffObj(
-        currVals,
-        endValue,
-        key => willLeave(key, endValue, currVals, currV)
+  startAnimating() {
+    if (!this.unsubscribeAnimation) {
+      this.unsubscribeAnimation = animationLoop.subscribe(
+        this.state, this.animationStep, this.animationRender
       );
+      animationLoop.start();
+    }
+  },
 
-      currVals = clone(currVals);
-      currV = clone(currV);
-      Object.keys(mergedVals)
-        .filter(key => !currVals.hasOwnProperty(key))
-        .forEach(key => {
-          currVals[key] = willEnter(key, endValue, currVals, currV);
-          currV[key] = mapTree(zero, currVals[key]);
-        });
+  animationStep(state, timeStep) {
+    let {currVals, currV} = state;
+    let {endValue} = this.props;
+    const {willEnter, willLeave} = this.props;
 
-      const frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
+    if (typeof endValue === 'function') {
+      endValue = endValue(currVals);
+    }
 
-      const newCurrVals = updateCurrVals(frameRate, currVals, currV, mergedVals);
-      const newCurrV = updateCurrV(frameRate, currVals, currV, mergedVals);
+    const mergedVals = mergeDiffObj(
+      currVals,
+      endValue,
+      key => willLeave(key, endValue, currVals, currV)
+    );
 
-      this.setState(() => {
-        return {
-          currVals: newCurrVals,
-          currV: newCurrV,
-          now: Date.now(),
-        };
+    currVals = clone(currVals);
+    currV = clone(currV);
+    Object.keys(mergedVals)
+      .filter(key => !currVals.hasOwnProperty(key))
+      .forEach(key => {
+        currVals[key] = willEnter(key, endValue, currVals, currV);
+        currV[key] = mapTree(zero, currVals[key]);
       });
 
-      const stop = noSpeed(newCurrV);
-      if (stop && !justStarted) {
-        if (isLastRaf) {
-          this._rafID = null;
-        } else {
-          this.raf(false, true);
-        }
-      } else {
-        this.raf(false, false);
-      }
-    });
+    const nextState = updateState({currVals, currV}, mergedVals, timeStep / 1000);
+
+    if (noSpeed(currV) && noSpeed(nextState.currV)) {
+      this.unsubscribeAnimation();
+      this.unsubscribeAnimation = undefined;
+    }
+
+    return nextState;
+  },
+
+  animationRender(state) {
+    // TODO: Interpolation
+    this.setState(state);
   },
 
   render() {
