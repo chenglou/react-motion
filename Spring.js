@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import {range, mapTree, clone} from './utils';
+import {mapTree, clone} from './utils';
 import stepper from './stepper';
 
 // ---------
@@ -39,7 +39,7 @@ function mergeDiff(collA, collB, onRemove, accum) {
 }
 
 function mergeDiffObj(a, b, onRemove) {
-  const keys = mergeDiff(Object.keys(a), Object.keys(b), a => !onRemove(a), []);
+  const keys = mergeDiff(Object.keys(a), Object.keys(b), _a => !onRemove(_a), []);
   const ret = {};
   keys.forEach(key => {
     if (b.hasOwnProperty(key)) {
@@ -140,7 +140,7 @@ function noSpeed(coll) {
 }
 
 
-export default React.createClass({
+const Spring = React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
       PropTypes.func,
@@ -225,8 +225,11 @@ export default React.createClass({
   render() {
     const {currVals} = this.state;
     return React.Children.only(this.props.children(currVals));
-  }
+  },
 });
+
+
+export default Spring;
 
 
 export const TransitionSpring = React.createClass({

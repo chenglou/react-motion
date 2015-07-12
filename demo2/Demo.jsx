@@ -3,19 +3,19 @@ import Spring from '../Spring';
 import {range, reinsert, clamp} from '../utils';
 
 // TODO: start at center, not upper left
-let allColors = [
+const allColors = [
   '#EF767A', '#456990', '#49BEAA', '#49DCB1', '#EEB868', '#EF767A', '#456990',
-  '#49BEAA', '#49DCB1', '#EEB868', '#EF767A'
+  '#49BEAA', '#49DCB1', '#EEB868', '#EF767A',
 ];
-let [count, width, height, top, left] = [11, 70, 90, 100, 150];
+const [count, width, height, top, left] = [11, 70, 90, 100, 150];
 // indexed by visual position
-let layout = range(count).map(n => {
-  let row = Math.floor(n / 3);
-  let col = n % 3;
+const layout = range(count).map(n => {
+  const row = Math.floor(n / 3);
+  const col = n % 3;
   return [width * col, height * row];
 });
 
-let Demo = React.createClass({
+const Demo = React.createClass({
   getInitialState() {
     return {
       mouse: [0, 0],
@@ -36,19 +36,19 @@ let Demo = React.createClass({
   },
 
   handleMouseMove({pageX, pageY}) {
-    let {order, lastPress, isPressed, delta: [dx, dy]} = this.state;
+    const {order, lastPress, isPressed, delta: [dx, dy]} = this.state;
     if (isPressed) {
-      let col = clamp(Math.floor((pageX - left) / width), 0, 2);
-      let row = clamp(Math.floor((pageY - top) / height), 0, Math.floor(count / 3));
-      let index = row * 3 + col;
-      let newOrder = reinsert(order, order.indexOf(lastPress), index);
+      const col = clamp(Math.floor((pageX - left) / width), 0, 2);
+      const row = clamp(Math.floor((pageY - top) / height), 0, Math.floor(count / 3));
+      const index = row * 3 + col;
+      const newOrder = reinsert(order, order.indexOf(lastPress), index);
       this.setState({mouse: [pageX - dx, pageY - dy], order: newOrder});
     }
   },
 
   handleMouseDown(key, [pressX, pressY], {pageX, pageY}) {
-    let dx = pageX - pressX;
-    let dy = pageY - pressY;
+    const dx = pageX - pressX;
+    const dy = pageY - pressY;
     this.setState({
       lastPress: key,
       isPressed: true,
@@ -62,24 +62,24 @@ let Demo = React.createClass({
   },
 
   getValues() {
-    let {order, lastPress, isPressed, mouse} = this.state;
+    const {order, lastPress, isPressed, mouse} = this.state;
     return {
       order: order.map((_, key) => {
         if (key === lastPress && isPressed) {
           return {val: mouse, config: []};
         }
-        let visualPosition = order.indexOf(key);
+        const visualPosition = order.indexOf(key);
         return {val: layout[visualPosition], config: [120, 17]};
       }),
       scales: {
         val: range(count).map((_, key) => lastPress === key && isPressed ? 1.2 : 1),
         config: [180, 10],
-      }
+      },
     };
   },
 
   render() {
-    let {order, lastPress} = this.state;
+    const {order, lastPress} = this.state;
     return (
       <Spring endValue={this.getValues}>
         {({order: currOrder, scales: {val: scales}}) =>
@@ -108,7 +108,7 @@ let Demo = React.createClass({
         }
       </Spring>
     );
-  }
+  },
 });
 
 export default Demo;

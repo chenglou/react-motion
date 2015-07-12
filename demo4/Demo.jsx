@@ -1,7 +1,7 @@
 import React from 'react';
 import {TransitionSpring} from '../Spring';
 
-let Demo = React.createClass({
+const Demo = React.createClass({
   getInitialState() {
     return {
       photos: {
@@ -17,12 +17,12 @@ let Demo = React.createClass({
   },
 
   handleChange({target: {value}}) {
-    let {currPhoto, photos} = this.state;
+    const {photos} = this.state;
     this.setState({currPhoto: value});
-    if (parseInt(value) === Object.keys(photos).length - 1) {
-      let w = Math.floor(Math.random() * 500 + 200);
-      let h = Math.floor(Math.random() * 500 + 200);
-      let hash = (Math.random() + '').slice(3);
+    if (parseInt(value, 10) === Object.keys(photos).length - 1) {
+      const w = Math.floor(Math.random() * 500 + 200);
+      const h = Math.floor(Math.random() * 500 + 200);
+      const hash = (Math.random() + '').slice(3);
       this.setState({
         photos: {
           ...photos,
@@ -40,24 +40,24 @@ let Demo = React.createClass({
   },
 
   getValues() {
-    let {photos, currPhoto} = this.state;
-    let keys = Object.keys(photos);
-    let currKey = keys[currPhoto];
-    let [width, height] = photos[currKey];
-    let widths = keys.map(key => {
-      let [origW, origH] = photos[key];
+    const {photos, currPhoto} = this.state;
+    const keys = Object.keys(photos);
+    const currKey = keys[currPhoto];
+    const [width, height] = photos[currKey];
+    const widths = keys.map(key => {
+      const [origW, origH] = photos[key];
       return height / origH * origW;
     });
     let offset = 0;
-    for (var i = 0; i < widths.length; i++) {
+    for (let i = 0; i < widths.length; i++) {
       if (keys[i] === currKey) {
         break;
       }
       offset -= widths[i];
     }
-    let configs = {};
+    const configs = {};
     keys.reduce((prevLeft, key, i) => {
-      let [origW, origH] = photos[key];
+      const [origW, origH] = photos[key];
       configs[key] = {
         val: {
           left: prevLeft,
@@ -73,7 +73,7 @@ let Demo = React.createClass({
   },
 
   render() {
-    let {photos, currPhoto} = this.state;
+    const {photos, currPhoto} = this.state;
     return (
       <div>
         <div>When you scroll to the end, wait for the images to load.</div>
@@ -101,7 +101,7 @@ let Demo = React.createClass({
         </TransitionSpring>
       </div>
     );
-  }
+  },
 });
 
 export default Demo;

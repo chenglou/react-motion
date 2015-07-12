@@ -1,7 +1,7 @@
 import React from 'react';
 import Spring from '../Spring';
 
-let Demo = React.createClass({
+const Demo = React.createClass({
   getInitialState() {
     return {open: false};
   },
@@ -28,7 +28,7 @@ let Demo = React.createClass({
         </Spring>
       </div>
     );
-  }
+  },
 });
 
 export default Demo;
