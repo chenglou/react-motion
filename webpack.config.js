@@ -22,8 +22,7 @@ if (DEV) {
   devtool = 'eval-source-map';
   loaders = ['react-hot'].concat(loaders);
   plugins = plugins.concat([
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
+    new webpack.HotModuleReplacementPlugin()
   ]);
   entry = Object.keys(entry).reduce(function (result, key) {
     result[key] = [
@@ -52,11 +51,14 @@ module.exports = {
       test: /\.jsx?$/,
       exclude: /build|node_modules/,
       loaders: loaders
-    }]
+    }],
+    preLoaders: [
+      {test: /\.jsx?$/, loader: 'eslint', exclude: /build|node_modules/},
+    ],
   },
   resolve: {
     extensions: ['', '.js', '.jsx']
   },
-  plugins: plugins
+  plugins: plugins,
+  eslint: {configFile: '.eslintrc'},
 };
-
