@@ -5,8 +5,12 @@ var port = process.env.PORT || 3000;
 
 new WebpackDevServer(webpack(config), {
   publicPath: config.output.publicPath,
-  hot: true
-}).listen(port, 'localhost', function (err, result) {
+  hot: true,
+  stats: {
+    chunkModules: false,
+    colors: true
+  }
+}).listen(port, 'localhost', function (err) {
   if (err) {
     console.log(err);
   }
