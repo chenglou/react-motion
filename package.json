@@ -24,7 +24,7 @@
   "scripts": {
     "start": "NODE_ENV=development node server.js",
     "build": "NODE_ENV=production webpack -p",
-    "lint": "eslint Spring.jsx stepper.js utils.js",
+    "lint": "eslint .",
     "prerelease": "NODE_ENV=production webpack --config webpack.prod.config.js",
     "test": "mocha --compilers js:babel/register --recursive test",
     "test:dev": "npm test -- --watch",
