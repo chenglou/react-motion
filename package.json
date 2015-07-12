@@ -25,7 +25,7 @@
   "scripts": {
     "start": "NODE_ENV=development node server.js",
     "build": "NODE_ENV=production webpack -p",
-    "lint": "eslint .",
+    "lint": "eslint --ext .js,.jsx .",
     "prerelease": "NODE_ENV=production webpack --config webpack.prod.config.js",
     "test": "mocha --compilers js:babel/register --recursive test",
     "test:dev": "npm test -- --watch",

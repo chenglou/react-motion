@@ -1,7 +1,7 @@
 import React from 'react';
 import {TransitionSpring} from '../Spring';
 
-let Demo = React.createClass({
+const Demo = React.createClass({
   getInitialState() {
     return {
       todos: {
@@ -30,25 +30,25 @@ let Demo = React.createClass({
 
   handleSubmit(e) {
     e.preventDefault();
-    let {todos, value} = this.state;
+    const {todos, value} = this.state;
     this.setState({
       todos: {
         ['t' + Date.now()]: {text: value, isDone: false},
         ...todos,
-      }
+      },
     });
   },
 
   handleDone(key) {
-    let {todos} = this.state;
+    const {todos} = this.state;
     todos[key].isDone = !todos[key].isDone;
     this.forceUpdate();
   },
 
   handleToggleAll() {
-    let {todos} = this.state;
-    let keys = Object.keys(todos);
-    let allDone = keys.every(date => todos[date].isDone);
+    const {todos} = this.state;
+    const keys = Object.keys(todos);
+    const allDone = keys.every(date => todos[date].isDone);
     keys.forEach(date => todos[date].isDone = !allDone);
     this.forceUpdate();
   },
@@ -58,9 +58,9 @@ let Demo = React.createClass({
   },
 
   handleClearCompleted() {
-    let {todos} = this.state;
-    let newTodos = {};
-    for (var prop in todos) {
+    const {todos} = this.state;
+    const newTodos = {};
+    for (const prop in todos) {
       if (!todos[prop].isDone) {
         newTodos[prop] = todos[prop];
       }
@@ -69,18 +69,18 @@ let Demo = React.createClass({
   },
 
   handleDestroy(date) {
-    let {todos} = this.state;
+    const {todos} = this.state;
     delete todos[date];
     this.forceUpdate();
   },
 
   // actual animation-related logic
   getValues() {
-    let {todos, value, selected} = this.state;
-    let configs = {};
+    const {todos, value, selected} = this.state;
+    const configs = {};
     Object.keys(todos)
       .filter(date => {
-        let todo = todos[date];
+        const todo = todos[date];
         return todo.text.toUpperCase().indexOf(value.toUpperCase()) >= 0 &&
           (selected === 'completed' && todo.isDone ||
           selected === 'active' && !todo.isDone ||
@@ -116,7 +116,7 @@ let Demo = React.createClass({
   },
 
   render() {
-    let {todos, value, selected} = this.state;
+    const {todos, value, selected} = this.state;
     return (
       <section className="todoapp">
         <header className="header">
@@ -132,14 +132,15 @@ let Demo = React.createClass({
           </form>
         </header>
         <section className="main">
-          <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll}/>
-          <TransitionSpring endValue={this.getValues} willLeave={this.willLeave} willEnter={this.willEnter}>
+          <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll} />
+          <TransitionSpring endValue={this.getValues} willLeave={this.willLeave}
+            willEnter={this.willEnter}>
             {configs =>
               <ul className="todo-list">
                 {Object.keys(configs).map(date => {
-                  let config = configs[date];
-                  let {data: {isDone, text}, height, opacity} = config;
-                  let style = {height: height.val, opacity: opacity.val};
+                  const config = configs[date];
+                  const {data: {isDone, text}, height, opacity} = config;
+                  const style = {height: height.val, opacity: opacity.val};
                   return (
                     <li key={date} style={style} className={isDone ? 'completed' : ''}>
                       <div className="view">
@@ -197,7 +198,7 @@ let Demo = React.createClass({
         </footer>
       </section>
     );
-  }
+  },
 });
 
 export default Demo;

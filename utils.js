@@ -1,5 +1,3 @@
-'use strict';
-
 // damn it JS
 export function clone(coll) {
   return JSON.parse(JSON.stringify(coll));
@@ -10,12 +8,14 @@ export function eq(a, b) {
 }
 
 export function range(start, afterStop) {
+  let _afterStop = afterStop;
+  let _start = start;
   if (afterStop == null) {
-    afterStop = start;
-    start = 0;
+    _afterStop = start;
+    _start = 0;
   }
   const ret = [];
-  for (let i = start; i < afterStop; i++) {
+  for (let i = _start; i < _afterStop; i++) {
     ret.push(i);
   }
   return ret;
@@ -43,7 +43,7 @@ export function mapTree(f, ...rest) {
 
 function _reshapeTree(path, a, b, f) {
   if (a == null) {
-    throw 'wtf2';
+    throw new Error('wtf2');
   }
 
   if (b == null) {
@@ -81,15 +81,13 @@ export function toArr(obj) {
 }
 
 export function reinsert(arr, from, to) {
-  arr = clone(arr);
-  const val = arr[from];
-  arr.splice(from, 1);
-  arr.splice(to, 0, val);
-  return arr;
+  const _arr = arr.slice(0);
+  const val = _arr[from];
+  _arr.splice(from, 1);
+  _arr.splice(to, 0, val);
+  return _arr;
 }
 
 export function clamp(n, min, max) {
-  return n < min ? min
-    : n > max ? max
-    : n;
+  return Math.max(Math.min(n, max), min);
 }
