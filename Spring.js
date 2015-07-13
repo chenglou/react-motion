@@ -70,7 +70,7 @@ function interpolateVals(alpha, nextVals, prevVals) {
   if (nextVals._isReactElement) {
     return nextVals;
   }
-  if (typeof endValue === 'number') {
+  if (typeof nextVals === 'number') {
     return nextVals * alpha + prevVals * (1 - alpha);
   }
   if (nextVals.val != null && nextVals.config && nextVals.config.length === 0) {
