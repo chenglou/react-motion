@@ -59,108 +59,116 @@ function mergeDiffObj(a, b, onRemove) {
   return ret;
 }
 
-// TODO: tests
-function updateState(state, endValue, timeStep, k, b) {
-  const {currVals, currV} = state;
-
-  if (endValue === null) {
-    return {
-      currVals: null,
-      currV: null,
-    };
+// TODO: refactor common logic with updateCurrVals and updateCurrV
+function interpolateVals(alpha, nextVals, prevVals) {
+  if (nextVals === null) {
+    return null;
   }
-
-  if (endValue._isReactElement) {
-    return {
-      currVals: endValue,
-      currV: endValue,
-    };
+  if (prevVals == null) {
+    return nextVals;
   }
-
+  if (nextVals._isReactElement) {
+    return nextVals;
+  }
   if (typeof endValue === 'number') {
-    if (k == null || b == null) {
-      return {
-        currVals: endValue,
-        currV: mapTree(zero, currV),
-      };
-    }
-
-    const [x, v] = stepper(timeStep, currVals, currV, endValue, k, b);
-
+    return nextVals * alpha + prevVals * (1 - alpha);
+  }
+  if (nextVals.val != null && nextVals.config && nextVals.config.length === 0) {
+    return nextVals;
+  }
+  if (nextVals.val != null) {
     return {
-      currVals: x,
-      currV: v,
+      val: interpolateVals(alpha, nextVals.val, prevVals.val),
+      config: nextVals.config,
     };
   }
-
-  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
-    return {
-      currVals: endValue,
-      currV: mapTree(zero, currV),
-    };
+  if (Array.isArray(nextVals)) {
+    return nextVals.map((_, i) => interpolateVals(alpha, nextVals[i], prevVals[i]));
   }
-
-  if (endValue.val != null) {
-    const [_k, _b] = endValue.config || [170, 26];
-
-    const tempState = updateState({
-      currVals: currVals.val,
-      currV: currV.val,
-    }, endValue.val, timeStep, _k, _b);
-
-    return {
-      currVals: {
-        val: tempState.currVals,
-        config: endValue.config,
-      },
-      currV: {
-        val: tempState.currV,
-        config: endValue.config,
-      },
-    };
-  }
-
-  if (Array.isArray(endValue)) {
-    return endValue.reduce(
-      (ret, _, i) => {
-        const tempState = updateState({
-          currVals: currVals[i],
-          currV: currV[i],
-        }, endValue[i], timeStep, k, b);
-
-        ret.currVals.push(tempState.currVals);
-        ret.currV.push(tempState.currV);
-
-        return ret;
-      },
-      {
-        currVals: [],
-        currV: [],
-      }
-    );
-  }
-
-  if (Object.prototype.toString.call(endValue) === '[object Object]') {
-    const ret = {
-      currVals: {},
-      currV: {},
-    };
-    Object.keys(endValue).forEach(key => {
-      const tempState = updateState({
-        currVals: currVals[key],
-        currV: currV[key],
-      }, endValue[key], timeStep, k, b);
-
-      ret.currVals[key] = tempState.currVals;
-      ret.currV[key] = tempState.currV;
+  if (Object.prototype.toString.call(nextVals) === '[object Object]') {
+    const ret = {};
+    Object.keys(nextVals).forEach(key => {
+      ret[key] = interpolateVals(alpha, nextVals[key], prevVals[key]);
     });
     return ret;
   }
+  return nextVals;
+}
 
-  return {
-    currVals: endValue,
-    currV: mapTree(zero, currV),
-  };
+// TODO: refactor common logic with updateCurrV
+// TODO: tests
+function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
+  if (endValue === null) {
+    return null;
+  }
+  if (endValue._isReactElement) {
+    return endValue;
+  }
+  if (typeof endValue === 'number') {
+    if (k == null || b == null) {
+      return endValue;
+    }
+    // TODO: do something to stepper to make this not allocate (2 steppers?)
+    return stepper(frameRate, currVals, currV, endValue, k, b)[0];
+  }
+  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
+    return endValue;
+  }
+  if (endValue.val != null) {
+    const [_k, _b] = endValue.config || [170, 26];
+    return {
+      val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
+      config: endValue.config,
+    };
+  }
+  if (Array.isArray(endValue)) {
+    return endValue.map((_, i) => updateCurrVals(frameRate, currVals[i], currV[i], endValue[i], k, b));
+  }
+  if (Object.prototype.toString.call(endValue) === '[object Object]') {
+    const ret = {};
+    Object.keys(endValue).forEach(key => {
+      ret[key] = updateCurrVals(frameRate, currVals[key], currV[key], endValue[key], k, b);
+    });
+    return ret;
+  }
+  return endValue;
+}
+
+function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
+  if (endValue === null) {
+    return null;
+  }
+  if (endValue._isReactElement) {
+    return endValue;
+  }
+  if (typeof endValue === 'number') {
+    if (k == null || b == null) {
+      return mapTree(zero, currV);
+    }
+    // TODO: do something to stepper to make this not allocate (2 steppers?)
+    return stepper(frameRate, currVals, currV, endValue, k, b)[1];
+  }
+  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
+    return mapTree(zero, currV);
+  }
+  if (endValue.val != null) {
+    const [_k, _b] = endValue.config || [170, 26];
+    return {
+      val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
+      config: endValue.config,
+    };
+  }
+  if (Array.isArray(endValue)) {
+    return endValue.map((_, i) => updateCurrV(frameRate, currVals[i], currV[i], endValue[i], k, b));
+  }
+  if (Object.prototype.toString.call(endValue) === '[object Object]') {
+    const ret = {};
+    Object.keys(endValue).forEach(key => {
+      ret[key] = updateCurrV(frameRate, currVals[key], currV[key], endValue[key], k, b);
+    });
+    return ret;
+  }
+  return mapTree(zero, currV);
 }
 
 function noSpeed(coll) {
@@ -227,19 +235,25 @@ const Spring = React.createClass({
       endValue = endValue(currVals);
     }
 
-    const nextState = updateState(state, endValue, timeStep / 1000);
+    const nextVals = updateCurrVals(timeStep / 1000, currVals, currV, endValue);
+    const nextV = updateCurrV(timeStep / 1000, currVals, currV, endValue);
 
-    if (noSpeed(currV) && noSpeed(nextState.currV)) {
+    if (noSpeed(currV) && noSpeed(nextV)) {
       this.unsubscribeAnimation();
       this.unsubscribeAnimation = undefined;
     }
 
-    return nextState;
+    return {
+      currVals: nextVals,
+      currV: nextV,
+    };
   },
 
-  animationRender(state) {
-    // TODO: Interpolation
-    this.setState(state);
+  animationRender(alpha, nextState, prevState) {
+    this.setState({
+      currVals: interpolateVals(alpha, nextState.currVals, prevState.currVals),
+      currV: nextState.currV,
+    });
   },
 
   render() {
@@ -343,19 +357,25 @@ export const TransitionSpring = React.createClass({
         currV[key] = mapTree(zero, currVals[key]);
       });
 
-    const nextState = updateState({currVals, currV}, mergedVals, timeStep / 1000);
+    const nextVals = updateCurrVals(timeStep / 1000, currVals, currV, mergedVals);
+    const nextV = updateCurrV(timeStep / 1000, currVals, currV, mergedVals);
 
-    if (noSpeed(currV) && noSpeed(nextState.currV)) {
+    if (noSpeed(currV) && noSpeed(nextV)) {
       this.unsubscribeAnimation();
       this.unsubscribeAnimation = undefined;
     }
 
-    return nextState;
+    return {
+      currVals: nextVals,
+      currV: nextV,
+    };
   },
 
-  animationRender(state) {
-    // TODO: Interpolation
-    this.setState(state);
+  animationRender(alpha, nextState, prevState) {
+    this.setState({
+      currVals: interpolateVals(alpha, nextState.currVals, prevState.currVals),
+      currV: nextState.currV,
+    });
   },
 
   render() {

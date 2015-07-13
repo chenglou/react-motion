@@ -18,7 +18,10 @@ const prototype = {
 
     animationLoop.step = function step(subscriber) {
       if (subscriber.active) {
-        subscriber.value = subscriber.step(subscriber.value, timeStep);
+        const value = subscriber.value;
+
+        subscriber.prevValue = value;
+        subscriber.value = subscriber.step(value, timeStep);
       }
     };
 
@@ -29,6 +32,7 @@ const prototype = {
     const animationLoop = this;
     const subscriber = {
       value: value,
+      prevValue: value,
       step: step,
       render: render,
       active: true,
@@ -67,7 +71,7 @@ const prototype = {
 
     const alpha = 1 + animationLoop.accumulatedTime / timeStep;
     animationLoop.state.forEach(function render(subscriber) {
-      subscriber.render(subscriber.value, alpha);
+      subscriber.render(alpha, subscriber.value, subscriber.prevValue);
     });
 
     animationLoop.state = animationLoop.state.filter(isActiveSubscription);
