@@ -5,7 +5,7 @@ import createAnimationLoop from './src/animationLoop';
 
 // ---------
 const animationLoop = createAnimationLoop({
-  timeStep: 1000 / 60, // ms
+  timeStep: 1 / 60,
   timeScale: 1,
   maxSteps: 10,
   getTime: performance.now.bind(performance),
@@ -235,8 +235,8 @@ const Spring = React.createClass({
       endValue = endValue(currVals);
     }
 
-    const nextVals = updateCurrVals(timeStep / 1000, currVals, currV, endValue);
-    const nextV = updateCurrV(timeStep / 1000, currVals, currV, endValue);
+    const nextVals = updateCurrVals(timeStep, currVals, currV, endValue);
+    const nextV = updateCurrV(timeStep, currVals, currV, endValue);
 
     if (noSpeed(currV) && noSpeed(nextV)) {
       this.unsubscribeAnimation();
@@ -357,8 +357,8 @@ export const TransitionSpring = React.createClass({
         currV[key] = mapTree(zero, currVals[key]);
       });
 
-    const nextVals = updateCurrVals(timeStep / 1000, currVals, currV, mergedVals);
-    const nextV = updateCurrV(timeStep / 1000, currVals, currV, mergedVals);
+    const nextVals = updateCurrVals(timeStep, currVals, currV, mergedVals);
+    const nextV = updateCurrV(timeStep, currVals, currV, mergedVals);
 
     if (noSpeed(currV) && noSpeed(nextV)) {
       this.unsubscribeAnimation();

@@ -10,7 +10,13 @@ const prototype = {
 
   setOptions: function setOptions(options) {
     const animationLoop = this;
-    const timeStep = animationLoop.timeStep = options.timeStep;
+
+    // Seconds
+    const timeStep = options.timeStep;
+
+    // Milliseconds
+    animationLoop.timeStep = timeStep * 1000;
+
     animationLoop.timeScale = options.timeScale;
     animationLoop.maxSteps = options.maxSteps;
     animationLoop.getTime = options.getTime;
