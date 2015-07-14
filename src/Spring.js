@@ -149,7 +149,7 @@ export const Spring = React.createClass({
 
   getDefaultProps() {
     return {
-          component: 'div',
+      component: 'div',
     };
   },
   getInitialState() {
@@ -252,6 +252,7 @@ export const TransitionSpring = React.createClass({
       PropTypes.object,
       PropTypes.array,
     ]),
+    component: PropTypes.any,
     children: PropTypes.func.isRequired,
   },
 
@@ -259,6 +260,7 @@ export const TransitionSpring = React.createClass({
     return {
       willEnter: (key, value) => value,
       willLeave: () => null,
+      component: 'div',
     };
   },
 
@@ -385,7 +387,7 @@ export const TransitionSpring = React.createClass({
 
   render() {
     const {currVals} = this.state;
-    return React.Children.only(this.props.children(currVals));
+    return React.createElement(this.props.component, this.props, React.Children.only(this.props.children(currVals)));
   },
 });
 
