@@ -1,4 +1,4 @@
-function isPlainObject(obj) {
+export function isPlainObject(obj) {
   return obj ? typeof obj === 'object' &&
     Object.getPrototypeOf(obj) === Object.prototype : false;
 }
@@ -14,15 +14,15 @@ export function clone(coll) {
 
 // currenly a helper used for producing a tree of the same shape as the
 // input(s),  but with different values. It's technically not a real `map`
-// equivalent for trees, since it skips calling f on non-scalars.
+// equivalent for trees, since it skips calling f on non-numbers.
 
 // TODO: probably doesn't need path, stop allocating uselessly
 // TODO: don't need to map over many trees anymore
-// TODO: skipping non-scalars is weird and non-generic. Use pre-order traversal
+// TODO: skipping non-numbers is weird and non-generic. Use pre-order traversal
 // assume trees are of the same shape
 function _mapTree(path, f, trees) {
   const t1 = trees[0];
-  if (typeof t1 === 'number' || typeof t1 === 'string') {
+  if (typeof t1 === 'number') {
     return f(path, ...trees);
   }
   if (Array.isArray(t1)) {
