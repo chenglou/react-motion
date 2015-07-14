@@ -49,11 +49,11 @@ module.exports = {
   module: {
     loaders: [{
       test: /\.jsx?$/,
-      exclude: /build|node_modules/,
+      exclude: /build|lib|node_modules/,
       loaders: loaders
     }],
     preLoaders: [
-      {test: /\.jsx?$/, loader: 'eslint', exclude: /build|node_modules/},
+      {test: /\.jsx?$/, loader: 'eslint', exclude: /build|lib|node_modules/},
     ],
   },
   resolve: {

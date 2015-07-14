@@ -1,6 +1,6 @@
 import React from 'react';
-import Spring from '../Spring';
-import {range, reinsert, clamp} from '../utils';
+import {Spring} from '../src/Spring';
+import {range, reinsert, clamp} from '../src/utils';
 
 // TODO: start at center, not upper left
 const allColors = [

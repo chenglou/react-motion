@@ -1,9 +1,8 @@
 import React, {PropTypes} from 'react';
-import {mapTree, clone} from './utils';
+import {mapTree, clone, isPlainObject} from './utils';
 import stepper from './stepper';
-import createAnimationLoop from './src/animationLoop';
+import createAnimationLoop from './animationLoop';
 
-// ---------
 const animationLoop = createAnimationLoop({
   timeStep: 1 / 60,
   timeScale: 1,
@@ -96,13 +95,9 @@ function interpolateVals(alpha, nextVals, prevVals) {
 }
 
 // TODO: refactor common logic with updateCurrV
-// TODO: tests
-function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
+export function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
   if (endValue === null) {
     return null;
-  }
-  if (endValue._isReactElement) {
-    return endValue;
   }
   if (typeof endValue === 'number') {
     if (k == null || b == null) {
@@ -116,15 +111,18 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
   }
   if (endValue.val != null) {
     const [_k, _b] = endValue.config || [170, 26];
-    return {
+    let ret = {
       val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
-      config: endValue.config,
     };
+    if (endValue.config) {
+      ret.config = endValue.config;
+    }
+    return ret;
   }
   if (Array.isArray(endValue)) {
     return endValue.map((_, i) => updateCurrVals(frameRate, currVals[i], currV[i], endValue[i], k, b));
   }
-  if (Object.prototype.toString.call(endValue) === '[object Object]') {
+  if (isPlainObject(endValue)) {
     const ret = {};
     Object.keys(endValue).forEach(key => {
       ret[key] = updateCurrVals(frameRate, currVals[key], currV[key], endValue[key], k, b);
@@ -134,12 +132,9 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
   return endValue;
 }
 
-function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
+export function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
   if (endValue === null) {
     return null;
-  }
-  if (endValue._isReactElement) {
-    return endValue;
   }
   if (typeof endValue === 'number') {
     if (k == null || b == null) {
@@ -153,15 +148,18 @@ function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
   }
   if (endValue.val != null) {
     const [_k, _b] = endValue.config || [170, 26];
-    return {
+    let ret = {
       val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
-      config: endValue.config,
     };
+    if (endValue.config) {
+      ret.config = endValue.config;
+    }
+    return ret;
   }
   if (Array.isArray(endValue)) {
     return endValue.map((_, i) => updateCurrV(frameRate, currVals[i], currV[i], endValue[i], k, b));
   }
-  if (Object.prototype.toString.call(endValue) === '[object Object]') {
+  if (isPlainObject(endValue)) {
     const ret = {};
     Object.keys(endValue).forEach(key => {
       ret[key] = updateCurrV(frameRate, currVals[key], currV[key], endValue[key], k, b);
@@ -171,18 +169,17 @@ function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
   return mapTree(zero, currV);
 }
 
-function noSpeed(coll) {
+export function noSpeed(coll) {
   if (Array.isArray(coll)) {
     return coll.every(noSpeed);
   }
-  if (Object.prototype.toString.call(coll) === '[object Object]') {
+  if (isPlainObject(coll)) {
     return Object.keys(coll).every(key => key === 'config' ? true : noSpeed(coll[key]));
   }
-  return coll === 0;
+  return typeof coll === 'number' ? coll === 0 : true;
 }
 
-
-const Spring = React.createClass({
+export const Spring = React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
       PropTypes.func,
@@ -262,10 +259,6 @@ const Spring = React.createClass({
   },
 });
 
-
-export default Spring;
-
-
 export const TransitionSpring = React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
@@ -293,7 +286,7 @@ export const TransitionSpring = React.createClass({
 
   getDefaultProps() {
     return {
-      willEnter: (key, endValue) => endValue[key],
+      willEnter: (key, value) => value,
       willLeave: () => null,
     };
   },
@@ -342,20 +335,60 @@ export const TransitionSpring = React.createClass({
       endValue = endValue(currVals);
     }
 
-    const mergedVals = mergeDiffObj(
-      currVals,
-      endValue,
-      key => willLeave(key, endValue, currVals, currV)
-    );
+    let mergedVals;
 
-    currVals = clone(currVals);
-    currV = clone(currV);
-    Object.keys(mergedVals)
-      .filter(key => !currVals.hasOwnProperty(key))
-      .forEach(key => {
-        currVals[key] = willEnter(key, endValue, currVals, currV);
-        currV[key] = mapTree(zero, currVals[key]);
+    if (Array.isArray(endValue)) {
+      let currValsObj = {};
+      currVals.forEach(objWithKey => {
+        currValsObj[objWithKey.key] = objWithKey;
       });
+
+      let endValueObj = {};
+      endValue.forEach(objWithKey => {
+        endValueObj[objWithKey.key] = objWithKey;
+      });
+      let currVObj = {};
+      endValue.forEach(objWithKey => {
+        currVObj[objWithKey.key] = objWithKey;
+      });
+
+      const mergedValsObj = mergeDiffObj(
+        currValsObj,
+        endValueObj,
+        key => willLeave(key, endValue, currVals, currV)
+      );
+
+      let mergedValsKeys = Object.keys(mergedValsObj);
+      mergedVals = mergedValsKeys.map(key => mergedValsObj[key]);
+      mergedValsKeys
+        .filter(key => !currValsObj.hasOwnProperty(key))
+        .forEach(key => {
+          currValsObj[key] = willEnter(key, mergedValsObj[key], endValue, currVals, currV);
+          currVObj[key] = mapTree(zero, currValsObj[key]);
+        });
+
+      currVals = Object.keys(currValsObj).map(key => currValsObj[key]);
+      currV = Object.keys(currVObj).map(key => currVObj[key]);
+    } else {
+      // only other option is obj
+      mergedVals = mergeDiffObj(
+        currVals,
+        endValue,
+        // TODO: stop allocating like crazy in this whole code path
+        key => willLeave(key, endValue, currVals, currV)
+      );
+
+      // TODO: check if this is necessary
+      currVals = clone(currVals);
+      currV = clone(currV);
+      Object.keys(mergedVals)
+        .filter(key => !currVals.hasOwnProperty(key))
+        .forEach(key => {
+          // TODO: param format changed, check other demos
+          currVals[key] = willEnter(key, mergedVals[key], endValue, currVals, currV);
+          currV[key] = mapTree(zero, currVals[key]);
+        });
+    }
 
     const nextVals = updateCurrVals(timeStep, currVals, currV, mergedVals);
     const nextV = updateCurrV(timeStep, currVals, currV, mergedVals);

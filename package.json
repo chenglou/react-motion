@@ -1,8 +1,8 @@
 {
   "name": "react-motion",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "A spring that solves your animation problems.",
-  "main": "lib/Spring.js",
+  "main": "lib/react-motion.js",
   "peerDependencies": {
     "react": ">=0.13.2"
   },
@@ -24,12 +24,12 @@
   },
   "scripts": {
     "start": "NODE_ENV=development node server.js",
-    "build": "NODE_ENV=production webpack -p",
+    "build-demos": "NODE_ENV=production webpack -p",
     "lint": "eslint --ext .js,.jsx .",
-    "prerelease": "NODE_ENV=production webpack --config webpack.prod.config.js",
+    "prerelease": "babel src --out-dir lib && NODE_ENV=production webpack --config webpack.prod.config.js",
     "test": "mocha --compilers js:babel/register --recursive test",
     "test:dev": "npm test -- --watch",
-    "test:cov": "`npm bin`/babel-node `npm bin`/isparta cover --report text --report html `npm bin`/_mocha -- --recursive"
+    "test:cov": "`npm bin`/babel-node `npm bin`/isparta cover --report text --report html `npm bin`/_mocha -- --recursive src"
   },
   "repository": {
     "type": "git",

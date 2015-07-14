@@ -4,10 +4,10 @@
 	else if(typeof define === 'function' && define.amd)
 		define(["react"], factory);
 	else if(typeof exports === 'object')
-		exports["Spring"] = factory(require("react"));
+		exports["ReactMotion"] = factory(require("react"));
 	else
-		root["Spring"] = factory(root["React"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
+		root["ReactMotion"] = factory(root["React"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -44,7 +44,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.c = installedModules;
 
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "lib/";
+/******/ 	__webpack_require__.p = "build/";
 
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
@@ -56,27 +56,37 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
+	exports.__esModule = true;
+
+	var _Spring = __webpack_require__(1);
+
+	exports.Spring = _Spring.Spring;
+	exports.TransitionSpring = _Spring.TransitionSpring;
+	exports.utils = _Spring.utils;
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.updateCurrVals = updateCurrVals;
+	exports.updateCurrV = updateCurrV;
+	exports.noSpeed = noSpeed;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	function _slicedToArray(arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }
-
-	function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
-
-	var _react = __webpack_require__(1);
+	var _react = __webpack_require__(2);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _utils = __webpack_require__(2);
+	var _utils = __webpack_require__(3);
 
-	var _stepper = __webpack_require__(3);
+	var _stepper = __webpack_require__(4);
 
 	var _stepper2 = _interopRequireDefault(_stepper);
 
-	// ---------
 	var FRAME_RATE = 1 / 60;
 
 	function zero() {
@@ -84,28 +94,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	// TODO: test
-	function mergeDiff(_x5, _x6, _x7, _x8) {
+	function mergeDiff(_x, _x2, _x3, _x4) {
 	  var _again = true;
 
 	  _function: while (_again) {
-	    var collA = _x5,
-	        collB = _x6,
-	        onRemove = _x7,
-	        accum = _x8;
-	    _collA = a = aa = _collB = b = bb = undefined;
+	    var collA = _x,
+	        collB = _x2,
+	        onRemove = _x3,
+	        accum = _x4;
+	    a = aa = b = bb = undefined;
 	    _again = false;
-
-	    var _collA = _toArray(collA);
-
-	    var a = _collA[0];
-
-	    var aa = _collA.slice(1);
-
-	    var _collB = _toArray(collB);
-
-	    var b = _collB[0];
-
-	    var bb = _collB.slice(1);
+	    var a = collA[0];
+	    var aa = collA.slice(1);
+	    var b = collB[0];
+	    var bb = collB.slice(1);
 
 	    if (collA.length === 0 && collB.length === 0) {
 	      return accum;
@@ -115,57 +117,57 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (collB.length === 0) {
 	      if (onRemove(a)) {
-	        _x5 = aa;
-	        _x6 = collB;
-	        _x7 = onRemove;
-	        _x8 = accum;
+	        _x = aa;
+	        _x2 = collB;
+	        _x3 = onRemove;
+	        _x4 = accum;
 	        _again = true;
 	        continue _function;
 	      }
-	      _x5 = aa;
-	      _x6 = collB;
-	      _x7 = onRemove;
-	      _x8 = accum.concat(a);
+	      _x = aa;
+	      _x2 = collB;
+	      _x3 = onRemove;
+	      _x4 = accum.concat(a);
 	      _again = true;
 	      continue _function;
 	    }
 	    if (a === b) {
 	      // fails for ([undefined], [], () => true). but don't do that
-	      _x5 = aa;
-	      _x6 = bb;
-	      _x7 = onRemove;
-	      _x8 = accum.concat(a);
+	      _x = aa;
+	      _x2 = bb;
+	      _x3 = onRemove;
+	      _x4 = accum.concat(a);
 	      _again = true;
 	      continue _function;
 	    }
 	    if (collB.indexOf(a) === -1) {
 	      if (onRemove(a)) {
-	        _x5 = aa;
-	        _x6 = collB;
-	        _x7 = onRemove;
-	        _x8 = accum;
+	        _x = aa;
+	        _x2 = collB;
+	        _x3 = onRemove;
+	        _x4 = accum;
 	        _again = true;
 	        continue _function;
 	      }
-	      _x5 = aa;
-	      _x6 = collB;
-	      _x7 = onRemove;
-	      _x8 = accum.concat(a);
+	      _x = aa;
+	      _x2 = collB;
+	      _x3 = onRemove;
+	      _x4 = accum.concat(a);
 	      _again = true;
 	      continue _function;
 	    }
-	    _x5 = aa;
-	    _x6 = collB;
-	    _x7 = onRemove;
-	    _x8 = accum;
+	    _x = aa;
+	    _x2 = collB;
+	    _x3 = onRemove;
+	    _x4 = accum;
 	    _again = true;
 	    continue _function;
 	  }
 	}
 
 	function mergeDiffObj(a, b, onRemove) {
-	  var keys = mergeDiff(Object.keys(a), Object.keys(b), function (a) {
-	    return !onRemove(a);
+	  var keys = mergeDiff(Object.keys(a), Object.keys(b), function (_a) {
+	    return !onRemove(_a);
 	  }, []);
 	  var ret = {};
 	  keys.forEach(function (key) {
@@ -180,17 +182,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	// TODO: refactor common logic with updateCurrV
-	// TODO: tests
-	function updateCurrVals(frameRate, currVals, currV, endValue) {
-	  var k = arguments[4] === undefined ? 170 : arguments[4];
-	  var b = arguments[5] === undefined ? 26 : arguments[5];
 
+	function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
 	  if (endValue === null) {
 	    return null;
 	  }
 	  if (typeof endValue === 'number') {
+	    if (k == null || b == null) {
+	      return endValue;
+	    }
 	    // TODO: do something to stepper to make this not allocate (2 steppers?)
-	    return (0, _stepper2['default'])(frameRate, currVals, currV, endValue, k, b)[0];
+	    return _stepper2['default'](frameRate, currVals, currV, endValue, k, b)[0];
 	  }
 	  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
 	    return endValue;
@@ -198,22 +200,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (endValue.val != null) {
 	    var _ref = endValue.config || [170, 26];
 
-	    var _ref2 = _slicedToArray(_ref, 2);
+	    var _k = _ref[0];
+	    var _b = _ref[1];
 
-	    var _k = _ref2[0];
-	    var _b = _ref2[1];
-
-	    return {
-	      val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
-	      config: endValue.config
+	    var ret = {
+	      val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, _k, _b)
 	    };
+	    if (endValue.config) {
+	      ret.config = endValue.config;
+	    }
+	    return ret;
 	  }
-	  if (Object.prototype.toString.call(endValue) === '[object Array]') {
+	  if (Array.isArray(endValue)) {
 	    return endValue.map(function (_, i) {
 	      return updateCurrVals(frameRate, currVals[i], currV[i], endValue[i], k, b);
 	    });
 	  }
-	  if (Object.prototype.toString.call(endValue) === '[object Object]') {
+	  if (_utils.isPlainObject(endValue)) {
 	    var _ret = (function () {
 	      var ret = {};
 	      Object.keys(endValue).forEach(function (key) {
@@ -229,38 +232,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return endValue;
 	}
 
-	function updateCurrV(frameRate, currVals, currV, endValue) {
-	  var k = arguments[4] === undefined ? 170 : arguments[4];
-	  var b = arguments[5] === undefined ? 26 : arguments[5];
-
+	function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
 	  if (endValue === null) {
 	    return null;
 	  }
 	  if (typeof endValue === 'number') {
-	    return (0, _stepper2['default'])(frameRate, currVals, currV, endValue, k, b)[1];
+	    if (k == null || b == null) {
+	      return _utils.mapTree(zero, currV);
+	    }
+	    // TODO: do something to stepper to make this not allocate (2 steppers?)
+	    return _stepper2['default'](frameRate, currVals, currV, endValue, k, b)[1];
 	  }
 	  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
-	    return (0, _utils.mapTree)(zero, currV);
+	    return _utils.mapTree(zero, currV);
 	  }
 	  if (endValue.val != null) {
-	    var _ref3 = endValue.config || [170, 26];
+	    var _ref2 = endValue.config || [170, 26];
 
-	    var _ref32 = _slicedToArray(_ref3, 2);
+	    var _k = _ref2[0];
+	    var _b = _ref2[1];
 
-	    var _k = _ref32[0];
-	    var _b = _ref32[1];
-
-	    return {
-	      val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
-	      config: endValue.config
+	    var ret = {
+	      val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, _k, _b)
 	    };
+	    if (endValue.config) {
+	      ret.config = endValue.config;
+	    }
+	    return ret;
 	  }
-	  if (Object.prototype.toString.call(endValue) === '[object Array]') {
+	  if (Array.isArray(endValue)) {
 	    return endValue.map(function (_, i) {
 	      return updateCurrV(frameRate, currVals[i], currV[i], endValue[i], k, b);
 	    });
 	  }
-	  if (Object.prototype.toString.call(endValue) === '[object Object]') {
+	  if (_utils.isPlainObject(endValue)) {
 	    var _ret2 = (function () {
 	      var ret = {};
 	      Object.keys(endValue).forEach(function (key) {
@@ -273,26 +278,27 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (typeof _ret2 === 'object') return _ret2.v;
 	  }
-	  return (0, _utils.mapTree)(zero, currV);
+	  return _utils.mapTree(zero, currV);
 	}
 
 	function noSpeed(coll) {
-	  if (Object.prototype.toString.call(coll) === '[object Array]') {
+	  if (Array.isArray(coll)) {
 	    return coll.every(noSpeed);
 	  }
-	  if (Object.prototype.toString.call(coll) === '[object Object]') {
+	  if (_utils.isPlainObject(coll)) {
 	    return Object.keys(coll).every(function (key) {
 	      return key === 'config' ? true : noSpeed(coll[key]);
 	    });
 	  }
-	  return coll === 0;
+	  return typeof coll === 'number' ? coll === 0 : true;
 	}
 
-	exports['default'] = _react2['default'].createClass({
+	var Spring = _react2['default'].createClass({
 	  displayName: 'Spring',
 
 	  propTypes: {
-	    endValue: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.object, _react.PropTypes.array]).isRequired
+	    endValue: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.object, _react.PropTypes.array]).isRequired,
+	    children: _react.PropTypes.func.isRequired
 	  },
 
 	  getInitialState: function getInitialState() {
@@ -303,7 +309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return {
 	      currVals: endValue,
-	      currV: (0, _utils.mapTree)(zero, endValue),
+	      currV: _utils.mapTree(zero, endValue),
 	      now: null
 	    };
 	  },
@@ -376,26 +382,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  render: function render() {
 	    var currVals = this.state.currVals;
 
-	    return _react2['default'].createElement(
-	      'div',
-	      this.props,
-	      this.props.children(currVals)
-	    );
+	    return _react2['default'].Children.only(this.props.children(currVals));
 	  }
 	});
+
+	exports.Spring = Spring;
 	var TransitionSpring = _react2['default'].createClass({
 	  displayName: 'TransitionSpring',
 
 	  propTypes: {
 	    endValue: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.object]).isRequired,
 	    willLeave: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.object, _react.PropTypes.array]),
-	    willEnter: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.object, _react.PropTypes.array])
+	    willEnter: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.object, _react.PropTypes.array]),
+	    children: _react.PropTypes.func.isRequired
 	  },
 
 	  getDefaultProps: function getDefaultProps() {
 	    return {
-	      willEnter: function willEnter(key, endValue) {
-	        return endValue[key];
+	      willEnter: function willEnter(key, value) {
+	        return value;
 	      },
 	      willLeave: function willLeave() {
 	        return null;
@@ -411,7 +416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return {
 	      currVals: endValue,
-	      currV: (0, _utils.mapTree)(zero, endValue),
+	      currV: _utils.mapTree(zero, endValue),
 	      now: null
 	    };
 	  },
@@ -441,9 +446,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _state2 = _this2.state;
 	      var currVals = _state2.currVals;
 	      var currV = _state2.currV;
-	      var now = _state2.now;
+	      var now = _this2.state.now;
+	      var endValue = _this2.props.endValue;
 	      var _props = _this2.props;
-	      var endValue = _props.endValue;
 	      var willEnter = _props.willEnter;
 	      var willLeave = _props.willLeave;
 
@@ -451,18 +456,64 @@ return /******/ (function(modules) { // webpackBootstrap
 	        endValue = endValue(currVals);
 	      }
 
-	      var mergedVals = mergeDiffObj(currVals, endValue, function (key) {
-	        return willLeave(key, endValue, currVals, currV);
-	      });
+	      var mergedVals = undefined;
+	      if (Array.isArray(endValue)) {
+	        (function () {
+	          var currValsObj = {};
+	          currVals.forEach(function (objWithKey) {
+	            currValsObj[objWithKey.key] = objWithKey;
+	          });
 
-	      currVals = (0, _utils.clone)(currVals);
-	      currV = (0, _utils.clone)(currV);
-	      Object.keys(mergedVals).filter(function (key) {
-	        return !currVals.hasOwnProperty(key);
-	      }).forEach(function (key) {
-	        currVals[key] = willEnter(key, endValue, currVals, currV);
-	        currV[key] = (0, _utils.mapTree)(zero, currVals[key]);
-	      });
+	          var endValueObj = {};
+	          endValue.forEach(function (objWithKey) {
+	            endValueObj[objWithKey.key] = objWithKey;
+	          });
+	          var currVObj = {};
+	          endValue.forEach(function (objWithKey) {
+	            currVObj[objWithKey.key] = objWithKey;
+	          });
+
+	          var mergedValsObj = mergeDiffObj(currValsObj, endValueObj, function (key) {
+	            return willLeave(key, endValue, currVals, currV);
+	          });
+
+	          var mergedValsKeys = Object.keys(mergedValsObj);
+	          mergedVals = mergedValsKeys.map(function (key) {
+	            return mergedValsObj[key];
+	          });
+	          mergedValsKeys.filter(function (key) {
+	            return !currValsObj.hasOwnProperty(key);
+	          }).forEach(function (key) {
+	            currValsObj[key] = willEnter(key, mergedValsObj[key], endValue, currVals, currV);
+	            currVObj[key] = _utils.mapTree(zero, currValsObj[key]);
+	          });
+
+	          currVals = Object.keys(currValsObj).map(function (key) {
+	            return currValsObj[key];
+	          });
+	          currV = Object.keys(currVObj).map(function (key) {
+	            return currVObj[key];
+	          });
+	        })();
+	      } else {
+	        // only other option is obj
+	        mergedVals = mergeDiffObj(currVals, endValue,
+	        // TODO: stop allocating like crazy in this whole code path
+	        function (key) {
+	          return willLeave(key, endValue, currVals, currV);
+	        });
+
+	        // TODO: check if this is necessary
+	        currVals = _utils.clone(currVals);
+	        currV = _utils.clone(currV);
+	        Object.keys(mergedVals).filter(function (key) {
+	          return !currVals.hasOwnProperty(key);
+	        }).forEach(function (key) {
+	          // TODO: param format changed, check other demos
+	          currVals[key] = willEnter(key, mergedVals[key], endValue, currVals, currV);
+	          currV[key] = _utils.mapTree(zero, currVals[key]);
+	        });
+	      }
 
 	      var frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
 
@@ -493,11 +544,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  render: function render() {
 	    var currVals = this.state.currVals;
 
-	    return _react2['default'].createElement(
-	      'div',
-	      this.props,
-	      this.props.children(currVals)
-	    );
+	    return _react2['default'].Children.only(this.props.children(currVals));
 	  }
 	});
 
@@ -524,31 +571,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: numbers? strings?
 
 /***/ },
-/* 1 */
+/* 2 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports) {
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
+	exports.__esModule = true;
+	exports.isPlainObject = isPlainObject;
 	exports.clone = clone;
-	exports.eq = eq;
-	exports.range = range;
 	exports.mapTree = mapTree;
-	exports.reshapeTree = reshapeTree;
-	exports.toOj = toOj;
-	exports.toArr = toArr;
 	exports.reinsert = reinsert;
 	exports.clamp = clamp;
+	exports.range = range;
 
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+	function isPlainObject(obj) {
+	  return obj ? typeof obj === 'object' && Object.getPrototypeOf(obj) === Object.prototype : false;
+	}
 
 	// damn it JS
 
@@ -556,37 +600,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return JSON.parse(JSON.stringify(coll));
 	}
 
-	function eq(a, b) {
-	  return JSON.stringify(a) === JSON.stringify(b);
-	}
+	// export function eq(a, b) {
+	//   return JSON.stringify(a) === JSON.stringify(b);
+	// }
 
-	function range(start, afterStop) {
-	  if (afterStop == null) {
-	    afterStop = start;
-	    start = 0;
-	  }
-	  var ret = [];
-	  for (var i = start; i < afterStop; i++) {
-	    ret.push(i);
-	  }
-	  return ret;
-	}
+	// currenly a helper used for producing a tree of the same shape as the
+	// input(s),  but with different values. It's technically not a real `map`
+	// equivalent for trees, since it skips calling f on non-numbers.
 
-	// assume trees same are same
+	// TODO: probably doesn't need path, stop allocating uselessly
+	// TODO: don't need to map over many trees anymore
+	// TODO: skipping non-numbers is weird and non-generic. Use pre-order traversal
+	// assume trees are of the same shape
 	function _mapTree(path, f, trees) {
 	  var t1 = trees[0];
-	  if (Object.prototype.toString.call(t1) === '[object Array]') {
+	  if (typeof t1 === 'number') {
+	    return f.apply(undefined, [path].concat(trees));
+	  }
+	  if (Array.isArray(t1)) {
 	    return t1.map(function (_, i) {
-	      return _mapTree([].concat(_toConsumableArray(path), [i]), f, trees.map(function (val) {
+	      return _mapTree([].concat(path, [i]), f, trees.map(function (val) {
 	        return val[i];
 	      }));
 	    });
 	  }
-	  if (Object.prototype.toString.call(t1) === '[object Object]') {
+	  if (isPlainObject(t1)) {
 	    var _ret = (function () {
 	      var newTree = {};
 	      Object.keys(t1).forEach(function (key) {
-	        newTree[key] = _mapTree([].concat(_toConsumableArray(path), [key]), f, trees.map(function (val) {
+	        newTree[key] = _mapTree([].concat(path, [key]), f, trees.map(function (val) {
 	          return val[key];
 	        }));
 	      });
@@ -597,7 +639,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (typeof _ret === 'object') return _ret.v;
 	  }
-	  return f.apply(undefined, [path].concat(_toConsumableArray(trees)));
+	  // return last one just because
+	  return trees[trees.length - 1];
 	}
 
 	function mapTree(f) {
@@ -608,78 +651,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return _mapTree([], f, rest);
 	}
 
-	function _reshapeTree(path, a, b, f) {
-	  if (a == null) {
-	    throw 'wtf2';
-	  }
+	// function _reshapeTree(path, a, b, f) {
+	//   if (a == null) {
+	//     throw new Error('wtf2');
+	//   }
 
-	  if (b == null) {
-	    return f(path, a);
-	  }
+	//   if (b == null) {
+	//     return f(path, a);
+	//   }
 
-	  if (Object.prototype.toString.call(a) === '[object Array]') {
-	    return a.map(function (val, i) {
-	      return _reshapeTree([].concat(_toConsumableArray(path), [i]), val, b[i], f);
-	    });
-	  }
-	  if (Object.prototype.toString.call(a) === '[object Object]') {
-	    var _ret2 = (function () {
-	      var newTree = {};
-	      Object.keys(a).forEach(function (key) {
-	        newTree[key] = _reshapeTree([].concat(_toConsumableArray(path), [key]), a[key], b[key], f);
-	      });
-	      return {
-	        v: newTree
-	      };
-	    })();
+	//   if (Array.isArray(a)) {
+	//     return a.map((val, i) => _reshapeTree([...path, i], val, b[i], f));
+	//   }
+	//   if (Object.prototype.toString.call(a) === '[object Object]') {
+	//     const newTree = {};
+	//     Object.keys(a).forEach(key => {
+	//       newTree[key] = _reshapeTree([...path, key], a[key], b[key], f);
+	//     });
+	//     return newTree;
+	//   }
 
-	    if (typeof _ret2 === 'object') return _ret2.v;
-	  }
+	//   return b;
+	// }
 
-	  return b;
-	}
+	// export function reshapeTree(a, b, f) {
+	//   return _reshapeTree([], a, b, f);
+	// }
 
-	function reshapeTree(a, b, f) {
-	  return _reshapeTree([], a, b, f);
-	}
+	// export function toOj(vals, keys) {
+	//   const ret = {};
+	//   vals.forEach((val, i) => ret[keys[i]] = val);
+	//   return ret;
+	// }
 
-	function toOj(vals, keys) {
-	  var ret = {};
-	  vals.forEach(function (val, i) {
-	    return ret[keys[i]] = val;
-	  });
-	  return ret;
-	}
+	// export function toArr(obj) {
+	//   const keys = Object.keys(obj);
+	//   const vals = keys.map(k => obj[k]);
+	//   return [keys, vals];
+	// }
 
-	function toArr(obj) {
-	  var keys = Object.keys(obj);
-	  var vals = keys.map(function (k) {
-	    return obj[k];
-	  });
-	  return [keys, vals];
-	}
+	// TODO: these are for a demos, not for the library. Move
 
 	function reinsert(arr, from, to) {
-	  arr = clone(arr);
-	  var val = arr[from];
-	  arr.splice(from, 1);
-	  arr.splice(to, 0, val);
-	  return arr;
+	  var _arr = arr.slice(0);
+	  var val = _arr[from];
+	  _arr.splice(from, 1);
+	  _arr.splice(to, 0, val);
+	  return _arr;
 	}
 
 	function clamp(n, min, max) {
-	  return n < min ? min : n > max ? max : n;
+	  return Math.max(Math.min(n, max), min);
+	}
+
+	function range(start, afterStop) {
+	  var _afterStop = afterStop;
+	  var _start = start;
+	  if (afterStop == null) {
+	    _afterStop = start;
+	    _start = 0;
+	  }
+	  var ret = [];
+	  for (var i = _start; i < _afterStop; i++) {
+	    ret.push(i);
+	  }
+	  return ret;
 	}
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports) {
 
 	"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
+	exports.__esModule = true;
 	exports["default"] = stepper;
 	var errorMargin = 0.0001;
 
@@ -698,8 +743,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // let a = (Fspring + Fdamper) / mass;
 	  var a = Fspring + Fdamper;
 
-	  var newX = x + v * frameRate;
 	  var newV = v + a * frameRate;
+	  var newX = x + newV * frameRate;
 
 	  if (Math.abs(newV - v) < errorMargin && Math.abs(newX - x) < errorMargin) {
 	    return [destX, 0];

@@ -6,8 +6,8 @@ pids
 *.seed
 
 coverage
-
 node_modules
+lib
 
 .DS_Store
 all.js.map

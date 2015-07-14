@@ -1,5 +1,5 @@
 import React from 'react';
-import Spring from '../Spring';
+import {Spring} from '../src/Spring';
 
 const Demo = React.createClass({
   getInitialState() {

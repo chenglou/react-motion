@@ -1,7 +1,8 @@
 # React-Motion
 
+[![npm version](https://badge.fury.io/js/react-motion.svg)](https://www.npmjs.com/package/react-motion)
+[![Bower version](https://badge.fury.io/bo/react-motion.svg)](http://badge.fury.io/bo/react-motion)
 [![react-motion channel on slack](https://img.shields.io/badge/slack-react--motion%40reactiflux-61DAAA.svg?style=flat)](https://reactiflux.slack.com/messages/react-motion/)
-
 
 ```js
 <Spring endValue={{val: 10}}>
@@ -16,6 +17,10 @@ Npm:
 
 Bower:
 `bower install react-motion`
+
+1998 Script Tag:
+`<script src="path/to/react-motion/build/react-motion.js"></script>`
+(Module exposed as `ReactMotion`)
 
 [Check](https://cdn.rawgit.com/chenglou/react-motion/cffb3894f42e4825178d9c7c0313b2f4e9e65ab2/demo0/index.html) [Out](https://cdn.rawgit.com/chenglou/react-motion/cffb3894f42e4825178d9c7c0313b2f4e9e65ab2/demo1/index.html) [The](https://cdn.rawgit.com/chenglou/react-motion/cffb3894f42e4825178d9c7c0313b2f4e9e65ab2/demo2/index.html) [Cool](https://cdn.rawgit.com/chenglou/react-motion/cffb3894f42e4825178d9c7c0313b2f4e9e65ab2/demo3/index.html) [Demos](https://cdn.rawgit.com/chenglou/react-motion/072fef7b84b2d57187643baa4156ee2a7374655f/demo4/index.html).
 
@@ -183,9 +188,9 @@ Like `Spring`, but can takes two other props: `willEnter` and `willLeave`. Throu
 
 `endValue`: now constrained to an object of the shape `{key => yourStuff}` (the data is constrained to this shape, but that doesn't mean the way you use your interpolated value has to be). When your the `endValue` provide differs from the current interpolated value by an added/removed key:
 
-`willEnter`: a callback that's called **once** and is passed `(keyThatEnters, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration that'll serve as the starting value of that new key. That configuration will be merged into `endValue`. The default value of `willEnter` is `(key, endValue) => endValue[key]`. It returns the same configuration as the one you just specified in `endValue`. In other words, the start and end are the same: no animation.
+`willEnter`: a callback that's called **once** and is passed `(keyThatEnters, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration that'll serve as the starting value of that new key. That configuration will be merged into `endValue`. The default value of `willEnter` is `(key, endValue) => endValue[key]`. It returns the same configuration as the one you just specified in `endValue`. In other words, the start and end are the same: no animation.
 
-`willLeave`: a callback that's called **many** times and is passed `(keyThatLeaves, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration (which will serve as the new `endValue[keyThatLeaves]` and merged into `endValue`) to indicate you still want to keep the item around. Otherwise, return `null`.
+`willLeave`: a callback that's called **many** times and is passed `(keyThatLeaves, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration (which will serve as the new `endValue[keyThatLeaves]` and merged into `endValue`) to indicate you still want to keep the item around. Otherwise, return `null`.
 
 #### Sample Usage
 _(See the demo files for fuller ones.)_
@@ -223,7 +228,7 @@ let Demo = React.createClass({
     };
   },
 
-  willLeave(key, endValue, currentValue, currentSpeed) {
+  willLeave(key, value, endValue, currentValue, currentSpeed) {
     if (currentValue[key].opacity.val === 0 && currentSpeed[key].opacity.val === 0) {
       return null; // kill component when opacity reaches 0
     }
@@ -246,17 +251,20 @@ let Demo = React.createClass({
         endValue={this.getEndValue}
         willEnter={this.willEnter}
         willLeave={this.willLeave}>
-        {currentValue => Object.keys(currentValue).map(key => {
-          let style = {
-            height: currentValue[key].height.val,
-            opacity: currentValue[key].opacity.val,
-          };
-          return (
-            <div onClick={this.handleClick.bind(null, key)} style={style}>
-              {currentValue[key].text}
-            </div>
-          );
-        })}
+        {currentValue =>
+          <div>
+            {Object.keys(currentValue).map(key => {
+              let style = {
+                height: currentValue[key].height.val,
+                opacity: currentValue[key].opacity.val,
+              };
+              return (
+                <div onClick={this.handleClick.bind(null, key)} style={style}>
+                  {currentValue[key].text}
+                </div>
+              );
+            })}}
+          </div>
       </TransitionSpring>
     );
   }
