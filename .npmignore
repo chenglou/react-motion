@@ -8,3 +8,4 @@ test/
 .gitignore
 .npmignore
 webpack.config.js
+build/

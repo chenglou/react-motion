@@ -1,5 +1,5 @@
 import expect from 'expect';
-import * as u from '../utils';
+import * as u from '../src/utils';
 import React from 'react';
 
 describe('mapTree', () => {

@@ -1,6 +1,6 @@
 import React from 'react';
-import {Spring} from '../Spring';
-import {range} from '../utils';
+import {Spring} from '../src/Spring';
+import {range} from '../src/utils';
 
 const Demo = React.createClass({
   getInitialState() {

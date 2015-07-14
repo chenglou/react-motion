@@ -5,8 +5,8 @@ pids
 *.pid
 *.seed
 
+build
 coverage
-
 node_modules
 
 .DS_Store

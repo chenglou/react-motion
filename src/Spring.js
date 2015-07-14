@@ -251,7 +251,7 @@ export const TransitionSpring = React.createClass({
 
   getDefaultProps() {
     return {
-      willEnter: (key, endValue) => endValue[key],
+      willEnter: (key, value) => value,
       willLeave: () => null,
     };
   },
@@ -297,20 +297,59 @@ export const TransitionSpring = React.createClass({
         endValue = endValue(currVals);
       }
 
-      const mergedVals = mergeDiffObj(
-        currVals,
-        endValue,
-        key => willLeave(key, endValue, currVals, currV)
-      );
-
-      currVals = clone(currVals);
-      currV = clone(currV);
-      Object.keys(mergedVals)
-        .filter(key => !currVals.hasOwnProperty(key))
-        .forEach(key => {
-          currVals[key] = willEnter(key, endValue, currVals, currV);
-          currV[key] = mapTree(zero, currVals[key]);
+      let mergedVals;
+      if (Array.isArray(endValue)) {
+        let currValsObj = {};
+        currVals.forEach(objWithKey => {
+          currValsObj[objWithKey.key] = objWithKey;
         });
+
+        let endValueObj = {};
+        endValue.forEach(objWithKey => {
+          endValueObj[objWithKey.key] = objWithKey;
+        });
+        let currVObj = {};
+        endValue.forEach(objWithKey => {
+          currVObj[objWithKey.key] = objWithKey;
+        });
+
+        const mergedValsObj = mergeDiffObj(
+          currValsObj,
+          endValueObj,
+          key => willLeave(key, endValue, currVals, currV)
+        );
+
+        let mergedValsKeys = Object.keys(mergedValsObj);
+        mergedVals = mergedValsKeys.map(key => mergedValsObj[key]);
+        mergedValsKeys
+          .filter(key => !currValsObj.hasOwnProperty(key))
+          .forEach(key => {
+            currValsObj[key] = willEnter(key, mergedValsObj[key], endValue, currVals, currV);
+            currVObj[key] = mapTree(zero, currValsObj[key]);
+          });
+
+        currVals = Object.keys(currValsObj).map(key => currValsObj[key]);
+        currV = Object.keys(currVObj).map(key => currVObj[key]);
+      } else {
+        // only other option is obj
+        mergedVals = mergeDiffObj(
+          currVals,
+          endValue,
+          // TODO: stop allocating like crazy in this whole code path
+          key => willLeave(key, endValue, currVals, currV)
+        );
+
+        // TODO: check if this is necessary
+        currVals = clone(currVals);
+        currV = clone(currV);
+        Object.keys(mergedVals)
+          .filter(key => !currVals.hasOwnProperty(key))
+          .forEach(key => {
+            // TODO: param format changed, check other demos
+            currVals[key] = willEnter(key, mergedVals[key], endValue, currVals, currV);
+            currV[key] = mapTree(zero, currVals[key]);
+          });
+      }
 
       const frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
 

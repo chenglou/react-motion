@@ -1,5 +1,5 @@
 import expect from 'expect';
-import * as s from '../Spring';
+import * as s from '../src/Spring';
 import React from 'react';
 
 const FRAME_RATE = 1 / 60;
