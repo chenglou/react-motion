@@ -144,8 +144,14 @@ export const Spring = React.createClass({
       PropTypes.array,
     ]).isRequired,
     children: PropTypes.func.isRequired,
+    component: PropTypes.any,
   },
 
+  getDefaultProps() {
+    return {
+          component: 'div',
+    };
+  },
   getInitialState() {
     let {endValue} = this.props;
     if (typeof endValue === 'function') {
@@ -220,7 +226,7 @@ export const Spring = React.createClass({
 
   render() {
     const {currVals} = this.state;
-    return React.Children.only(this.props.children(currVals));
+    return React.createElement(this.props.component, this.props, React.Children.only(this.props.children(currVals)));
   },
 });
 

@@ -11,3 +11,9 @@ lib
 
 .DS_Store
 all.js.map
+
+
+# Intellij
+.idea/
+*.iml
+*.iws

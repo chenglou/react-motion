@@ -66,7 +66,7 @@ let Demo = React.createClass({
 The library exports a default `Spring`, a `TransitionSpring` and `utils`.
 
 ### &lt;Spring />
-Exposes a single prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
+Exposes a single required prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
 Type: `endValue: object | array | object -> (object | array)`.
 
 `endValue` can be of an arbitrary shape (**but must stay the same shape from one render to the next**). There are however 2 reserved keys: `val` and `config`. Say your initial data structure looks so:
@@ -181,6 +181,21 @@ getEndValues: function(currentPositions) {
   return {val: endValue, config: [120, 17]};
 },
 
+```
+Spring also exposes an optional "component" prop similar to [ReactTransitionGroup](https://facebook.github.io/react/docs/animation.html#rendering-a-different-component) that allows
+you to specify the wrapper component for the rendered children. Defaults to a 'div'.
+
+```jsx
+<Spring endValue={{size: {val: 10}, top: 20}} component="span">
+  {tweeningCollection => {
+    let style = {
+      width: tweeningCollection.size.val,
+      height: tweeningCollection.size.val,
+      top: tweeningCollection.top,
+    };
+    return <div style={style} />;
+  }}
+</Spring>
 ```
 
 ### &lt;TransitionSpring />
