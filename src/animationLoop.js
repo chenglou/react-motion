@@ -1,5 +1,18 @@
-function isActiveSubscription(subscription) {
-  return subscription.active;
+// This function is 3 to 5 times faster then Array.prototype.filter
+// but iterates in reverse and mutates the array. Worth it?
+function reverseFilter(array, callback, argument) {
+  let index = array.length;
+  while (index--) {
+    if (!callback(array[index], argument)) {
+      array.splice(index, 1);
+    }
+  }
+  return array;
+}
+
+function renderSubscriber(subscriber, alpha) {
+  subscriber.render(alpha, subscriber.value, subscriber.prevValue);
+  return subscriber.active;
 }
 
 const prototype = {
@@ -75,12 +88,12 @@ const prototype = {
       animationLoop.accumulatedTime -= timeStep;
     }
 
-    const alpha = 1 + animationLoop.accumulatedTime / timeStep;
-    animationLoop.state.forEach(function render(subscriber) {
-      subscriber.render(alpha, subscriber.value, subscriber.prevValue);
-    });
-
-    animationLoop.state = animationLoop.state.filter(isActiveSubscription);
+    // Render and filter in one iteration.
+    reverseFilter(
+      animationLoop.state,
+      renderSubscriber,
+      1 + animationLoop.accumulatedTime / timeStep
+    );
 
     if (!animationLoop.state.length) {
       animationLoop.shouldStop = true;
