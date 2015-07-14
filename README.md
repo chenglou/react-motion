@@ -188,9 +188,9 @@ Like `Spring`, but can takes two other props: `willEnter` and `willLeave`. Throu
 
 `endValue`: now constrained to an object of the shape `{key => yourStuff}` (the data is constrained to this shape, but that doesn't mean the way you use your interpolated value has to be). When your the `endValue` provide differs from the current interpolated value by an added/removed key:
 
-`willEnter`: a callback that's called **once** and is passed `(keyThatEnters, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration that'll serve as the starting value of that new key. That configuration will be merged into `endValue`. The default value of `willEnter` is `(key, endValue) => endValue[key]`. It returns the same configuration as the one you just specified in `endValue`. In other words, the start and end are the same: no animation.
+`willEnter`: a callback that's called **once** and is passed `(keyThatEnters, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration that'll serve as the starting value of that new key. That configuration will be merged into `endValue`. The default value of `willEnter` is `(key, endValue) => endValue[key]`. It returns the same configuration as the one you just specified in `endValue`. In other words, the start and end are the same: no animation.
 
-`willLeave`: a callback that's called **many** times and is passed `(keyThatLeaves, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration (which will serve as the new `endValue[keyThatLeaves]` and merged into `endValue`) to indicate you still want to keep the item around. Otherwise, return `null`.
+`willLeave`: a callback that's called **many** times and is passed `(keyThatLeaves, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration (which will serve as the new `endValue[keyThatLeaves]` and merged into `endValue`) to indicate you still want to keep the item around. Otherwise, return `null`.
 
 #### Sample Usage
 _(See the demo files for fuller ones.)_
@@ -228,7 +228,7 @@ let Demo = React.createClass({
     };
   },
 
-  willLeave(key, endValue, currentValue, currentSpeed) {
+  willLeave(key, value, endValue, currentValue, currentSpeed) {
     if (currentValue[key].opacity.val === 0 && currentSpeed[key].opacity.val === 0) {
       return null; // kill component when opacity reaches 0
     }

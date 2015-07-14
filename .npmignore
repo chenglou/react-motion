@@ -9,3 +9,4 @@ test/
 .npmignore
 webpack.config.js
 build/
+src/
