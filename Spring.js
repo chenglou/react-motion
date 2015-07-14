@@ -2,7 +2,6 @@ import React, {PropTypes} from 'react';
 import {mapTree, clone, isPlainObject} from './utils';
 import stepper from './stepper';
 
-// ---------
 const FRAME_RATE = 1 / 60;
 
 function zero() {
@@ -137,7 +136,7 @@ export function noSpeed(coll) {
   return typeof coll === 'number' ? coll === 0 : true;
 }
 
-const Spring = React.createClass({
+export const Spring = React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
       PropTypes.func,
@@ -224,10 +223,6 @@ const Spring = React.createClass({
     return React.Children.only(this.props.children(currVals));
   },
 });
-
-
-export default Spring;
-
 
 export const TransitionSpring = React.createClass({
   propTypes: {

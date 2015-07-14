@@ -1,5 +1,5 @@
 import React from 'react';
-import Spring from '../Spring';
+import {Spring} from '../Spring';
 import {range} from '../utils';
 
 const Demo = React.createClass({

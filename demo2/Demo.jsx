@@ -1,5 +1,5 @@
 import React from 'react';
-import Spring from '../Spring';
+import {Spring} from '../Spring';
 import {range, reinsert, clamp} from '../utils';
 
 // TODO: start at center, not upper left

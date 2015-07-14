@@ -4,7 +4,6 @@
 [![Bower version](https://badge.fury.io/bo/react-motion.svg)](http://badge.fury.io/bo/react-motion)
 [![react-motion channel on slack](https://img.shields.io/badge/slack-react--motion%40reactiflux-61DAAA.svg?style=flat)](https://reactiflux.slack.com/messages/react-motion/)
 
-
 ```js
 <Spring endValue={{val: 10}}>
   {interpolated => <div>{interpolated.val}</div>}
@@ -248,17 +247,20 @@ let Demo = React.createClass({
         endValue={this.getEndValue}
         willEnter={this.willEnter}
         willLeave={this.willLeave}>
-        {currentValue => Object.keys(currentValue).map(key => {
-          let style = {
-            height: currentValue[key].height.val,
-            opacity: currentValue[key].opacity.val,
-          };
-          return (
-            <div onClick={this.handleClick.bind(null, key)} style={style}>
-              {currentValue[key].text}
-            </div>
-          );
-        })}
+        {currentValue =>
+          <div>
+            {Object.keys(currentValue).map(key => {
+              let style = {
+                height: currentValue[key].height.val,
+                opacity: currentValue[key].opacity.val,
+              };
+              return (
+                <div onClick={this.handleClick.bind(null, key)} style={style}>
+                  {currentValue[key].text}
+                </div>
+              );
+            })}}
+          </div>
       </TransitionSpring>
     );
   }
