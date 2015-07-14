@@ -4,6 +4,47 @@ import React from 'react';
 
 const FRAME_RATE = 1 / 60;
 
+describe('TransitionSpring', ()=> {
+  it('should default to a "div" as a child wrapper component', ()=> {
+    const element = React.createElement(s.TransitionSpring, {endValue: {top: 100}}, () => {
+      return React.createElement('span')
+    });
+    const renderer = React.addons.TestUtils.createRenderer();
+    renderer.render(element);
+    const component = renderer.getRenderOutput();
+    expect(component.type).toEqual("div");
+  });
+  it('should allow a user to modify the containing component', ()=> {
+    const element = React.createElement(s.TransitionSpring, {endValue: {top: 100}, component: 'span'}, () => {
+      return React.createElement('span')
+    });
+    const renderer = React.addons.TestUtils.createRenderer();
+    renderer.render(element);
+    const component = renderer.getRenderOutput();
+    expect(component.type).toEqual("span");
+  });
+});
+describe('Spring', ()=> {
+  it('should default to a "div" as a child wrapper component', ()=> {
+    const element = React.createElement(s.Spring, {endValue: {top: 100}}, () => {
+      return React.createElement('span')
+    });
+    const renderer = React.addons.TestUtils.createRenderer();
+    renderer.render(element);
+    const component = renderer.getRenderOutput();
+    expect(component.type).toEqual("div");
+  });
+  it('should allow a user to modify the containing component', ()=> {
+    const element = React.createElement(s.Spring, {endValue: {top: 100}, component: 'span'}, () => {
+      return React.createElement('span')
+    });
+    const renderer = React.addons.TestUtils.createRenderer();
+    renderer.render(element);
+    const component = renderer.getRenderOutput();
+    expect(component.type).toEqual("span");
+  });
+});
+
 describe('updateCurrVals', () => {
   it('should not error on null', () => {
     expect(s.updateCurrVals(FRAME_RATE, {val: null}, {val: null}, {val: null}))

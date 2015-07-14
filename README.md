@@ -66,7 +66,7 @@ let Demo = React.createClass({
 The library exports a default `Spring`, a `TransitionSpring` and `utils`.
 
 ### &lt;Spring />
-Exposes a single prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
+Exposes a single required prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
 Type: `endValue: object | array | object -> (object | array)`.
 
 `endValue` can be of an arbitrary shape (**but must stay the same shape from one render to the next**). There are however 2 reserved keys: `val` and `config`. Say your initial data structure looks so:
@@ -182,6 +182,21 @@ getEndValues: function(currentPositions) {
 },
 
 ```
+Spring also exposes an optional "component" prop, similar to [ReactTransitionGroup](https://facebook.github.io/react/docs/animation.html#rendering-a-different-component), that allows
+you to specify the wrapper component for the rendered children. Defaults to a 'div'.
+
+```jsx
+<Spring endValue={{size: {val: 10}, top: 20}} component="span">
+  {tweeningCollection => {
+    let style = {
+      width: tweeningCollection.size.val,
+      height: tweeningCollection.size.val,
+      top: tweeningCollection.top,
+    };
+    return <div style={style} />;
+  }}
+</Spring>
+```
 
 ### &lt;TransitionSpring />
 Like `Spring`, but can takes two other props: `willEnter` and `willLeave`. Throughout this section, please remember that ""
@@ -191,6 +206,8 @@ Like `Spring`, but can takes two other props: `willEnter` and `willLeave`. Throu
 `willEnter`: a callback that's called **once** and is passed `(keyThatEnters, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration that'll serve as the starting value of that new key. That configuration will be merged into `endValue`. The default value of `willEnter` is `(key, endValue) => endValue[key]`. It returns the same configuration as the one you just specified in `endValue`. In other words, the start and end are the same: no animation.
 
 `willLeave`: a callback that's called **many** times and is passed `(keyThatLeaves, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration (which will serve as the new `endValue[keyThatLeaves]` and merged into `endValue`) to indicate you still want to keep the item around. Otherwise, return `null`.
+
+`component`: (Optional) Same prop as `Spring`, allows for the customization of the wrapper element in the rendered children. Defaults to 'div'
 
 #### Sample Usage
 _(See the demo files for fuller ones.)_

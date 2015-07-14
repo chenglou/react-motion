@@ -14,7 +14,7 @@ const Demo = React.createClass({
     return (
       <div>
         <button onMouseDown={this.handleMouseDown}>Toggle</button>
-        <Spring endValue={{val: this.state.open ? 400 : 0}}>
+        <Spring endValue={{val: this.state.open ? 400 : 0}} component="span">
           {({val}) =>
             // children is a callback which should accept the current value of
             // `endValue`
