@@ -13,7 +13,7 @@ describe('mapTree', () => {
     expect(u.mapTree(add1, {a: [1, {b: 2}]})).toEqual({a: [2, {b: 3}]});
   });
 
-  it('should be not infinitely recurse into structures we provide ', () => {
+  it('should be not infinitely recurse into structures we provide', () => {
     expect(u.mapTree(() => [1, 2], {a: [1, {b: 2}]}))
       .toEqual({a: [[1, 2], {b: [1, 2]}]});
   });

@@ -54,7 +54,7 @@ function mergeDiffObj(a, b, onRemove) {
 
 // TODO: refactor common logic with updateCurrV
 // TODO: tests
-function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
+export function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
   if (endValue === null) {
     return null;
   }
@@ -73,10 +73,13 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
   }
   if (endValue.val != null) {
     const [_k, _b] = endValue.config || [170, 26];
-    return {
+    let ret = {
       val: updateCurrVals(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
-      config: endValue.config,
     };
+    if (endValue.config) {
+      ret.config = endValue.config;
+    }
+    return ret;
   }
   if (Array.isArray(endValue)) {
     return endValue.map((_, i) => updateCurrVals(frameRate, currVals[i], currV[i], endValue[i], k, b));
@@ -91,7 +94,7 @@ function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
   return endValue;
 }
 
-function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
+export function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
   if (endValue === null) {
     return null;
   }
