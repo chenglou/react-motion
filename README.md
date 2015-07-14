@@ -207,6 +207,8 @@ Like `Spring`, but can takes two other props: `willEnter` and `willLeave`. Throu
 
 `willLeave`: a callback that's called **many** times and is passed `(keyThatLeaves, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration (which will serve as the new `endValue[keyThatLeaves]` and merged into `endValue`) to indicate you still want to keep the item around. Otherwise, return `null`.
 
+`component`: (Optional) Same prop as `Spring`, allows for the customization of the wrapper element in the rendered children. Defaults to 'div'
+
 #### Sample Usage
 _(See the demo files for fuller ones.)_
 
