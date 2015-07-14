@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import {mapTree, clone} from './utils';
+import {mapTree, clone, isPlainObject} from './utils';
 import stepper from './stepper';
 
 // ---------
@@ -53,13 +53,9 @@ function mergeDiffObj(a, b, onRemove) {
 }
 
 // TODO: refactor common logic with updateCurrV
-// TODO: tests
 export function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
   if (endValue === null) {
     return null;
-  }
-  if (endValue._isReactElement) {
-    return endValue;
   }
   if (typeof endValue === 'number') {
     if (k == null || b == null) {
@@ -84,7 +80,7 @@ export function updateCurrVals(frameRate, currVals, currV, endValue, k, b) {
   if (Array.isArray(endValue)) {
     return endValue.map((_, i) => updateCurrVals(frameRate, currVals[i], currV[i], endValue[i], k, b));
   }
-  if (Object.prototype.toString.call(endValue) === '[object Object]') {
+  if (isPlainObject(endValue)) {
     const ret = {};
     Object.keys(endValue).forEach(key => {
       ret[key] = updateCurrVals(frameRate, currVals[key], currV[key], endValue[key], k, b);
@@ -98,9 +94,6 @@ export function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
   if (endValue === null) {
     return null;
   }
-  if (endValue._isReactElement) {
-    return endValue;
-  }
   if (typeof endValue === 'number') {
     if (k == null || b == null) {
       return mapTree(zero, currV);
@@ -113,15 +106,18 @@ export function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
   }
   if (endValue.val != null) {
     const [_k, _b] = endValue.config || [170, 26];
-    return {
+    let ret = {
       val: updateCurrV(frameRate, currVals.val, currV.val, endValue.val, _k, _b),
-      config: endValue.config,
     };
+    if (endValue.config) {
+      ret.config = endValue.config;
+    }
+    return ret;
   }
   if (Array.isArray(endValue)) {
     return endValue.map((_, i) => updateCurrV(frameRate, currVals[i], currV[i], endValue[i], k, b));
   }
-  if (Object.prototype.toString.call(endValue) === '[object Object]') {
+  if (isPlainObject(endValue)) {
     const ret = {};
     Object.keys(endValue).forEach(key => {
       ret[key] = updateCurrV(frameRate, currVals[key], currV[key], endValue[key], k, b);
