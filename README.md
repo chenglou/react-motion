@@ -182,7 +182,7 @@ getEndValues: function(currentPositions) {
 },
 
 ```
-Spring also exposes an optional "component" prop similar to [ReactTransitionGroup](https://facebook.github.io/react/docs/animation.html#rendering-a-different-component) that allows
+Spring also exposes an optional "component" prop, similar to [ReactTransitionGroup](https://facebook.github.io/react/docs/animation.html#rendering-a-different-component), that allows
 you to specify the wrapper component for the rendered children. Defaults to a 'div'.
 
 ```jsx
