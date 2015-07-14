@@ -127,17 +127,15 @@ export function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
   return mapTree(zero, currV);
 }
 
-
-function noSpeed(coll) {
+export function noSpeed(coll) {
   if (Array.isArray(coll)) {
     return coll.every(noSpeed);
   }
-  if (Object.prototype.toString.call(coll) === '[object Object]') {
+  if (isPlainObject(coll)) {
     return Object.keys(coll).every(key => key === 'config' ? true : noSpeed(coll[key]));
   }
-  return coll === 0;
+  return typeof coll === 'number' ? coll === 0 : true;
 }
-
 
 const Spring = React.createClass({
   propTypes: {
