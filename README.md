@@ -18,6 +18,10 @@ Npm:
 Bower:
 `bower install react-motion`
 
+1998 Script Tag:
+`<script src="path/to/react-motion/build/react-motion.js"></script>`
+(Module exposed as `ReactMotion`)
+
 [Check](https://cdn.rawgit.com/chenglou/react-motion/cffb3894f42e4825178d9c7c0313b2f4e9e65ab2/demo0/index.html) [Out](https://cdn.rawgit.com/chenglou/react-motion/cffb3894f42e4825178d9c7c0313b2f4e9e65ab2/demo1/index.html) [The](https://cdn.rawgit.com/chenglou/react-motion/cffb3894f42e4825178d9c7c0313b2f4e9e65ab2/demo2/index.html) [Cool](https://cdn.rawgit.com/chenglou/react-motion/cffb3894f42e4825178d9c7c0313b2f4e9e65ab2/demo3/index.html) [Demos](https://cdn.rawgit.com/chenglou/react-motion/072fef7b84b2d57187643baa4156ee2a7374655f/demo4/index.html).
 
 ## What does this library try to solve?

@@ -5,9 +5,9 @@ pids
 *.pid
 *.seed
 
-build
 coverage
 node_modules
+lib
 
 .DS_Store
 all.js.map

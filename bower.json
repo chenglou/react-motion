@@ -1,12 +1,12 @@
 {
   "name": "react-motion",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "homepage": "https://github.com/chenglou/react-motion",
   "authors": [
     "chenglou"
   ],
   "description": "A spring that solves your animation problems.",
-  "main": ["lib/Spring.js"],
+  "main": ["build/react-motion.js"],
   "dependencies": {
     "react": ">=0.13.2"
   },
@@ -28,6 +28,7 @@
     "node_modules",
     "test",
     "demo*",
-    "server.js"
+    "server.js",
+    "src"
   ]
 }
