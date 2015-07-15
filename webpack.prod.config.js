@@ -3,6 +3,7 @@ var path = require('path');
 
 // currently, this is for bower
 var config = {
+  devtool: 'sourcemap',
   entry: {
     index: './src/react-motion.js'
   },

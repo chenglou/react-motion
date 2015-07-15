@@ -1,6 +1,5 @@
 var webpack = require('webpack');
 
-var devtool;
 var loaders = ['babel'];
 var DEV = process.env.NODE_ENV === 'development';
 var port = process.env.PORT || 3000;
@@ -40,7 +39,6 @@ if (DEV) {
 }
 
 module.exports = {
-  devtool: devtool,
   entry: entry,
   output: {
     filename: './[name]/all.js',
