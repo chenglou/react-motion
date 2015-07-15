@@ -149,6 +149,7 @@ export const Spring = React.createClass({
   getInitialState() {
     let {endValue} = this.props;
     if (typeof endValue === 'function') {
+      // TODO: provide warning for failing to provide base case
       endValue = endValue();
     }
     return {

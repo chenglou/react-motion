@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RIP CSSTransitionGroup</title>
+  <meta name="viewport">
+  <style>
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  .main {
+    padding: 0px;
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+  }
+
+  .item-list {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background: #222;
+    margin: 0px;
+    border: 6px solid #222;
+    list-style: none;
+    padding: 0px;
+    overflow: scroll;
+  }
+
+  .item {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 5px;
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .item .item-inside {
+    background: #f9f9f9;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: all 400ms ease-out 400ms;
+    opacity: 1;
+    border-radius: 5px;
+    display: flex;
+    display: -webkit-flex;
+    font-size: 50pt;
+    justify-content: center;
+    -webkit-justify-content: center;
+    -webkit-align-items: center;
+  }
+
+  .transition-in {
+    transition: all 400ms ease-out 400ms;
+    opacity: 0.001 !important;
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+  }
+  </style>
+</head>
+
+<body>
+  <div id="content"></div>
+  <script src="./all.js"></script>
+</body>
+
+</html>

@@ -16,6 +16,7 @@ var entry = {
   demo2: './demo2/index.jsx',
   demo3: './demo3/index.jsx',
   demo4: './demo4/index.jsx',
+  demo5: './demo5/index.jsx',
 };
 
 if (DEV) {
