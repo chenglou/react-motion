@@ -40,14 +40,14 @@ const prototype = {
         const value = subscriber.value;
 
         subscriber.prevValue = value;
-        subscriber.value = subscriber.step(value, timeStep);
+        subscriber.value = subscriber.step(timeStep, value);
       }
     };
 
     return animationLoop;
   },
 
-  subscribe: function subscribe(value, step, render) {
+  subscribe: function subscribe(step, render, value) {
     const animationLoop = this;
     const subscriber = {
       value: value,

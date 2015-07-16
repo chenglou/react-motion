@@ -218,13 +218,13 @@ export const Spring = React.createClass({
   startAnimating() {
     if (!this.unsubscribeAnimation) {
       this.unsubscribeAnimation = animationLoop.subscribe(
-        this.state, this.animationStep, this.animationRender
+        this.animationStep, this.animationRender, this.state
       );
       animationLoop.start();
     }
   },
 
-  animationStep(state, timeStep) {
+  animationStep(timeStep, state) {
     const {currVals, currV} = state;
     let {endValue} = this.props;
 
@@ -320,13 +320,13 @@ export const TransitionSpring = React.createClass({
   startAnimating() {
     if (!this.unsubscribeAnimation) {
       this.unsubscribeAnimation = animationLoop.subscribe(
-        this.state, this.animationStep, this.animationRender
+        this.animationStep, this.animationRender, this.state
       );
       animationLoop.start();
     }
   },
 
-  animationStep(state, timeStep) {
+  animationStep(timeStep, state) {
     let {currVals, currV} = state;
     let {endValue} = this.props;
     const {willEnter, willLeave} = this.props;
