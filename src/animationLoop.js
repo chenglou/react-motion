@@ -1,6 +1,6 @@
 // This function is 3 to 5 times faster then Array.prototype.filter
 // but iterates in reverse and mutates the array. Worth it?
-function reverseFilter(array, callback, argument) {
+export function reverseFilter(array, callback, argument) {
   let index = array.length;
   while (index--) {
     if (!callback(array[index], argument)) {
