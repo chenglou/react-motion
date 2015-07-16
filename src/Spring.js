@@ -1,14 +1,16 @@
 import React, {PropTypes} from 'react';
 import {mapTree, clone, isPlainObject} from './utils';
 import stepper from './stepper';
+import now from 'performance-now';
+import raf from 'raf';
 import createAnimationLoop from './animationLoop';
 
 const animationLoop = createAnimationLoop({
   timeStep: 1 / 60,
   timeScale: 1,
   maxSteps: 10,
-  getTime: performance.now.bind(performance),
-  ticker: window.requestAnimationFrame.bind(window),
+  getTime: now,
+  ticker: raf,
 });
 
 function zero() {
