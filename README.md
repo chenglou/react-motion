@@ -186,7 +186,7 @@ getEndValues: function(currentPositions) {
 ### &lt;TransitionSpring />
 Like `Spring`, but can takes two other props: `willEnter` and `willLeave`. Throughout this section, please remember that ""
 
-`endValue`: now constrained to an object of the shape `{key => yourStuff}` (the data is constrained to this shape, but that doesn't mean the way you use your interpolated value has to be). When your the `endValue` provide differs from the current interpolated value by an added/removed key:
+`endValue`: now constrained to an object (or a callback `currentValue -> object`) of the shape `{key => yourStuff}` (the data is constrained to this shape, but that doesn't mean the way you use your interpolated value has to be). When your the `endValue` provide differs from the current interpolated value by an added/removed key:
 
 `willEnter`: a callback that's called **once** and is passed `(keyThatEnters, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration that'll serve as the starting value of that new key. That configuration will be merged into `endValue`. The default value of `willEnter` is `(key, endValue) => endValue[key]`. It returns the same configuration as the one you just specified in `endValue`. In other words, the start and end are the same: no animation.
 
