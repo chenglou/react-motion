@@ -1,12 +1,11 @@
 var webpack = require('webpack');
 
 var loaders = ['babel'];
-var DEV = process.env.NODE_ENV === 'development';
 var port = process.env.PORT || 3000;
 
 var plugins = [
   new webpack.DefinePlugin({
-    '__DEV__': JSON.stringify(DEV)
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
   })
 ];
 var entry = {
@@ -18,7 +17,7 @@ var entry = {
   demo5: './demo5/index.jsx',
 };
 
-if (DEV) {
+if (process.env.NODE_ENV === 'development') {
   devtool = 'eval-source-map';
   loaders = ['react-hot'].concat(loaders);
   plugins = plugins.concat([
