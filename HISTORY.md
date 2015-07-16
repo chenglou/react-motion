@@ -4,6 +4,9 @@ Legend:
 - [F]: fix
 - [B]: fix
 
+### Upcoming
+- [F] Definitively fix the previous problem of mis-detecting React Element as object.
+
 ### 0.1.0 (July 14th 2015)
 - [B] Breaking API: `TransitionSpring`'s `willEnter`'s callback signature is now `(keyThatEnters, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)` (added `correspondingValue` as the second argument). Same for `willLeave`.
 - [B] `Spring` is now no longer exposed as a default, but simply as "Spring": `require('react-motion').Spring`. Or `import {Spring} from 'react-motion'`.

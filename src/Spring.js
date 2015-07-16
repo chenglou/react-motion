@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import {mapTree, clone, isPlainObject} from './utils';
+import {mapTree, isPlainObject} from './utils';
 import stepper from './stepper';
 
 const FRAME_RATE = 1 / 60;
@@ -355,9 +355,6 @@ export const TransitionSpring = React.createClass({
           key => willLeave(key, endValue, currVals, currV)
         );
 
-        // TODO: check if this is necessary
-        currVals = clone(currVals);
-        currV = clone(currV);
         Object.keys(mergedVals)
           .filter(key => !currVals.hasOwnProperty(key))
           .forEach(key => {
