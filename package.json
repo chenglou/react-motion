@@ -5,7 +5,7 @@
   "main": "lib/react-motion.js",
   "dependencies": {
     "performance-now": "^0.2.0",
-    "raf": "^3.0.0"
+    "raf": "^3.1.0"
   },
   "peerDependencies": {
     "react": ">=0.13.2"
