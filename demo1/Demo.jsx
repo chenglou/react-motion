@@ -17,7 +17,7 @@ const Demo = React.createClass({
 
   getValues(currentPositions) {
     // currentPositions of `undefined` means it's the first render for Spring
-    if (currentPositions === undefined) {
+    if (currentPositions == undefined) {
       return {val: range(6).map(() => [0, 0])};
     }
     const endValue = currentPositions.val.map((_, i) => {
