@@ -4,11 +4,56 @@ import isPlainObject from 'lodash.isPlainObject';
 import stepper from './stepper';
 import noVelocity from './noVelocity';
 import mergeDiff from './mergeDiff';
+import now from 'performance-now';
+import raf from 'raf';
+import createAnimationLoop from './animationLoop';
 
-const FRAME_RATE = 1 / 60;
+const animationLoop = createAnimationLoop({
+  timeStep: 1 / 60,
+  timeScale: 1,
+  maxSteps: 10,
+  getTime: now,
+  ticker: raf,
+});
 
 function zero() {
   return 0;
+}
+
+// TODO: refactor common logic with updateCurrVals and updateCurrV
+function interpolateVals(alpha, nextVals, prevVals) {
+  if (nextVals === null) {
+    return null;
+  }
+  if (prevVals == null) {
+    return nextVals;
+  }
+  if (typeof nextVals === 'number') {
+    return nextVals * alpha + prevVals * (1 - alpha);
+  }
+  if (nextVals.val != null && nextVals.config && nextVals.config.length === 0) {
+    return nextVals;
+  }
+  if (nextVals.val != null) {
+    let ret = {
+      val: interpolateVals(alpha, nextVals.val, prevVals.val),
+    };
+    if (nextVals.config) {
+      ret.config = nextVals.config;
+    }
+    return ret;
+  }
+  if (Array.isArray(nextVals)) {
+    return nextVals.map((_, i) => interpolateVals(alpha, nextVals[i], prevVals[i]));
+  }
+  if (isPlainObject(nextVals)) {
+    const ret = {};
+    Object.keys(nextVals).forEach(key => {
+      ret[key] = interpolateVals(alpha, nextVals[key], prevVals[key]);
+    });
+    return ret;
+  }
+  return nextVals;
 }
 
 // TODO: refactor common logic with updateCurrV
@@ -105,67 +150,59 @@ export const Spring = React.createClass({
     return {
       currVals: endValue,
       currV: mapTree(zero, endValue),
-      now: null,
     };
   },
 
   componentDidMount() {
-    this.raf(true, false);
+    this.startAnimating();
   },
 
   componentWillReceiveProps() {
-    this.raf(true, false);
+    this.startAnimating();
   },
 
   componentWillUnmount() {
-    cancelAnimationFrame(this._rafID);
+    if (this.unsubscribeAnimation) {
+      this.unsubscribeAnimation();
+      this.unsubscribeAnimation = undefined;
+    }
   },
 
-  _rafID: null,
-
-  raf(justStarted, isLastRaf) {
-    if (justStarted && this._rafID != null) {
-      // already rafing
-      return;
+  startAnimating() {
+    if (!this.unsubscribeAnimation) {
+      this.unsubscribeAnimation = animationLoop.subscribe(
+        this.animationStep, this.animationRender, this.state
+      );
+      animationLoop.start();
     }
-    this._rafID = requestAnimationFrame(() => {
-      const {currVals, currV, now} = this.state;
-      let {endValue} = this.props;
+  },
 
-      if (typeof endValue === 'function') {
-        endValue = endValue(currVals);
-      }
-      const frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
+  animationStep(timeStep, state) {
+    const {currVals, currV} = state;
+    let {endValue} = this.props;
 
-      const newCurrVals = updateCurrVals(frameRate, currVals, currV, endValue);
-      const newCurrV = updateCurrV(frameRate, currVals, currV, endValue);
+    if (typeof endValue === 'function') {
+      endValue = endValue(currVals);
+    }
 
-      this.setState(() => {
-        return {
-          currVals: newCurrVals,
-          currV: newCurrV,
-          now: Date.now(),
-        };
-      });
+    const newCurrVals = updateCurrVals(timeStep, currVals, currV, endValue);
+    const newCurrV = updateCurrV(timeStep, currVals, currV, endValue);
 
-      const stop = noVelocity(newCurrV);
-      if (stop && !justStarted) {
-        // this flag is necessary, because in `endValue` callback, the user
-        // might check that the current value has reached the destination, and
-        // decide to return a new destination value. However, since s/he's
-        // accessing the last tick's current value, and if we stop rafing after
-        // speed is 0, the next `endValue` is never called and we never detect
-        // the new chained animation. isLastRaf ensures that we raf a single
-        // more time in case the user wants to chain another animation at the
-        // end of this one
-        if (isLastRaf) {
-          this._rafID = null;
-        } else {
-          this.raf(false, true);
-        }
-      } else {
-        this.raf(false, false);
-      }
+    if (noVelocity(currV) && noVelocity(newCurrV)) {
+      this.unsubscribeAnimation();
+      this.unsubscribeAnimation = undefined;
+    }
+
+    return {
+      currVals: newCurrVals,
+      currV: newCurrV,
+    };
+  },
+
+  animationRender(alpha, nextState, prevState) {
+    this.setState({
+      currVals: interpolateVals(alpha, nextState.currVals, prevState.currVals),
+      currV: nextState.currV,
     });
   },
 
@@ -217,127 +254,125 @@ export const TransitionSpring = React.createClass({
     return {
       currVals: endValue,
       currV: mapTree(zero, endValue),
-      now: null,
     };
   },
 
   componentDidMount() {
-    this.raf(true, false);
+    this.startAnimating();
   },
 
   componentWillReceiveProps() {
-    this.raf(true, false);
+    this.startAnimating();
   },
 
   componentWillUnmount() {
-    cancelAnimationFrame(this._rafID);
+    if (this.unsubscribeAnimation) {
+      this.unsubscribeAnimation();
+      this.unsubscribeAnimation = undefined;
+    }
   },
 
-  _rafID: null,
-
-  raf(justStarted, isLastRaf) {
-    if (justStarted && this._rafID != null) {
-      // already rafing
-      return;
+  startAnimating() {
+    if (!this.unsubscribeAnimation) {
+      this.unsubscribeAnimation = animationLoop.subscribe(
+        this.animationStep, this.animationRender, this.state
+      );
+      animationLoop.start();
     }
-    this._rafID = requestAnimationFrame(() => {
-      let {currVals, currV} = this.state;
-      const {now} = this.state;
-      let {endValue} = this.props;
-      const {willEnter, willLeave} = this.props;
+  },
 
-      if (typeof endValue === 'function') {
-        endValue = endValue(currVals);
-      }
+  animationStep(timeStep, state) {
+    let {currVals, currV} = state;
+    let {endValue} = this.props;
+    const {willEnter, willLeave} = this.props;
 
-      let mergedVals;
-      if (Array.isArray(endValue)) {
-        let currValsObj = {};
-        currVals.forEach(objWithKey => {
-          currValsObj[objWithKey.key] = objWithKey;
-        });
+    if (typeof endValue === 'function') {
+      endValue = endValue(currVals);
+    }
 
-        let endValueObj = {};
-        endValue.forEach(objWithKey => {
-          endValueObj[objWithKey.key] = objWithKey;
-        });
-        let currVObj = {};
-        endValue.forEach(objWithKey => {
-          currVObj[objWithKey.key] = objWithKey;
-        });
-
-        const mergedValsObj = mergeDiff(
-          currValsObj,
-          endValueObj,
-          key => willLeave(key, endValue, currVals, currV)
-        );
-
-        let mergedValsKeys = Object.keys(mergedValsObj);
-        mergedValsKeys
-          .filter(key => !currValsObj.hasOwnProperty(key))
-          .forEach(key => {
-            const enterVal = willEnter(key, mergedValsObj[key], endValue, currVals, currV);
-            currValsObj[key] = enterVal;
-            // We want the willEnter value to be stored as the endValue (in this
-            // case, since it's entering, doesn't matter) once. This is very
-            // different than providing a mere data structure to make the
-            // currVals, currV and endValue trees look the same for the purpose
-            // of interpolating on trees of same shape, and then use endValue's
-            // values to compute currentInterpolationValues anyway. Previously,
-            // after providing willEnter value, we still use the non-numerical
-            // values of endValue. But now that we use the non-numerical value
-            // of willEnter once, we've effectively replace CSSTG since you can
-            // let the react reconciler handle reconciling between 2 components
-            // that differ by only a className
-            mergedValsObj[key] = enterVal;
-            currVObj[key] = mapTree(zero, currValsObj[key]);
-          });
-
-        mergedVals = mergedValsKeys.map(key => mergedValsObj[key]);
-        currVals = Object.keys(currValsObj).map(key => currValsObj[key]);
-        currV = Object.keys(currVObj).map(key => currVObj[key]);
-      } else {
-        // only other option is obj
-        mergedVals = mergeDiff(
-          currVals,
-          endValue,
-          // TODO: stop allocating like crazy in this whole code path
-          key => willLeave(key, endValue, currVals, currV)
-        );
-
-        Object.keys(mergedVals)
-          .filter(key => !currVals.hasOwnProperty(key))
-          .forEach(key => {
-            const enterVal = willEnter(key, mergedVals[key], endValue, currVals, currV);
-            currVals[key] = enterVal;
-            mergedVals[key] = enterVal;
-            currV[key] = mapTree(zero, currVals[key]);
-          });
-      }
-
-      const frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
-
-      const newCurrVals = updateCurrVals(frameRate, currVals, currV, mergedVals);
-      const newCurrV = updateCurrV(frameRate, currVals, currV, mergedVals);
-
-      this.setState(() => {
-        return {
-          currVals: newCurrVals,
-          currV: newCurrV,
-          now: Date.now(),
-        };
+    let mergedVals;
+    if (Array.isArray(endValue)) {
+      let currValsObj = {};
+      currVals.forEach(objWithKey => {
+        currValsObj[objWithKey.key] = objWithKey;
       });
 
-      const stop = noVelocity(newCurrV);
-      if (stop && !justStarted) {
-        if (isLastRaf) {
-          this._rafID = null;
-        } else {
-          this.raf(false, true);
-        }
-      } else {
-        this.raf(false, false);
-      }
+      let endValueObj = {};
+      endValue.forEach(objWithKey => {
+        endValueObj[objWithKey.key] = objWithKey;
+      });
+      let currVObj = {};
+      endValue.forEach(objWithKey => {
+        currVObj[objWithKey.key] = objWithKey;
+      });
+
+      const mergedValsObj = mergeDiff(
+        currValsObj,
+        endValueObj,
+        key => willLeave(key, endValue, currVals, currV)
+      );
+
+      let mergedValsKeys = Object.keys(mergedValsObj);
+      mergedValsKeys
+        .filter(key => !currValsObj.hasOwnProperty(key))
+        .forEach(key => {
+          const enterVal = willEnter(key, mergedValsObj[key], endValue, currVals, currV);
+          currValsObj[key] = enterVal;
+          // We want the willEnter value to be stored as the endValue (in this
+          // case, since it's entering, doesn't matter) once. This is very
+          // different than providing a mere data structure to make the
+          // currVals, currV and endValue trees look the same for the purpose
+          // of interpolating on trees of same shape, and then use endValue's
+          // values to compute currentInterpolationValues anyway. Previously,
+          // after providing willEnter value, we still use the non-numerical
+          // values of endValue. But now that we use the non-numerical value
+          // of willEnter once, we've effectively replace CSSTG since you can
+          // let the react reconciler handle reconciling between 2 components
+          // that differ by only a className
+          mergedValsObj[key] = enterVal;
+          currVObj[key] = mapTree(zero, currValsObj[key]);
+        });
+
+      mergedVals = mergedValsKeys.map(key => mergedValsObj[key]);
+      currVals = Object.keys(currValsObj).map(key => currValsObj[key]);
+      currV = Object.keys(currVObj).map(key => currVObj[key]);
+    } else {
+      // only other option is obj
+      mergedVals = mergeDiff(
+        currVals,
+        endValue,
+        // TODO: stop allocating like crazy in this whole code path
+        key => willLeave(key, endValue, currVals, currV)
+      );
+
+      Object.keys(mergedVals)
+        .filter(key => !currVals.hasOwnProperty(key))
+        .forEach(key => {
+          const enterVal = willEnter(key, mergedVals[key], endValue, currVals, currV);
+          currVals[key] = enterVal;
+          mergedVals[key] = enterVal;
+          currV[key] = mapTree(zero, currVals[key]);
+        });
+    }
+
+    const newCurrVals = updateCurrVals(timeStep, currVals, currV, mergedVals);
+    const newCurrV = updateCurrV(timeStep, currVals, currV, mergedVals);
+
+    if (noVelocity(currV) && noVelocity(newCurrV)) {
+      this.unsubscribeAnimation();
+      this.unsubscribeAnimation = undefined;
+    }
+
+    return {
+      currVals: newCurrVals,
+      currV: newCurrV,
+    };
+  },
+
+  animationRender(alpha, nextState, prevState) {
+    this.setState({
+      currVals: interpolateVals(alpha, nextState.currVals, prevState.currVals),
+      currV: nextState.currV,
     });
   },
 
