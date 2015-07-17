@@ -345,15 +345,3 @@ export const TransitionSpring = React.createClass({
     return React.Children.only(this.props.children(currVals));
   },
 });
-
-function reorderKeys(obj, f) {
-  const ret = {};
-  f(Object.keys(obj)).forEach(key => {
-    ret[key] = obj[key];
-  });
-  return ret;
-}
-
-export const utils = {
-  reorderKeys,
-};
