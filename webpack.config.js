@@ -1,13 +1,11 @@
 var webpack = require('webpack');
 
-var devtool;
 var loaders = ['babel'];
-var DEV = process.env.NODE_ENV === 'development';
 var port = process.env.PORT || 3000;
 
 var plugins = [
   new webpack.DefinePlugin({
-    '__DEV__': JSON.stringify(DEV)
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
   })
 ];
 var entry = {
@@ -16,9 +14,10 @@ var entry = {
   demo2: './demo2/index.jsx',
   demo3: './demo3/index.jsx',
   demo4: './demo4/index.jsx',
+  demo5: './demo5/index.jsx',
 };
 
-if (DEV) {
+if (process.env.NODE_ENV === 'development') {
   devtool = 'eval-source-map';
   loaders = ['react-hot'].concat(loaders);
   plugins = plugins.concat([
@@ -39,7 +38,6 @@ if (DEV) {
 }
 
 module.exports = {
-  devtool: devtool,
   entry: entry,
   output: {
     filename: './[name]/all.js',

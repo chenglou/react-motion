@@ -1,6 +1,6 @@
 import React from 'react';
 import {Spring} from '../src/Spring';
-import {range} from '../src/utils';
+import range from 'lodash.range';
 
 const Demo = React.createClass({
   getInitialState() {
@@ -16,7 +16,7 @@ const Demo = React.createClass({
   },
 
   getValues(currentPositions) {
-    // currentPositions of `null` means it's the first render for Spring
+    // currentPositions of `undefined` means it's the first render for Spring
     if (currentPositions == null) {
       return {val: range(6).map(() => [0, 0])};
     }

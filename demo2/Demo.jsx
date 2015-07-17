@@ -1,6 +1,18 @@
 import React from 'react';
 import {Spring} from '../src/Spring';
-import {range, reinsert, clamp} from '../src/utils';
+import range from 'lodash.range';
+
+function reinsert(arr, from, to) {
+  const _arr = arr.slice(0);
+  const val = _arr[from];
+  _arr.splice(from, 1);
+  _arr.splice(to, 0, val);
+  return _arr;
+}
+
+function clamp(n, min, max) {
+  return Math.max(Math.min(n, max), min);
+}
 
 // TODO: start at center, not upper left
 const allColors = [
