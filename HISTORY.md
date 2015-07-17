@@ -6,6 +6,7 @@ Legend:
 
 ### Upcoming
 - [F] Definitively fix the previous problem of mis-detecting React Element as object.
+- [I] Stabilize the spring algorithm. No more erratic behavior with a big amount of animated items. #57
 
 ### 0.1.0 (July 14th 2015)
 - [B] Breaking API: `TransitionSpring`'s `willEnter`'s callback signature is now `(keyThatEnters, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)` (added `correspondingValue` as the second argument). Same for `willLeave`.
