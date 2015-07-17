@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import {mapTree, isPlainObject} from './utils';
 import stepper from './stepper';
+import noVelocity from './noVelocity';
 
 const FRAME_RATE = 1 / 60;
 
@@ -126,16 +127,6 @@ export function updateCurrV(frameRate, currVals, currV, endValue, k, b) {
   return mapTree(zero, currV);
 }
 
-export function noSpeed(coll) {
-  if (Array.isArray(coll)) {
-    return coll.every(noSpeed);
-  }
-  if (isPlainObject(coll)) {
-    return Object.keys(coll).every(key => key === 'config' ? true : noSpeed(coll[key]));
-  }
-  return typeof coll === 'number' ? coll === 0 : true;
-}
-
 export const Spring = React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
@@ -198,7 +189,7 @@ export const Spring = React.createClass({
         };
       });
 
-      const stop = noSpeed(newCurrV);
+      const stop = noVelocity(newCurrV);
       if (stop && !justStarted) {
         // this flag is necessary, because in `endValue` callback, the user
         // might check that the current value has reached the destination, and
@@ -378,7 +369,7 @@ export const TransitionSpring = React.createClass({
         };
       });
 
-      const stop = noSpeed(newCurrV);
+      const stop = noVelocity(newCurrV);
       if (stop && !justStarted) {
         if (isLastRaf) {
           this._rafID = null;

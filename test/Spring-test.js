@@ -108,22 +108,3 @@ describe('updateCurrV', () => {
     });
   });
 });
-
-describe('noSpeed', () => {
-  it('should return true on 0s', () => {
-    expect(s.noSpeed({a: [0, 0, {b: 0}]})).toBe(true);
-  });
-
-  it('should return true on collections of 0s with non-numerical vals', () => {
-    const comp = <div />;
-    expect(s.noSpeed({a: null, b: 0})).toBe(true);
-    expect(s.noSpeed({a: [0, 0, 'hi']})).toBe(true);
-    expect(s.noSpeed({a: [comp, 0, 'hi']})).toBe(true);
-  });
-
-  it('should return false otherwise', () => {
-    expect(s.noSpeed({a: null, b: 1})).toBe(false);
-    expect(s.noSpeed({a: [0, 2, 'hi']})).toBe(false);
-    expect(s.noSpeed({a: [3, 0, 0]})).toBe(false);
-  });
-});
