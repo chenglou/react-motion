@@ -17,6 +17,7 @@
     "eslint-plugin-react": "^2.7.0",
     "expect": "^1.6.0",
     "isparta": "^3.0.3",
+    "lodash.range": "^3.0.1",
     "mocha": "^2.2.5",
     "react-hot-loader": "^1.2.8",
     "webpack": "^1.10.1",
@@ -48,5 +49,8 @@
     "ui"
   ],
   "author": "chenglou",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "lodash.isplainobject": "^3.2.0"
+  }
 }

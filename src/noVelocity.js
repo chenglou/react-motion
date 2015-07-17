@@ -1,4 +1,4 @@
-import {isPlainObject} from './utils';
+import isPlainObject from 'lodash.isPlainObject';
 
 export default function noVelocity(coll) {
   if (Array.isArray(coll)) {
