@@ -105,12 +105,12 @@ const Demo = React.createClass({
   },
 
   // TODO: change naming
-  willLeave(date, destVals, currVals) {
-    if (currVals[date].opacity.val > 0) {
+  willLeave(date, endValue, currValue) {
+    if (currValue[date].opacity.val > 0) {
       return {
         height: {val: 0},
         opacity: {val: 0},
-        data: currVals[date].data,
+        data: currValue[date].data,
       };
     }
   },
