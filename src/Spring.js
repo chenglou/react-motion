@@ -2,54 +2,12 @@ import React, {PropTypes} from 'react';
 import {mapTree, isPlainObject} from './utils';
 import stepper from './stepper';
 import noVelocity from './noVelocity';
+import mergeDiff from './mergeDiff';
 
 const FRAME_RATE = 1 / 60;
 
 function zero() {
   return 0;
-}
-
-// TODO: test
-function mergeDiff(collA, collB, onRemove, accum) {
-  const [a, ...aa] = collA;
-  const [b, ...bb] = collB;
-
-  if (collA.length === 0 && collB.length === 0) {
-    return accum;
-  }
-  if (collA.length === 0) {
-    return accum.concat(collB);
-  }
-  if (collB.length === 0) {
-    if (onRemove(a)) {
-      return mergeDiff(aa, collB, onRemove, accum);
-    }
-    return mergeDiff(aa, collB, onRemove, accum.concat(a));
-  }
-  if (a === b) { // fails for ([undefined], [], () => true). but don't do that
-    return mergeDiff(aa, bb, onRemove, accum.concat(a));
-  }
-  if (collB.indexOf(a) === -1) {
-    if (onRemove(a)) {
-      return mergeDiff(aa, collB, onRemove, accum);
-    }
-    return mergeDiff(aa, collB, onRemove, accum.concat(a));
-  }
-  return mergeDiff(aa, collB, onRemove, accum);
-}
-
-function mergeDiffObj(a, b, onRemove) {
-  const keys = mergeDiff(Object.keys(a), Object.keys(b), _a => !onRemove(_a), []);
-  const ret = {};
-  keys.forEach(key => {
-    if (b.hasOwnProperty(key)) {
-      ret[key] = b[key];
-    } else {
-      ret[key] = onRemove(key);
-    }
-  });
-
-  return ret;
 }
 
 // TODO: refactor common logic with updateCurrV
@@ -307,7 +265,7 @@ export const TransitionSpring = React.createClass({
           currVObj[objWithKey.key] = objWithKey;
         });
 
-        const mergedValsObj = mergeDiffObj(
+        const mergedValsObj = mergeDiff(
           currValsObj,
           endValueObj,
           key => willLeave(key, endValue, currVals, currV)
@@ -339,7 +297,7 @@ export const TransitionSpring = React.createClass({
         currV = Object.keys(currVObj).map(key => currVObj[key]);
       } else {
         // only other option is obj
-        mergedVals = mergeDiffObj(
+        mergedVals = mergeDiff(
           currVals,
           endValue,
           // TODO: stop allocating like crazy in this whole code path
