@@ -1,10 +1,3 @@
-import filterRight from './filterRight';
-
-function renderSubscriber(subscriber, alpha) {
-  subscriber.render(alpha, subscriber.value, subscriber.prevValue);
-  return subscriber.active;
-}
-
 const prototype = {
   running: false,
   shouldStop: false,
@@ -63,6 +56,7 @@ const prototype = {
       return;
     }
 
+    const state = animationLoop.state;
     const timeStep = animationLoop.timeStep;
     const frameTime = currentTime - animationLoop.lastTime;
 
@@ -74,16 +68,31 @@ const prototype = {
     }
 
     while (animationLoop.accumulatedTime > 0) {
-      animationLoop.state.forEach(animationLoop.step);
+      state.forEach(animationLoop.step);
       animationLoop.accumulatedTime -= timeStep;
     }
 
-    // Render and filter in one iteration.
-    filterRight(
-      animationLoop.state,
-      renderSubscriber,
-      1 + animationLoop.accumulatedTime / timeStep
-    );
+    const alpha = 1 + animationLoop.accumulatedTime / timeStep;
+    let index = 0;
+    let nextState;
+    let subscriber;
+
+    while (index < state.length) {
+      subscriber = state[index];
+      subscriber.render(alpha, subscriber.value, subscriber.prevValue);
+
+      if (!nextState && !subscriber.active) {
+        nextState = [];
+      } else if (nextState && subscriber.active) {
+        nextState.push(subscriber);
+      }
+
+      index++;
+    }
+
+    if (nextState) {
+      animationLoop.state = nextState;
+    }
 
     if (!animationLoop.state.length) {
       animationLoop.shouldStop = true;
