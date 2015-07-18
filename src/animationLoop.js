@@ -1,14 +1,4 @@
-// This function is 3 to 5 times faster then Array.prototype.filter
-// but iterates in reverse and mutates the array. Worth it?
-export function reverseFilter(array, callback, argument) {
-  let index = array.length;
-  while (index--) {
-    if (!callback(array[index], argument)) {
-      array.splice(index, 1);
-    }
-  }
-  return array;
-}
+import filterRight from './filterRight';
 
 function renderSubscriber(subscriber, alpha) {
   subscriber.render(alpha, subscriber.value, subscriber.prevValue);
@@ -89,7 +79,7 @@ const prototype = {
     }
 
     // Render and filter in one iteration.
-    reverseFilter(
+    filterRight(
       animationLoop.state,
       renderSubscriber,
       1 + animationLoop.accumulatedTime / timeStep
