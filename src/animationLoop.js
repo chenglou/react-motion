@@ -1,6 +1,6 @@
-import filterRight from './filterRight';
+import filter from './filter';
 
-function renderSubscriber(subscriber, alpha) {
+function renderSubscriber(alpha, subscriber) {
   subscriber.render(alpha, subscriber.value, subscriber.prevValue);
   return subscriber.active;
 }
@@ -79,7 +79,7 @@ const prototype = {
     }
 
     // Render and filter in one iteration.
-    filterRight(
+    animationLoop.state = filter(
       animationLoop.state,
       renderSubscriber,
       1 + animationLoop.accumulatedTime / timeStep
