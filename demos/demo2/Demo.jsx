@@ -1,5 +1,5 @@
 import React from 'react';
-import {Spring} from '../src/Spring';
+import {Spring} from '../../src/Spring';
 import range from 'lodash.range';
 
 function reinsert(arr, from, to) {

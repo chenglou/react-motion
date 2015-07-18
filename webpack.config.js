@@ -9,12 +9,12 @@ var plugins = [
   })
 ];
 var entry = {
-  demo0: './demo0/index.jsx',
-  demo1: './demo1/index.jsx',
-  demo2: './demo2/index.jsx',
-  demo3: './demo3/index.jsx',
-  demo4: './demo4/index.jsx',
-  demo5: './demo5/index.jsx',
+  demo0: './demos/demo0/index.jsx',
+  demo1: './demos/demo1/index.jsx',
+  demo2: './demos/demo2/index.jsx',
+  demo3: './demos/demo3/index.jsx',
+  demo4: './demos/demo4/index.jsx',
+  demo5: './demos/demo5/index.jsx',
 };
 
 if (process.env.NODE_ENV === 'development') {
@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === 'development') {
   ]);
   entry = Object.keys(entry).reduce(function (result, key) {
     result[key] = [
-      'webpack-dev-server/client?http://localhost:' + port,
+      'webpack-dev-server/client?http://0.0.0.0:' + port,
       'webpack/hot/only-dev-server',
       entry[key]
     ];
@@ -40,9 +40,9 @@ if (process.env.NODE_ENV === 'development') {
 module.exports = {
   entry: entry,
   output: {
-    filename: './[name]/all.js',
-    publicPath: '/',
-    path: __dirname
+    filename: '[name]/all.js',
+    publicPath: '/demos/',
+    path: __dirname + '/demos/'
   },
   module: {
     loaders: [{
