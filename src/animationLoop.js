@@ -75,10 +75,9 @@ const prototype = {
     const alpha = 1 + animationLoop.accumulatedTime / timeStep;
     let index = 0;
     let nextState;
-    let subscriber;
 
     while (index < state.length) {
-      subscriber = state[index];
+      let subscriber = state[index];
       subscriber.render(alpha, subscriber.value, subscriber.prevValue);
 
       if (!nextState && !subscriber.active) {
