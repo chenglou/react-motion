@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types, react/no-did-mount-set-state */
-import {TransitionSpring} from '../src/Spring';
+import {TransitionSpring} from '../../src/Spring';
 import range from 'lodash.range';
 import React from 'react';
 
