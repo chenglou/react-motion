@@ -25,6 +25,13 @@ const prototype = {
         subscriber.prevValue = value;
         subscriber.value = subscriber.step(timeStep, value);
       }
+
+      // Can’t use else here because subscriber.step() might cause
+      // subscriber to become inactive.
+      if (!subscriber.active) {
+        // Mark as dirty to perform filtering in the render step.
+        animationLoop.dirty = true;
+      }
     };
 
     return animationLoop;
@@ -76,21 +83,21 @@ const prototype = {
     let index = 0;
     let nextState;
 
+    // If there are any inactive subscribers (loop is dirty)
+    // we need to filter state.
+    if (animationLoop.dirty) {
+      nextState = animationLoop.state = [];
+    }
+
     while (index < state.length) {
       let subscriber = state[index];
       subscriber.render(alpha, subscriber.value, subscriber.prevValue);
 
-      if (!nextState && !subscriber.active) {
-        nextState = [];
-      } else if (nextState && subscriber.active) {
+      if (nextState && subscriber.active) {
         nextState.push(subscriber);
       }
 
       index++;
-    }
-
-    if (nextState) {
-      animationLoop.state = nextState;
     }
 
     if (!animationLoop.state.length) {
