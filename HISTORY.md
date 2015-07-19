@@ -5,7 +5,9 @@ Legend:
 - [B]: fix
 
 ### Upcoming
+- [B] `willLeave` returning `false` will now keep the key. Only `null` and `undefined` will serve as a signal to kill the disappeared key.
 - [F] Definitively fix the previous problem of mis-detecting React Element as object.
+- [F] `willLeave` is now called only once per disappearing key. It was called more than once previously as a implementation detail. Though you should never have put side-effects in `willLeave`. It's still discouraged now.
 - [I] Stabilize the spring algorithm. No more erratic behavior with a big amount of animated items. #57
 
 ### 0.1.0 (July 14th 2015)
