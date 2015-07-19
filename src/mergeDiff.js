@@ -1,42 +1,51 @@
-// TODO: stop allocating
-function mergeDiffArr(collA, collB, onRemove, accum) {
-  const [a, ...aa] = collA;
-  const [b, ...bb] = collB;
+// this function is allocation-less thanks to babel, which transforms the tail
+// calls into loops
+function mergeDiffArr2(arrA, arrB, collB, indexA, indexB, onRemove, accum) {
+  const endA = indexA === arrA.length;
+  const endB = indexB === arrB.length;
+  const keyA = arrA[indexA];
+  const keyB = arrB[indexB];
+  if (endA && endB) {
+    // returning null here, otherwise lint complains that we're not expecting
+    // a return value in subsequent calls. We know what we're doing.
+    return null;
+  }
 
-  if (collA.length === 0 && collB.length === 0) {
-    return accum;
+  if (endA) {
+    accum[keyB] = collB[keyB];
+    return mergeDiffArr2(arrA, arrB, collB, indexA, indexB + 1, onRemove, accum);
   }
-  if (collA.length === 0) {
-    return accum.concat(collB);
-  }
-  if (collB.length === 0) {
-    if (onRemove(a)) {
-      return mergeDiffArr(aa, collB, onRemove, accum);
+
+  if (endB) {
+    let fill = onRemove(keyA);
+    if (fill == null) {
+      return mergeDiffArr2(arrA, arrB, collB, indexA + 1, indexB, onRemove, accum);
     }
-    return mergeDiffArr(aa, collB, onRemove, accum.concat(a));
+    accum[keyA] = fill;
+    return mergeDiffArr2(arrA, arrB, collB, indexA + 1, indexB, onRemove, accum);
   }
-  if (a === b) { // fails for ([undefined], [], () => true). but don't do that
-    return mergeDiffArr(aa, bb, onRemove, accum.concat(a));
+
+  if (keyA === keyB) {
+    accum[keyA] = collB[keyA];
+    return mergeDiffArr2(arrA, arrB, collB, indexA + 1, indexB + 1, onRemove, accum);
   }
-  if (collB.indexOf(a) === -1) {
-    if (onRemove(a)) {
-      return mergeDiffArr(aa, collB, onRemove, accum);
+
+  if (!collB.hasOwnProperty(keyA)) {
+    let fill = onRemove(keyA);
+    if (fill == null) {
+      return mergeDiffArr2(arrA, arrB, collB, indexA + 1, indexB, onRemove, accum);
     }
-    return mergeDiffArr(aa, collB, onRemove, accum.concat(a));
+    accum[keyA] = fill;
+    return mergeDiffArr2(arrA, arrB, collB, indexA + 1, indexB, onRemove, accum);
   }
-  return mergeDiffArr(aa, collB, onRemove, accum);
+
+  return mergeDiffArr2(arrA, arrB, collB, indexA + 1, indexB, onRemove, accum);
 }
 
 export default function mergeDiff(a, b, onRemove) {
-  const keys = mergeDiffArr(Object.keys(a), Object.keys(b), _a => !onRemove(_a), []);
-  const ret = {};
-  keys.forEach(key => {
-    if (b.hasOwnProperty(key)) {
-      ret[key] = b[key];
-    } else {
-      ret[key] = onRemove(key);
-    }
-  });
-
+  let ret = {};
+  // if anyone can make this work without allocating the arrays here, we'll
+  // give you a medal
+  mergeDiffArr2(Object.keys(a), Object.keys(b), b, 0, 0, onRemove, ret);
   return ret;
 }
