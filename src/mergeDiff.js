@@ -18,10 +18,9 @@ function mergeDiffArr2(arrA, arrB, collB, indexA, indexB, onRemove, accum) {
 
   if (endB) {
     let fill = onRemove(keyA);
-    if (fill == null) {
-      return mergeDiffArr2(arrA, arrB, collB, indexA + 1, indexB, onRemove, accum);
+    if (fill != null) {
+      accum[keyA] = fill;
     }
-    accum[keyA] = fill;
     return mergeDiffArr2(arrA, arrB, collB, indexA + 1, indexB, onRemove, accum);
   }
 
@@ -32,10 +31,9 @@ function mergeDiffArr2(arrA, arrB, collB, indexA, indexB, onRemove, accum) {
 
   if (!collB.hasOwnProperty(keyA)) {
     let fill = onRemove(keyA);
-    if (fill == null) {
-      return mergeDiffArr2(arrA, arrB, collB, indexA + 1, indexB, onRemove, accum);
+    if (fill != null) {
+      accum[keyA] = fill;
     }
-    accum[keyA] = fill;
     return mergeDiffArr2(arrA, arrB, collB, indexA + 1, indexB, onRemove, accum);
   }
 
