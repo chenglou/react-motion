@@ -20,6 +20,11 @@ function zero() {
   return 0;
 }
 
+function assignByObjKey(ret, objWithKey) {
+  ret[objWithKey.key] = objWithKey;
+  return ret;
+}
+
 // TODO: refactor common logic with updateCurrValue and updateCurrVelocity
 function interpolateValue(alpha, nextValue, prevValue) {
   if (nextValue === null) {
@@ -47,11 +52,10 @@ function interpolateValue(alpha, nextValue, prevValue) {
     return nextValue.map((_, i) => interpolateValue(alpha, nextValue[i], prevValue[i]));
   }
   if (isPlainObject(nextValue)) {
-    const ret = {};
-    Object.keys(nextValue).forEach(key => {
+    return Object.keys(nextValue).reduce((ret, key) => {
       ret[key] = interpolateValue(alpha, nextValue[key], prevValue[key]);
-    });
-    return ret;
+      return ret;
+    }, {});
   }
   return nextValue;
 }
@@ -85,11 +89,10 @@ export function updateCurrValue(frameRate, currValue, currVelocity, endValue, k,
     return endValue.map((_, i) => updateCurrValue(frameRate, currValue[i], currVelocity[i], endValue[i], k, b));
   }
   if (isPlainObject(endValue)) {
-    const ret = {};
-    Object.keys(endValue).forEach(key => {
+    return Object.keys(endValue).reduce((ret, key) => {
       ret[key] = updateCurrValue(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
-    });
-    return ret;
+      return ret;
+    }, {});
   }
   return endValue;
 }
@@ -122,11 +125,10 @@ export function updateCurrVelocity(frameRate, currValue, currVelocity, endValue,
     return endValue.map((_, i) => updateCurrVelocity(frameRate, currValue[i], currVelocity[i], endValue[i], k, b));
   }
   if (isPlainObject(endValue)) {
-    const ret = {};
-    Object.keys(endValue).forEach(key => {
+    return Object.keys(endValue).reduce((ret, key) => {
       ret[key] = updateCurrVelocity(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
-    });
-    return ret;
+      return ret;
+    }, {});
   }
   return mapTree(zero, currVelocity);
 }
@@ -292,19 +294,9 @@ export const TransitionSpring = React.createClass({
 
     let mergedValue;
     if (Array.isArray(endValue)) {
-      let currValueObj = {};
-      currValue.forEach(objWithKey => {
-        currValueObj[objWithKey.key] = objWithKey;
-      });
-
-      let endValueObj = {};
-      endValue.forEach(objWithKey => {
-        endValueObj[objWithKey.key] = objWithKey;
-      });
-      let currVelocityObj = {};
-      endValue.forEach(objWithKey => {
-        currVelocityObj[objWithKey.key] = objWithKey;
-      });
+      const currValueObj = currValue.reduce(assignByObjKey, {});
+      const endValueObj = endValue.reduce(assignByObjKey, {});
+      const currVelocityObj = endValue.reduce(assignByObjKey, {});
 
       const mergedValueObj = mergeDiff(
         currValueObj,

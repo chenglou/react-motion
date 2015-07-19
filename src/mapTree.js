@@ -17,11 +17,10 @@ function _mapTree(path, f, trees) {
     return t1.map((_, i) => _mapTree([...path, i], f, trees.map(val => val[i])));
   }
   if (isPlainObject(t1)) {
-    const newTree = {};
-    Object.keys(t1).forEach(key => {
+    return Object.keys(t1).reduce((newTree, key) => {
       newTree[key] = _mapTree([...path, key], f, trees.map(val => val[key]));
-    });
-    return newTree;
+      return newTree;
+    }, {});
   }
   // return last one just because
   return trees[trees.length - 1];

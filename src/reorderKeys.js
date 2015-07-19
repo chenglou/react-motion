@@ -1,7 +1,6 @@
 export default function reorderKeys(obj, f) {
-  const ret = {};
-  f(Object.keys(obj)).forEach(key => {
+  return f(Object.keys(obj)).reduce((ret, key) => {
     ret[key] = obj[key];
-  });
-  return ret;
+    return ret;
+  }, {});
 }
