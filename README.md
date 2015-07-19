@@ -228,7 +228,7 @@ let Demo = React.createClass({
     };
   },
 
-  willLeave(key, value, endValue, currentValue, currentSpeed) {
+  willLeave(key, endValue, currentValue, currentSpeed) {
     if (currentValue[key].opacity.val === 0 && currentSpeed[key].opacity.val === 0) {
       return null; // kill component when opacity reaches 0
     }
@@ -263,8 +263,9 @@ let Demo = React.createClass({
                   {currentValue[key].text}
                 </div>
               );
-            })}}
+            })}
           </div>
+        }
       </TransitionSpring>
     );
   }
