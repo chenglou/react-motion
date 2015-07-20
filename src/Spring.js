@@ -4,16 +4,12 @@ import isPlainObject from 'lodash.isPlainObject';
 import stepper from './stepper';
 import noVelocity from './noVelocity';
 import mergeDiff from './mergeDiff';
-import now from 'performance-now';
-import raf from 'raf';
 import createAnimationLoop from './animationLoop';
 
 const animationLoop = createAnimationLoop({
   timeStep: 1 / 60,
   timeScale: 1,
   maxSteps: 10,
-  getTime: now,
-  ticker: raf,
 });
 
 function zero() {

@@ -1,4 +1,6 @@
 import filter from './filter';
+import now from 'performance-now';
+import raf from 'raf';
 
 function renderSubscriber(alpha, subscriber) {
   subscriber.render(alpha, subscriber.value, subscriber.prevValue);
@@ -12,20 +14,16 @@ const prototype = {
   accumulatedTime: 0,
 
   setOptions: function setOptions(options) {
-    const animationLoop = this;
-
     // Seconds
     const timeStep = options.timeStep;
 
     // Milliseconds
-    animationLoop.timeStep = timeStep * 1000;
+    this.timeStep = timeStep * 1000;
 
-    animationLoop.timeScale = options.timeScale;
-    animationLoop.maxSteps = options.maxSteps;
-    animationLoop.getTime = options.getTime;
-    animationLoop.ticker = options.ticker;
+    this.timeScale = options.timeScale;
+    this.maxSteps = options.maxSteps;
 
-    animationLoop.step = function step(subscriber) {
+    this.step = function step(subscriber) {
       if (subscriber.active) {
         const value = subscriber.value;
 
@@ -34,11 +32,10 @@ const prototype = {
       }
     };
 
-    return animationLoop;
+    return this;
   },
 
   subscribe: function subscribe(step, render, value) {
-    const animationLoop = this;
     const subscriber = {
       value: value,
       prevValue: value,
@@ -47,7 +44,7 @@ const prototype = {
       active: true,
     };
 
-    animationLoop.state.push(subscriber);
+    this.state.push(subscriber);
 
     return function unsubscribe() {
       subscriber.active = false;
@@ -55,58 +52,55 @@ const prototype = {
   },
 
   loop: function loop() {
-    const animationLoop = this;
-    const currentTime = animationLoop.getTime();
+    const currentTime = now();
 
-    if (animationLoop.shouldStop) {
-      animationLoop.running = animationLoop.shouldStop = false;
+    if (this.shouldStop) {
+      this.running = this.shouldStop = false;
       return;
     }
 
-    const timeStep = animationLoop.timeStep;
-    const frameTime = currentTime - animationLoop.lastTime;
+    const timeStep = this.timeStep;
+    const frameTime = currentTime - this.lastTime;
 
-    animationLoop.lastTime = currentTime;
-    animationLoop.accumulatedTime += frameTime * animationLoop.timeScale;
+    this.lastTime = currentTime;
+    this.accumulatedTime += frameTime * this.timeScale;
 
-    if (animationLoop.accumulatedTime > timeStep * animationLoop.maxSteps) {
-      animationLoop.accumulatedTime = 0;
+    if (this.accumulatedTime > timeStep * this.maxSteps) {
+      this.accumulatedTime = 0;
     }
 
-    while (animationLoop.accumulatedTime > 0) {
-      animationLoop.state.forEach(animationLoop.step);
-      animationLoop.accumulatedTime -= timeStep;
+    while (this.accumulatedTime > 0) {
+      this.state.forEach(this.step);
+      this.accumulatedTime -= timeStep;
     }
 
     // Render and filter in one iteration.
-    animationLoop.state = filter(
-      animationLoop.state,
+    this.state = filter(
+      this.state,
       renderSubscriber,
-      1 + animationLoop.accumulatedTime / timeStep
+      1 + this.accumulatedTime / timeStep
     );
 
-    if (!animationLoop.state.length) {
-      animationLoop.shouldStop = true;
+    if (!this.state.length) {
+      this.shouldStop = true;
     }
 
-    animationLoop.ticker(animationLoop.loop);
+    raf(this.loop);
   },
 
   start: function start() {
-    const animationLoop = this;
-
-    if (animationLoop.state.length) {
-      if (animationLoop.shouldStop) {
-        animationLoop.shouldStop = false;
-      } else if (!animationLoop.running) {
-        animationLoop.running = true;
-        animationLoop.lastTime = animationLoop.getTime();
-        animationLoop.accumulatedTime = 0;
-        animationLoop.ticker(animationLoop.loop);
+    if (this.state.length) {
+      if (this.shouldStop) {
+        this.shouldStop = false;
+      } else if (!this.running) {
+        this.running = true;
+        this.lastTime = now();
+        this.accumulatedTime = 0;
+        raf(this.loop);
       }
     }
 
-    return animationLoop;
+    return this;
   },
 
   stop: function stop() {
