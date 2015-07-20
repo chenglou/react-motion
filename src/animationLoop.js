@@ -13,17 +13,14 @@ const prototype = {
   lastTime: 0,
   accumulatedTime: 0,
 
-  setOptions: function setOptions(options) {
-    // Seconds
-    const timeStep = options.timeStep;
+  setOptions({timeStep, timeScale, maxSteps}) {
+    // timeStep in milliseconds
+    this.timeStep = timeStep * 1000; // seconds
 
-    // Milliseconds
-    this.timeStep = timeStep * 1000;
+    this.timeScale = timeScale;
+    this.maxSteps = maxSteps;
 
-    this.timeScale = options.timeScale;
-    this.maxSteps = options.maxSteps;
-
-    this.step = function step(subscriber) {
+    this.step = subscriber => {
       if (subscriber.active) {
         const value = subscriber.value;
 
@@ -31,11 +28,9 @@ const prototype = {
         subscriber.value = subscriber.step(timeStep, value);
       }
     };
-
-    return this;
   },
 
-  subscribe: function subscribe(step, render, value) {
+  subscribe(step, render, value) {
     const subscriber = {
       value: value,
       prevValue: value,
@@ -51,7 +46,7 @@ const prototype = {
     };
   },
 
-  loop: function loop() {
+  loop() {
     const currentTime = now();
 
     if (this.shouldStop) {
@@ -81,14 +76,14 @@ const prototype = {
       1 + this.accumulatedTime / timeStep
     );
 
-    if (!this.state.length) {
+    if (this.state.length === 0) {
       this.shouldStop = true;
     }
 
     raf(this.loop);
   },
 
-  start: function start() {
+  start() {
     if (this.state.length) {
       if (this.shouldStop) {
         this.shouldStop = false;
@@ -99,15 +94,13 @@ const prototype = {
         raf(this.loop);
       }
     }
-
-    return this;
   },
 
-  stop: function stop() {
-    this.shouldStop = true;
+  // stop() {
+  //   this.shouldStop = true;
 
-    return this;
-  },
+  //   return this;
+  // },
 };
 
 export default function createAnimationLoop(options) {

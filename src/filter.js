@@ -1,5 +1,6 @@
-// Just like Array.prototype.filter, but passes third argument as
-// the first argument to the callback instead of setting it as the context.
+// Just like Array.prototype.filter, but passes third argument as the first
+// argument to the callback. This is to allocating an inline callback (that
+// refers to something outside as a closure) in the filter call.
 export default function filter(array, callback, argument) {
   const ret = [];
   const len = array.length;

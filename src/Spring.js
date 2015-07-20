@@ -159,17 +159,22 @@ export const Spring = React.createClass({
     this.startAnimating();
   },
 
+  unsubscribeAnimation: null,
+
   componentWillUnmount() {
     if (this.unsubscribeAnimation) {
       this.unsubscribeAnimation();
-      this.unsubscribeAnimation = undefined;
+      this.unsubscribeAnimation = null;
     }
   },
 
   startAnimating() {
     if (!this.unsubscribeAnimation) {
+      // means we're not animating
       this.unsubscribeAnimation = animationLoop.subscribe(
-        this.animationStep, this.animationRender, this.state
+        this.animationStep,
+        this.animationRender,
+        this.state,
       );
       animationLoop.start();
     }
