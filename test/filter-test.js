@@ -1,7 +1,7 @@
 import expect from 'expect';
 import filter from '../src/filter';
 
-describe('filterRight', () => {
+describe('filter', () => {
   it('should keep items the callback returns truthy for', () => {
     const array = [1, 2, 3, 4];
     const callback = (_, item) => item % 2;
