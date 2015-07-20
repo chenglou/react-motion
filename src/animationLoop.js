@@ -13,23 +13,6 @@ const prototype = {
   lastTime: 0,
   accumulatedTime: 0,
 
-  setOptions({timeStep, timeScale, maxSteps}) {
-    // timeStep in milliseconds
-    this.timeStep = timeStep * 1000; // seconds
-
-    this.timeScale = timeScale;
-    this.maxSteps = maxSteps;
-
-    this.step = subscriber => {
-      if (subscriber.active) {
-        const value = subscriber.value;
-
-        subscriber.prevValue = value;
-        subscriber.value = subscriber.step(timeStep, value);
-      }
-    };
-  },
-
   subscribe(step, render, value) {
     const subscriber = {
       value: value,
@@ -103,15 +86,25 @@ const prototype = {
   // },
 };
 
-export default function createAnimationLoop(options) {
+export default function createAnimationLoop({timeStep, timeScale, maxSteps}) {
   const animationLoop = Object.create(prototype);
 
   animationLoop.loop = animationLoop.loop.bind(animationLoop);
   animationLoop.state = [];
 
-  if (options) {
-    animationLoop.setOptions(options);
-  }
+  // timeStep is in milliseconds
+  animationLoop.timeStep = timeStep * 1000; // seconds
+  animationLoop.timeScale = timeScale;
+  animationLoop.maxSteps = maxSteps;
+
+  animationLoop.step = subscriber => {
+    if (subscriber.active) {
+      const value = subscriber.value;
+
+      subscriber.prevValue = value;
+      subscriber.value = subscriber.step(timeStep, value);
+    }
+  };
 
   return animationLoop;
 }
