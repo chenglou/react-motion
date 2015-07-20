@@ -1,10 +1,3 @@
-import filterRight from './filterRight';
-
-function renderSubscriber(subscriber, alpha) {
-  subscriber.render(alpha, subscriber.value, subscriber.prevValue);
-  return subscriber.active;
-}
-
 const prototype = {
   running: false,
   shouldStop: false,
@@ -31,6 +24,13 @@ const prototype = {
 
         subscriber.prevValue = value;
         subscriber.value = subscriber.step(timeStep, value);
+      }
+
+      // Can’t use else here because subscriber.step() might cause
+      // subscriber to become inactive.
+      if (!subscriber.active) {
+        // Mark as dirty to perform filtering in the render step.
+        animationLoop.dirty = true;
       }
     };
 
@@ -63,6 +63,7 @@ const prototype = {
       return;
     }
 
+    const state = animationLoop.state;
     const timeStep = animationLoop.timeStep;
     const frameTime = currentTime - animationLoop.lastTime;
 
@@ -74,16 +75,31 @@ const prototype = {
     }
 
     while (animationLoop.accumulatedTime > 0) {
-      animationLoop.state.forEach(animationLoop.step);
+      state.forEach(animationLoop.step);
       animationLoop.accumulatedTime -= timeStep;
     }
 
-    // Render and filter in one iteration.
-    filterRight(
-      animationLoop.state,
-      renderSubscriber,
-      1 + animationLoop.accumulatedTime / timeStep
-    );
+    const alpha = 1 + animationLoop.accumulatedTime / timeStep;
+    let index = 0;
+    let nextState;
+
+    // If there are any inactive subscribers (loop is dirty)
+    // we need to filter state.
+    if (animationLoop.dirty) {
+      nextState = animationLoop.state = [];
+      animationLoop.dirty = false;
+    }
+
+    while (index < state.length) {
+      let subscriber = state[index];
+      subscriber.render(alpha, subscriber.value, subscriber.prevValue);
+
+      if (nextState && subscriber.active) {
+        nextState.push(subscriber);
+      }
+
+      index++;
+    }
 
     if (!animationLoop.state.length) {
       animationLoop.shouldStop = true;
