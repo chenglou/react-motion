@@ -87,6 +87,7 @@ const prototype = {
     // we need to filter state.
     if (animationLoop.dirty) {
       nextState = animationLoop.state = [];
+      animationLoop.dirty = false;
     }
 
     while (index < state.length) {
