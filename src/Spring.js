@@ -196,8 +196,13 @@ export const Spring = React.createClass({
     const newCurrVelocity = updateCurrVelocity(timeStep, currValue, currVelocity, endValue);
 
     if (noVelocity(currVelocity) && noVelocity(newCurrVelocity)) {
-      this.unsubscribeAnimation();
-      this.unsubscribeAnimation = undefined;
+      // This might be null if the above `endValue()` calls an ownder handler
+      // that unmounts the Spring, in which case `componentWillUnmount` would
+      // have already unsubscribed.
+      if (this.unsubscribeAnimation) {
+        this.unsubscribeAnimation();
+        this.unsubscribeAnimation = null;
+      }
     }
 
     return {
@@ -207,10 +212,13 @@ export const Spring = React.createClass({
   },
 
   animationRender(alpha, nextState, prevState) {
-    this.setState({
-      currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
-      currVelocity: nextState.currVelocity,
-    });
+    // This could be null. See above explanation on `endValue()`.
+    if (this.unsubscribeAnimation != null) {
+      this.setState({
+        currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
+        currVelocity: nextState.currVelocity,
+      });
+    }
   },
 
   render() {
@@ -358,8 +366,11 @@ export const TransitionSpring = React.createClass({
     const newCurrVelocity = updateCurrVelocity(timeStep, currValue, currVelocity, mergedValue);
 
     if (noVelocity(currVelocity) && noVelocity(newCurrVelocity)) {
-      this.unsubscribeAnimation();
-      this.unsubscribeAnimation = undefined;
+      // See comment in Spring.
+      if (this.unsubscribeAnimation) {
+        this.unsubscribeAnimation();
+        this.unsubscribeAnimation = undefined;
+      }
     }
 
     return {
@@ -369,10 +380,13 @@ export const TransitionSpring = React.createClass({
   },
 
   animationRender(alpha, nextState, prevState) {
-    this.setState({
-      currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
-      currVelocity: nextState.currVelocity,
-    });
+    // See comment in Spring.
+    if (this.unsubscribeAnimation != null) {
+      this.setState({
+        currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
+        currVelocity: nextState.currVelocity,
+      });
+    }
   },
 
   render() {
