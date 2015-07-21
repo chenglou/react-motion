@@ -3,6 +3,7 @@ import now from 'performance-now';
 import raf from 'raf';
 
 function renderSubscriber(alpha, subscriber) {
+  // subscriber.render: this.animationRender
   subscriber.render(alpha, subscriber.value, subscriber.prevValue);
   return subscriber.active;
 }
@@ -13,8 +14,11 @@ const prototype = {
   lastTime: 0,
   accumulatedTime: 0,
 
+  // step: this.animationStep
+  // render: this.animationRender
+  // value: state
   subscribe(step, render, value) {
-    const subscriber = {
+    let subscriber = {
       value: value,
       prevValue: value,
       step: step,
@@ -22,7 +26,7 @@ const prototype = {
       active: true,
     };
 
-    this.state.push(subscriber);
+    this.subscribers.push(subscriber);
 
     return function unsubscribe() {
       subscriber.active = false;
@@ -38,6 +42,7 @@ const prototype = {
     }
 
     const timeStep = this.timeStep;
+    // delta
     const frameTime = currentTime - this.lastTime;
 
     this.lastTime = currentTime;
@@ -48,18 +53,18 @@ const prototype = {
     }
 
     while (this.accumulatedTime > 0) {
-      this.state.forEach(this.step);
+      this.subscribers.forEach(this.step); // animationLoop.step
       this.accumulatedTime -= timeStep;
     }
 
     // Render and filter in one iteration.
-    this.state = filter(
-      this.state,
+    this.subscribers = filter(
+      this.subscribers,
       renderSubscriber,
       1 + this.accumulatedTime / timeStep
     );
 
-    if (this.state.length === 0) {
+    if (this.subscribers.length === 0) {
       this.shouldStop = true;
     }
 
@@ -67,7 +72,7 @@ const prototype = {
   },
 
   start() {
-    if (this.state.length) {
+    if (this.subscribers.length) {
       if (this.shouldStop) {
         this.shouldStop = false;
       } else if (!this.running) {
@@ -87,10 +92,10 @@ const prototype = {
 };
 
 export default function createAnimationLoop({timeStep, timeScale, maxSteps}) {
-  const animationLoop = Object.create(prototype);
+  let animationLoop = Object.create(prototype);
 
   animationLoop.loop = animationLoop.loop.bind(animationLoop);
-  animationLoop.state = [];
+  animationLoop.subscribers = [];
 
   // timeStep is in milliseconds
   animationLoop.timeStep = timeStep * 1000; // seconds
@@ -99,10 +104,10 @@ export default function createAnimationLoop({timeStep, timeScale, maxSteps}) {
 
   animationLoop.step = subscriber => {
     if (subscriber.active) {
-      const value = subscriber.value;
+      const value = subscriber.value; // value = this.state
 
       subscriber.prevValue = value;
-      subscriber.value = subscriber.step(timeStep, value);
+      subscriber.value = subscriber.step(timeStep, value); // animationStep
     }
   };
 

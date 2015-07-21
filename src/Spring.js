@@ -7,8 +7,11 @@ import mergeDiff from './mergeDiff';
 import createAnimationLoop from './animationLoop';
 
 const animationLoop = createAnimationLoop({
+  // Fixed time step in seconds.
   timeStep: 1 / 60,
+  // Slow-mo anyone? Give 0.1 a try.
   timeScale: 1,
+  // Pause if we have more than this many steps worth of accumulated time.
   maxSteps: 10,
 });
 
@@ -30,6 +33,7 @@ function interpolateValue(alpha, nextValue, prevValue) {
     return nextValue;
   }
   if (typeof nextValue === 'number') {
+    // https://github.com/chenglou/react-motion/pull/57#issuecomment-121924628
     return nextValue * alpha + prevValue * (1 - alpha);
   }
   if (nextValue.val != null && nextValue.config && nextValue.config.length === 0) {
@@ -278,7 +282,9 @@ export const TransitionSpring = React.createClass({
   startAnimating() {
     if (!this.unsubscribeAnimation) {
       this.unsubscribeAnimation = animationLoop.subscribe(
-        this.animationStep, this.animationRender, this.state
+        this.animationStep,
+        this.animationRender,
+        this.state
       );
       animationLoop.start();
     }
