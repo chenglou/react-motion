@@ -2,6 +2,6 @@ build
 coverage
 lib
 node_modules
-*/all.js
+**/*/all.js
 webpack.*.js
 server.js
