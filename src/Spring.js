@@ -245,7 +245,7 @@ export const TransitionSpring = React.createClass({
       // PropTypes.arrayOf(PropTypes.shape({
       //   key: PropTypes.any.isRequired,
       // })),
-      PropTypes.arrayOf(PropTypes.element),
+      // PropTypes.arrayOf(PropTypes.element),
     ]).isRequired,
     willLeave: PropTypes.oneOfType([
       PropTypes.func,
@@ -320,64 +320,29 @@ export const TransitionSpring = React.createClass({
     }
 
     let mergedValue;
-    if (Array.isArray(endValue)) {
-      const currValueObj = currValue.reduce(assignByObjKey, {});
-      const endValueObj = endValue.reduce(assignByObjKey, {});
-      const currVelocityObj = endValue.reduce(assignByObjKey, {});
+    // only other option is obj
+    mergedValue = mergeDiff(
+      currValue,
+      endValue,
+      // TODO: stop allocating like crazy in this whole code path
+      key => willLeave(key, endValue, currValue, currVelocity)
+    );
 
-      const mergedValueObj = mergeDiff(
-        currValueObj,
-        endValueObj,
-        key => willLeave(key, endValue, currValue, currVelocity)
-      );
-
-      let mergedValueKeys = Object.keys(mergedValueObj);
-      mergedValueKeys
-        .filter(key => !currValueObj.hasOwnProperty(key))
-        .forEach(key => {
-          const enterValue = willEnter(key, mergedValueObj[key], endValue, currValue, currVelocity);
-          currValueObj[key] = enterValue;
-          // We want the willEnter value to be stored as the endValue (in this
-          // case, since it's entering, doesn't matter) once. This is very
-          // different than providing a mere data structure to make the
-          // currValue, currVelocity and endValue trees look the same for the purpose
-          // of interpolating on trees of same shape, and then use endValue's
-          // values to compute currentInterpolationValues anyway. Previously,
-          // after providing willEnter value, we still use the non-numerical
-          // values of endValue. But now that we use the non-numerical value
-          // of willEnter once, we've effectively replace CSSTG since you can
-          // let the react reconciler handle reconciling between 2 components
-          // that differ by only a className
-          mergedValueObj[key] = enterValue;
-          currVelocityObj[key] = mapTree(zero, currValueObj[key]);
-        });
-
-      mergedValue = mergedValueKeys.map(key => mergedValueObj[key]);
-      currValue = Object.keys(currValueObj).map(key => currValueObj[key]);
-      currVelocity = Object.keys(currVelocityObj).map(key => currVelocityObj[key]);
-    } else {
-      // only other option is obj
-      mergedValue = mergeDiff(
-        currValue,
-        endValue,
-        // TODO: stop allocating like crazy in this whole code path
-        key => willLeave(key, endValue, currValue, currVelocity)
-      );
-
-      Object.keys(mergedValue)
-        .filter(key => !currValue.hasOwnProperty(key))
-        .forEach(key => {
-          const enterValue = willEnter(key, mergedValue[key], endValue, currValue, currVelocity);
-          currValue[key] = enterValue;
-          mergedValue[key] = enterValue;
-          currVelocity[key] = mapTree(zero, currValue[key]);
-        });
-    }
+    let hasNewKey = false;
+    Object.keys(mergedValue)
+      .filter(key => !currValue.hasOwnProperty(key))
+      .forEach(key => {
+        hasNewKey = true;
+        const enterValue = willEnter(key, mergedValue[key], endValue, currValue, currVelocity);
+        currValue[key] = enterValue;
+        mergedValue[key] = enterValue;
+        currVelocity[key] = mapTree(zero, currValue[key]);
+      });
 
     const newCurrValue = updateCurrValue(timeStep, currValue, currVelocity, mergedValue);
     const newCurrVelocity = updateCurrVelocity(timeStep, currValue, currVelocity, mergedValue);
 
-    if (noVelocity(currVelocity) && noVelocity(newCurrVelocity)) {
+    if (noVelocity(currVelocity) && noVelocity(newCurrVelocity) && !hasNewKey) {
       // check explanation in `Spring.animationRender`
       if (!this.hasUnmounted) {
         this.unsubscribeAnimation();
