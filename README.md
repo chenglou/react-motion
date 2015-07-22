@@ -63,7 +63,7 @@ let Demo = React.createClass({
 });
 ```
 
-The library exports a default `Spring`, a `TransitionSpring` and `utils`.
+The library exports a `Spring`, a `TransitionSpring` and `utils`.
 
 ### &lt;Spring />
 Exposes a single prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
@@ -184,7 +184,7 @@ getEndValues: function(currentPositions) {
 ```
 
 ### &lt;TransitionSpring />
-Like `Spring`, but can takes two other props: `willEnter` and `willLeave`. Throughout this section, please remember that ""
+Like `Spring`, but can take two other props: `willEnter` and `willLeave`. Throughout this section, please remember that
 
 `endValue`: now constrained to an object (or a callback `currentValue -> object`) of the shape `{key => yourStuff}` (the data is constrained to this shape, but that doesn't mean the way you use your interpolated value has to be). When `endValue` differs from the current interpolated value by an added/removed key:
 
