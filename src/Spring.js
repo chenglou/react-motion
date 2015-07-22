@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import React, {PropTypes} from 'react';
 import mapTree from './mapTree';
 import isPlainObject from 'lodash.isPlainObject';
@@ -165,11 +167,15 @@ export const Spring = React.createClass({
 
   unsubscribeAnimation: null,
 
+  // used in animationRender
+  hasUnmounted: false,
+
   componentWillUnmount() {
     if (this.unsubscribeAnimation) {
       this.unsubscribeAnimation();
       this.unsubscribeAnimation = null;
     }
+    this.hasUnmounted = true;
   },
 
   startAnimating() {
@@ -196,10 +202,8 @@ export const Spring = React.createClass({
     const newCurrVelocity = updateCurrVelocity(timeStep, currValue, currVelocity, endValue);
 
     if (noVelocity(currVelocity) && noVelocity(newCurrVelocity)) {
-      // This might be null if the above `endValue()` calls an ownder handler
-      // that unmounts the Spring, in which case `componentWillUnmount` would
-      // have already unsubscribed.
-      if (this.unsubscribeAnimation) {
+      // check explanation in `animationRender`
+      if (!this.hasUnmounted) {
         this.unsubscribeAnimation();
         this.unsubscribeAnimation = null;
       }
@@ -212,8 +216,11 @@ export const Spring = React.createClass({
   },
 
   animationRender(alpha, nextState, prevState) {
-    // This could be null. See above explanation on `endValue()`.
-    if (this.unsubscribeAnimation != null) {
+    // `this.hasUnmounted` might be true in the following condition:
+    // user does some checks in `endValue` and calls an owner handler
+    // owner sets state in the callback, triggering a re-render
+    // re-render unmounts the Spring
+    if (!this.hasUnmounted) {
       this.setState({
         currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
         currVelocity: nextState.currVelocity,
@@ -279,6 +286,11 @@ export const TransitionSpring = React.createClass({
   componentWillReceiveProps() {
     this.startAnimating();
   },
+
+  unsubscribeAnimation: null,
+
+  // used in animationRender
+  hasUnmounted: false,
 
   componentWillUnmount() {
     if (this.unsubscribeAnimation) {
@@ -366,8 +378,8 @@ export const TransitionSpring = React.createClass({
     const newCurrVelocity = updateCurrVelocity(timeStep, currValue, currVelocity, mergedValue);
 
     if (noVelocity(currVelocity) && noVelocity(newCurrVelocity)) {
-      // See comment in Spring.
-      if (this.unsubscribeAnimation) {
+      // check explanation in `Spring.animationRender`
+      if (!this.hasUnmounted) {
         this.unsubscribeAnimation();
         this.unsubscribeAnimation = undefined;
       }
@@ -381,7 +393,7 @@ export const TransitionSpring = React.createClass({
 
   animationRender(alpha, nextState, prevState) {
     // See comment in Spring.
-    if (this.unsubscribeAnimation != null) {
+    if (!this.hasUnmounted) {
       this.setState({
         currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
         currVelocity: nextState.currVelocity,
