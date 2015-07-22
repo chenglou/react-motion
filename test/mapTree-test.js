@@ -1,4 +1,3 @@
-import expect from 'expect';
 import mapTree from '../src/mapTree';
 import React from 'react';
 

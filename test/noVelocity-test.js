@@ -1,4 +1,3 @@
-import expect from 'expect';
 import noVelocity from '../src/noVelocity';
 import React from 'react';
 
