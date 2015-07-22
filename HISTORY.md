@@ -1,16 +1,17 @@
 Legend:
 
-- [I]: improvement
-- [F]: fix
-- [B]: fix
+- [B]: Breaking
+- [F]: Fix
+- [I]: Improvement
 
-### Upcoming
+### 0.2.0 (July 22th 2015)
 - [B] `willLeave` returning `false` will now keep the key. Only `null` and `undefined` will serve as a signal to kill the disappeared key.
+- [B] `willLeave` previously failed to expose the second argument `correspondingValueOfKeyThatJustLeft`. It's now exposed correctly.
 - [F] Definitively fix the previous problem of mis-detecting React Element as object.
 - [F] `willLeave` is now called only once per disappearing key. It was called more than once previously as a implementation detail. Though you should never have put side-effects in `willLeave`. It's still discouraged now.
 - [F] If you have some `this.props.handlerThatSetStateAndUnmountsSpringInOwnerRender()` in `Spring`'s `endValue`, Spring's already scheduled `requestAnimationFrame` will no longer cause an extra `setState` since it's unmounted. But in general, _please_ don't put side-effect in `endValue`.
 - [I] Stabilize the spring algorithm. No more erratic behavior with a big amount of animated items or tab switching (which usually slows down `requestAnimationFrame`). #57
-- [I] Partial (total?) support for IE9 by using a requestAnimationFrame polyfill.
+- [I] Partial (total?) support for IE9 by using a `requestAnimationFrame` polyfill.
 
 ### 0.1.0 (July 14th 2015)
 - [B] Breaking API: `TransitionSpring`'s `willEnter`'s callback signature is now `(keyThatEnters, correspondingValue, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)` (added `correspondingValue` as the second argument). Same for `willLeave`.

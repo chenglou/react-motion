@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import React, {PropTypes} from 'react';
 import mapTree from './mapTree';
 import isPlainObject from 'lodash.isPlainObject';
@@ -19,11 +17,6 @@ const animationLoop = createAnimationLoop({
 
 function zero() {
   return 0;
-}
-
-function assignByObjKey(ret, objWithKey) {
-  ret[objWithKey.key] = objWithKey;
-  return ret;
 }
 
 // TODO: refactor common logic with updateCurrValue and updateCurrVelocity
@@ -325,7 +318,7 @@ export const TransitionSpring = React.createClass({
       currValue,
       endValue,
       // TODO: stop allocating like crazy in this whole code path
-      key => willLeave(key, endValue, currValue, currVelocity)
+      key => willLeave(key, currValue[key], endValue, currValue, currVelocity)
     );
 
     let hasNewKey = false;
