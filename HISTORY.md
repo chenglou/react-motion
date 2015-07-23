@@ -4,6 +4,9 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### Upcoming
+- [F] Import some internal modules correctly for Ubuntu/Linux node (case-sensitive for them).
+
 ### 0.2.0 (July 22th 2015)
 - [B] `willLeave` returning `false` will now keep the key. Only `null` and `undefined` will serve as a signal to kill the disappeared key.
 - [B] `willLeave` previously failed to expose the second argument `correspondingValueOfKeyThatJustLeft`. It's now exposed correctly.
