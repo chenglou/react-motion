@@ -21,4 +21,20 @@ describe('filter', () => {
 
     filter(array, callback, 'foo');
   });
+
+  it('should iterate over items added while filtering', () => {
+    const array = [1];
+    let pushed = false;
+    const callback = () => {
+      if (!pushed) {
+        array.push(2);
+        pushed = true;
+      }
+      return true;
+    };
+
+    const result = filter(array, callback);
+
+    expect(result).toEqual([1, 2]);
+  });
 });
