@@ -1,4 +1,4 @@
-import isPlainObject from 'lodash.isPlainObject';
+import isPlainObject from 'lodash.isplainobject';
 
 // currenly a helper used for producing a tree of the same shape as the
 // input(s),  but with different values. It's technically not a real `map`

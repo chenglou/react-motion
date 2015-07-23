@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import mapTree from './mapTree';
-import isPlainObject from 'lodash.isPlainObject';
+import isPlainObject from 'lodash.isplainobject';
 import stepper from './stepper';
 import noVelocity from './noVelocity';
 import mergeDiff from './mergeDiff';
