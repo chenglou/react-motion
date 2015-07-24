@@ -4,8 +4,9 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
-### Upcoming
+### 0.2.1 (July 24th 2015)
 - [F] Import some internal modules correctly for Ubuntu/Linux node (case-sensitive for them).
+- [F] Nested springs work again.
 
 ### 0.2.0 (July 22th 2015)
 - [B] `willLeave` returning `false` will now keep the key. Only `null` and `undefined` will serve as a signal to kill the disappeared key.
