@@ -1,4 +1,3 @@
-import expect from 'expect';
 import filter from '../src/filter';
 
 describe('filter', () => {
@@ -9,8 +8,8 @@ describe('filter', () => {
 
     expect(result).toContain(1);
     expect(result).toContain(3);
-    expect(result).toNotContain(2);
-    expect(result).toNotContain(4);
+    expect(result).not.toContain(2);
+    expect(result).not.toContain(4);
   });
 
   it('should pass argument to callback', () => {

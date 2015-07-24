@@ -1,4 +1,3 @@
-import expect from 'expect';
 import mergeDiff from '../src/mergeDiff';
 
 let t = () => true;

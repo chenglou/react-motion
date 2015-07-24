@@ -15,10 +15,16 @@
     "eslint-config-airbnb": "0.0.6",
     "eslint-loader": "^0.14.1",
     "eslint-plugin-react": "^2.7.0",
-    "expect": "^1.6.0",
-    "isparta": "^3.0.3",
+    "inject-loader": "^2.0.0",
+    "isparta-loader": "^0.2.0",
+    "karma": "^0.12.37",
+    "karma-coverage": "^0.4.2",
+    "karma-jasmine": "^0.3.6",
+    "karma-nyan-reporter": "^0.2.1",
+    "karma-phantomjs-launcher": "^0.2.0",
+    "karma-webpack": "^1.6.0",
     "lodash.range": "^3.0.1",
-    "mocha": "^2.2.5",
+    "phantomjs": "^1.9.17",
     "react-hot-loader": "^1.2.8",
     "webpack": "^1.10.1",
     "webpack-dev-server": "^1.10.1"
@@ -28,9 +34,10 @@
     "build-demos": "NODE_ENV=production webpack -p",
     "lint": "eslint --ext .js,.jsx .",
     "prerelease": "babel src --out-dir lib && NODE_ENV=production webpack --config webpack.prod.config.js",
-    "test": "mocha --compilers js:babel/register --recursive test",
-    "test:dev": "npm test -- --watch",
-    "test:cov": "`npm bin`/babel-node `npm bin`/isparta cover --report text --report html `npm bin`/_mocha -- --recursive src"
+    "karma": "karma start ./karma.conf.js",
+    "test": "npm run karma --  --single-run --reporters nyan",
+    "test:dev": "npm run karma -- --no-single-run --auto-watch --reporters nyan",
+    "test:cov": "COVERAGE=1 npm run karma -- --single-run --reporters coverage"
   },
   "repository": {
     "type": "git",

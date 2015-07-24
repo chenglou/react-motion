@@ -1,4 +1,3 @@
-import expect from 'expect';
 import * as s from '../src/Spring';
 import React from 'react';
 

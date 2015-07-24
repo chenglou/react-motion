@@ -1,4 +1,3 @@
-import expect from 'expect';
 import reorderKeys from '../src/reorderKeys';
 
 describe('reorderKeys', () => {
