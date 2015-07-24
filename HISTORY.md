@@ -4,7 +4,7 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
-### 0.2.1 (July 24th 2015)
+### 0.2.2 (July 24th 2015)
 - [F] Import some internal modules correctly for Ubuntu/Linux node (case-sensitive for them).
 - [F] Nested springs work again.
 

@@ -111,9 +111,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _mapTree2 = _interopRequireDefault(_mapTree);
 	
-	var _lodashIsPlainObject = __webpack_require__(5);
+	var _lodashIsplainobject = __webpack_require__(5);
 	
-	var _lodashIsPlainObject2 = _interopRequireDefault(_lodashIsPlainObject);
+	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
 	
 	var _stepper = __webpack_require__(10);
 	
@@ -173,7 +173,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return interpolateValue(alpha, nextValue[i], prevValue[i]);
 	    });
 	  }
-	  if (_lodashIsPlainObject2['default'](nextValue)) {
+	  if (_lodashIsplainobject2['default'](nextValue)) {
 	    return Object.keys(nextValue).reduce(function (ret, key) {
 	      ret[key] = interpolateValue(alpha, nextValue[key], prevValue[key]);
 	      return ret;
@@ -217,7 +217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return updateCurrValue(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
 	    });
 	  }
-	  if (_lodashIsPlainObject2['default'](endValue)) {
+	  if (_lodashIsplainobject2['default'](endValue)) {
 	    return Object.keys(endValue).reduce(function (ret, key) {
 	      ret[key] = updateCurrValue(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
 	      return ret;
@@ -259,7 +259,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return updateCurrVelocity(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
 	    });
 	  }
-	  if (_lodashIsPlainObject2['default'](endValue)) {
+	  if (_lodashIsplainobject2['default'](endValue)) {
 	    return Object.keys(endValue).reduce(function (ret, key) {
 	      ret[key] = updateCurrVelocity(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
 	      return ret;
@@ -523,7 +523,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodashIsPlainObject = __webpack_require__(5);
+	var _lodashIsplainobject = __webpack_require__(5);
 	
 	// currenly a helper used for producing a tree of the same shape as the
 	// input(s),  but with different values. It's technically not a real `map`
@@ -534,7 +534,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: skipping non-numbers is weird and non-generic. Use pre-order traversal
 	// assume trees are of the same shape
 	
-	var _lodashIsPlainObject2 = _interopRequireDefault(_lodashIsPlainObject);
+	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
 	
 	function _mapTree(path, f, trees) {
 	  var t1 = trees[0];
@@ -548,7 +548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }));
 	    });
 	  }
-	  if (_lodashIsPlainObject2['default'](t1)) {
+	  if (_lodashIsplainobject2['default'](t1)) {
 	    return Object.keys(t1).reduce(function (newTree, key) {
 	      newTree[key] = _mapTree([].concat(path, [key]), f, trees.map(function (val) {
 	        return val[key];
@@ -1253,15 +1253,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodashIsPlainObject = __webpack_require__(5);
+	var _lodashIsplainobject = __webpack_require__(5);
 	
-	var _lodashIsPlainObject2 = _interopRequireDefault(_lodashIsPlainObject);
+	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
 	
 	function noVelocity(coll) {
 	  if (Array.isArray(coll)) {
 	    return coll.every(noVelocity);
 	  }
-	  if (_lodashIsPlainObject2['default'](coll)) {
+	  if (_lodashIsplainobject2['default'](coll)) {
 	    return Object.keys(coll).every(function (key) {
 	      return key === 'config' ? true : noVelocity(coll[key]);
 	    });
@@ -1537,10 +1537,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function filter(array, callback, argument) {
 	  var ret = [];
-	  var len = array.length;
 	  var index = 0;
 	
-	  while (index < len) {
+	  // Don’t cache array.length since we want to iterate
+	  // over items that might be added during filtering.
+	  while (index < array.length) {
 	    if (callback(argument, array[index], index, array)) {
 	      ret.push(array[index]);
 	    }
