@@ -1,22 +1,23 @@
-// import * as s from '../src/Spring';
 import React, {addons} from 'react/addons';
-
-const test = require('inject!../src/Spring');
-const s = test({
-  './noVelocity': () => {
-    console.log('adf');
-    return false;
-  },
-});
-
 const TestUtils = addons.TestUtils;
-const Spring = s.Spring;
+
+const injector = require('inject!../src/Spring');
 
 const FRAME_RATE = 1 / 60;
 
 describe('updateCurrValue', () => {
+  let updateCurrValue;
+
+  beforeEach(() => {
+    updateCurrValue = injector({
+      './noVelocity': () => {
+        return false;
+      },
+    }).updateCurrValue;
+  });
+
   it('should not error on null', () => {
-    expect(s.updateCurrValue(FRAME_RATE, {val: null}, {val: null}, {val: null}))
+    expect(updateCurrValue(FRAME_RATE, {val: null}, {val: null}, {val: null}))
       .toEqual({val: null});
   });
 
@@ -24,7 +25,7 @@ describe('updateCurrValue', () => {
     const currValue = {count: 0};
     const currVelocity = {count: 1};
     const endValue = {count: 100};
-    expect(s.updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue))
+    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue))
       .toEqual({count: 100});
   });
 
@@ -32,7 +33,7 @@ describe('updateCurrValue', () => {
     const currValue = {count: {val: 1, config: []}};
     const currVelocity = {count: {val: 5, config: []}};
     const endValue = {count: {val: 10, config: []}};
-    expect(s.updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue))
+    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue))
       .toEqual({count: {val: 10, config: []}});
   });
 
@@ -40,7 +41,7 @@ describe('updateCurrValue', () => {
     const currValue = {val: [1, 2, 3]};
     const currVelocity = {val: [5, 5, 5]};
     const endValue = {val: [10, 10, 10]};
-    expect(s.updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
+    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
       val: [1.4722222222222223, 2.425, 3.3777777777777778],
     });
   });
@@ -49,7 +50,7 @@ describe('updateCurrValue', () => {
     const currValue = {count: {val: [1, 2, {a: 3}]}};
     const currVelocity = {count: {val: [10, 20, {a: 30}]}};
     const endValue = {count: {val: [100, 200, {a: 300}]}};
-    expect(s.updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
+    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
       count: {
         val: [5.769444444444445, 11.53888888888889, {a: 17.308333333333334}],
       },
@@ -60,14 +61,14 @@ describe('updateCurrValue', () => {
     let currValue = {val: [2, {val: 2, config: [100, 10]}]};
     let currVelocity = {val: [10, {val: 10, config: [100, 10]}]};
     let endValue = {val: [2, {val: 2, config: [100, 10]}]};
-    expect(s.updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
+    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
       val: [2.0944444444444446, {val: 2.138888888888889, config: [100, 10]}],
     });
 
     currValue = {val: [1, {val: 1, config: []}]};
     currVelocity = {val: [5, {val: 5, config: []}]};
     endValue = {val: [10, {val: 10, config: []}]};
-    expect(s.updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
+    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
       val: [1.4722222222222223, {val: 10, config: []}],
     });
   });
@@ -77,15 +78,25 @@ describe('updateCurrValue', () => {
     const currValue = {val: [2, 'hi', comp]};
     const currVelocity = {val: [5, 'hi', comp]};
     const endValue = {val: [10, 'hi', comp]};
-    expect(s.updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
+    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
       val: [2.425, 'hi', comp],
     });
   });
 });
 
 describe('updateCurrVelocity', () => {
+  let updateCurrVelocity;
+
+  beforeEach(() => {
+    updateCurrVelocity = injector({
+      './noVelocity': () => {
+        return false;
+      },
+    }).updateCurrVelocity;
+  });
+
   it('should not error on null', () => {
-    expect(s.updateCurrVelocity(FRAME_RATE, {val: null}, {val: null}, {val: null}))
+    expect(updateCurrVelocity(FRAME_RATE, {val: null}, {val: null}, {val: null}))
       .toEqual({val: null});
   });
 
@@ -96,7 +107,7 @@ describe('updateCurrVelocity', () => {
     const currValue = {count: 0};
     const currVelocity = {count: 1};
     const endValue = {count: 100};
-    expect(s.updateCurrVelocity(FRAME_RATE, currValue, currVelocity, endValue))
+    expect(updateCurrVelocity(FRAME_RATE, currValue, currVelocity, endValue))
       .toEqual({count: 0});
   });
 
@@ -104,7 +115,7 @@ describe('updateCurrVelocity', () => {
     const currValue = {count: {val: 1, config: []}};
     const currVelocity = {count: {val: 5, config: []}};
     const endValue = {count: {val: 10, config: []}};
-    expect(s.updateCurrVelocity(FRAME_RATE, currValue, currVelocity, endValue))
+    expect(updateCurrVelocity(FRAME_RATE, currValue, currVelocity, endValue))
       .toEqual({count: {val: 0, config: []}});
   });
 
@@ -113,14 +124,24 @@ describe('updateCurrVelocity', () => {
     const currValue = {val: [1, ['hi'], comp]};
     const currVelocity = {val: [1, ['hi'], comp]};
     const endValue = {val: [10, ['hi'], comp]};
-    expect(s.updateCurrVelocity(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
+    expect(updateCurrVelocity(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
       val: [26.066666666666666, ['hi'], comp],
     });
   });
 });
 
 describe('Spring', () => {
-  it('should call raf one more time after it is done animating', (done) => {
+  let Spring;
+
+  beforeEach(() => {
+    Spring = injector({
+      './noVelocity': () => {
+        return false;
+      },
+    }).Spring;
+  });
+
+  it('should call raf one more time after it is done animating', done => {
     let count = [];
     const App = React.createClass({
       render() {
@@ -141,7 +162,7 @@ describe('Spring', () => {
     }, 0);
   });
 
-  xit('should pass the new value', (done) => {
+  xit('should pass the new value', done => {
     let count = [];
     const App = React.createClass({
       render() {
@@ -162,7 +183,7 @@ describe('Spring', () => {
     }, 30);
   });
 
-  xit('should work with nested springs', () => {
+  xit('should work with nested springs', done => {
     let count = [];
     const App = React.createClass({
       render() {
