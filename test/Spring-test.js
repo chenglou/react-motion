@@ -1,5 +1,16 @@
-import * as s from '../src/Spring';
-import React from 'react';
+// import * as s from '../src/Spring';
+import React, {addons} from 'react/addons';
+
+const test = require('inject!../src/Spring');
+const s = test({
+  './noVelocity': () => {
+    console.log('adf');
+    return false;
+  },
+});
+
+const TestUtils = addons.TestUtils;
+const Spring = s.Spring;
 
 const FRAME_RATE = 1 / 60;
 
@@ -105,5 +116,70 @@ describe('updateCurrVelocity', () => {
     expect(s.updateCurrVelocity(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
       val: [26.066666666666666, ['hi'], comp],
     });
+  });
+});
+
+describe('Spring', () => {
+  it('should call raf one more time after it is done animating', (done) => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Spring endValue={{val: 400}}>
+            {({val}) => {
+              count.push(val);
+              return <div />;
+            }}
+          </Spring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+    setTimeout(() => {
+      expect(count).toEqual([400, 400]);
+      done();
+    }, 0);
+  });
+
+  xit('should pass the new value', (done) => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Spring endValue={currValue => ({val: currValue == null ? 0 : 400})}>
+            {({val}) => {
+              count.push(val);
+              return <div />;
+            }}
+          </Spring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+    setTimeout(() => {
+      expect(count).toEqual([400, 400]);
+      done();
+    }, 30);
+  });
+
+  xit('should work with nested springs', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Spring endValue={{val: 400}}>
+            {({val}) => {
+              count.push(val);
+              return <div />;
+            }}
+          </Spring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+    setTimeout(() => {
+      expect(count).toEqual([400, 400]);
+      done();
+    }, 0);
   });
 });
