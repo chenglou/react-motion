@@ -3,10 +3,11 @@
 // refers to something outside as a closure) in the filter call.
 export default function filter(array, callback, argument) {
   const ret = [];
-  const len = array.length;
   let index = 0;
 
-  while (index < len) {
+  // Don’t cache array.length since we want to iterate
+  // over items that might be added during filtering.
+  while (index < array.length) {
     if (callback(argument, array[index], index, array)) {
       ret.push(array[index]);
     }
