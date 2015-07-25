@@ -11,6 +11,7 @@
     "comma-dangle": [2, "always-multiline"],
     "no-eq-null": 0,
     "block-scoped-var": 0, // until fixed https://github.com/eslint/eslint/issues/2253
+    "no-nested-ternary": 0, // until fixed https://github.com/eslint/eslint/issues/2253
 
     "react/jsx-no-undef": 2,
     "react/jsx-quotes": [2, "double", "avoid-escape"],
