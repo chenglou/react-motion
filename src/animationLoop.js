@@ -1,14 +1,14 @@
-import {default as defaultNow} from 'performance-now';
-import {default as defaultRaf} from 'raf';
+import defaultNow from 'performance-now';
+import defaultRaf from 'raf';
 
-export default function configAnimation(config) {
+export default function configAnimation(config = {}) {
   let {
     timeStep = 1 / 60 * 1000,
     timeScale = 1,
     maxSteps = 10,
     raf = defaultRaf,
     now = defaultNow,
-  } = config || {}; // Allow for no config passed
+  } = config;
 
   let animRunning = [];
   let shouldStop = false;
@@ -43,7 +43,6 @@ export default function configAnimation(config) {
       }
       accumulatedTime -= timeStep;
     }
-
 
     // Render and filter in one iteration.
     // Really imperative section for the sake of not allocating
@@ -81,16 +80,10 @@ export default function configAnimation(config) {
     }
   }
 
-  function makeStopAnimation(val) {
-    return () => {
-      val.active = false;
-    };
-  }
-
   return function startAnimation(state, step, render) {
     for (let i = 0; i < animRunning.length; i++) {
       let val = animRunning[i];
-      if (val.step === step) { // looking towards removing component
+      if (val.step === step) {
         val.active = true;
         if (!running) {
           start();
@@ -108,8 +101,7 @@ export default function configAnimation(config) {
       active: true,
     };
 
-    // Cache stop function to avoid creating it in the check above
-    newAnim.stop = makeStopAnimation(newAnim);
+    newAnim.stop = () => newAnim.active = false;
     animRunning.push(newAnim);
 
     if (!running) {
