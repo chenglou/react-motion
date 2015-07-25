@@ -47,6 +47,15 @@ describe('updateCurrValue', () => {
     });
   });
 
+  it('should do negative numbers', () => {
+    const currValue = {val: 1};
+    const currVelocity = {val: 100};
+    const endValue = {val: -1000};
+    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
+      val: -45.325,
+    });
+  });
+
   it('should do nested updates, with a default config', () => {
     const currValue = {count: {val: [1, 2, {a: 3}]}};
     const currVelocity = {count: {val: [10, 20, {a: 30}]}};
