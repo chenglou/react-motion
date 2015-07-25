@@ -2,6 +2,7 @@ import React, {addons} from 'react/addons';
 const TestUtils = addons.TestUtils;
 
 const injector = require('inject!../src/Spring');
+// const injectorAnimationLoop = require('inject!../src/animationLoop');
 
 const FRAME_RATE = 1 / 60;
 
@@ -132,12 +133,13 @@ describe('updateCurrVelocity', () => {
 
 describe('Spring', () => {
   let Spring;
-
   beforeEach(() => {
     Spring = injector({
-      './noVelocity': () => {
-        return false;
-      },
+      // './animationLoop': injectorAnimationLoop({
+      //   raf: cb => {
+      //     cb();
+      //   },
+      // }),
     }).Spring;
   });
 
@@ -149,6 +151,10 @@ describe('Spring', () => {
           <Spring endValue={{val: 400}}>
             {({val}) => {
               count.push(val);
+              if (count.length === 2) {
+                expect(count).toEqual([400, 400]);
+                done();
+              }
               return <div />;
             }}
           </Spring>
@@ -156,13 +162,9 @@ describe('Spring', () => {
       },
     });
     TestUtils.renderIntoDocument(<App />);
-    setTimeout(() => {
-      expect(count).toEqual([400, 400]);
-      done();
-    }, 0);
   });
 
-  xit('should pass the new value', done => {
+  it('should pass the new value', done => {
     let count = [];
     const App = React.createClass({
       render() {
@@ -170,6 +172,9 @@ describe('Spring', () => {
           <Spring endValue={currValue => ({val: currValue == null ? 0 : 400})}>
             {({val}) => {
               count.push(val);
+              if (count.length > 2 && count[count.length - 1] === 400) {
+                done();
+              }
               return <div />;
             }}
           </Spring>
@@ -177,10 +182,6 @@ describe('Spring', () => {
       },
     });
     TestUtils.renderIntoDocument(<App />);
-    setTimeout(() => {
-      expect(count).toEqual([400, 400]);
-      done();
-    }, 30);
   });
 
   xit('should work with nested springs', done => {
