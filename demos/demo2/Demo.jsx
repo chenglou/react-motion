@@ -59,18 +59,16 @@ const Demo = React.createClass({
   },
 
   handleMouseDown(key, [pressX, pressY], {pageX, pageY}) {
-    const dx = pageX - pressX;
-    const dy = pageY - pressY;
     this.setState({
       lastPress: key,
       isPressed: true,
-      delta: [dx, dy],
-      mouse: [pageX - dx, pageY - dy],
+      delta: [pageX - pressX, pageY - pressY],
+      mouse: [pressX, pressY],
     });
   },
 
   handleMouseUp() {
-    this.setState({isPressed: false, dx: 0, dy: 0});
+    this.setState({isPressed: false, delta: [0, 0]});
   },
 
   getValues() {
