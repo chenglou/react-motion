@@ -282,3 +282,30 @@ Since `TransitionSpring` dictates `endValue` to be an object, manipulating keys 
 
 #### `utils.reorderKeys(object, newKeysFunction)`
 `newKeysFunction` will receive, as arguments, the array of keys in `object` and should return a new array of keys (with e.g. order changed and/or keys missing). `reorderKeys` will then return a new object similar to `object`, but with the keys in the order `newKeysFunction` dictated.
+
+## FAQ
+
+- How do I do staggering/chained animation where items animate in one after another?
+In most cases, what you want to express here is a relationship between animations, e.g. item 2 appears after item 1. Staggering/chained animation have hard-coded values and go against the spirit of a physics system. Check out [demo 1](https://cdn.rawgit.com/chenglou/react-motion/3b5be548cd08630a836562a053576ff91f94b93f/demo1/index.html); each ball follows the one in front of it, creating a natural staggering animation. The code in `endValue` looks roughly so:
+
+```jsx
+<Spring endValue={currentPositions => {
+  const endValue = currentPositions.val.map(
+    (_, i) => i === 0 ? someMousePosition : currentPositions.val[i - 1]
+  );
+  return {val: endValue};
+}}>
+  ...
+```
+First ball's destination is the mouse position. The subsequent ones' destination is the current position of the ball in front of them. The values depend on each other. No hard-coded duration/timeout here!
+
+- My `ref` doesn't work in the children function.
+React string refs won't work:
+
+```jsx
+<Spring endValue={...}>
+  {currentValue => <div ref="stuff" />}
+</Spring>
+```
+
+This is how React works. Here's the [callback ref solution](https://facebook.github.io/react/docs/more-about-refs.html#the-ref-callback-attribute).
