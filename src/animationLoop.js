@@ -1,115 +1,121 @@
-import filter from './filter';
-import now from 'performance-now';
-import raf from 'raf';
+import {default as defaultNow} from 'performance-now';
+import {default as defaultRaf} from 'raf';
 
-function renderSubscriber(alpha, subscriber) {
-  // subscriber.render: this.animationRender
-  subscriber.render(alpha, subscriber.value, subscriber.prevValue);
-  return subscriber.active;
-}
+export default function configAnimation(config) {
+  let {
+    timeStep = 1 / 60 * 1000,
+    timeScale = 1,
+    maxSteps = 10,
+    raf = defaultRaf,
+    now = defaultNow,
+  } = config || {}; // Allow for no config passed
 
-const prototype = {
-  running: false,
-  shouldStop: false,
-  lastTime: 0,
-  accumulatedTime: 0,
+  let animRunning = [];
+  let shouldStop = false;
+  let running = false;
+  let prevTime = 0;
+  let accumulatedTime = 0;
 
-  // step: this.animationStep
-  // render: this.animationRender
-  // value: state
-  subscribe(step, render, value) {
-    let subscriber = {
-      value: value,
-      prevValue: value,
-      step: step,
-      render: render,
-      active: true,
-    };
-
-    this.subscribers.push(subscriber);
-
-    return function unsubscribe() {
-      subscriber.active = false;
-    };
-  },
-
-  loop() {
-    const currentTime = now();
-
-    if (this.shouldStop) {
-      this.running = this.shouldStop = false;
+  function loop() {
+    if (shouldStop) {
+      running = shouldStop = false;
       return;
     }
 
-    const timeStep = this.timeStep;
-    // delta
-    const frameTime = currentTime - this.lastTime;
+    const currentTime = now();
+    const frameTime = currentTime - prevTime; // delta
 
-    this.lastTime = currentTime;
-    this.accumulatedTime += frameTime * this.timeScale;
+    prevTime = currentTime;
+    accumulatedTime += frameTime * timeScale;
 
-    if (this.accumulatedTime > timeStep * this.maxSteps) {
-      this.accumulatedTime = 0;
+    if (accumulatedTime > timeStep * maxSteps) {
+      accumulatedTime = 0;
     }
 
-    while (this.accumulatedTime > 0) {
-      this.subscribers.forEach(this.step); // animationLoop.step
-      this.accumulatedTime -= timeStep;
+    while (accumulatedTime > 0) {
+      for (let i = 0; i < animRunning.length; i++) {
+        const {active, step} = animRunning[i];
+        if (active) {
+          const prevNewState = animRunning[i].newState;
+          animRunning[i].newState = step(timeStep / 1000, prevNewState);
+          animRunning[i].prevState = prevNewState;
+        }
+      }
+      accumulatedTime -= timeStep;
     }
+
 
     // Render and filter in one iteration.
-    this.subscribers = filter(
-      this.subscribers,
-      renderSubscriber,
-      1 + this.accumulatedTime / timeStep
-    );
+    // Really imperative section for the sake of not allocating
+    const newAnimRunning = [];
+    const alpha = 1 + accumulatedTime / timeStep;
+    let index = 0;
+    while (index < animRunning.length) {
+      const {render, active, newState, prevState} = animRunning[index];
 
-    if (this.subscribers.length === 0) {
-      this.shouldStop = true;
+      // Might mutate animRunning........
+      render(alpha, newState, prevState);
+      if (active) {
+        newAnimRunning.push(animRunning[index]);
+      }
+      index++;
     }
 
-    raf(this.loop);
-  },
+    animRunning = newAnimRunning;
 
-  start() {
-    if (this.subscribers.length) {
-      if (this.shouldStop) {
-        this.shouldStop = false;
-      } else if (!this.running) {
-        this.running = true;
-        this.lastTime = now();
-        this.accumulatedTime = 0;
-        raf(this.loop);
+    if (animRunning.length === 0) {
+      shouldStop = true;
+    }
+
+    raf(loop);
+  }
+
+  function start() {
+    if (shouldStop) {
+      shouldStop = false;
+    } else if (!running) {
+      running = true;
+      prevTime = now();
+      accumulatedTime = 0;
+      raf(loop);
+    }
+  }
+
+  function makeStopAnimation(val) {
+    return () => {
+      val.active = false;
+    };
+  }
+
+  return function startAnimation(state, step, render) {
+    for (let i = 0; i < animRunning.length; i++) {
+      let val = animRunning[i];
+      if (val.step === step) { // looking towards removing component
+        val.active = true;
+        if (!running) {
+          start();
+        }
+
+        return val.stop;
       }
     }
-  },
 
-  // stop() {
-  //   this.shouldStop = true;
+    let newAnim = {
+      step,
+      render,
+      prevState: state,
+      newState: state, // push initial state
+      active: true,
+    };
 
-  //   return this;
-  // },
-};
+    // Cache stop function to avoid creating it in the check above
+    newAnim.stop = makeStopAnimation(newAnim);
+    animRunning.push(newAnim);
 
-export default function createAnimationLoop({timeStep, timeScale, maxSteps}) {
-  let animationLoop = Object.create(prototype);
-
-  animationLoop.loop = animationLoop.loop.bind(animationLoop);
-  animationLoop.subscribers = [];
-
-  // timeStep is in milliseconds
-  animationLoop.timeStep = timeStep * 1000; // seconds
-  animationLoop.timeScale = timeScale;
-  animationLoop.maxSteps = maxSteps;
-
-  animationLoop.step = subscriber => {
-    if (subscriber.active) {
-      const value = subscriber.value; // value = this.state
-
-      subscriber.prevValue = value;
-      subscriber.value = subscriber.step(timeStep, value); // animationStep
+    if (!running) {
+      start();
     }
-  };
 
-  return animationLoop;
+    return newAnim.stop;
+  };
 }
