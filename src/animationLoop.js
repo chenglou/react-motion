@@ -1,115 +1,115 @@
-import filter from './filter';
-import now from 'performance-now';
-import raf from 'raf';
+import {default as defaultNow} from 'performance-now';
+import {default as defaultRaf} from 'raf';
 
-function renderSubscriber(alpha, subscriber) {
-  // subscriber.render: this.animationRender
-  subscriber.render(alpha, subscriber.value, subscriber.prevValue);
-  return subscriber.active;
-}
+export default function configAnimation(config = {}) {
+  let {
+    timeStep = 1 / 60 * 1000,
+    timeScale = 1,
+    maxSteps = 10,
+    raf = defaultRaf,
+    now = defaultNow,
+  } = config;
 
-const prototype = {
-  running: false,
-  shouldStop: false,
-  lastTime: 0,
-  accumulatedTime: 0,
+  let animRunning = [];
+  let running = false;
+  let prevTime = 0;
+  let accumulatedTime = 0;
 
-  // step: this.animationStep
-  // render: this.animationRender
-  // value: state
-  subscribe(step, render, value) {
-    let subscriber = {
-      value: value,
-      prevValue: value,
-      step: step,
-      render: render,
+  function loop() {
+    const currentTime = now();
+    const frameTime = currentTime - prevTime; // delta
+
+    prevTime = currentTime;
+    accumulatedTime += frameTime * timeScale;
+
+    if (accumulatedTime > timeStep * maxSteps) {
+      accumulatedTime = 0;
+    }
+
+    let frameNumber = Math.ceil(accumulatedTime / timeStep);
+    for (let i = 0; i < animRunning.length; i++) {
+      const {active, step, prevState: prevPrevState, nextState: prevNextState} = animRunning[i];
+      if (!active) {
+        continue;
+      }
+
+      // Seems like because the TS sets destVals as enterVals for the first
+      // tick, we might render that value twice. We render it once, currValue is
+      // enterVal and destVal is enterVal. The next tick is faster than 16ms,
+      // so accumulatedTime (which would be about -16ms from the previous tick)
+      // is negative (-16ms + any number less than 16ms < 0). So we just render
+      // part ways towards the nextState, but that's enterVal still. We render
+      // say 75% between currValue (=== enterVal) and destValue (=== enterVal).
+      // So we render the same value a second time.
+      // The solution bellow is to recalculate the destination state even when
+      // you're moving partially towards it.
+      if (accumulatedTime <= 0) {
+        animRunning[i].nextState = step(timeStep / 1000, prevPrevState);
+      } else {
+        for (let j = 0; j < frameNumber; j++) {
+          animRunning[i].nextState = step(timeStep / 1000, prevNextState);
+          animRunning[i].prevState = prevNextState;
+        }
+      }
+    }
+
+    accumulatedTime = accumulatedTime - frameNumber * timeStep;
+
+    // Render and filter in one iteration.
+    const newAnimRunning = [];
+    const alpha = 1 + accumulatedTime / timeStep;
+    for (let i = 0; i < animRunning.length; i++) {
+      const {render, active, nextState, prevState} = animRunning[i];
+
+      // Might mutate animRunning........
+      render(alpha, nextState, prevState);
+      if (active) {
+        newAnimRunning.push(animRunning[i]);
+      }
+    }
+
+    animRunning = newAnimRunning;
+
+    if (animRunning.length === 0) {
+      running = false;
+    } else {
+      raf(loop);
+    }
+  }
+
+  function start() {
+    if (!running) {
+      running = true;
+      prevTime = now();
+      accumulatedTime = 0;
+      raf(loop);
+    }
+  }
+
+  return function startAnimation(state, step, render) {
+    for (let i = 0; i < animRunning.length; i++) {
+      let val = animRunning[i];
+      if (val.step === step) {
+        val.active = true;
+        val.prevState = state;
+        start();
+        return val.stop;
+      }
+    }
+
+    let newAnim = {
+      step,
+      render,
+      prevState: state,
+      nextState: state,
       active: true,
     };
 
-    this.subscribers.push(subscriber);
+    newAnim.stop = () => newAnim.active = false;
+    animRunning.push(newAnim);
 
-    return function unsubscribe() {
-      subscriber.active = false;
-    };
-  },
+    start();
 
-  loop() {
-    const currentTime = now();
-
-    if (this.shouldStop) {
-      this.running = this.shouldStop = false;
-      return;
-    }
-
-    const timeStep = this.timeStep;
-    // delta
-    const frameTime = currentTime - this.lastTime;
-
-    this.lastTime = currentTime;
-    this.accumulatedTime += frameTime * this.timeScale;
-
-    if (this.accumulatedTime > timeStep * this.maxSteps) {
-      this.accumulatedTime = 0;
-    }
-
-    while (this.accumulatedTime > 0) {
-      this.subscribers.forEach(this.step); // animationLoop.step
-      this.accumulatedTime -= timeStep;
-    }
-
-    // Render and filter in one iteration.
-    this.subscribers = filter(
-      this.subscribers,
-      renderSubscriber,
-      1 + this.accumulatedTime / timeStep
-    );
-
-    if (this.subscribers.length === 0) {
-      this.shouldStop = true;
-    }
-
-    raf(this.loop);
-  },
-
-  start() {
-    if (this.subscribers.length) {
-      if (this.shouldStop) {
-        this.shouldStop = false;
-      } else if (!this.running) {
-        this.running = true;
-        this.lastTime = now();
-        this.accumulatedTime = 0;
-        raf(this.loop);
-      }
-    }
-  },
-
-  // stop() {
-  //   this.shouldStop = true;
-
-  //   return this;
-  // },
-};
-
-export default function createAnimationLoop({timeStep, timeScale, maxSteps}) {
-  let animationLoop = Object.create(prototype);
-
-  animationLoop.loop = animationLoop.loop.bind(animationLoop);
-  animationLoop.subscribers = [];
-
-  // timeStep is in milliseconds
-  animationLoop.timeStep = timeStep * 1000; // seconds
-  animationLoop.timeScale = timeScale;
-  animationLoop.maxSteps = maxSteps;
-
-  animationLoop.step = subscriber => {
-    if (subscriber.active) {
-      const value = subscriber.value; // value = this.state
-
-      subscriber.prevValue = value;
-      subscriber.value = subscriber.step(timeStep, value); // animationStep
-    }
+    return newAnim.stop;
   };
-
-  return animationLoop;
 }
