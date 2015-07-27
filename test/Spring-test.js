@@ -265,7 +265,7 @@ describe('Spring', () => {
     const App = React.createClass({
       render() {
         return (
-          <Spring endValue={currValue => ({val: currValue == null ? 0 : 400})}>
+          <Spring defaultValue={{val: 0}} endValue={{val: 400}}>
             {({val}) => {
               count.push(val);
               if (count.length > 2 && count[count.length - 1] === 400) {

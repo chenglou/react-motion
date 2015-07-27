@@ -50,7 +50,7 @@ let Demo = React.createClass({
     return (
       <div>
         <button onMouseDown={this.handleMouseDown}>Toggle</button>
-        <Spring endValue={{val: this.state.open ? 400 : 0}}>
+        <Spring defaultValue={{val: 0}} endValue={{val: this.state.open ? 400 : 0}}>
           {interpolated =>
             <div className="demo0-block" style={{
               transform: `translate3d(${interpolated.val}px, 0, 0)`,
@@ -169,15 +169,11 @@ But this is still slightly tedious. Here's an alternative:
 
 Explicitly setting a `config` of `[]` signals `Spring` not to drill down that collection and animate.
 
-Sometime, you want to rely on the currently interpolated value to calculate `endValue`. E.g. (demo 1) a chat head's final position is the current position of the leading chat head. `endValue` can also accept a function `(currentPositions) => yourEndValue`, where `currentPositions` is the same data structure you'd receive from the children callback.
+Sometime, you want to rely on the currently interpolated value to calculate `endValue`. E.g. (demo 1) a chat head's final position is the current position of the leading chat head. `endValue` can also accept a function `(currentPositions) => yourEndValue`, where `currentPositions` is the same data you received from the previous tick of children callback.
 
 ```jsx
 // ...Somewhere in your React class
 getEndValues: function(currentPositions) {
-  // currentPositions of `null` means it's the first render for Spring.
-  if (currentPositions == null) {
-    return {val: utils.range(6).map(() => [0, 0])};
-  }
   // This is really the previous tick of currentPositions. In practice, it
   // doesn't make much difference.
   let endValue = currentPositions.val.map((_, i) => {

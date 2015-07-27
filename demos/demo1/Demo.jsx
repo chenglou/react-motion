@@ -16,12 +16,8 @@ const Demo = React.createClass({
   },
 
   getValues(currentPositions) {
-    // currentPositions of `undefined` means it's the first render for Spring
-    if (currentPositions == null) {
-      return {val: range(6).map(() => [0, 0])};
-    }
     const endValue = currentPositions.val.map((_, i) => {
-      // hack. We're getting the currentPositions of the previous ball, but in
+      // We're getting the currentPositions of the previous ball, but in
       // reality it's not really the "current" position. It's the last render's.
       // If we want to get the real current position, we'd have to compute it
       // now, then read into it now. This gets very tedious with this API.
@@ -32,7 +28,7 @@ const Demo = React.createClass({
 
   render() {
     return (
-      <Spring endValue={this.getValues}>
+      <Spring defaultValue={{val: range(6).map(() => [0, 0])}} endValue={this.getValues}>
         {({val}) =>
           <div
             className="demo1"
