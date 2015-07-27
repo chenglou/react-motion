@@ -5,12 +5,9 @@ import stepper from './stepper';
 import noVelocity from './noVelocity';
 import mergeDiff from './mergeDiff';
 import configAnimation from './animationLoop';
+import zero from './zero';
 
 const startAnimation = configAnimation();
-
-function zero() {
-  return 0;
-}
 
 // TODO: refactor common logic with updateCurrValue and updateCurrVelocity
 function interpolateValue(alpha, nextValue, prevValue) {
