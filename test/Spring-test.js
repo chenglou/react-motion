@@ -142,6 +142,7 @@ describe('updateCurrVelocity', () => {
 
 describe('Spring', () => {
   let Spring;
+  let TransitionSpring;
   beforeEach(() => {
     Spring = injector({
       // './animationLoop': injectorAnimationLoop({
@@ -150,6 +151,33 @@ describe('Spring', () => {
       //   },
       // }),
     }).Spring;
+    TransitionSpring = injector({
+      // './animationLoop': injectorAnimationLoop({
+      //   raf: cb => {
+      //     cb();
+      //   },
+      // }),
+    }).TransitionSpring;
+  });
+
+  it('should allow returning null from children function', () => {
+    const App = React.createClass({
+      render() {
+        // shouldn't throw here
+        return <Spring endValue={{val: 0}}>{() => null}</Spring>;
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+    const App2 = React.createClass({
+      render() {
+        return (
+          <TransitionSpring endValue={{a: {}}}>
+            {() => null}
+          </TransitionSpring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App2 />);
   });
 
   it('should call raf one more time after it is done animating', done => {

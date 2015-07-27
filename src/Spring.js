@@ -231,8 +231,8 @@ export const Spring = React.createClass({
   },
 
   render() {
-    const {currValue} = this.state;
-    return React.Children.only(this.props.children(currValue));
+    const renderedChildren = this.props.children(this.state.currValue);
+    return renderedChildren && React.Children.only(renderedChildren);
   },
 });
 
@@ -318,8 +318,7 @@ export const TransitionSpring = React.createClass({
   },
 
   render() {
-    const {currValue} = this.state;
-
-    return React.Children.only(this.props.children(currValue));
+    const renderedChildren = this.props.children(this.state.currValue);
+    return renderedChildren && React.Children.only(renderedChildren);
   },
 });
