@@ -194,6 +194,51 @@ describe('Spring', () => {
     TestUtils.renderIntoDocument(<App />);
   });
 
+  it('should allow a defaultValue', done => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Spring defaultValue={{val: 1}} endValue={{val: 10}}>
+            {({val}) => {
+              count.push(val);
+              if (count.length === 2) {
+                expect(count[0]).toBe(1);
+                expect(count[1]).toBeGreaterThan(1);
+                setTimeout(done, 0);
+              }
+              return null;
+            }}
+          </Spring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+  });
+
+  it('should allow a defaultValue for TransitionSpring', done => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <TransitionSpring defaultValue={{a: {val: 1}}} endValue={{a: {val: 10}}}>
+            {({a: {val}}) => {
+              count.push(val);
+              if (count.length === 2) {
+                expect(count[0]).toBe(1);
+                expect(count[1]).toBeGreaterThan(1);
+                setTimeout(done, 0);
+              }
+              return null;
+            }}
+          </TransitionSpring>
+        );
+      },
+    });
+
+    TestUtils.renderIntoDocument(<App />);
+  });
+
   it('should call raf one more time after it is done animating', done => {
     let count = [];
     const App = React.createClass({

@@ -167,6 +167,10 @@ function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
 
 export const Spring = React.createClass({
   propTypes: {
+    defaultValue: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.array,
+    ]),
     endValue: PropTypes.oneOfType([
       PropTypes.func,
       PropTypes.object,
@@ -176,14 +180,20 @@ export const Spring = React.createClass({
   },
 
   getInitialState() {
-    let {endValue} = this.props;
-    if (typeof endValue === 'function') {
-      // TODO: provide warning for failing to provide base case
-      endValue = endValue();
+    const {endValue, defaultValue} = this.props;
+    let currValue;
+    if (defaultValue == null) {
+      if (typeof endValue === 'function') {
+        currValue = endValue();
+      } else {
+        currValue = endValue;
+      }
+    } else {
+      currValue = defaultValue;
     }
     return {
-      currValue: endValue,
-      currVelocity: mapTree(zero, endValue),
+      currValue: currValue,
+      currVelocity: mapTree(zero, currValue),
     };
   },
 
@@ -238,6 +248,7 @@ export const Spring = React.createClass({
 
 export const TransitionSpring = React.createClass({
   propTypes: {
+    defaultValue: PropTypes.objectOf(PropTypes.any),
     endValue: PropTypes.oneOfType([
       PropTypes.func,
       PropTypes.objectOf(PropTypes.any.isRequired),
@@ -269,13 +280,20 @@ export const TransitionSpring = React.createClass({
   },
 
   getInitialState() {
-    let {endValue} = this.props;
-    if (typeof endValue === 'function') {
-      endValue = endValue();
+    const {endValue, defaultValue} = this.props;
+    let currValue;
+    if (defaultValue == null) {
+      if (typeof endValue === 'function') {
+        currValue = endValue();
+      } else {
+        currValue = endValue;
+      }
+    } else {
+      currValue = defaultValue;
     }
     return {
-      currValue: endValue,
-      currVelocity: mapTree(zero, endValue),
+      currValue: currValue,
+      currVelocity: mapTree(zero, currValue),
     };
   },
 

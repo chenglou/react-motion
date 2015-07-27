@@ -8,6 +8,7 @@ Legend:
 - [F] Import some internal modules correctly for Ubuntu/Linux node (case-sensitive for them).
 - [F] Nested springs work again.
 - [I]: Allow returning `null` from children function. #101
+- [I]: `defaultValue` for specifying a... default value, upon mounting.
 
 ### 0.2.0 (July 22th 2015)
 - [B] `willLeave` returning `false` will now keep the key. Only `null` and `undefined` will serve as a signal to kill the disappeared key.

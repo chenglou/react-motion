@@ -66,10 +66,17 @@ let Demo = React.createClass({
 The library exports a `Spring`, a `TransitionSpring` and `utils`.
 
 ### &lt;Spring />
-Exposes a single prop, `endValue`, which takes either an object, an array or a function that returns an object or an array.
-Type: `endValue: object | array | object -> (object | array)`.
+Exposes the props `defaultValue` (object or array) and `endValue` (object, array or a function that returns an object or an array).
 
-`endValue` can be of an arbitrary shape (**but must stay the same shape from one render to the next**). There are however 2 reserved keys: `val` and `config`. Say your initial data structure looks so:
+Types:
+- `defaultValue: object | array`.
+- `endValue: object | array | object -> (object | array)`.
+
+Both values can be of an arbitrary shape (**but must have the same shape. `endValue` must stay the same shape from one render to the next**).
+
+`defaultValue` is used as the first value upon mounting. Usually your `endValue` would differ from it, as to give the mounting animation effect.
+
+`endValue` is the value you want to reach. There are 2 reserved keys for it: `val` and `config`. Say your initial data structure looks so:
 
 ```js
 {size: 10, top: 20}
@@ -185,6 +192,8 @@ getEndValues: function(currentPositions) {
 
 ### &lt;TransitionSpring />
 Like `Spring`, but can take two other props: `willEnter` and `willLeave`. Throughout this section, please remember that
+
+`defaultValue`: see `endValue` just below.
 
 `endValue`: now constrained to an object (or a callback `currentValue -> object`) of the shape `{key => yourStuff}` (the data is constrained to this shape, but that doesn't mean the way you use your interpolated value has to be). When `endValue` differs from the current interpolated value by an added/removed key:
 
