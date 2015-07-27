@@ -14,7 +14,7 @@ function zero() {
 
 // TODO: refactor common logic with updateCurrValue and updateCurrVelocity
 function interpolateValue(alpha, nextValue, prevValue) {
-  if (nextValue === null) {
+  if (nextValue == null) {
     return null;
   }
   if (prevValue == null) {
@@ -50,7 +50,7 @@ function interpolateValue(alpha, nextValue, prevValue) {
 
 // TODO: refactor common logic with updateCurrVelocity
 export function updateCurrValue(frameRate, currValue, currVelocity, endValue, k, b) {
-  if (endValue === null) {
+  if (endValue == null) {
     return null;
   }
   if (typeof endValue === 'number') {
@@ -86,7 +86,7 @@ export function updateCurrValue(frameRate, currValue, currVelocity, endValue, k,
 }
 
 export function updateCurrVelocity(frameRate, currValue, currVelocity, endValue, k, b) {
-  if (endValue === null) {
+  if (endValue == null) {
     return null;
   }
   if (typeof endValue === 'number') {
