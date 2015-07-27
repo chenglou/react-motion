@@ -240,9 +240,7 @@ export const TransitionSpring = React.createClass({
   propTypes: {
     endValue: PropTypes.oneOfType([
       PropTypes.func,
-      PropTypes.objectOf({
-        key: PropTypes.any.isRequired,
-      }),
+      PropTypes.objectOf(PropTypes.any.isRequired),
       // coming soon
       // PropTypes.arrayOf(PropTypes.shape({
       //   key: PropTypes.any.isRequired,
