@@ -91,7 +91,7 @@ const Demo = React.createClass({
   render() {
     const {order, lastPress} = this.state;
     return (
-      <Spring endValue={this.getValues}>
+      <Spring endValue={this.getValues()}>
         {({order: currOrder, scales: {val: scales}}) =>
           <div
             className="demo2"

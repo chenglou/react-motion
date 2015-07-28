@@ -139,7 +139,6 @@ export const TransitionSpring = React.createClass({
     endValue: PropTypes.oneOfType([
       PropTypes.func,
       PropTypes.objectOf(PropTypes.any.isRequired),
-      // coming soon
       // PropTypes.arrayOf(PropTypes.shape({
       //   key: PropTypes.any.isRequired,
       // })),
@@ -149,7 +148,6 @@ export const TransitionSpring = React.createClass({
       PropTypes.func,
       // PropTypes.object,
       // PropTypes.array,
-      // TODO: numbers? strings?
     ]),
     willEnter: PropTypes.oneOfType([
       PropTypes.func,

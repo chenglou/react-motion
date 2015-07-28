@@ -169,21 +169,20 @@ But this is still slightly tedious. Here's an alternative:
 
 Explicitly setting a `config` of `[]` signals `Spring` not to drill down that collection and animate.
 
-Sometime, you want to rely on the currently interpolated value to calculate `endValue`. E.g. (demo 1) a chat head's final position is the current position of the leading chat head. `endValue` can also accept a function `(currentPositions) => yourEndValue`, where `currentPositions` is the same data you received from the previous tick of children callback.
+Sometime, you want to rely on the currently interpolated value to calculate `endValue`. E.g. (demo 1) a chat head's final position is the current position of the leading chat head. `endValue` can also accept a function `(prevValue) => yourEndValue`, where `prevValue` is the data you returned from the previous tick of `getEndValue`.
 
 ```jsx
 // ...Somewhere in your React class
-getEndValues: function(currentPositions) {
-  // This is really the previous tick of currentPositions. In practice, it
-  // doesn't make much difference.
-  let endValue = currentPositions.val.map((_, i) => {
+getEndValue: function(prevValue) {
+  let endValue = prevValue.val.map((_, i) => {
     // First one follows the mouse
-    return i === 0 ? this.state.mousePosition : currentPositions.val[i - 1];
+    return i === 0 ? this.state.mousePosition : prevValue.val[i - 1];
   });
   // Have fun adjusting config to make the chat heads bounce a little more!
   return {val: endValue, config: [120, 17]};
 },
 
+// in render: <Spring endValue={this.getEndValue}></Spring>
 ```
 
 ### &lt;TransitionSpring />
@@ -253,7 +252,7 @@ let Demo = React.createClass({
   render() {
     return (
       <TransitionSpring
-        endValue={this.getEndValue}
+        endValue={this.getEndValue()}
         willEnter={this.willEnter}
         willLeave={this.willLeave}>
         {currentValue =>
@@ -294,15 +293,15 @@ Since `TransitionSpring` dictates `endValue` to be an object, manipulating keys 
 In most cases, what you want to express here is a relationship between animations, e.g. item 2 appears after item 1. Staggering/chained animation have hard-coded values and go against the spirit of a physics system. Check out [demo 1](https://cdn.rawgit.com/chenglou/react-motion/3b5be548cd08630a836562a053576ff91f94b93f/demo1/index.html); each ball follows the one in front of it, creating a natural staggering animation. The code in `endValue` looks roughly so:
 
 ```jsx
-<Spring endValue={currentPositions => {
-  const endValue = currentPositions.val.map(
-    (_, i) => i === 0 ? someMousePosition : currentPositions.val[i - 1]
+<Spring endValue={prevValue => {
+  const endValue = prevValue.val.map(
+    (_, i) => i === 0 ? someMousePosition : prevValue.val[i - 1]
   );
   return {val: endValue};
 }}>
   ...
 ```
-First ball's destination is the mouse position. The subsequent ones' destination is the current position of the ball in front of them. The values depend on each other. No hard-coded duration/timeout here!
+First ball's destination is the mouse position. The subsequent ones' destination is the current position of the ball in front of them (technically, the previous tick's position; Doesn't matter much). The values depend on each other. No hard-coded duration/timeout here!
 
 - My `ref` doesn't work in the children function.
 React string refs won't work:

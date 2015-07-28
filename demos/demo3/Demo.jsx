@@ -75,7 +75,7 @@ const Demo = React.createClass({
   },
 
   // actual animation-related logic
-  getValues() {
+  getEndValue() {
     const {todos, value, selected} = this.state;
     const configs = {};
     Object.keys(todos)
@@ -133,7 +133,7 @@ const Demo = React.createClass({
         </header>
         <section className="main">
           <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll} />
-          <TransitionSpring endValue={this.getValues} willLeave={this.willLeave}
+          <TransitionSpring endValue={this.getEndValue()} willLeave={this.willLeave}
             willEnter={this.willEnter}>
             {configs =>
               <ul className="todo-list">

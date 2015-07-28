@@ -15,20 +15,19 @@ const Demo = React.createClass({
     this.handleMouseMove(touches[0]);
   },
 
-  getValues(currentPositions) {
-    const endValue = currentPositions.val.map((_, i) => {
-      // We're getting the currentPositions of the previous ball, but in
-      // reality it's not really the "current" position. It's the last render's.
-      // If we want to get the real current position, we'd have to compute it
-      // now, then read into it now. This gets very tedious with this API.
-      return i === 0 ? this.state.mouse : currentPositions.val[i - 1];
-    });
+  getEndValue(prevValue) {
+    // `prevValue` is the interpolated value of the last tick
+    const endValue = prevValue.val.map(
+      (_, i) => i === 0 ? this.state.mouse : prevValue.val[i - 1]
+    );
     return {val: endValue, config: [120, 17]};
   },
 
   render() {
     return (
-      <Spring defaultValue={{val: range(6).map(() => [0, 0])}} endValue={this.getValues}>
+      <Spring
+        defaultValue={{val: range(6).map(() => [0, 0])}}
+        endValue={this.getEndValue}>
         {({val}) =>
           <div
             className="demo1"

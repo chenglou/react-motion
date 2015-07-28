@@ -26,20 +26,17 @@ const Demo = React.createClass({
       this.setState({
         photos: {
           ...photos,
-          // What the hell are you doing chenglou?
-
-          // I'm loading pictures on the fly and using the default
-          // transitionless (!) `willEnter` to place the picture on the page.
-          // essentially, I'm abusing the diffing/merging algorithm to animate
-          // from one (more or less) arbitrary data structure to another, and It
-          // Just Works.
+          // Loading pictures on the fly and using the default transitionless
+          // (!) `willEnter` to place the picture on the page. essentially, I'm
+          // abusing the diffing/merging algorithm to animate from one (more or
+          // less) arbitrary data structure to another, and It Just Works.
           [`http://lorempixel.com/${w}/${h}/sports/a${hash}`]: [w, h],
         },
       });
     }
   },
 
-  getValues() {
+  getEndValue() {
     const {photos, currPhoto} = this.state;
     const keys = Object.keys(photos);
     const currKey = keys[currPhoto];
@@ -84,7 +81,7 @@ const Demo = React.createClass({
           value={currPhoto}
           onChange={this.handleChange} />
         {currPhoto}
-        <TransitionSpring endValue={this.getValues}>
+        <TransitionSpring endValue={this.getEndValue()}>
           {({container, ...rest}) =>
             <div className="demo4">
               <div className="demo4-inner" style={container.val}>
