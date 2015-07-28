@@ -194,7 +194,7 @@ Like `Spring`, but can take two other props: `willEnter` and `willLeave`. Throug
 
 `willEnter`: a callback that's called **once** and is passed `(keyThatEnters, correspondingValueOfKey, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration that'll serve as the starting value of that new key. That configuration will be merged into `endValue`. The default value of `willEnter` is `(key, endValue) => endValue[key]`. It returns the same configuration as the one you just specified in `endValue`. In other words, the start and end are the same: no animation.
 
-`willLeave`: a callback that's called **many** times and is passed `(keyThatLeaves, correspondingValueOfKeyThatJustLeft, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration (which will serve as the new `endValue[keyThatLeaves]` and merged into `endValue`) to indicate you still want to keep the item around. Otherwise, return `null`.
+`willLeave`: a callback that's called **many** times and is passed `(keyThatLeaves, correspondingValueOfKeyThatJustLeft, endValueYouJustSpecified, currentInterpolatedValue, currentSpeed)`. Return an object/array configuration (which will serve as the new `endValue[keyThatLeaves]` and merged into `endValue`). When that value is reached through the spring interpolation, the key will be actually unmounted.
 
 #### Sample Usage
 _(See the demo files for fuller ones.)_
