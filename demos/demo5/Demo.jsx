@@ -18,6 +18,10 @@ const Demo = React.createClass({
     };
   },
 
+  handleTouchStart(pos, press, e) {
+    this.handleMouseDown(pos, press, e.touches[0]);
+  },
+
   handleMouseDown(pos, [pressX, pressY], {pageX, pageY}) {
     this.setState({
       delta: [pageX - pressX, pageY - pressY],
@@ -25,6 +29,13 @@ const Demo = React.createClass({
       isPressed: true,
       lastPressed: pos,
     });
+  },
+
+  handleTouchMove(e) {
+    if (this.state.isPressed) {
+      e.preventDefault();
+    }
+    this.handleMouseMove(e.touches[0]);
   },
 
   handleMouseMove({pageX, pageY}) {
@@ -67,7 +78,12 @@ const Demo = React.createClass({
     } = this.state;
 
     return (
-      <div onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp} className="demo5">
+      <div
+        onMouseMove={this.handleMouseMove}
+        onTouchMove={this.handleTouchMove}
+        onMouseUp={this.handleMouseUp}
+        onTouchEnd={this.handleMouseUp}
+        className="demo5">
         {
           grid.map((row, i) => {
             return row.map((cell, j) => {
@@ -125,7 +141,8 @@ const Demo = React.createClass({
                             WebkitTransform: `translate3d(${x}px, ${y}px, 0)`,
                           }}
                           className={'demo5-ball ' + active}
-                          onMouseDown={this.handleMouseDown.bind(null, [i, j], [x, y])}>
+                          onMouseDown={this.handleMouseDown.bind(null, [i, j], [x, y])}
+                          onTouchStart={this.handleTouchStart.bind(null, [i, j], [x, y])}>
                           <div className="demo5-constants">
                             {stiffness}{dragged === 'stiffness' && thing}
                           </div>
