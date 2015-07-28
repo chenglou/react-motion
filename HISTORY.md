@@ -4,11 +4,14 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### Upcoming
+- [I] Allow returning `null` from children function. #101
+- [I] `defaultValue` for specifying a... default value, upon mounting.
+- [I] `TransitionSpring`'s `willLeave` API got simplified and now asks for an object as a return value instead of `null`. `null` is still supported, but is deprecated and will be removed in the next version. See the new docs on it [here](https://github.com/chenglou/react-motion/blob/24d6a7284ef61268c0ead67fe43d7e40bf45d381/README.md#transitionspring-).
+
 ### 0.2.2 (July 24th 2015)
 - [F] Import some internal modules correctly for Ubuntu/Linux node (case-sensitive for them).
 - [F] Nested springs work again.
-- [I]: Allow returning `null` from children function. #101
-- [I]: `defaultValue` for specifying a... default value, upon mounting.
 
 ### 0.2.0 (July 22th 2015)
 - [B] `willLeave` returning `false` will now keep the key. Only `null` and `undefined` will serve as a signal to kill the disappeared key.
