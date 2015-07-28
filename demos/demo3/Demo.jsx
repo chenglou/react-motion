@@ -106,13 +106,11 @@ const Demo = React.createClass({
 
   // TODO: change naming
   willLeave(date, valueThatJustLeft) {
-    if (valueThatJustLeft.opacity.val > 0) {
-      return {
-        height: {val: 0},
-        opacity: {val: 0},
-        data: valueThatJustLeft.data,
-      };
-    }
+    return {
+      height: {val: 0},
+      opacity: {val: 0},
+      data: valueThatJustLeft.data,
+    };
   },
 
   render() {

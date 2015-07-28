@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import mapTree from './mapTree';
 import noVelocity from './noVelocity';
+import compareTrees from './compareTrees';
 import mergeDiff from './mergeDiff';
 import configAnimation from './animationLoop';
 import zero from './zero';
@@ -24,7 +25,19 @@ function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
       currValue,
       endValue,
       // TODO: stop allocating like crazy in this whole code path
-      key => willLeave(key, currValue[key], endValue, currValue, currVelocity)
+      key => {
+        const res = willLeave(key, currValue[key], endValue, currValue, currVelocity);
+        if (res == null) {
+          // For legacy reason. We won't allow returning null soon
+          // TODO: remove, after next release
+          return null;
+        }
+
+        if (noVelocity(currVelocity[key]) && compareTrees(currValue[key], res)) {
+          return null;
+        }
+        return res;
+      }
     );
 
     Object.keys(mergedValue)
@@ -71,6 +84,8 @@ export const Spring = React.createClass({
     let currValue;
     if (defaultValue == null) {
       if (typeof endValue === 'function') {
+        // TODO: provide perf tip here when endValue argument count is 0
+        // (meaning you could have passed an obj)
         currValue = endValue();
       } else {
         currValue = endValue;
