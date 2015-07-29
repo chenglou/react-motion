@@ -124,6 +124,7 @@ export default function components(React) {
         this.accumulatedTime = 0;
       }
 
+      // Number of frames that have elapsed since last `raf`
       const frameNumber = Math.ceil(this.accumulatedTime / timeStep);
       let {
         currFrameValue,
@@ -153,6 +154,8 @@ export default function components(React) {
           newCurrValue = newState.currValue;
           newCurrVelocity = newState.currVelocity;
         } else {
+          // Catch up to where we're suppose to be by calculating `frameNumber`
+          // steps forward
           for (let j = 0; j < frameNumber; j++) {
             let newState = animationStep(timeStep / 1000, newCurrValue, newCurrVelocity);
             newCurrValue = newState.currValue;
@@ -199,7 +202,7 @@ export default function components(React) {
       const newCurrVelocity = updateCurrVelocity(timestep, currValue, currVelocity, endValue);
 
       if (noVelocity(newCurrVelocity)) {
-        // check explanation in `Spring.animationRender`
+        // This will prevent the `animationLoop` from stepping
         this.active = false; // Nasty side effects...
       }
 
