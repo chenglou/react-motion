@@ -97,7 +97,6 @@ export default function components(React) {
     },
 
     componentWillUnmount() {
-      this.stopAnimation();
       this.hasUnmounted = true;
     },
 
@@ -294,7 +293,7 @@ export default function components(React) {
     },
 
     componentWillUnmount() {
-      this.stopAnimation();
+      this.hasUnmounted = true;
     },
 
     startAnimating() {
