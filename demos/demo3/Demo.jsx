@@ -1,5 +1,6 @@
 import React from 'react';
 import {TransitionSpring} from '../../src/Spring';
+import presets from '../../src/presets';
 
 const Demo = React.createClass({
   getInitialState() {
@@ -88,8 +89,8 @@ const Demo = React.createClass({
       })
       .forEach(date => {
         configs[date] = {
-          height: {val: 60, config: [120, 17]},
-          opacity: {val: 1, config: [120, 17]},
+          height: {val: 60, config: presets.gentle},
+          opacity: {val: 1, config: presets.gentle},
           data: todos[date],
         };
       });
