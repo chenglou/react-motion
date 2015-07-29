@@ -1,4 +1,14 @@
-import React, {PropTypes} from 'react';
+
+let React;
+try {
+  React = require('react-native');
+} catch(e) {
+  React = require('react');
+}
+
+let {PropTypes} = React;
+
+
 import mapTree from './mapTree';
 import noVelocity from './noVelocity';
 import compareTrees from './compareTrees';
