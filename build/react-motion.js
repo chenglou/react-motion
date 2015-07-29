@@ -69,11 +69,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Spring = _Spring.Spring;
 	exports.TransitionSpring = _Spring.TransitionSpring;
 	
-	var _constants2 = __webpack_require__(19);
+	var _presets2 = __webpack_require__(19);
 	
-	var _constants3 = _interopRequireDefault(_constants2);
+	var _presets3 = _interopRequireDefault(_presets2);
 	
-	exports.constants = _constants3['default'];
+	exports.presets = _presets3['default'];
 	var utils = {
 	  reorderKeys: _reorderKeys2['default']
 	};
@@ -1668,11 +1668,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _zero2 = _interopRequireDefault(_zero);
 	
-	var _constants = __webpack_require__(19);
+	var _presets = __webpack_require__(19);
 	
 	// TODO: refactor common logic with updateCurrValue and updateCurrVelocity
 	
-	var _constants2 = _interopRequireDefault(_constants);
+	var _presets2 = _interopRequireDefault(_presets);
 	
 	function interpolateValue(alpha, nextValue, prevValue) {
 	  if (nextValue == null) {
@@ -1728,7 +1728,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return endValue;
 	  }
 	  if (endValue.val != null) {
-	    var _ref = endValue.config || _constants2['default'].noWobble;
+	    var _ref = endValue.config || _presets2['default'].noWobble;
 	
 	    var _k = _ref[0];
 	    var _b = _ref[1];
@@ -1770,7 +1770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _mapTree2['default'](_zero2['default'], currVelocity);
 	  }
 	  if (endValue.val != null) {
-	    var _ref2 = endValue.config || _constants2['default'].noWobble;
+	    var _ref2 = endValue.config || _presets2['default'].noWobble;
 	
 	    var _k = _ref2[0];
 	    var _b = _ref2[1];
@@ -1814,7 +1814,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // position is considered as the stretched/compressed position of a spring
 	  var Fspring = -k * (x - destX);
 	
-	  // Damping constant, in kg / s
+	  // Damping, in kg / s
 	  var Fdamper = -b * v;
 	
 	  // usually we put mass here, but for animation purposes, specifying mass is a
