@@ -10,7 +10,7 @@
 </Spring>
 ```
 
-Animate a counter to `10`, from whatever value it currently is. For more advanced usage, see below.
+Animate a counter to `10`, from whatever value it currently is. For more advanced usage, see [below](#constants).
 
 Npm:
 `npm install react-motion`
@@ -279,7 +279,7 @@ let Demo = React.createClass({
 ```
 
 ### `constants`
-Some tasteful, commonly used spring constants you can plug into your `endValue`'s `config`. [See here].
+Some tasteful, commonly used spring constants you can plug into your `endValue` like so: `{val: 10, config: constants.wobbly}`. [See here](https://github.com/chenglou/react-motion/blob/372446fc8679dcdbf4de2e983d53709ab40ce88c/src/constants.js).
 
 ### Little Extras
 _(You might not need this until later on.)_
