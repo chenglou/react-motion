@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("react"));
+		module.exports = factory((function webpackLoadOptionalExternalModule() { try { return require("react-native"); } catch(e) {} }()), require("react"));
 	else if(typeof define === 'function' && define.amd)
-		define(["react"], factory);
+		define(["react-native", "react"], factory);
 	else if(typeof exports === 'object')
-		exports["ReactMotion"] = factory(require("react"));
+		exports["ReactMotion"] = factory((function webpackLoadOptionalExternalModule() { try { return require("react-native"); } catch(e) {} }()), require("react"));
 	else
-		root["ReactMotion"] = factory(root["React"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_3__) {
+		root["ReactMotion"] = factory(root["react-native"], root["React"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -68,6 +68,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.Spring = _Spring.Spring;
 	exports.TransitionSpring = _Spring.TransitionSpring;
+	
+	var _constants2 = __webpack_require__(19);
+	
+	var _constants3 = _interopRequireDefault(_constants2);
+	
+	exports.constants = _constants3['default'];
 	var utils = {
 	  reorderKeys: _reorderKeys2['default']
 	};
@@ -98,198 +104,146 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	exports.__esModule = true;
-	exports.updateCurrValue = updateCurrValue;
-	exports.updateCurrVelocity = updateCurrVelocity;
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _react = __webpack_require__(3);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _mapTree = __webpack_require__(4);
+	var _mapTree = __webpack_require__(3);
 	
 	var _mapTree2 = _interopRequireDefault(_mapTree);
 	
-	var _lodashIsplainobject = __webpack_require__(5);
-	
-	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
-	
-	var _stepper = __webpack_require__(10);
-	
-	var _stepper2 = _interopRequireDefault(_stepper);
-	
-	var _noVelocity = __webpack_require__(11);
+	var _noVelocity = __webpack_require__(9);
 	
 	var _noVelocity2 = _interopRequireDefault(_noVelocity);
 	
-	var _mergeDiff = __webpack_require__(12);
+	var _compareTrees = __webpack_require__(10);
+	
+	var _compareTrees2 = _interopRequireDefault(_compareTrees);
+	
+	var _mergeDiff = __webpack_require__(11);
 	
 	var _mergeDiff2 = _interopRequireDefault(_mergeDiff);
 	
-	var _animationLoop = __webpack_require__(13);
+	var _animationLoop = __webpack_require__(12);
 	
 	var _animationLoop2 = _interopRequireDefault(_animationLoop);
 	
-	var animationLoop = _animationLoop2['default']({
-	  // Fixed time step in seconds.
-	  timeStep: 1 / 60,
-	  // Slow-mo anyone? Give 0.1 a try.
-	  timeScale: 1,
-	  // Pause if we have more than this many steps worth of accumulated time.
-	  maxSteps: 10
-	});
+	var _zero = __webpack_require__(16);
 	
-	function zero() {
-	  return 0;
+	var _zero2 = _interopRequireDefault(_zero);
+	
+	var _updateTree = __webpack_require__(17);
+	
+	var React = undefined;
+	try {
+	  React = __webpack_require__(20);
+	} catch (e) {
+	  React = __webpack_require__(21);
 	}
 	
-	// TODO: refactor common logic with updateCurrValue and updateCurrVelocity
-	function interpolateValue(alpha, nextValue, prevValue) {
-	  if (nextValue === null) {
-	    return null;
+	var _React = React;
+	var PropTypes = _React.PropTypes;
+	
+	var startAnimation = _animationLoop2['default']();
+	
+	function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
+	  var currValue = state.currValue;
+	  var currVelocity = state.currVelocity;
+	
+	  var _getProps = getProps();
+	
+	  var willEnter = _getProps.willEnter;
+	  var willLeave = _getProps.willLeave;
+	  var endValue = _getProps.endValue;
+	
+	  if (typeof endValue === 'function') {
+	    endValue = endValue(currValue);
 	  }
-	  if (prevValue == null) {
-	    return nextValue;
-	  }
-	  if (typeof nextValue === 'number') {
-	    // https://github.com/chenglou/react-motion/pull/57#issuecomment-121924628
-	    return nextValue * alpha + prevValue * (1 - alpha);
-	  }
-	  if (nextValue.val != null && nextValue.config && nextValue.config.length === 0) {
-	    return nextValue;
-	  }
-	  if (nextValue.val != null) {
-	    var ret = {
-	      val: interpolateValue(alpha, nextValue.val, prevValue.val)
-	    };
-	    if (nextValue.config) {
-	      ret.config = nextValue.config;
-	    }
-	    return ret;
-	  }
-	  if (Array.isArray(nextValue)) {
-	    return nextValue.map(function (_, i) {
-	      return interpolateValue(alpha, nextValue[i], prevValue[i]);
+	
+	  var mergedValue = endValue; // set mergedValue to endValue as the default
+	  var hasNewKey = false;
+	
+	  if (shouldMerge) {
+	    mergedValue = _mergeDiff2['default'](currValue, endValue,
+	    // TODO: stop allocating like crazy in this whole code path
+	    function (key) {
+	      var res = willLeave(key, currValue[key], endValue, currValue, currVelocity);
+	      if (res == null) {
+	        // For legacy reason. We won't allow returning null soon
+	        // TODO: remove, after next release
+	        return null;
+	      }
+	
+	      if (_noVelocity2['default'](currVelocity[key]) && _compareTrees2['default'](currValue[key], res)) {
+	        return null;
+	      }
+	      return res;
+	    });
+	
+	    Object.keys(mergedValue).filter(function (key) {
+	      return !currValue.hasOwnProperty(key);
+	    }).forEach(function (key) {
+	      hasNewKey = true;
+	      var enterValue = willEnter(key, mergedValue[key], endValue, currValue, currVelocity);
+	      currValue[key] = enterValue;
+	      mergedValue[key] = enterValue;
+	      currVelocity[key] = _mapTree2['default'](_zero2['default'], currValue[key]);
 	    });
 	  }
-	  if (_lodashIsplainobject2['default'](nextValue)) {
-	    return Object.keys(nextValue).reduce(function (ret, key) {
-	      ret[key] = interpolateValue(alpha, nextValue[key], prevValue[key]);
-	      return ret;
-	    }, {});
+	
+	  var newCurrValue = _updateTree.updateCurrValue(timestep, currValue, currVelocity, mergedValue);
+	  var newCurrVelocity = _updateTree.updateCurrVelocity(timestep, currValue, currVelocity, mergedValue);
+	
+	  if (!hasNewKey && _noVelocity2['default'](currVelocity) && _noVelocity2['default'](newCurrVelocity)) {
+	    // check explanation in `Spring.animationRender`
+	    stopAnimation(); // Nasty side effects....
 	  }
-	  return nextValue;
+	
+	  return {
+	    currValue: newCurrValue,
+	    currVelocity: newCurrVelocity
+	  };
 	}
 	
-	// TODO: refactor common logic with updateCurrVelocity
-	
-	function updateCurrValue(frameRate, currValue, currVelocity, endValue, k, b) {
-	  if (endValue === null) {
-	    return null;
-	  }
-	  if (typeof endValue === 'number') {
-	    if (k == null || b == null) {
-	      return endValue;
-	    }
-	    // TODO: do something to stepper to make this not allocate (2 steppers?)
-	    return _stepper2['default'](frameRate, currValue, currVelocity, endValue, k, b)[0];
-	  }
-	  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
-	    return endValue;
-	  }
-	  if (endValue.val != null) {
-	    var _ref = endValue.config || [170, 26];
-	
-	    var _k = _ref[0];
-	    var _b = _ref[1];
-	
-	    var ret = {
-	      val: updateCurrValue(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b)
-	    };
-	    if (endValue.config) {
-	      ret.config = endValue.config;
-	    }
-	    return ret;
-	  }
-	  if (Array.isArray(endValue)) {
-	    return endValue.map(function (_, i) {
-	      return updateCurrValue(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
-	    });
-	  }
-	  if (_lodashIsplainobject2['default'](endValue)) {
-	    return Object.keys(endValue).reduce(function (ret, key) {
-	      ret[key] = updateCurrValue(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
-	      return ret;
-	    }, {});
-	  }
-	  return endValue;
-	}
-	
-	function updateCurrVelocity(frameRate, currValue, currVelocity, endValue, k, b) {
-	  if (endValue === null) {
-	    return null;
-	  }
-	  if (typeof endValue === 'number') {
-	    if (k == null || b == null) {
-	      return _mapTree2['default'](zero, currVelocity);
-	    }
-	    // TODO: do something to stepper to make this not allocate (2 steppers?)
-	    return _stepper2['default'](frameRate, currValue, currVelocity, endValue, k, b)[1];
-	  }
-	  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
-	    return _mapTree2['default'](zero, currVelocity);
-	  }
-	  if (endValue.val != null) {
-	    var _ref2 = endValue.config || [170, 26];
-	
-	    var _k = _ref2[0];
-	    var _b = _ref2[1];
-	
-	    var ret = {
-	      val: updateCurrVelocity(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b)
-	    };
-	    if (endValue.config) {
-	      ret.config = endValue.config;
-	    }
-	    return ret;
-	  }
-	  if (Array.isArray(endValue)) {
-	    return endValue.map(function (_, i) {
-	      return updateCurrVelocity(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
-	    });
-	  }
-	  if (_lodashIsplainobject2['default'](endValue)) {
-	    return Object.keys(endValue).reduce(function (ret, key) {
-	      ret[key] = updateCurrVelocity(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
-	      return ret;
-	    }, {});
-	  }
-	  return _mapTree2['default'](zero, currVelocity);
-	}
-	
-	var Spring = _react2['default'].createClass({
+	var Spring = React.createClass({
 	  displayName: 'Spring',
 	
 	  propTypes: {
-	    endValue: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.object, _react.PropTypes.array]).isRequired,
-	    children: _react.PropTypes.func.isRequired
+	    defaultValue: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+	    endValue: PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.array]).isRequired,
+	    children: PropTypes.func.isRequired
 	  },
 	
 	  getInitialState: function getInitialState() {
-	    var endValue = this.props.endValue;
+	    var _props = this.props;
+	    var endValue = _props.endValue;
+	    var defaultValue = _props.defaultValue;
 	
-	    if (typeof endValue === 'function') {
-	      // TODO: provide warning for failing to provide base case
-	      endValue = endValue();
+	    var currValue = undefined;
+	    if (defaultValue == null) {
+	      if (typeof endValue === 'function') {
+	        // TODO: provide perf tip here when endValue argument count is 0
+	        // (meaning you could have passed an obj)
+	        currValue = endValue();
+	      } else {
+	        currValue = endValue;
+	      }
+	    } else {
+	      currValue = defaultValue;
 	    }
 	    return {
-	      currValue: endValue,
-	      currVelocity: _mapTree2['default'](zero, endValue)
+	      currValue: currValue,
+	      currVelocity: _mapTree2['default'](_zero2['default'], currValue)
 	    };
 	  },
 	
 	  componentDidMount: function componentDidMount() {
+	    var _this = this;
+	
+	    this.animationStep = animationStep.bind(null, false, function () {
+	      return _this.stopAnimation();
+	    }, function () {
+	      return _this.props;
+	    });
 	    this.startAnimating();
 	  },
 	
@@ -297,51 +251,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.startAnimating();
 	  },
 	
-	  unsubscribeAnimation: null,
+	  stopAnimation: null,
 	
 	  // used in animationRender
 	  hasUnmounted: false,
 	
+	  animationStep: null,
+	
 	  componentWillUnmount: function componentWillUnmount() {
-	    if (this.unsubscribeAnimation) {
-	      this.unsubscribeAnimation();
-	      this.unsubscribeAnimation = null;
-	    }
+	    this.stopAnimation();
 	    this.hasUnmounted = true;
 	  },
 	
 	  startAnimating: function startAnimating() {
-	    if (!this.unsubscribeAnimation) {
-	      // means we're not animating
-	      this.unsubscribeAnimation = animationLoop.subscribe(this.animationStep, this.animationRender, this.state);
-	      animationLoop.start();
-	    }
-	  },
-	
-	  animationStep: function animationStep(timeStep, state) {
-	    var currValue = state.currValue;
-	    var currVelocity = state.currVelocity;
-	    var endValue = this.props.endValue;
-	
-	    if (typeof endValue === 'function') {
-	      endValue = endValue(currValue);
-	    }
-	
-	    var newCurrValue = updateCurrValue(timeStep, currValue, currVelocity, endValue);
-	    var newCurrVelocity = updateCurrVelocity(timeStep, currValue, currVelocity, endValue);
-	
-	    if (_noVelocity2['default'](currVelocity) && _noVelocity2['default'](newCurrVelocity)) {
-	      // check explanation in `animationRender`
-	      if (!this.hasUnmounted) {
-	        this.unsubscribeAnimation();
-	        this.unsubscribeAnimation = null;
-	      }
-	    }
-	
-	    return {
-	      currValue: newCurrValue,
-	      currVelocity: newCurrVelocity
-	    };
+	    // Is smart enough to not start it twice
+	    this.stopAnimation = startAnimation(this.state, this.animationStep, this.animationRender);
 	  },
 	
 	  animationRender: function animationRender(alpha, nextState, prevState) {
@@ -351,43 +275,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // re-render unmounts the Spring
 	    if (!this.hasUnmounted) {
 	      this.setState({
-	        currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
+	        currValue: _updateTree.interpolateValue(alpha, nextState.currValue, prevState.currValue),
 	        currVelocity: nextState.currVelocity
 	      });
 	    }
 	  },
 	
 	  render: function render() {
-	    var currValue = this.state.currValue;
-	
-	    return _react2['default'].Children.only(this.props.children(currValue));
+	    var renderedChildren = this.props.children(this.state.currValue);
+	    return renderedChildren && React.Children.only(renderedChildren);
 	  }
 	});
 	
 	exports.Spring = Spring;
-	var TransitionSpring = _react2['default'].createClass({
+	var TransitionSpring = React.createClass({
 	  displayName: 'TransitionSpring',
 	
 	  propTypes: {
-	    endValue: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.objectOf({
-	      key: _react.PropTypes.any.isRequired
-	    })]).
-	    // coming soon
+	    defaultValue: PropTypes.objectOf(PropTypes.any),
+	    endValue: PropTypes.oneOfType([PropTypes.func, PropTypes.objectOf(PropTypes.any.isRequired)]).
 	    // PropTypes.arrayOf(PropTypes.shape({
 	    //   key: PropTypes.any.isRequired,
 	    // })),
 	    // PropTypes.arrayOf(PropTypes.element),
 	    isRequired,
-	    willLeave: _react.PropTypes.oneOfType([_react.PropTypes.func]),
+	    willLeave: PropTypes.oneOfType([PropTypes.func]),
 	
 	    // PropTypes.object,
 	    // PropTypes.array,
-	    // TODO: numbers? strings?
-	    willEnter: _react.PropTypes.oneOfType([_react.PropTypes.func]),
+	    willEnter: PropTypes.oneOfType([PropTypes.func]),
 	
 	    // PropTypes.object,
 	    // PropTypes.array,
-	    children: _react.PropTypes.func.isRequired
+	    children: PropTypes.func.isRequired
 	  },
 	
 	  getDefaultProps: function getDefaultProps() {
@@ -402,18 +322,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  getInitialState: function getInitialState() {
-	    var endValue = this.props.endValue;
+	    var _props2 = this.props;
+	    var endValue = _props2.endValue;
+	    var defaultValue = _props2.defaultValue;
 	
-	    if (typeof endValue === 'function') {
-	      endValue = endValue();
+	    var currValue = undefined;
+	    if (defaultValue == null) {
+	      if (typeof endValue === 'function') {
+	        currValue = endValue();
+	      } else {
+	        currValue = endValue;
+	      }
+	    } else {
+	      currValue = defaultValue;
 	    }
 	    return {
-	      currValue: endValue,
-	      currVelocity: _mapTree2['default'](zero, endValue)
+	      currValue: currValue,
+	      currVelocity: _mapTree2['default'](_zero2['default'], currValue)
 	    };
 	  },
 	
 	  componentDidMount: function componentDidMount() {
+	    var _this2 = this;
+	
+	    this.animationStep = animationStep.bind(null, true, function () {
+	      return _this2.stopAnimation();
+	    }, function () {
+	      return _this2.props;
+	    });
 	    this.startAnimating();
 	  },
 	
@@ -421,99 +357,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.startAnimating();
 	  },
 	
-	  unsubscribeAnimation: null,
+	  stopAnimation: null,
 	
 	  // used in animationRender
 	  hasUnmounted: false,
 	
+	  animationStep: null,
+	
 	  componentWillUnmount: function componentWillUnmount() {
-	    if (this.unsubscribeAnimation) {
-	      this.unsubscribeAnimation();
-	      this.unsubscribeAnimation = undefined;
-	    }
+	    this.stopAnimation();
 	  },
 	
 	  startAnimating: function startAnimating() {
-	    if (!this.unsubscribeAnimation) {
-	      this.unsubscribeAnimation = animationLoop.subscribe(this.animationStep, this.animationRender, this.state);
-	      animationLoop.start();
-	    }
-	  },
-	
-	  animationStep: function animationStep(timeStep, state) {
-	    var currValue = state.currValue;
-	    var currVelocity = state.currVelocity;
-	    var endValue = this.props.endValue;
-	    var _props = this.props;
-	    var willEnter = _props.willEnter;
-	    var willLeave = _props.willLeave;
-	
-	    if (typeof endValue === 'function') {
-	      endValue = endValue(currValue);
-	    }
-	
-	    var mergedValue = undefined;
-	    // only other option is obj
-	    mergedValue = _mergeDiff2['default'](currValue, endValue,
-	    // TODO: stop allocating like crazy in this whole code path
-	    function (key) {
-	      return willLeave(key, currValue[key], endValue, currValue, currVelocity);
-	    });
-	
-	    var hasNewKey = false;
-	    Object.keys(mergedValue).filter(function (key) {
-	      return !currValue.hasOwnProperty(key);
-	    }).forEach(function (key) {
-	      hasNewKey = true;
-	      var enterValue = willEnter(key, mergedValue[key], endValue, currValue, currVelocity);
-	      currValue[key] = enterValue;
-	      mergedValue[key] = enterValue;
-	      currVelocity[key] = _mapTree2['default'](zero, currValue[key]);
-	    });
-	
-	    var newCurrValue = updateCurrValue(timeStep, currValue, currVelocity, mergedValue);
-	    var newCurrVelocity = updateCurrVelocity(timeStep, currValue, currVelocity, mergedValue);
-	
-	    if (_noVelocity2['default'](currVelocity) && _noVelocity2['default'](newCurrVelocity) && !hasNewKey) {
-	      // check explanation in `Spring.animationRender`
-	      if (!this.hasUnmounted) {
-	        this.unsubscribeAnimation();
-	        this.unsubscribeAnimation = undefined;
-	      }
-	    }
-	
-	    return {
-	      currValue: newCurrValue,
-	      currVelocity: newCurrVelocity
-	    };
+	    this.stopAnimation = startAnimation(this.state, this.animationStep, this.animationRender);
 	  },
 	
 	  animationRender: function animationRender(alpha, nextState, prevState) {
 	    // See comment in Spring.
 	    if (!this.hasUnmounted) {
 	      this.setState({
-	        currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
+	        currValue: _updateTree.interpolateValue(alpha, nextState.currValue, prevState.currValue),
 	        currVelocity: nextState.currVelocity
 	      });
 	    }
 	  },
 	
 	  render: function render() {
-	    var currValue = this.state.currValue;
-	
-	    return _react2['default'].Children.only(this.props.children(currValue));
+	    var renderedChildren = this.props.children(this.state.currValue);
+	    return renderedChildren && React.Children.only(renderedChildren);
 	  }
 	});
 	exports.TransitionSpring = TransitionSpring;
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
-
-/***/ },
-/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -523,7 +400,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodashIsplainobject = __webpack_require__(5);
+	var _lodashIsplainobject = __webpack_require__(4);
 	
 	// currenly a helper used for producing a tree of the same shape as the
 	// input(s),  but with different values. It's technically not a real `map`
@@ -571,7 +448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -584,9 +461,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	'use strict';
 	
-	var baseFor = __webpack_require__(6),
-	    isArguments = __webpack_require__(7),
-	    keysIn = __webpack_require__(8);
+	var baseFor = __webpack_require__(5),
+	    isArguments = __webpack_require__(6),
+	    keysIn = __webpack_require__(7);
 	
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
@@ -680,7 +557,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = isPlainObject;
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports) {
 
 	/**
@@ -773,7 +650,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = baseFor;
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports) {
 
 	/**
@@ -885,7 +762,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = isArguments;
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -898,8 +775,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	'use strict';
 	
-	var isArguments = __webpack_require__(7),
-	    isArray = __webpack_require__(9);
+	var isArguments = __webpack_require__(6),
+	    isArray = __webpack_require__(8);
 	
 	/** Used to detect unsigned integer values. */
 	var reIsUint = /^\d+$/;
@@ -1022,7 +899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = keysIn;
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports) {
 
 	/**
@@ -1206,44 +1083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = isArray;
 
 /***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	exports.__esModule = true;
-	exports["default"] = stepper;
-	var errorMargin = 0.0001;
-	
-	function stepper(frameRate, x, v, destX, k, b) {
-	  // Spring stiffness, in kg / s^2
-	
-	  // for animations, destX is really spring length (spring at rest). initial
-	  // position is considered as the stretched/compressed position of a spring
-	  var Fspring = -k * (x - destX);
-	
-	  // Damping constant, in kg / s
-	  var Fdamper = -b * v;
-	
-	  // usually we put mass here, but for animation purposes, specifying mass is a
-	  // bit redundant. you could simply adjust k and b accordingly
-	  // let a = (Fspring + Fdamper) / mass;
-	  var a = Fspring + Fdamper;
-	
-	  var newV = v + a * frameRate;
-	  var newX = x + newV * frameRate;
-	
-	  if (Math.abs(newV - v) < errorMargin && Math.abs(newX - x) < errorMargin) {
-	    return [destX, 0];
-	  }
-	
-	  return [newX, newV];
-	}
-	
-	module.exports = exports["default"];
-
-/***/ },
-/* 11 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1253,7 +1093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodashIsplainobject = __webpack_require__(5);
+	var _lodashIsplainobject = __webpack_require__(4);
 	
 	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
 	
@@ -1272,7 +1112,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 12 */
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	exports.__esModule = true;
+	exports['default'] = compareTrees;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _lodashIsplainobject = __webpack_require__(4);
+	
+	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
+	
+	function compareTrees(a, b) {
+	  if (Array.isArray(a)) {
+	    return a.every(function (v, i) {
+	      return compareTrees(v, b[i]);
+	    });
+	  }
+	
+	  if (_lodashIsplainobject2['default'](a)) {
+	    return Object.keys(a).every(function (key) {
+	      return key === 'config' ? true : compareTrees(a[key], b[key]);
+	    });
+	  }
+	
+	  return a === b;
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 11 */
 /***/ function(module, exports) {
 
 	// this function is allocation-less thanks to babel, which transforms the tail
@@ -1281,7 +1154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.__esModule = true;
 	exports["default"] = mergeDiff;
-	function mergeDiffArr2(_x, _x2, _x3, _x4, _x5, _x6, _x7) {
+	function mergeDiffArr(_x, _x2, _x3, _x4, _x5, _x6, _x7) {
 	  var _again = true;
 	
 	  _function: while (_again) {
@@ -1379,182 +1252,163 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var ret = {};
 	  // if anyone can make this work without allocating the arrays here, we'll
 	  // give you a medal
-	  mergeDiffArr2(Object.keys(a), Object.keys(b), b, 0, 0, onRemove, ret);
+	  mergeDiffArr(Object.keys(a), Object.keys(b), b, 0, 0, onRemove, ret);
 	  return ret;
 	}
 	
 	module.exports = exports["default"];
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	exports.__esModule = true;
-	exports['default'] = createAnimationLoop;
+	exports['default'] = configAnimation;
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _filter = __webpack_require__(14);
-	
-	var _filter2 = _interopRequireDefault(_filter);
-	
-	var _performanceNow = __webpack_require__(15);
+	var _performanceNow = __webpack_require__(13);
 	
 	var _performanceNow2 = _interopRequireDefault(_performanceNow);
 	
-	var _raf = __webpack_require__(17);
+	var _raf = __webpack_require__(15);
 	
 	var _raf2 = _interopRequireDefault(_raf);
 	
-	function renderSubscriber(alpha, subscriber) {
-	  // subscriber.render: this.animationRender
-	  subscriber.render(alpha, subscriber.value, subscriber.prevValue);
-	  return subscriber.active;
-	}
+	function configAnimation() {
+	  var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	  var _config$timeStep = config.timeStep;
+	  var timeStep = _config$timeStep === undefined ? 1 / 60 * 1000 : _config$timeStep;
+	  var _config$timeScale = config.timeScale;
+	  var timeScale = _config$timeScale === undefined ? 1 : _config$timeScale;
+	  var _config$maxSteps = config.maxSteps;
+	  var maxSteps = _config$maxSteps === undefined ? 10 : _config$maxSteps;
+	  var _config$raf = config.raf;
+	  var raf = _config$raf === undefined ? _raf2['default'] : _config$raf;
+	  var _config$now = config.now;
+	  var now = _config$now === undefined ? _performanceNow2['default'] : _config$now;
 	
-	var prototype = {
-	  running: false,
-	  shouldStop: false,
-	  lastTime: 0,
-	  accumulatedTime: 0,
+	  var animRunning = [];
+	  var running = false;
+	  var prevTime = 0;
+	  var accumulatedTime = 0;
 	
-	  // step: this.animationStep
-	  // render: this.animationRender
-	  // value: state
-	  subscribe: function subscribe(step, render, value) {
-	    var subscriber = {
-	      value: value,
-	      prevValue: value,
-	      step: step,
-	      render: render,
-	      active: true
-	    };
+	  function loop() {
+	    var currentTime = now();
+	    var frameTime = currentTime - prevTime; // delta
 	
-	    this.subscribers.push(subscriber);
+	    prevTime = currentTime;
+	    accumulatedTime += frameTime * timeScale;
 	
-	    return function unsubscribe() {
-	      subscriber.active = false;
-	    };
-	  },
-	
-	  loop: function loop() {
-	    var currentTime = _performanceNow2['default']();
-	
-	    if (this.shouldStop) {
-	      this.running = this.shouldStop = false;
-	      return;
+	    if (accumulatedTime > timeStep * maxSteps) {
+	      accumulatedTime = 0;
 	    }
 	
-	    var timeStep = this.timeStep;
-	    // delta
-	    var frameTime = currentTime - this.lastTime;
+	    var frameNumber = Math.ceil(accumulatedTime / timeStep);
+	    for (var i = 0; i < animRunning.length; i++) {
+	      var _animRunning$i = animRunning[i];
+	      var active = _animRunning$i.active;
+	      var step = _animRunning$i.step;
+	      var prevPrevState = _animRunning$i.prevState;
+	      var prevNextState = _animRunning$i.nextState;
 	
-	    this.lastTime = currentTime;
-	    this.accumulatedTime += frameTime * this.timeScale;
+	      if (!active) {
+	        continue;
+	      }
 	
-	    if (this.accumulatedTime > timeStep * this.maxSteps) {
-	      this.accumulatedTime = 0;
+	      // Seems like because the TS sets destVals as enterVals for the first
+	      // tick, we might render that value twice. We render it once, currValue is
+	      // enterVal and destVal is enterVal. The next tick is faster than 16ms,
+	      // so accumulatedTime (which would be about -16ms from the previous tick)
+	      // is negative (-16ms + any number less than 16ms < 0). So we just render
+	      // part ways towards the nextState, but that's enterVal still. We render
+	      // say 75% between currValue (=== enterVal) and destValue (=== enterVal).
+	      // So we render the same value a second time.
+	      // The solution bellow is to recalculate the destination state even when
+	      // you're moving partially towards it.
+	      if (accumulatedTime <= 0) {
+	        animRunning[i].nextState = step(timeStep / 1000, prevPrevState);
+	      } else {
+	        for (var j = 0; j < frameNumber; j++) {
+	          animRunning[i].nextState = step(timeStep / 1000, prevNextState);
+	          animRunning[i].prevState = prevNextState;
+	        }
+	      }
 	    }
 	
-	    while (this.accumulatedTime > 0) {
-	      this.subscribers.forEach(this.step); // animationLoop.step
-	      this.accumulatedTime -= timeStep;
-	    }
+	    accumulatedTime = accumulatedTime - frameNumber * timeStep;
 	
 	    // Render and filter in one iteration.
-	    this.subscribers = _filter2['default'](this.subscribers, renderSubscriber, 1 + this.accumulatedTime / timeStep);
+	    var newAnimRunning = [];
+	    var alpha = 1 + accumulatedTime / timeStep;
+	    for (var i = 0; i < animRunning.length; i++) {
+	      var _animRunning$i2 = animRunning[i];
 	
-	    if (this.subscribers.length === 0) {
-	      this.shouldStop = true;
+	      // Might mutate animRunning........
+	      var render = _animRunning$i2.render;
+	      var active = _animRunning$i2.active;
+	      var nextState = _animRunning$i2.nextState;
+	      var prevState = _animRunning$i2.prevState;
+	      render(alpha, nextState, prevState);
+	      if (active) {
+	        newAnimRunning.push(animRunning[i]);
+	      }
 	    }
 	
-	    _raf2['default'](this.loop);
-	  },
+	    animRunning = newAnimRunning;
 	
-	  start: function start() {
-	    if (this.subscribers.length) {
-	      if (this.shouldStop) {
-	        this.shouldStop = false;
-	      } else if (!this.running) {
-	        this.running = true;
-	        this.lastTime = _performanceNow2['default']();
-	        this.accumulatedTime = 0;
-	        _raf2['default'](this.loop);
-	      }
+	    if (animRunning.length === 0) {
+	      running = false;
+	    } else {
+	      raf(loop);
 	    }
 	  }
 	
-	};
-	
-	// stop() {
-	//   this.shouldStop = true;
-	
-	//   return this;
-	// },
-	
-	function createAnimationLoop(_ref) {
-	  var timeStep = _ref.timeStep;
-	  var timeScale = _ref.timeScale;
-	  var maxSteps = _ref.maxSteps;
-	
-	  var animationLoop = Object.create(prototype);
-	
-	  animationLoop.loop = animationLoop.loop.bind(animationLoop);
-	  animationLoop.subscribers = [];
-	
-	  // timeStep is in milliseconds
-	  animationLoop.timeStep = timeStep * 1000; // seconds
-	  animationLoop.timeScale = timeScale;
-	  animationLoop.maxSteps = maxSteps;
-	
-	  animationLoop.step = function (subscriber) {
-	    if (subscriber.active) {
-	      var value = subscriber.value; // value = this.state
-	
-	      subscriber.prevValue = value;
-	      subscriber.value = subscriber.step(timeStep, value); // animationStep
+	  function start() {
+	    if (!running) {
+	      running = true;
+	      prevTime = now();
+	      accumulatedTime = 0;
+	      raf(loop);
 	    }
-	  };
+	  }
 	
-	  return animationLoop;
+	  return function startAnimation(state, step, render) {
+	    for (var i = 0; i < animRunning.length; i++) {
+	      var val = animRunning[i];
+	      if (val.step === step) {
+	        val.active = true;
+	        val.prevState = state;
+	        start();
+	        return val.stop;
+	      }
+	    }
+	
+	    var newAnim = {
+	      step: step,
+	      render: render,
+	      prevState: state,
+	      nextState: state,
+	      active: true
+	    };
+	
+	    newAnim.stop = function () {
+	      return newAnim.active = false;
+	    };
+	    animRunning.push(newAnim);
+	
+	    start();
+	
+	    return newAnim.stop;
+	  };
 	}
 	
 	module.exports = exports['default'];
 
 /***/ },
-/* 14 */
-/***/ function(module, exports) {
-
-	// Just like Array.prototype.filter, but passes third argument as the first
-	// argument to the callback. This is to allocating an inline callback (that
-	// refers to something outside as a closure) in the filter call.
-	"use strict";
-	
-	exports.__esModule = true;
-	exports["default"] = filter;
-	
-	function filter(array, callback, argument) {
-	  var ret = [];
-	  var index = 0;
-	
-	  // Don’t cache array.length since we want to iterate
-	  // over items that might be added during filtering.
-	  while (index < array.length) {
-	    if (callback(argument, array[index], index, array)) {
-	      ret.push(array[index]);
-	    }
-	    index++;
-	  }
-	
-	  return ret;
-	}
-	
-	module.exports = exports["default"];
-
-/***/ },
-/* 15 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {// Generated by CoffeeScript 1.7.1
@@ -1590,10 +1444,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    loadTime = new Date().getTime();
 	  }
 	}).call(undefined);
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ },
-/* 16 */
+/* 14 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -1694,12 +1548,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 17 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var now = __webpack_require__(15),
+	var now = __webpack_require__(13),
 	    global = typeof window === 'undefined' ? {} : window,
 	    vendors = ['moz', 'webkit'],
 	    suffix = 'AnimationFrame',
@@ -1768,6 +1622,246 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports.cancel = function () {
 	  caf.apply(global, arguments);
 	};
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	// used by the tree-walking updates and springs. Avoids some allocations
+	"use strict";
+	
+	exports.__esModule = true;
+	exports["default"] = zero;
+	
+	function zero() {
+	  return 0;
+	}
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	exports.__esModule = true;
+	exports.interpolateValue = interpolateValue;
+	exports.updateCurrValue = updateCurrValue;
+	exports.updateCurrVelocity = updateCurrVelocity;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _lodashIsplainobject = __webpack_require__(4);
+	
+	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
+	
+	var _mapTree = __webpack_require__(3);
+	
+	var _mapTree2 = _interopRequireDefault(_mapTree);
+	
+	var _stepper = __webpack_require__(18);
+	
+	var _stepper2 = _interopRequireDefault(_stepper);
+	
+	var _zero = __webpack_require__(16);
+	
+	var _zero2 = _interopRequireDefault(_zero);
+	
+	var _constants = __webpack_require__(19);
+	
+	// TODO: refactor common logic with updateCurrValue and updateCurrVelocity
+	
+	var _constants2 = _interopRequireDefault(_constants);
+	
+	function interpolateValue(alpha, nextValue, prevValue) {
+	  if (nextValue == null) {
+	    return null;
+	  }
+	  if (prevValue == null) {
+	    return nextValue;
+	  }
+	  if (typeof nextValue === 'number') {
+	    // https://github.com/chenglou/react-motion/pull/57#issuecomment-121924628
+	    return nextValue * alpha + prevValue * (1 - alpha);
+	  }
+	  if (nextValue.val != null && nextValue.config && nextValue.config.length === 0) {
+	    return nextValue;
+	  }
+	  if (nextValue.val != null) {
+	    var ret = {
+	      val: interpolateValue(alpha, nextValue.val, prevValue.val)
+	    };
+	    if (nextValue.config) {
+	      ret.config = nextValue.config;
+	    }
+	    return ret;
+	  }
+	  if (Array.isArray(nextValue)) {
+	    return nextValue.map(function (_, i) {
+	      return interpolateValue(alpha, nextValue[i], prevValue[i]);
+	    });
+	  }
+	  if (_lodashIsplainobject2['default'](nextValue)) {
+	    return Object.keys(nextValue).reduce(function (ret, key) {
+	      ret[key] = interpolateValue(alpha, nextValue[key], prevValue[key]);
+	      return ret;
+	    }, {});
+	  }
+	  return nextValue;
+	}
+	
+	// TODO: refactor common logic with updateCurrVelocity
+	
+	function updateCurrValue(frameRate, currValue, currVelocity, endValue, k, b) {
+	  if (endValue == null) {
+	    return null;
+	  }
+	  if (typeof endValue === 'number') {
+	    if (k == null || b == null) {
+	      return endValue;
+	    }
+	    // TODO: do something to stepper to make this not allocate (2 steppers?)
+	    return _stepper2['default'](frameRate, currValue, currVelocity, endValue, k, b)[0];
+	  }
+	  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
+	    return endValue;
+	  }
+	  if (endValue.val != null) {
+	    var _ref = endValue.config || _constants2['default'].noWobble;
+	
+	    var _k = _ref[0];
+	    var _b = _ref[1];
+	
+	    var ret = {
+	      val: updateCurrValue(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b)
+	    };
+	    if (endValue.config) {
+	      ret.config = endValue.config;
+	    }
+	    return ret;
+	  }
+	  if (Array.isArray(endValue)) {
+	    return endValue.map(function (_, i) {
+	      return updateCurrValue(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
+	    });
+	  }
+	  if (_lodashIsplainobject2['default'](endValue)) {
+	    return Object.keys(endValue).reduce(function (ret, key) {
+	      ret[key] = updateCurrValue(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
+	      return ret;
+	    }, {});
+	  }
+	  return endValue;
+	}
+	
+	function updateCurrVelocity(frameRate, currValue, currVelocity, endValue, k, b) {
+	  if (endValue == null) {
+	    return null;
+	  }
+	  if (typeof endValue === 'number') {
+	    if (k == null || b == null) {
+	      return _mapTree2['default'](_zero2['default'], currVelocity);
+	    }
+	    // TODO: do something to stepper to make this not allocate (2 steppers?)
+	    return _stepper2['default'](frameRate, currValue, currVelocity, endValue, k, b)[1];
+	  }
+	  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
+	    return _mapTree2['default'](_zero2['default'], currVelocity);
+	  }
+	  if (endValue.val != null) {
+	    var _ref2 = endValue.config || _constants2['default'].noWobble;
+	
+	    var _k = _ref2[0];
+	    var _b = _ref2[1];
+	
+	    var ret = {
+	      val: updateCurrVelocity(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b)
+	    };
+	    if (endValue.config) {
+	      ret.config = endValue.config;
+	    }
+	    return ret;
+	  }
+	  if (Array.isArray(endValue)) {
+	    return endValue.map(function (_, i) {
+	      return updateCurrVelocity(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
+	    });
+	  }
+	  if (_lodashIsplainobject2['default'](endValue)) {
+	    return Object.keys(endValue).reduce(function (ret, key) {
+	      ret[key] = updateCurrVelocity(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
+	      return ret;
+	    }, {});
+	  }
+	  return _mapTree2['default'](_zero2['default'], currVelocity);
+	}
+
+/***/ },
+/* 18 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	exports["default"] = stepper;
+	var errorMargin = 0.0001;
+	
+	function stepper(frameRate, x, v, destX, k, b) {
+	  // Spring stiffness, in kg / s^2
+	
+	  // for animations, destX is really spring length (spring at rest). initial
+	  // position is considered as the stretched/compressed position of a spring
+	  var Fspring = -k * (x - destX);
+	
+	  // Damping constant, in kg / s
+	  var Fdamper = -b * v;
+	
+	  // usually we put mass here, but for animation purposes, specifying mass is a
+	  // bit redundant. you could simply adjust k and b accordingly
+	  // let a = (Fspring + Fdamper) / mass;
+	  var a = Fspring + Fdamper;
+	
+	  var newV = v + a * frameRate;
+	  var newX = x + newV * frameRate;
+	
+	  if (Math.abs(newV - v) < errorMargin && Math.abs(newX - x) < errorMargin) {
+	    return [destX, 0];
+	  }
+	
+	  return [newX, newV];
+	}
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+	// [stiffness, damping]
+	"use strict";
+	
+	exports.__esModule = true;
+	exports["default"] = {
+	  noWobble: [170, 26], // the default
+	  gentle: [120, 14],
+	  wobbly: [180, 12],
+	  stiff: [210, 20]
+	};
+	module.exports = exports["default"];
+
+/***/ },
+/* 20 */
+/***/ function(module, exports) {
+
+	if(typeof __WEBPACK_EXTERNAL_MODULE_20__ === 'undefined') {var e = new Error("Cannot find module \"react-native\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
+	module.exports = __WEBPACK_EXTERNAL_MODULE_20__;
+
+/***/ },
+/* 21 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_21__;
 
 /***/ }
 /******/ ])

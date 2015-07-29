@@ -4,7 +4,7 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
-### Upcoming
+### 0.2.3 (July 29th 2015)
 - [I] React-native support!
 - [I] Allow returning `null` from children function. #101
 - [I] `defaultValue` for specifying a... default value, upon mounting.
