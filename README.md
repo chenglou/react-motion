@@ -65,7 +65,7 @@ let Demo = React.createClass({
 });
 ```
 
-The library exports a `Spring`, a `TransitionSpring` and `utils`.
+The library exports a `Spring`, a `TransitionSpring`, `constants` `utils`.
 
 ### &lt;Spring />
 Exposes the props `defaultValue` (object or array) and `endValue` (object, array or a function that returns an object or an array).
@@ -115,7 +115,7 @@ But lots of times you don't want all the values to animate the same way. You can
 {size: {val: 10, config: [120, 17]}, top: 20}
 ```
 
-A stiffness of `120` and damping of `17` gives the spring a slight bounce effect. The default configuration, if you don't pass `config` alongside `val`, is `[170, 26]`.
+A stiffness of `120` and damping of `17` gives the spring a slight bounce effect. The library exports a `constants` object that contains the commonly used stiffness and damping. See the `constants` section below.
 
 You can nest `val` wrappers; the innermost takes priority:
 
@@ -277,6 +277,9 @@ let Demo = React.createClass({
   }
 });
 ```
+
+### `constants`
+Some tasteful, commonly used spring constants you can plug into your `endValue`'s `config`. [See here].
 
 ### Little Extras
 _(You might not need this until later on.)_
