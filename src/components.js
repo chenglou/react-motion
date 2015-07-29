@@ -1,72 +1,19 @@
+import now from 'performance-now';
+import raf from 'raf';
+
 import mapTree from './mapTree';
 import noVelocity from './noVelocity';
 import compareTrees from './compareTrees';
 import mergeDiff from './mergeDiff';
-import configAnimation from './animationLoop';
 import zero from './zero';
 import {interpolateValue, updateCurrValue, updateCurrVelocity} from './updateTree';
 
-
-const startAnimation = configAnimation();
-
-function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
-  let {currValue, currVelocity} = state;
-  let {willEnter, willLeave, endValue} = getProps();
-
-  if (typeof endValue === 'function') {
-    endValue = endValue(currValue);
-  }
-
-  let mergedValue = endValue; // set mergedValue to endValue as the default
-  let hasNewKey = false;
-
-  if (shouldMerge) {
-    mergedValue = mergeDiff(
-      currValue,
-      endValue,
-      // TODO: stop allocating like crazy in this whole code path
-      key => {
-        const res = willLeave(key, currValue[key], endValue, currValue, currVelocity);
-        if (res == null) {
-          // For legacy reason. We won't allow returning null soon
-          // TODO: remove, after next release
-          return null;
-        }
-
-        if (noVelocity(currVelocity[key]) && compareTrees(currValue[key], res)) {
-          return null;
-        }
-        return res;
-      }
-    );
-
-    Object.keys(mergedValue)
-      .filter(key => !currValue.hasOwnProperty(key))
-      .forEach(key => {
-        hasNewKey = true;
-        const enterValue = willEnter(key, mergedValue[key], endValue, currValue, currVelocity);
-        currValue[key] = enterValue;
-        mergedValue[key] = enterValue;
-        currVelocity[key] = mapTree(zero, currValue[key]);
-      });
-  }
-
-  const newCurrValue = updateCurrValue(timestep, currValue, currVelocity, mergedValue);
-  const newCurrVelocity = updateCurrVelocity(timestep, currValue, currVelocity, mergedValue);
-
-  if (!hasNewKey && noVelocity(currVelocity) && noVelocity(newCurrVelocity)) {
-    // check explanation in `Spring.animationRender`
-    stopAnimation(); // Nasty side effects....
-  }
-
-  return {
-    currValue: newCurrValue,
-    currVelocity: newCurrVelocity,
-  };
-}
+const timeStep = 1 / 60 * 1000;
+const timeScale = 1;
+const maxSteps = 10;
 
 export default function components(React) {
-  const {PropTypes} = React;
+  let {PropTypes} = React;
 
   const Spring = React.createClass({
     propTypes: {
@@ -84,6 +31,16 @@ export default function components(React) {
       children: PropTypes.func.isRequired,
     },
 
+    prevTime: 0,
+    accumulatedTime: 0,
+    active: false,
+    hasUnmounted: false,
+
+    currFrameValue: null,
+    currFrameVelocity: null,
+    nextFrameValue: null,
+    nextFrameVelocity: null,
+
     getInitialState() {
       const {endValue, defaultValue} = this.props;
       let currValue;
@@ -98,14 +55,40 @@ export default function components(React) {
       } else {
         currValue = defaultValue;
       }
+
+      const vel = mapTree(zero, currValue);
+
+      // We can't use `setState` because we need to synchronously set them and
+      // also because they're not directly the values used for rendering.
+      //
+      // It looks like this:
+      // --------|---------------------*----------------------------------|-----
+      //   currFrameValue1          interpolatedValue            nextFrameValue1
+      //
+      //
+      // If the next `raf` comes too quickly, we might get
+      // --------|--------------------------------------*-----------------|-----
+      //   currFrameValue1                      interpolatedValue nextFrameValue1
+      //
+      //
+      // If the next `raf` comes a little later, we might get
+      // --------|---------------*----------------------------------------|-----
+      //   nextFrameValue1  interpolatedValue                     nextFrameValue2
+      //
+      //         ^
+      //         |
+      //      notice we moved by one frame
+      this.currFrameValue = currValue;
+      this.currFrameVelocity = vel;
+      this.nextFrameValue = currValue;
+      this.nextFrameVelocity = vel;
       return {
         currValue: currValue,
-        currVelocity: mapTree(zero, currValue),
+        currVelocity: vel,
       };
     },
 
     componentDidMount() {
-      this.animationStep = animationStep.bind(null, false, () => this.stopAnimation(), () => this.props);
       this.startAnimating();
     },
 
@@ -113,38 +96,117 @@ export default function components(React) {
       this.startAnimating();
     },
 
-    stopAnimation: null,
-
-    // used in animationRender
-    hasUnmounted: false,
-
-    animationStep: null,
-
     componentWillUnmount() {
       this.stopAnimation();
       this.hasUnmounted = true;
     },
 
     startAnimating() {
-      // Is smart enough to not start it twice
-      this.stopAnimation = startAnimation(
-        this.state,
-        this.animationStep,
-        this.animationRender,
-      );
+      if (!this.active) {
+        this.active = true;
+        raf(this.animationLoop);
+      }
     },
 
-    animationRender(alpha, nextState, prevState) {
-      // `this.hasUnmounted` might be true in the following condition:
-      // user does some checks in `endValue` and calls an owner handler
-      // owner sets state in the callback, triggering a re-render
-      // re-render unmounts the Spring
+    animationLoop() {
+      const {
+        animationStep,
+        animationLoop,
+      } = this;
+
+      const currentTime = now();
+      const frameTime = currentTime - this.prevTime; // delta
+
+      this.prevTime = currentTime;
+      this.accumulatedTime += frameTime * timeScale;
+
+      if (this.accumulatedTime > timeStep * maxSteps) {
+        this.accumulatedTime = 0;
+      }
+
+      const frameNumber = Math.ceil(this.accumulatedTime / timeStep);
+      let {
+        currFrameValue,
+        currFrameVelocity,
+        nextFrameValue,
+        nextFrameVelocity,
+      } = this;
+
+      let newCurrValue = nextFrameValue;
+      let newCurrVelocity = nextFrameVelocity;
+      let newPrevValue = currFrameValue;
+      let newPrevVelocity = currFrameVelocity;
+
+      if (this.active) {
+        // Seems like because the TS sets destVals as enterVals for the first
+        // tick, we might render that value twice. We render it once, currValue
+        // is enterVal and destVal is enterVal. The next tick is faster than
+        // 16ms, so accumulatedTime (which would be about -16ms from the
+        // previous tick) is negative (-16ms + any number less than 16ms < 0).
+        // So we just render part ways towards the nextState, but that's
+        // enterVal still. We render say 75% between currValue (=== enterVal)
+        // and destValue (=== enterVal). So we render the same value a second
+        // time. The solution bellow is to recalculate the destination state
+        // even when you're moving partially towards it.
+        if (this.accumulatedTime <= 0) {
+          let newState = animationStep(timeStep / 1000, currFrameValue, currFrameVelocity);
+          newCurrValue = newState.currValue;
+          newCurrVelocity = newState.currVelocity;
+        } else {
+          for (let j = 0; j < frameNumber; j++) {
+            let newState = animationStep(timeStep / 1000, newCurrValue, newCurrVelocity);
+            newCurrValue = newState.currValue;
+            newCurrVelocity = newState.currVelocity;
+
+            newPrevValue = nextFrameValue;
+            nextFrameValue = newCurrValue;
+
+            newPrevVelocity = nextFrameVelocity;
+            nextFrameVelocity = newCurrVelocity;
+          }
+        }
+      }
+
+      this.accumulatedTime = this.accumulatedTime - frameNumber * timeStep;
+      this.nextFrameValue = newCurrValue;
+      this.nextFrameVelocity = newCurrVelocity;
+      this.currFrameValue = newPrevValue;
+      this.currFrameVelocity = newPrevVelocity;
+
+      // The `setState` will trigger a render, independent from the `raf`
       if (!this.hasUnmounted) {
+        const alpha = !this.active ? 1 : 1 + this.accumulatedTime / timeStep;
         this.setState({
-          currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
-          currVelocity: nextState.currVelocity,
+          currValue: interpolateValue(alpha, newCurrValue, newPrevValue),
+          currVelocity: newCurrVelocity,
         });
       }
+
+      // We continue `raf`ing if the `Spring`'s active
+      if (this.active) {
+        raf(animationLoop);
+      }
+    },
+
+    animationStep(timestep, currValue, currVelocity) {
+      let {endValue} = this.props;
+
+      if (typeof endValue === 'function') {
+        endValue = endValue(currValue);
+      }
+
+      const newCurrValue = updateCurrValue(timestep, currValue, currVelocity, endValue);
+      const newCurrVelocity = updateCurrVelocity(timestep, currValue, currVelocity, endValue);
+
+      if (noVelocity(newCurrVelocity)) {
+        // check explanation in `Spring.animationRender`
+        this.active = false; // Nasty side effects...
+      }
+
+      return {
+        currValue: newCurrValue,
+        currVelocity: newCurrVelocity,
+      };
     },
 
     render() {
@@ -152,7 +214,6 @@ export default function components(React) {
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });
-
 
   const TransitionSpring = React.createClass({
     propTypes: {
@@ -185,6 +246,16 @@ export default function components(React) {
       };
     },
 
+    prevTime: 0,
+    accumulatedTime: 0,
+    active: false,
+    hasUnmounted: false,
+
+    currFrameValue: null,
+    currFrameVelocity: null,
+    nextFrameValue: null,
+    nextFrameVelocity: null,
+
     getInitialState() {
       const {endValue, defaultValue} = this.props;
       let currValue;
@@ -197,14 +268,21 @@ export default function components(React) {
       } else {
         currValue = defaultValue;
       }
+
+      const vel = mapTree(zero, currValue);
+
+      // See getInitialState in `Spring`
+      this.currFrameValue = currValue;
+      this.currFrameVelocity = vel;
+      this.nextFrameValue = currValue;
+      this.nextFrameVelocity = vel;
       return {
         currValue: currValue,
-        currVelocity: mapTree(zero, currValue),
+        currVelocity: vel,
       };
     },
 
     componentDidMount() {
-      this.animationStep = animationStep.bind(null, true, () => this.stopAnimation(), () => this.props);
       this.startAnimating();
     },
 
@@ -212,33 +290,137 @@ export default function components(React) {
       this.startAnimating();
     },
 
-    stopAnimation: null,
-
-    // used in animationRender
-    hasUnmounted: false,
-
-    animationStep: null,
-
     componentWillUnmount() {
       this.stopAnimation();
     },
 
     startAnimating() {
-      this.stopAnimation = startAnimation(
-        this.state,
-        this.animationStep,
-        this.animationRender,
-      );
+      if (!this.active) {
+        this.active = true;
+        raf(this.animationLoop);
+      }
     },
 
-    animationRender(alpha, nextState, prevState) {
-      // See comment in Spring.
+    // Look at `Spring` for comments (animationLoops are identical)
+    animationLoop() {
+      const {
+        animationStep,
+        animationLoop,
+      } = this;
+
+      const currentTime = now();
+      const frameTime = currentTime - this.prevTime; // delta
+
+      this.prevTime = currentTime;
+      this.accumulatedTime += frameTime * timeScale;
+
+      if (this.accumulatedTime > timeStep * maxSteps) {
+        this.accumulatedTime = 0;
+      }
+
+      const frameNumber = Math.ceil(this.accumulatedTime / timeStep);
+      let {
+        currFrameValue,
+        currFrameVelocity,
+        nextFrameValue,
+        nextFrameVelocity,
+      } = this;
+
+      let newCurrValue = nextFrameValue;
+      let newCurrVelocity = nextFrameVelocity;
+      let newPrevValue = currFrameValue;
+      let newPrevVelocity = currFrameVelocity;
+
+      if (this.active) {
+        if (this.accumulatedTime <= 0) {
+          let newState = animationStep(timeStep / 1000, currFrameValue, currFrameVelocity);
+          newCurrValue = newState.currValue;
+          newCurrVelocity = newState.currVelocity;
+        } else {
+          for (let j = 0; j < frameNumber; j++) {
+            let newState = animationStep(timeStep / 1000, newCurrValue, newCurrVelocity);
+            newCurrValue = newState.currValue;
+            newCurrVelocity = newState.currVelocity;
+
+            newPrevValue = nextFrameValue;
+            nextFrameValue = newCurrValue;
+
+            newPrevVelocity = nextFrameVelocity;
+            nextFrameVelocity = newCurrVelocity;
+          }
+        }
+      }
+
+      this.accumulatedTime = this.accumulatedTime - frameNumber * timeStep;
+      this.nextFrameValue = newCurrValue;
+      this.nextFrameVelocity = newCurrVelocity;
+      this.currFrameValue = newPrevValue;
+      this.currFrameVelocity = newPrevVelocity;
+
       if (!this.hasUnmounted) {
+        const alpha = !this.active ? 1 : 1 + this.accumulatedTime / timeStep;
         this.setState({
-          currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
-          currVelocity: nextState.currVelocity,
+          currValue: interpolateValue(alpha, newCurrValue, newPrevValue),
+          currVelocity: newCurrVelocity,
         });
       }
+
+      if (this.active) {
+        raf(animationLoop);
+      }
+    },
+
+    animationStep(timestep, currValue, currVelocity) {
+      let {willEnter, willLeave, endValue} = this.props;
+
+      if (typeof endValue === 'function') {
+        endValue = endValue(currValue);
+      }
+
+      let mergedValue = endValue; // set mergedValue to endValue as the default
+      let hasNewKey = false;
+
+      mergedValue = mergeDiff(
+        currValue,
+        endValue,
+        // TODO: stop allocating like crazy in this whole code path
+        key => {
+          const res = willLeave(key, currValue[key], endValue, currValue, currVelocity);
+          if (res == null) {
+            // For legacy reason. We won't allow returning null soon
+            // TODO: remove, after next release
+            return null;
+          }
+
+          if (noVelocity(currVelocity[key]) && compareTrees(currValue[key], res)) {
+            return null;
+          }
+          return res;
+        }
+      );
+
+      Object.keys(mergedValue)
+        .filter(key => !currValue.hasOwnProperty(key))
+        .forEach(key => {
+          hasNewKey = true;
+          const enterValue = willEnter(key, mergedValue[key], endValue, currValue, currVelocity);
+          currValue[key] = enterValue;
+          mergedValue[key] = enterValue;
+          currVelocity[key] = mapTree(zero, currValue[key]);
+        });
+
+      const newCurrValue = updateCurrValue(timestep, currValue, currVelocity, mergedValue);
+      const newCurrVelocity = updateCurrVelocity(timestep, currValue, currVelocity, mergedValue);
+
+      if (!hasNewKey && noVelocity(newCurrVelocity)) {
+        // check explanation in `Spring.animationRender`
+        this.active = false; // Nasty side effects...
+      }
+
+      return {
+        currValue: newCurrValue,
+        currVelocity: newCurrVelocity,
+      };
     },
 
     render() {
