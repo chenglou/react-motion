@@ -279,7 +279,7 @@ let Demo = React.createClass({
 ```
 
 ### `presets`
-Some tasteful, commonly used spring presets you can plug into your `endValue` like so: `{val: 10, config: presets.wobbly}`. [See here](https://github.com/chenglou/react-motion/blob/372446fc8679dcdbf4de2e983d53709ab40ce88c/src/constants.js).
+Some tasteful, commonly used spring presets you can plug into your `endValue` like so: `{val: 10, config: presets.wobbly}`. [See here](https://github.com/chenglou/react-motion/blob/bae579994bb9090847776f449ba38494a730ebc9/src/presets.js).
 
 ### Little Extras
 _(You might not need this until later on.)_
