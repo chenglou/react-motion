@@ -143,10 +143,10 @@ const Demo = React.createClass({
                           className={'demo5-ball ' + active}
                           onMouseDown={this.handleMouseDown.bind(null, [i, j], [x, y])}
                           onTouchStart={this.handleTouchStart.bind(null, [i, j], [x, y])}>
-                          <div className="demo5-constants">
+                          <div className="demo5-preset">
                             {stiffness}{dragged === 'stiffness' && thing}
                           </div>
-                          <div className="demo5-constants">
+                          <div className="demo5-preset">
                             {damping}{dragged === 'damping' && thing}
                           </div>
                         </div>

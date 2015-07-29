@@ -2,7 +2,7 @@ import isPlainObject from 'lodash.isplainobject';
 import mapTree from './mapTree';
 import stepper from './stepper';
 import zero from './zero';
-import constants from './constants';
+import presets from './presets';
 
 // TODO: refactor common logic with updateCurrValue and updateCurrVelocity
 export function interpolateValue(alpha, nextValue, prevValue) {
@@ -56,7 +56,7 @@ export function updateCurrValue(frameRate, currValue, currVelocity, endValue, k,
     return endValue;
   }
   if (endValue.val != null) {
-    const [_k, _b] = endValue.config || constants.noWobble;
+    const [_k, _b] = endValue.config || presets.noWobble;
     let ret = {
       val: updateCurrValue(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b),
     };
@@ -92,7 +92,7 @@ export function updateCurrVelocity(frameRate, currValue, currVelocity, endValue,
     return mapTree(zero, currVelocity);
   }
   if (endValue.val != null) {
-    const [_k, _b] = endValue.config || constants.noWobble;
+    const [_k, _b] = endValue.config || presets.noWobble;
     let ret = {
       val: updateCurrVelocity(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b),
     };

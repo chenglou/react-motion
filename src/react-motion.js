@@ -1,5 +1,5 @@
 export {Spring, TransitionSpring} from './Spring';
-export constants from './constants';
+export presets from './presets';
 import reorderKeys from './reorderKeys';
 export const utils = {
   reorderKeys,

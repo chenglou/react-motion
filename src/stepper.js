@@ -7,7 +7,7 @@ export default function stepper(frameRate, x, v, destX, k, b) {
   // position is considered as the stretched/compressed position of a spring
   const Fspring = -k * (x - destX);
 
-  // Damping constant, in kg / s
+  // Damping, in kg / s
   const Fdamper = -b * v;
 
   // usually we put mass here, but for animation purposes, specifying mass is a

@@ -10,7 +10,7 @@
 </Spring>
 ```
 
-Animate a counter to `10`, from whatever value it currently is. For more advanced usage, see [below](#constants).
+Animate a counter to `10`, from whatever value it currently is. For more advanced usage, see [below](#presets).
 
 Npm:
 `npm install react-motion`
@@ -30,7 +30,7 @@ Or build it yourself from the repo: `git clone https://github.com/chenglou/react
 
 [My React-Europe talk](https://www.youtube.com/watch?v=1tavDv5hXpo)
 
-For 95% of use-cases of animating components, we don't have to resort to using hard-coded easing curves and duration. Set up a stiffness and damping constant for your UI element, and let the magic of physics take care of the rest. This way, you don't have to worry about the more petty questions such as "what if the item's currently animating and is a position `x`? How do I adjust my time and curve?". It also greatly simplifies an animation API since there's really not that much to set up.
+For 95% of use-cases of animating components, we don't have to resort to using hard-coded easing curves and duration. Set up a stiffness and damping for your UI element, and let the magic of physics take care of the rest. This way, you don't have to worry about the more petty questions such as "what if the item's currently animating and is a position `x`? How do I adjust my time and curve?". It also greatly simplifies an animation API since there's really not that much to set up.
 
 This library also provides an alternative, more powerful API for React's `TransitionGroup`.
 
@@ -65,7 +65,7 @@ let Demo = React.createClass({
 });
 ```
 
-The library exports a `Spring`, a `TransitionSpring`, `constants` `utils`.
+The library exports a `Spring`, a `TransitionSpring`, `presets` `utils`.
 
 ### &lt;Spring />
 Exposes the props `defaultValue` (object or array) and `endValue` (object, array or a function that returns an object or an array).
@@ -115,7 +115,7 @@ But lots of times you don't want all the values to animate the same way. You can
 {size: {val: 10, config: [120, 17]}, top: 20}
 ```
 
-A stiffness of `120` and damping of `17` gives the spring a slight bounce effect. The library exports a `constants` object that contains the commonly used stiffness and damping. See the `constants` section below.
+A stiffness of `120` and damping of `17` gives the spring a slight bounce effect. The library exports a `presets` object that contains the commonly used stiffness and damping. See the `presets` section below.
 
 You can nest `val` wrappers; the innermost takes priority:
 
@@ -278,8 +278,8 @@ let Demo = React.createClass({
 });
 ```
 
-### `constants`
-Some tasteful, commonly used spring constants you can plug into your `endValue` like so: `{val: 10, config: constants.wobbly}`. [See here](https://github.com/chenglou/react-motion/blob/372446fc8679dcdbf4de2e983d53709ab40ce88c/src/constants.js).
+### `presets`
+Some tasteful, commonly used spring presets you can plug into your `endValue` like so: `{val: 10, config: presets.wobbly}`. [See here](https://github.com/chenglou/react-motion/blob/372446fc8679dcdbf4de2e983d53709ab40ce88c/src/constants.js).
 
 ### Little Extras
 _(You might not need this until later on.)_
