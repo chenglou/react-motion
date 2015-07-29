@@ -5,6 +5,7 @@ Legend:
 - [I]: Improvement
 
 ### Upcoming
+- [I] React-native support!
 - [I] Allow returning `null` from children function. #101
 - [I] `defaultValue` for specifying a... default value, upon mounting.
 - [I] `TransitionSpring`'s `willLeave` API got simplified and now asks for an object as a return value instead of `null`. `null` is still supported, but is deprecated and will be removed in the next version. See the new docs on it [here](https://github.com/chenglou/react-motion/blob/24d6a7284ef61268c0ead67fe43d7e40bf45d381/README.md#transitionspring-).

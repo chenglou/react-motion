@@ -6,9 +6,6 @@ try {
   React = require('react');
 }
 
-let {PropTypes} = React;
-
-
 import mapTree from './mapTree';
 import noVelocity from './noVelocity';
 import compareTrees from './compareTrees';
@@ -16,6 +13,8 @@ import mergeDiff from './mergeDiff';
 import configAnimation from './animationLoop';
 import zero from './zero';
 import {interpolateValue, updateCurrValue, updateCurrVelocity} from './updateTree';
+
+let {PropTypes} = React;
 
 const startAnimation = configAnimation();
 

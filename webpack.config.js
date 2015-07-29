@@ -59,4 +59,7 @@ module.exports = {
   },
   plugins: plugins,
   eslint: {configFile: '.eslintrc'},
+  externals: {
+    'react-native': true,
+  },
 };
