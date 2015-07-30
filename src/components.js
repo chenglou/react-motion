@@ -65,7 +65,7 @@ function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
   };
 }
 
-export default function(React) {
+export default function components(React) {
   const {PropTypes} = React;
 
   const Spring = React.createClass({
