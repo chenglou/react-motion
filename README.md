@@ -24,7 +24,7 @@ Bower:
 
 Or build it yourself from the repo: `git clone https://github.com/chenglou/react-motion.git && npm i && npm run prerelease`
 
-[Check](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo0/index.html) [Out](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo1/index.html) [The](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo2/index.html) [Cool](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo3/index.html) [Demos](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo4/index.html) [Here](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo5/index.html).
+[Check](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo0/index.html) [Out](https://cdn.rawgit.com/chenglou/react-motion/6d4379f7d3a4677f298c64f85794b422a53c916c/demos/demo1/index.html) [The](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo2/index.html) [Cool](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo3/index.html) [Demos](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo4/index.html) [Here](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo5/index.html).
 
 ## What does this library try to solve?
 
@@ -295,7 +295,7 @@ Since `TransitionSpring` dictates `endValue` to be an object, manipulating keys 
 ## FAQ
 
 - How do I do staggering/chained animation where items animate in one after another?
-In most cases, what you want to express here is a relationship between animations, e.g. item 2 appears after item 1. Staggering/chained animation have hard-coded values and go against the spirit of a physics system. Check out [demo 1](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo1/index.html); each ball follows the one in front of it, creating a natural staggering animation. The code in `endValue` looks roughly so:
+In most cases, what you want to express here is a relationship between animations, e.g. item 2 appears after item 1. Staggering/chained animation have hard-coded values and go against the spirit of a physics system. Check out [demo 1](https://cdn.rawgit.com/chenglou/react-motion/6d4379f7d3a4677f298c64f85794b422a53c916c/demos/demo1/index.html); each ball follows the one in front of it, creating a natural staggering animation. The code in `endValue` looks roughly so:
 
 ```jsx
 <Spring endValue={prevValue => {
