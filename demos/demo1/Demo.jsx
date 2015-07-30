@@ -1,6 +1,7 @@
 import React from 'react';
 import {Spring} from '../../src/Spring';
 import range from 'lodash.range';
+import presets from '../../src/presets';
 
 const Demo = React.createClass({
   getInitialState() {
@@ -17,30 +18,32 @@ const Demo = React.createClass({
 
   getEndValue(prevValue) {
     // `prevValue` is the interpolated value of the last tick
-    const endValue = prevValue.val.map(
-      (_, i) => i === 0 ? this.state.mouse : prevValue.val[i - 1]
-    );
-    return {val: endValue, config: [120, 17]};
+    const endValue = prevValue.map((_, i) => {
+      return i === 0
+        ? {val: this.state.mouse, config: []}
+        : {val: prevValue[i - 1].val, config: presets.gentle};
+    });
+    return endValue;
   },
 
   render() {
     return (
       <Spring
-        defaultValue={{val: range(6).map(() => [0, 0])}}
+        defaultValue={range(6).map(() => ({val: [0, 0]}))}
         endValue={this.getEndValue}>
-        {({val}) =>
+        {balls =>
           <div
             className="demo1"
             onMouseMove={this.handleMouseMove}
             onTouchMove={this.handleTouchMove}>
-              {val.map(([x, y], i) =>
+              {balls.map(({val: [x, y]}, i) =>
                 <div
                   key={i}
                   className={`demo1-ball ball-${i}`}
                   style={{
                     WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
                     transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                    zIndex: val.length - i,
+                    zIndex: balls.length - i,
                   }} />
               )}
           </div>
