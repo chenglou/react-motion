@@ -30,7 +30,11 @@ const Demo = React.createClass({
 
   evalCode() {
     const {code} = this.state;
-    const mountNode = this.refs.mountNode.getDOMNode();
+    const mountNode = React.findDOMNode(this.refs.mountNode);
+    if (code === '') {
+      React.render(<div>Display here</div>, mountNode);
+      return;
+    }
 
     try {
       // const makeHot = this.makeHot;
