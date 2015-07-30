@@ -4,6 +4,9 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### Upcoming
+- [B] React-native warning's now gone, but also put into a separate file path. To require react-motion on react-native, do `require('react-motion/native')`.
+
 ### 0.2.4 (July 29th 2015)
 - [I] React-native support!
 - [I] Allow returning `null` from children function. #101
