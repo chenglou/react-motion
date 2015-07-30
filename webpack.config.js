@@ -59,8 +59,5 @@ module.exports = {
     extensions: ['', '.js', '.jsx']
   },
   plugins: plugins,
-  eslint: {configFile: '.eslintrc'},
-  externals: {
-    'react-native': true,
-  },
+  eslint: {configFile: '.eslintrc'}
 };
