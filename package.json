@@ -25,6 +25,7 @@
     "karma-webpack": "^1.6.0",
     "lodash.range": "^3.0.1",
     "phantomjs": "^1.9.17",
+    "react-codemirror": "^0.1.2",
     "react-hot-loader": "^1.2.8",
     "webpack": "^1.10.1",
     "webpack-dev-server": "^1.10.1"
