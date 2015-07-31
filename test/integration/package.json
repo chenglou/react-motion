@@ -1,0 +1,13 @@
+{
+  "name": "integration",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Simple folder for testing whether the release worked or not.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

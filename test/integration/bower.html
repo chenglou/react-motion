@@ -1,0 +1,15 @@
+<html>
+  <head></head>
+  <body>
+    <script src="bower_components/react/react.js"></script>
+    <script src="bower_components/react-motion/build/react-motion.js"></script>
+    <script>
+      if (ReactMotion.Spring && ReactMotion.TransitionSpring) {
+        document.write('Everything looks fine. Check the console too.');
+      } else {
+        document.write('Something broke. Please check the console.');
+      }
+      console.log(ReactMotion);
+    </script>
+  </body>
+</html>
