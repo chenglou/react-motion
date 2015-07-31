@@ -1,6 +1,6 @@
 {
   "name": "react-motion",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "homepage": "https://github.com/chenglou/react-motion",
   "authors": [
     "chenglou"
@@ -33,6 +33,7 @@
     "webpack.config.js",
     "webpack.prod.config.js",
     "karma.conf.js",
-    "package.json"
+    "package.json",
+    "native/non-compiled.js"
   ]
 }

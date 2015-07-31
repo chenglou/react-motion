@@ -1,6 +1,6 @@
 {
   "name": "react-motion",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "A spring that solves your animation problems.",
   "main": "lib/react-motion.js",
   "peerDependencies": {
@@ -36,7 +36,7 @@
     "start": "NODE_ENV=development node server.js",
     "build-demos": "NODE_ENV=production webpack -p",
     "lint": "eslint --ext .js,.jsx .",
-    "prerelease": "babel src --out-dir lib && NODE_ENV=production webpack --config webpack.prod.config.js",
+    "prerelease": "babel src --out-dir lib && babel native/non-compiled.js > native/index.js && NODE_ENV=production webpack --config webpack.prod.config.js",
     "karma": "karma start ./karma.conf.js",
     "test": "npm run karma --  --single-run --reporters nyan",
     "test:dev": "npm run karma -- --no-single-run --auto-watch --reporters nyan",

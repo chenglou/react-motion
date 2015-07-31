@@ -9,3 +9,4 @@ karma.config.js
 webpack.config.js
 build/
 src/
+native/non-compiled.js
