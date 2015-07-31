@@ -29,6 +29,10 @@
     "test",
     "demo*",
     "server.js",
-    "src"
+    "src",
+    "webpack.config.js",
+    "webpack.prod.config.js",
+    "karma.conf.js",
+    "package.json"
   ]
 }

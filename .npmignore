@@ -4,9 +4,8 @@ demo*
 bower.json
 coverage/
 test/
-.eslintrc
-.gitignore
-.npmignore
+**/.*
+karma.config.js
 webpack.config.js
 build/
 src/

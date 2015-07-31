@@ -8,7 +8,7 @@ new WebpackDevServer(webpack(config), {
   hot: true,
   stats: {
     chunkModules: false,
-    colors: true
+    colors: true,
   }
 }).listen(port, '0.0.0.0', function (err) {
   if (err) {
