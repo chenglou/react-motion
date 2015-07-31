@@ -24,6 +24,8 @@ Bower:
 
 Or build it yourself from the repo: `git clone https://github.com/chenglou/react-motion.git && npm i && npm run prerelease`
 
+**For React-native**, instead of `require('react-motion')`, do `require('react-motion/native')`.
+
 [Check](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo0/index.html) [Out](https://cdn.rawgit.com/chenglou/react-motion/6d4379f7d3a4677f298c64f85794b422a53c916c/demos/demo1/index.html) [The](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo2/index.html) [Cool](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo3/index.html) [Demos](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo4/index.html) [Here](https://cdn.rawgit.com/chenglou/react-motion/c3c5403b6821b7a8954e3c379057ae7d9bbc39d5/demos/demo5/index.html).
 
 ## What does this library try to solve?

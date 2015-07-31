@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory((function webpackLoadOptionalExternalModule() { try { return require("react-native"); } catch(e) {} }()), require("react"));
+		module.exports = factory(require("react"));
 	else if(typeof define === 'function' && define.amd)
-		define(["react-native", "react"], factory);
+		define(["react"], factory);
 	else if(typeof exports === 'object')
-		exports["ReactMotion"] = factory((function webpackLoadOptionalExternalModule() { try { return require("react-native"); } catch(e) {} }()), require("react"));
+		exports["ReactMotion"] = factory(require("react"));
 	else
-		root["ReactMotion"] = factory(root["react-native"], root["React"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__) {
+		root["ReactMotion"] = factory(root["React"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_3__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -69,7 +69,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Spring = _Spring.Spring;
 	exports.TransitionSpring = _Spring.TransitionSpring;
 	
-	var _presets2 = __webpack_require__(19);
+	var _presets2 = __webpack_require__(21);
 	
 	var _presets3 = _interopRequireDefault(_presets2);
 	
@@ -103,45 +103,60 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _react = __webpack_require__(3);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _components = __webpack_require__(4);
+	
+	var _components2 = _interopRequireDefault(_components);
+	
+	module.exports = _components2['default'](_react2['default']);
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
 	exports.__esModule = true;
+	exports['default'] = components;
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _mapTree = __webpack_require__(3);
+	var _mapTree = __webpack_require__(5);
 	
 	var _mapTree2 = _interopRequireDefault(_mapTree);
 	
-	var _noVelocity = __webpack_require__(9);
+	var _noVelocity = __webpack_require__(11);
 	
 	var _noVelocity2 = _interopRequireDefault(_noVelocity);
 	
-	var _compareTrees = __webpack_require__(10);
+	var _compareTrees = __webpack_require__(12);
 	
 	var _compareTrees2 = _interopRequireDefault(_compareTrees);
 	
-	var _mergeDiff = __webpack_require__(11);
+	var _mergeDiff = __webpack_require__(13);
 	
 	var _mergeDiff2 = _interopRequireDefault(_mergeDiff);
 	
-	var _animationLoop = __webpack_require__(12);
+	var _animationLoop = __webpack_require__(14);
 	
 	var _animationLoop2 = _interopRequireDefault(_animationLoop);
 	
-	var _zero = __webpack_require__(16);
+	var _zero = __webpack_require__(18);
 	
 	var _zero2 = _interopRequireDefault(_zero);
 	
-	var _updateTree = __webpack_require__(17);
-	
-	var React = undefined;
-	try {
-	  React = __webpack_require__(20);
-	} catch (e) {
-	  React = __webpack_require__(21);
-	}
-	
-	var _React = React;
-	var PropTypes = _React.PropTypes;
+	var _updateTree = __webpack_require__(19);
 	
 	var startAnimation = _animationLoop2['default']();
 	
@@ -204,193 +219,199 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 	
-	var Spring = React.createClass({
-	  displayName: 'Spring',
+	function components(React) {
+	  var PropTypes = React.PropTypes;
 	
-	  propTypes: {
-	    defaultValue: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-	    endValue: PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.array]).isRequired,
-	    children: PropTypes.func.isRequired
-	  },
+	  var Spring = React.createClass({
+	    displayName: 'Spring',
 	
-	  getInitialState: function getInitialState() {
-	    var _props = this.props;
-	    var endValue = _props.endValue;
-	    var defaultValue = _props.defaultValue;
+	    propTypes: {
+	      defaultValue: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+	      endValue: PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.array]).isRequired,
+	      children: PropTypes.func.isRequired
+	    },
 	
-	    var currValue = undefined;
-	    if (defaultValue == null) {
-	      if (typeof endValue === 'function') {
-	        // TODO: provide perf tip here when endValue argument count is 0
-	        // (meaning you could have passed an obj)
-	        currValue = endValue();
+	    getInitialState: function getInitialState() {
+	      var _props = this.props;
+	      var endValue = _props.endValue;
+	      var defaultValue = _props.defaultValue;
+	
+	      var currValue = undefined;
+	      if (defaultValue == null) {
+	        if (typeof endValue === 'function') {
+	          // TODO: provide perf tip here when endValue argument count is 0
+	          // (meaning you could have passed an obj)
+	          currValue = endValue();
+	        } else {
+	          currValue = endValue;
+	        }
 	      } else {
-	        currValue = endValue;
+	        currValue = defaultValue;
 	      }
-	    } else {
-	      currValue = defaultValue;
-	    }
-	    return {
-	      currValue: currValue,
-	      currVelocity: _mapTree2['default'](_zero2['default'], currValue)
-	    };
-	  },
+	      return {
+	        currValue: currValue,
+	        currVelocity: _mapTree2['default'](_zero2['default'], currValue)
+	      };
+	    },
 	
-	  componentDidMount: function componentDidMount() {
-	    var _this = this;
+	    componentDidMount: function componentDidMount() {
+	      var _this = this;
 	
-	    this.animationStep = animationStep.bind(null, false, function () {
-	      return _this.stopAnimation();
-	    }, function () {
-	      return _this.props;
-	    });
-	    this.startAnimating();
-	  },
-	
-	  componentWillReceiveProps: function componentWillReceiveProps() {
-	    this.startAnimating();
-	  },
-	
-	  stopAnimation: null,
-	
-	  // used in animationRender
-	  hasUnmounted: false,
-	
-	  animationStep: null,
-	
-	  componentWillUnmount: function componentWillUnmount() {
-	    this.stopAnimation();
-	    this.hasUnmounted = true;
-	  },
-	
-	  startAnimating: function startAnimating() {
-	    // Is smart enough to not start it twice
-	    this.stopAnimation = startAnimation(this.state, this.animationStep, this.animationRender);
-	  },
-	
-	  animationRender: function animationRender(alpha, nextState, prevState) {
-	    // `this.hasUnmounted` might be true in the following condition:
-	    // user does some checks in `endValue` and calls an owner handler
-	    // owner sets state in the callback, triggering a re-render
-	    // re-render unmounts the Spring
-	    if (!this.hasUnmounted) {
-	      this.setState({
-	        currValue: _updateTree.interpolateValue(alpha, nextState.currValue, prevState.currValue),
-	        currVelocity: nextState.currVelocity
+	      this.animationStep = animationStep.bind(null, false, function () {
+	        return _this.stopAnimation();
+	      }, function () {
+	        return _this.props;
 	      });
-	    }
-	  },
+	      this.startAnimating();
+	    },
 	
-	  render: function render() {
-	    var renderedChildren = this.props.children(this.state.currValue);
-	    return renderedChildren && React.Children.only(renderedChildren);
-	  }
-	});
+	    componentWillReceiveProps: function componentWillReceiveProps() {
+	      this.startAnimating();
+	    },
 	
-	exports.Spring = Spring;
-	var TransitionSpring = React.createClass({
-	  displayName: 'TransitionSpring',
+	    stopAnimation: null,
 	
-	  propTypes: {
-	    defaultValue: PropTypes.objectOf(PropTypes.any),
-	    endValue: PropTypes.oneOfType([PropTypes.func, PropTypes.objectOf(PropTypes.any.isRequired)]).
-	    // PropTypes.arrayOf(PropTypes.shape({
-	    //   key: PropTypes.any.isRequired,
-	    // })),
-	    // PropTypes.arrayOf(PropTypes.element),
-	    isRequired,
-	    willLeave: PropTypes.oneOfType([PropTypes.func]),
+	    // used in animationRender
+	    hasUnmounted: false,
 	
-	    // PropTypes.object,
-	    // PropTypes.array,
-	    willEnter: PropTypes.oneOfType([PropTypes.func]),
+	    animationStep: null,
 	
-	    // PropTypes.object,
-	    // PropTypes.array,
-	    children: PropTypes.func.isRequired
-	  },
+	    componentWillUnmount: function componentWillUnmount() {
+	      this.stopAnimation();
+	      this.hasUnmounted = true;
+	    },
 	
-	  getDefaultProps: function getDefaultProps() {
-	    return {
-	      willEnter: function willEnter(key, value) {
-	        return value;
-	      },
-	      willLeave: function willLeave() {
-	        return null;
+	    startAnimating: function startAnimating() {
+	      // Is smart enough to not start it twice
+	      this.stopAnimation = startAnimation(this.state, this.animationStep, this.animationRender);
+	    },
+	
+	    animationRender: function animationRender(alpha, nextState, prevState) {
+	      // `this.hasUnmounted` might be true in the following condition:
+	      // user does some checks in `endValue` and calls an owner handler
+	      // owner sets state in the callback, triggering a re-render
+	      // re-render unmounts the Spring
+	      if (!this.hasUnmounted) {
+	        this.setState({
+	          currValue: _updateTree.interpolateValue(alpha, nextState.currValue, prevState.currValue),
+	          currVelocity: nextState.currVelocity
+	        });
 	      }
-	    };
-	  },
+	    },
 	
-	  getInitialState: function getInitialState() {
-	    var _props2 = this.props;
-	    var endValue = _props2.endValue;
-	    var defaultValue = _props2.defaultValue;
+	    render: function render() {
+	      var renderedChildren = this.props.children(this.state.currValue);
+	      return renderedChildren && React.Children.only(renderedChildren);
+	    }
+	  });
 	
-	    var currValue = undefined;
-	    if (defaultValue == null) {
-	      if (typeof endValue === 'function') {
-	        currValue = endValue();
+	  var TransitionSpring = React.createClass({
+	    displayName: 'TransitionSpring',
+	
+	    propTypes: {
+	      defaultValue: PropTypes.objectOf(PropTypes.any),
+	      endValue: PropTypes.oneOfType([PropTypes.func, PropTypes.objectOf(PropTypes.any.isRequired)]).
+	      // PropTypes.arrayOf(PropTypes.shape({
+	      //   key: PropTypes.any.isRequired,
+	      // })),
+	      // PropTypes.arrayOf(PropTypes.element),
+	      isRequired,
+	      willLeave: PropTypes.oneOfType([PropTypes.func]),
+	
+	      // PropTypes.object,
+	      // PropTypes.array,
+	      willEnter: PropTypes.oneOfType([PropTypes.func]),
+	
+	      // PropTypes.object,
+	      // PropTypes.array,
+	      children: PropTypes.func.isRequired
+	    },
+	
+	    getDefaultProps: function getDefaultProps() {
+	      return {
+	        willEnter: function willEnter(key, value) {
+	          return value;
+	        },
+	        willLeave: function willLeave() {
+	          return null;
+	        }
+	      };
+	    },
+	
+	    getInitialState: function getInitialState() {
+	      var _props2 = this.props;
+	      var endValue = _props2.endValue;
+	      var defaultValue = _props2.defaultValue;
+	
+	      var currValue = undefined;
+	      if (defaultValue == null) {
+	        if (typeof endValue === 'function') {
+	          currValue = endValue();
+	        } else {
+	          currValue = endValue;
+	        }
 	      } else {
-	        currValue = endValue;
+	        currValue = defaultValue;
 	      }
-	    } else {
-	      currValue = defaultValue;
-	    }
-	    return {
-	      currValue: currValue,
-	      currVelocity: _mapTree2['default'](_zero2['default'], currValue)
-	    };
-	  },
+	      return {
+	        currValue: currValue,
+	        currVelocity: _mapTree2['default'](_zero2['default'], currValue)
+	      };
+	    },
 	
-	  componentDidMount: function componentDidMount() {
-	    var _this2 = this;
+	    componentDidMount: function componentDidMount() {
+	      var _this2 = this;
 	
-	    this.animationStep = animationStep.bind(null, true, function () {
-	      return _this2.stopAnimation();
-	    }, function () {
-	      return _this2.props;
-	    });
-	    this.startAnimating();
-	  },
-	
-	  componentWillReceiveProps: function componentWillReceiveProps() {
-	    this.startAnimating();
-	  },
-	
-	  stopAnimation: null,
-	
-	  // used in animationRender
-	  hasUnmounted: false,
-	
-	  animationStep: null,
-	
-	  componentWillUnmount: function componentWillUnmount() {
-	    this.stopAnimation();
-	  },
-	
-	  startAnimating: function startAnimating() {
-	    this.stopAnimation = startAnimation(this.state, this.animationStep, this.animationRender);
-	  },
-	
-	  animationRender: function animationRender(alpha, nextState, prevState) {
-	    // See comment in Spring.
-	    if (!this.hasUnmounted) {
-	      this.setState({
-	        currValue: _updateTree.interpolateValue(alpha, nextState.currValue, prevState.currValue),
-	        currVelocity: nextState.currVelocity
+	      this.animationStep = animationStep.bind(null, true, function () {
+	        return _this2.stopAnimation();
+	      }, function () {
+	        return _this2.props;
 	      });
-	    }
-	  },
+	      this.startAnimating();
+	    },
 	
-	  render: function render() {
-	    var renderedChildren = this.props.children(this.state.currValue);
-	    return renderedChildren && React.Children.only(renderedChildren);
-	  }
-	});
-	exports.TransitionSpring = TransitionSpring;
+	    componentWillReceiveProps: function componentWillReceiveProps() {
+	      this.startAnimating();
+	    },
+	
+	    stopAnimation: null,
+	
+	    // used in animationRender
+	    hasUnmounted: false,
+	
+	    animationStep: null,
+	
+	    componentWillUnmount: function componentWillUnmount() {
+	      this.stopAnimation();
+	    },
+	
+	    startAnimating: function startAnimating() {
+	      this.stopAnimation = startAnimation(this.state, this.animationStep, this.animationRender);
+	    },
+	
+	    animationRender: function animationRender(alpha, nextState, prevState) {
+	      // See comment in Spring.
+	      if (!this.hasUnmounted) {
+	        this.setState({
+	          currValue: _updateTree.interpolateValue(alpha, nextState.currValue, prevState.currValue),
+	          currVelocity: nextState.currVelocity
+	        });
+	      }
+	    },
+	
+	    render: function render() {
+	      var renderedChildren = this.props.children(this.state.currValue);
+	      return renderedChildren && React.Children.only(renderedChildren);
+	    }
+	  });
+	
+	  return { Spring: Spring, TransitionSpring: TransitionSpring };
+	}
+	
+	module.exports = exports['default'];
 
 /***/ },
-/* 3 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -400,7 +421,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodashIsplainobject = __webpack_require__(4);
+	var _lodashIsplainobject = __webpack_require__(6);
 	
 	// currenly a helper used for producing a tree of the same shape as the
 	// input(s),  but with different values. It's technically not a real `map`
@@ -448,7 +469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 4 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -461,9 +482,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	'use strict';
 	
-	var baseFor = __webpack_require__(5),
-	    isArguments = __webpack_require__(6),
-	    keysIn = __webpack_require__(7);
+	var baseFor = __webpack_require__(7),
+	    isArguments = __webpack_require__(8),
+	    keysIn = __webpack_require__(9);
 	
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
@@ -557,7 +578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = isPlainObject;
 
 /***/ },
-/* 5 */
+/* 7 */
 /***/ function(module, exports) {
 
 	/**
@@ -650,7 +671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = baseFor;
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports) {
 
 	/**
@@ -762,7 +783,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = isArguments;
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -775,8 +796,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	'use strict';
 	
-	var isArguments = __webpack_require__(6),
-	    isArray = __webpack_require__(8);
+	var isArguments = __webpack_require__(8),
+	    isArray = __webpack_require__(10);
 	
 	/** Used to detect unsigned integer values. */
 	var reIsUint = /^\d+$/;
@@ -899,7 +920,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = keysIn;
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports) {
 
 	/**
@@ -1083,7 +1104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = isArray;
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1093,7 +1114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodashIsplainobject = __webpack_require__(4);
+	var _lodashIsplainobject = __webpack_require__(6);
 	
 	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
 	
@@ -1112,7 +1133,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1122,7 +1143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodashIsplainobject = __webpack_require__(4);
+	var _lodashIsplainobject = __webpack_require__(6);
 	
 	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
 	
@@ -1145,7 +1166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports) {
 
 	// this function is allocation-less thanks to babel, which transforms the tail
@@ -1259,7 +1280,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1269,11 +1290,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _performanceNow = __webpack_require__(13);
+	var _performanceNow = __webpack_require__(15);
 	
 	var _performanceNow2 = _interopRequireDefault(_performanceNow);
 	
-	var _raf = __webpack_require__(15);
+	var _raf = __webpack_require__(17);
 	
 	var _raf2 = _interopRequireDefault(_raf);
 	
@@ -1408,7 +1429,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {// Generated by CoffeeScript 1.7.1
@@ -1444,10 +1465,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    loadTime = new Date().getTime();
 	  }
 	}).call(undefined);
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -1548,12 +1569,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var now = __webpack_require__(13),
+	var now = __webpack_require__(15),
 	    global = typeof window === 'undefined' ? {} : window,
 	    vendors = ['moz', 'webkit'],
 	    suffix = 'AnimationFrame',
@@ -1624,7 +1645,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports) {
 
 	// used by the tree-walking updates and springs. Avoids some allocations
@@ -1640,7 +1661,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1652,23 +1673,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodashIsplainobject = __webpack_require__(4);
+	var _lodashIsplainobject = __webpack_require__(6);
 	
 	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
 	
-	var _mapTree = __webpack_require__(3);
+	var _mapTree = __webpack_require__(5);
 	
 	var _mapTree2 = _interopRequireDefault(_mapTree);
 	
-	var _stepper = __webpack_require__(18);
+	var _stepper = __webpack_require__(20);
 	
 	var _stepper2 = _interopRequireDefault(_stepper);
 	
-	var _zero = __webpack_require__(16);
+	var _zero = __webpack_require__(18);
 	
 	var _zero2 = _interopRequireDefault(_zero);
 	
-	var _presets = __webpack_require__(19);
+	var _presets = __webpack_require__(21);
 	
 	// TODO: refactor common logic with updateCurrValue and updateCurrVelocity
 	
@@ -1798,7 +1819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1835,7 +1856,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports) {
 
 	// [stiffness, damping]
@@ -1849,19 +1870,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  stiff: [210, 20]
 	};
 	module.exports = exports["default"];
-
-/***/ },
-/* 20 */
-/***/ function(module, exports) {
-
-	if(typeof __WEBPACK_EXTERNAL_MODULE_20__ === 'undefined') {var e = new Error("Cannot find module \"react-native\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
-	module.exports = __WEBPACK_EXTERNAL_MODULE_20__;
-
-/***/ },
-/* 21 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_21__;
 
 /***/ }
 /******/ ])
