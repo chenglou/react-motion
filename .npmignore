@@ -1,12 +1,12 @@
-react-motion.sublime-*
 server.js
 demo*
 bower.json
 coverage/
 test/
 **/.*
-karma.config.js
+karma.conf.js
 webpack.config.js
 build/
 src/
 native/non-compiled.js
+bower_components
