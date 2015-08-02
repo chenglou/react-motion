@@ -117,7 +117,7 @@ describe('Spring', () => {
                 expect(count[0]).toBe(0);
                 expect(count[1]).toBeGreaterThan(0);
                 expect(count[count.length - 2]).toBeLessThan(10);
-                done();
+                setTimeout(done, 0);
               }
               return <div />;
             }}
