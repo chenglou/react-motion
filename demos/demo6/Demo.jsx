@@ -103,7 +103,7 @@ const Demo = React.createClass({
 
         <div style={{
           outline: '1px solid red',
-          paddingTop: 50,
+          padding: '50px 0 50px 0',
         }}>
           <div ref="mountNode" style={{
             display: 'flex',
@@ -139,6 +139,129 @@ const Demo = React.createClass({
 
         </div>
 
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}>
+          <div style={{
+            width: 960,
+          }}>
+            <div style={{
+              outline: '1px solid black',
+              margin: '50px auto 50px auto',
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}>
+              <div style={{
+                width: 280,
+                outline: '1px solid green',
+                // marginRight: 40,
+              }}>
+                <div style={{
+                  fontSize: 24,
+                  margin: '10px 0 10px 0',
+                }}>
+                  asd
+                </div>
+                <div style={{
+                  margin: '10px 0 10px 0',
+                  fontSize: '16px',
+                }}>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Impedit obcaecati, provident modi. Aspernatur placeat dolorum architecto dolorem rerum nesciunt, mollitia veniam incidunt. Doloribus harum earum, similique debitis pariatur dolore quam.
+                </div>
+              </div>
+              <div style={{
+                width: 280,
+                outline: '1px solid green',
+                // marginRight: 40,
+              }}>
+                <div style={{
+                  fontSize: 24,
+                  margin: '10px 0 10px 0',
+                  // marginRight: 40,
+                }}>
+                  asd
+                </div>
+                <div style={{
+                  margin: '10px 0 10px 0',
+                  fontSize: '16px',
+                }}>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod ex omnis, culpa quisquam eveniet quis nostrum deleniti et recusandae nulla tempore libero similique ipsum vel, accusantium nam, ullam provident non.
+                </div>
+              </div>
+              <div style={{
+                width: 280,
+                outline: '1px solid green',
+              }}>
+                <div style={{
+                  fontSize: 24,
+                  margin: '10px 0 10px 0',
+                }}>
+                  asd
+                </div>
+                <div style={{
+                  margin: '10px 0 10px 0',
+                  fontSize: '16px',
+                }}>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias neque tempore fuga distinctio enim cum labore, vitae dolorem. Nesciunt, dignissimos, voluptas. Nesciunt officia modi molestias, illo dolorem saepe autem earum!
+                </div>
+              </div>
+            </div>
+
+            <hr style={{
+              borderTopColor: 'black',
+              width: 400,
+            }}/>
+
+            <div>
+              <div style={{
+                marginTop: 60,
+                // display: 'flex',
+              }}>
+                <div style={{
+                  outline: '1px solid green',
+                  width: 600,
+                }}>
+                  <div style={{
+                    fontSize: '24px',
+                    marginBottom: 5,
+                  }}>
+                    A Simple Component
+                  </div>
+                  <div style={{
+                    margin: '0 0 25px 0',
+                  }}>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores totam, dolorum sunt aperiam nisi consequuntur soluta nostrum beatae qui error dolorem pariatur numquam eaque sint, debitis, aliquam quod, reprehenderit expedita.
+                  </div>
+                </div>
+
+                <div style={{
+                  outline: '1px solid red',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                }}>
+                  <div style={{
+                    outline: '1px solid black',
+                    width: 600,
+                  }}>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores neque ut harum ipsa esse. Iure ab, sed deleniti velit fugiat modi, repellat ducimus minima vitae cumque, dolores, nisi consectetur ratione?
+                  </div>
+
+                  <div style={{
+                    outline: '1px solid green',
+                    width: 280,
+                  }}>
+                    demo
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
     );
   },
