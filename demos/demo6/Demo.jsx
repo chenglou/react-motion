@@ -14,12 +14,28 @@ import 'codemirror/mode/javascript/javascript';
 const Demo = React.createClass({
   getInitialState() {
     return {
-      code: 'asd',
+      code:
+`const Demo = React.createClass({
+  render() {
+    return (
+      <Spring defaultValue={0} endValue={1}>
+        {val =>
+          <div style={{transform: \`scale(\${val})\`}}>
+            React-motion
+          </div>
+        }
+      </Spring>
+    );
+  },
+});
+
+React.render(<Demo />, headerText);
+`
     };
   },
 
   componentDidMount() {
-    // this.makeHot = window.ReactHotAPI(() => [React.findDOMNode(this.refs.mountNode)]);
+    // this.makeHot = window.ReactHotAPI(() => [React.findDOMNode(this.refs.headerText)]);
     // console.log(this.makeHot,' ========');
     this.evalCode();
   },
@@ -30,27 +46,27 @@ const Demo = React.createClass({
 
   evalCode() {
     const {code} = this.state;
-    const mountNode = React.findDOMNode(this.refs.mountNode);
+    const headerText = React.findDOMNode(this.refs.headerText);
     if (code === '') {
-      React.render(<div>Display here</div>, mountNode);
+      React.render(<div>Display here</div>, headerText);
       return;
     }
 
     try {
       // const makeHot = this.makeHot;
       const jsCode = babel.transform(code).code;
-      // this needs mountNode to be available
+      // this needs headerText to be available
       eval(jsCode);
       // eval([
       //   'if (module.exports) {',
       //   '  module.exports = makeHot(module.exports, "module.exports");',
-      //   '  React.render(React.createElement(Demoa), mountNode);',
+      //   '  React.render(React.createElement(Demoa), headerText);',
       //   '}'
       // ].join('\n'));
     } catch (e) {
       React.render(
         <div className="demo6-error">Something went wrong.{e.message.split('\n')[0]}</div>,
-        mountNode
+        headerText
       );
     }
   },
@@ -67,7 +83,6 @@ const Demo = React.createClass({
     return (
       <div>
         <div className="nav-main" style={{
-          // display: 'flex',
           width: '100%',
           outline: '1px solid black',
           display: 'flex',
@@ -76,6 +91,7 @@ const Demo = React.createClass({
         }}>
           <div className="nav-inner" style={{
             width: 920,
+            padding: '0 20px 0 20px',
             outline: '1px solid red',
             display: 'flex',
             justifyContent: 'flex-end',
@@ -105,7 +121,7 @@ const Demo = React.createClass({
           outline: '1px solid red',
           padding: '50px 0 50px 0',
         }}>
-          <div ref="mountNode" style={{
+          <div ref="headerText" style={{
             display: 'flex',
             justifyContent: 'center',
             fontWeight: 400,
