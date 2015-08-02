@@ -1,20 +1,101 @@
-/* eslint-disable */
+/* eslint-disable no-unused-vars, no-eval */
 
 // webpack trying to bundle babel errors, haven't checked why too much
 import babel from 'babel-browser-transform/dist/babel-browser-transform';
 import CodeMirror from 'react-codemirror';
-// import React from 'react';
+// React and Spring are transpiled into other names, but the evals in the
+// component need to refer to the original names. Forunately babel doesn't
+// transform the `require`s into different names too
 const React = require('react');
 const {Spring} = require('../../src/Spring');
-// import {Spring} from '../../src/Spring';
 // loads js syntax
 import 'codemirror/mode/javascript/javascript';
-// import l from '../../src/log';
+import l from '../../src/log';
+
+const codeMirrorOpts = {
+  mode: 'javascript',
+  lineNumbers: true,
+  lineWrapping: true,
+  // javascript mode does bad things with jsx indents last time I checked
+  smartIndent: false,
+  matchBrackets: true,
+  theme: 'monokai',
+};
+
+const Example = React.createClass({
+  propTypes: {
+    code: React.PropTypes.string.isRequired,
+  },
+
+  getInitialState() {
+    return {code: this.props.code};
+  },
+
+  componentDidMount() {
+    this.evalCode();
+  },
+
+  componentDidUpdate() {
+    this.evalCode();
+  },
+
+  evalCode() {
+    const {code} = this.state;
+    const mountNode = React.findDOMNode(this.refs.mountNode);
+    if (code === '') {
+      React.render(<div>Display here</div>, mountNode);
+      return;
+    }
+
+    try {
+      const jsCode = babel.transform(code).code;
+      eval(jsCode);
+    } catch (e) {
+      React.render(
+        <div className="demo6-error">{e.message.split('\n')[0]}</div>,
+        mountNode,
+      );
+    }
+  },
+
+  updateCode(code) {
+    this.setState({code});
+  },
+
+  render() {
+    return (
+      <div style={{
+        outline: '1px solid red',
+        display: 'flex',
+        justifyContent: 'space-between',
+      }}>
+        <div style={{
+          outline: '1px solid black',
+          width: 600,
+        }}>
+          <CodeMirror
+            value={this.state.code}
+            onChange={this.updateCode}
+            options={codeMirrorOpts} />
+        </div>
+
+        <div style={{
+          outline: '1px solid green',
+          width: 280,
+        }}>
+          <div ref="mountNode" />
+        </div>
+
+      </div>
+    );
+  },
+});
 
 const Demo = React.createClass({
   getInitialState() {
+    // TODO: hightlight that cursor position after 1`
     return {
-      code:
+      headerCode:
 `const Demo = React.createClass({
   render() {
     return (
@@ -30,13 +111,11 @@ const Demo = React.createClass({
 });
 
 React.render(<Demo />, headerText);
-`
+`,
     };
   },
 
   componentDidMount() {
-    // this.makeHot = window.ReactHotAPI(() => [React.findDOMNode(this.refs.headerText)]);
-    // console.log(this.makeHot,' ========');
     this.evalCode();
   },
 
@@ -45,40 +124,30 @@ React.render(<Demo />, headerText);
   },
 
   evalCode() {
-    const {code} = this.state;
     const headerText = React.findDOMNode(this.refs.headerText);
-    if (code === '') {
+    const {headerCode} = this.state;
+    if (headerCode === '') {
       React.render(<div>Display here</div>, headerText);
       return;
     }
 
     try {
-      // const makeHot = this.makeHot;
-      const jsCode = babel.transform(code).code;
-      // this needs headerText to be available
+      const jsCode = babel.transform(headerCode).code;
       eval(jsCode);
-      // eval([
-      //   'if (module.exports) {',
-      //   '  module.exports = makeHot(module.exports, "module.exports");',
-      //   '  React.render(React.createElement(Demoa), headerText);',
-      //   '}'
-      // ].join('\n'));
     } catch (e) {
       React.render(
-        <div className="demo6-error">Something went wrong.{e.message.split('\n')[0]}</div>,
-        headerText
+        <div className="demo6-error">{e.message.split('\n')[0]}</div>,
+        headerText,
       );
     }
   },
 
-  updateCode(newCode) {
-    this.setState({
-      code: newCode,
-    });
+  updateCode(code) {
+    this.setState({headerCode: code});
   },
 
   render() {
-    const {code} = this.state;
+    const {headerCode, example1} = this.state;
 
     return (
       <div>
@@ -140,17 +209,9 @@ React.render(<Demo />, headerText);
             margin: '60px auto 0 auto',
           }}>
             <CodeMirror
-              value={code}
+              value={headerCode}
               onChange={this.updateCode}
-              options={{
-                mode: 'javascript',
-                lineNumbers: true,
-                lineWrapping: true,
-                // javascript mode does bad things with jsx indents last time I checked
-                smartIndent: false,
-                matchBrackets: true,
-                theme: 'monokai',
-              }} />
+              options={codeMirrorOpts} />
           </div>
 
         </div>
@@ -252,26 +313,7 @@ React.render(<Demo />, headerText);
                   </div>
                 </div>
 
-                <div style={{
-                  outline: '1px solid red',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                }}>
-                  <div style={{
-                    outline: '1px solid black',
-                    width: 600,
-                  }}>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores neque ut harum ipsa esse. Iure ab, sed deleniti velit fugiat modi, repellat ducimus minima vitae cumque, dolores, nisi consectetur ratione?
-                  </div>
-
-                  <div style={{
-                    outline: '1px solid green',
-                    width: 280,
-                  }}>
-                    demo
-                  </div>
-
-                </div>
+                <Example code={example1} />
 
               </div>
             </div>
