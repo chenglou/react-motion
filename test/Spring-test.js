@@ -103,6 +103,28 @@ describe('Spring', () => {
     TestUtils.renderIntoDocument(<App />);
   });
 
+  xit('should allow interpolating scalar numbers', done => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Spring defaultValue={0} endValue={10}>
+            {val => {
+              count.push(val);
+              if (count.length > 2 && count[count.length - 1] === 10) {
+                // TODO: make this test work
+                expect(count).toEqual([0, 1232]);
+                done();
+              }
+              return <div />;
+            }}
+          </Spring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+  });
+
   it('should call raf one more time after it is done animating', done => {
     let count = [];
     const App = React.createClass({

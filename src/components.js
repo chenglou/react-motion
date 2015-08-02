@@ -73,11 +73,13 @@ export default function components(React) {
       defaultValue: PropTypes.oneOfType([
         PropTypes.object,
         PropTypes.array,
+        PropTypes.number,
       ]),
       endValue: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.object,
         PropTypes.array,
+        PropTypes.number,
       ]).isRequired,
       children: PropTypes.func.isRequired,
     },
@@ -150,6 +152,7 @@ export default function components(React) {
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });
+
 
   const TransitionSpring = React.createClass({
     propTypes: {
