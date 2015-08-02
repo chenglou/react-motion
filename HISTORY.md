@@ -4,6 +4,9 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### Upcoming
+- `Spring` `endValue` and `defaultValue` now support passing a simple number. You no longer have to do `endValue={{val: 10}}`.
+
 ### 0.2.6 (July 31th 2015)
 - [F] React-native warning's now gone, but also put into a separate file path. To require react-motion on react-native, do `require('react-motion/native')`.
 - [I] Support for React 0.14.0-beta1.
