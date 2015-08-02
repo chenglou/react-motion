@@ -9,7 +9,7 @@ import {interpolateValue, updateCurrValue, updateCurrVelocity} from './updateTre
 
 const startAnimation = configAnimation();
 
-function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
+export function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
   let {currValue, currVelocity} = state;
   let {willEnter, willLeave, endValue} = getProps();
 
