@@ -24,8 +24,8 @@ const Demo = React.createClass({
           Toggle
         </button>
 
-        <Spring endValue={{val: this.state.open ? 400 : 0}}>
-          {({val}) =>
+        <Spring endValue={this.state.open ? 400 : 0}>
+          {val =>
             // children is a callback which should accept the current value of
             // `endValue`
             <div className="demo0">

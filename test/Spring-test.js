@@ -103,7 +103,7 @@ describe('Spring', () => {
     TestUtils.renderIntoDocument(<App />);
   });
 
-  xit('should allow interpolating scalar numbers', done => {
+  it('should allow interpolating scalar numbers', done => {
     let count = [];
     const App = React.createClass({
       render() {
@@ -111,9 +111,12 @@ describe('Spring', () => {
           <Spring defaultValue={0} endValue={10}>
             {val => {
               count.push(val);
+              // count.length being at least 3 we have at least one
+              // intermediary value
               if (count.length > 2 && count[count.length - 1] === 10) {
-                // TODO: make this test work
-                expect(count).toEqual([0, 1232]);
+                expect(count[0]).toBe(0);
+                expect(count[1]).toBeGreaterThan(0);
+                expect(count[count.length - 2]).toBeLessThan(10);
                 done();
               }
               return <div />;
