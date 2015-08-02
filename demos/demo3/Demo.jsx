@@ -78,8 +78,7 @@ const Demo = React.createClass({
   // actual animation-related logic
   getEndValue() {
     const {todos, value, selected} = this.state;
-    const configs = {};
-    Object.keys(todos)
+    return Object.keys(todos)
       .filter(date => {
         const todo = todos[date];
         return todo.text.toUpperCase().indexOf(value.toUpperCase()) >= 0 &&
@@ -87,14 +86,14 @@ const Demo = React.createClass({
           selected === 'active' && !todo.isDone ||
           selected === 'all');
       })
-      .forEach(date => {
+      .reduce((configs, date) => {
         configs[date] = {
           height: {val: 60, config: presets.gentle},
           opacity: {val: 1, config: presets.gentle},
           data: todos[date],
         };
-      });
-    return configs;
+        return configs;
+      }, {});
   },
 
   willEnter(date) {
