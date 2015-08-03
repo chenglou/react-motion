@@ -5,12 +5,12 @@
 [![react-motion channel on slack](https://img.shields.io/badge/slack-react--motion%40reactiflux-61DAAA.svg?style=flat)](https://reactiflux.slack.com/messages/react-motion/)
 
 ```js
-<Spring endValue={{val: 10}}>
+<Spring defaultValue={{val: 0}} endValue={{val: 10}}>
   {interpolated => <div>{interpolated.val}</div>}
 </Spring>
 ```
 
-Animate a counter to `10`, from whatever value it currently is. For more advanced usage, see [below](#presets).
+Animate a counter from `0` `10`. For more advanced usage, see [below](#presets).
 
 Npm:
 `npm install react-motion`
