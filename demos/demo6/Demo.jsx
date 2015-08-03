@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars, no-eval */
+/* eslint-disable no-unused-vars, no-eval, no-shadow */
 
 // webpack trying to bundle babel errors, haven't checked why too much
 import babel from 'babel-browser-transform/dist/babel-browser-transform';
@@ -49,10 +49,13 @@ const Example = React.createClass({
 
     try {
       const jsCode = babel.transform(code).code;
-      eval(jsCode);
+      // evaled code might override Demo and Example which makes things weird
+      (function doIt(Demo, Example) {
+        eval(jsCode);
+      })();
     } catch (e) {
       React.render(
-        <div className="demo6-error">{e.message.split('\n')[0]}</div>,
+        <pre className="demo6-error">{e.message}</pre>,
         mountNode,
       );
     }
@@ -91,6 +94,43 @@ const Example = React.createClass({
   },
 });
 
+// const Playground = React.createClass({
+//   propTypes: {
+//     code:
+//   }
+
+//   render() {
+//     return (
+//       <div>
+//         <div style={{
+//           marginTop: 60,
+//           // display: 'flex',
+//         }}>
+//           <div style={{
+//             outline: '1px solid green',
+//             width: 600,
+//           }}>
+//             <div style={{
+//               fontSize: '24px',
+//               marginBottom: 5,
+//             }}>
+//               A Simple Component
+//             </div>
+//             <div style={{
+//               margin: '0 0 25px 0',
+//             }}>
+//               Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores totam, dolorum sunt aperiam nisi consequuntur soluta nostrum beatae qui error dolorem pariatur numquam eaque sint, debitis, aliquam quod, reprehenderit expedita.
+//             </div>
+//           </div>
+
+//           <Example code={example1} />
+
+//         </div>
+//       </div>
+//     );
+//   },
+// });
+
 const Demo = React.createClass({
   getInitialState() {
     // TODO: hightlight that cursor position after 1`
@@ -111,6 +151,91 @@ const Demo = React.createClass({
 });
 
 React.render(<Demo />, headerText);
+`,
+    example1:
+`const Demo = React.createClass({
+  render() {
+    return (
+      <Spring
+        defaultValue={{val: {scale: 0, opacity: 0}}}
+        endValue={{val: {scale: 1, opacity: 1}}}>
+        {interpolated => {
+          return (
+            <div
+              className="block"
+              style={{
+                WebkitTransform: \`scale(\${interpolated.val.scale})\`,
+                transform: \`scale(\${interpolated.val.scale})\`,
+                opacity: interpolated.val.opacity,
+              }} />
+          );
+        }}
+      </Spring>
+    );
+  }
+});
+
+React.render(<Demo />, mountNode);
+`,
+
+    example2:
+`const Demo = React.createClass({
+  render() {
+    return (
+      <Spring
+        defaultValue={{scale: {val: 0}, opacity: {val: 0}}}
+        endValue={{scale: {val: 1}, opacity: {val: 1}}}>
+        {({scale, opacity}) => {
+          return (
+            <div
+              className="block"
+              style={{
+                WebkitTransform: \`scale(\${scale.val})\`,
+                transform: \`scale(\${scale.val})\`,
+                opacity: opacity.val,
+              }} />
+          );
+        }}
+      </Spring>
+    );
+  }
+});
+
+React.render(<Demo />, mountNode);
+`,
+    example3:
+`const Demo = React.createClass({
+  render() {
+    return (
+      <Spring
+        defaultValue={[1, 2, 3].map(i => ({val: -500}))}
+        endValue={prevValue => {
+          const newEndValue = prevValue.map((_, i) => {
+            return i === 0
+              ? {val: 50}
+              : {val: prevValue[i - 1].val};
+          });
+          return newEndValue;
+        }}>
+        {interpolated => {
+          return (
+            <div>
+              {interpolated.map(value =>
+                <div
+                  className="block"
+                  style={{
+                    transform: \`translateX(\${value.val}px)\`,
+                  }} />
+              )}
+            </div>
+          );
+        }}
+      </Spring>
+    );
+  }
+});
+
+React.render(<Demo />, mountNode);
 `,
     };
   },
@@ -133,7 +258,9 @@ React.render(<Demo />, headerText);
 
     try {
       const jsCode = babel.transform(headerCode).code;
-      eval(jsCode);
+      (function doIt(Demo, Example) {
+        eval(jsCode);
+      })();
     } catch (e) {
       React.render(
         <div className="demo6-error">{e.message.split('\n')[0]}</div>,
@@ -147,7 +274,7 @@ React.render(<Demo />, headerText);
   },
 
   render() {
-    const {headerCode, example1} = this.state;
+    const {headerCode, example1, example2, example3} = this.state;
 
     return (
       <div>
@@ -175,7 +302,7 @@ React.render(<Demo />, headerText);
               padding: '0 10px',
               lineHeight: '50px',
             }}>
-              Support
+              Demos
             </div>
             <div style={{
               padding: '0 10px',
@@ -291,7 +418,8 @@ React.render(<Demo />, headerText);
               width: 400,
             }}/>
 
-            <div>
+
+            <div className="playground">
               <div style={{
                 marginTop: 60,
                 // display: 'flex',
@@ -318,8 +446,67 @@ React.render(<Demo />, headerText);
               </div>
             </div>
 
+
+            <div className="playground">
+              <div style={{
+                marginTop: 60,
+                // display: 'flex',
+              }}>
+                <div style={{
+                  outline: '1px solid green',
+                  width: 600,
+                }}>
+                  <div style={{
+                    fontSize: '24px',
+                    marginBottom: 5,
+                  }}>
+                    A Simple Component
+                  </div>
+                  <div style={{
+                    margin: '0 0 25px 0',
+                  }}>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores totam, dolorum sunt aperiam nisi consequuntur soluta nostrum beatae qui error dolorem pariatur numquam eaque sint, debitis, aliquam quod, reprehenderit expedita.
+                  </div>
+                </div>
+
+                <Example code={example2} />
+
+              </div>
+            </div>
+
+
+            <div className="playground">
+              <div style={{
+                marginTop: 60,
+                // display: 'flex',
+              }}>
+                <div style={{
+                  outline: '1px solid green',
+                  width: 600,
+                }}>
+                  <div style={{
+                    fontSize: '24px',
+                    marginBottom: 5,
+                  }}>
+                    A Simple Component
+                  </div>
+                  <div style={{
+                    margin: '0 0 25px 0',
+                  }}>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores totam, dolorum sunt aperiam nisi consequuntur soluta nostrum beatae qui error dolorem pariatur numquam eaque sint, debitis, aliquam quod, reprehenderit expedita.
+                  </div>
+                </div>
+
+                <Example code={example3} />
+
+              </div>
+            </div>
+
+
           </div>
         </div>
+
+
       </div>
     );
   },
