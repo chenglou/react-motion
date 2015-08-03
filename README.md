@@ -291,6 +291,8 @@ Since `TransitionSpring` dictates `endValue` to be an object, manipulating keys 
 - Insert at the end: `{...oldConfigs, newKey: myConfigForThisKey}`.
 - Slice/splice/reverse/sort: this library exposes a `utils.reorderKeys` function.
 
+**Note**: object keys creation order is now guaranteed by the specs, except for integer keys, which follow ascending order and should not be used with `TransitionSpring` (unless that behavior's what you want). Fortunately, you can just add a letter to your key to solve the integer order problem.
+
 #### `utils.reorderKeys(object, newKeysFunction)`
 `newKeysFunction` will receive, as arguments, the array of keys in `object` and should return a new array of keys (with e.g. order changed and/or keys missing). `reorderKeys` will then return a new object similar to `object`, but with the keys in the order `newKeysFunction` dictated.
 
