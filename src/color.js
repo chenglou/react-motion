@@ -36,3 +36,41 @@ export function rgbToHex(red, green, blue) {
   b = b.length < 2 ? '0' + b : b;
   return '#' + r + g + b;
 }
+
+// This helper function does a linear interpolation of a value from
+// one range to another. This can be very useful for converting the
+// motion of a Spring to a range of UI property values. For example a
+// spring moving from position 0 to 1 could be interpolated to move a
+// view from pixel 300 to 350 and scale it from 0.5 to 1. The current
+// position of the `Spring` just needs to be run through this method
+// taking its input range in the _from_ parameters with the property
+// animation range in the _to_ parameters.
+export function mapValueInRange(value, fromLow, fromHigh, toLow, toHigh) {
+  let fromRangeSize = fromHigh - fromLow;
+  let toRangeSize = toHigh - toLow;
+  let valueScale = (value - fromLow) / fromRangeSize;
+  return toLow + (valueScale * toRangeSize);
+}
+
+// Interpolate two hex colors in a 0 - 1 range or optionally provide a
+// custom range with fromLow,fromHight. The output will be in hex by default
+// unless asRGB is true in which case it will be returned as an rgb string.
+export function interpolateColor(val, start, end, low, high, asRGB) {
+  let fromLow = low === undefined ? 0 : low;
+  let fromHigh = high === undefined ? 1 : high;
+  let startColor = hexToRGB(start);
+  let endColor = hexToRGB(end);
+  let r = Math.floor(
+    mapValueInRange(val, fromLow, fromHigh, startColor.r, endColor.r)
+  );
+  let g = Math.floor(
+    mapValueInRange(val, fromLow, fromHigh, startColor.g, endColor.g)
+  );
+  let b = Math.floor(
+    mapValueInRange(val, fromLow, fromHigh, startColor.b, endColor.b)
+  );
+  if (asRGB) {
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+  return rgbToHex(r, g, b);
+}
