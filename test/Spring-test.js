@@ -78,7 +78,7 @@ describe('Spring', () => {
     });
     TestUtils.renderIntoDocument(<App />);
 
-    // Initial render
+    // Checking initial render
     expect(count).toEqual([0]);
 
     // Move "time" by 8 steps, which is equivalent to 8 calls to `raf`
@@ -109,7 +109,7 @@ describe('Spring', () => {
 
     TestUtils.renderIntoDocument(<App />);
 
-    // Initial render
+    // Checking initial render
     expect(count).toEqual([0]);
     mockRaf.manySteps(4);
     expect(count).toEqual([
@@ -138,7 +138,7 @@ describe('Spring', () => {
 
     TestUtils.renderIntoDocument(<App />);
 
-    // Initial render
+    // Checking initial render
     expect(count).toEqual([[0, 0]]);
     mockRaf.manySteps(4);
     expect(count).toEqual([
@@ -167,7 +167,7 @@ describe('Spring', () => {
 
     TestUtils.renderIntoDocument(<App />);
 
-    // Initial render
+    // Checking initial render
     expect(count).toEqual([[0, 0]]);
     mockRaf.manySteps(4);
     expect(count).toEqual([
@@ -194,7 +194,7 @@ describe('Spring', () => {
     });
     TestUtils.renderIntoDocument(<App />);
 
-    // Initial render
+    // Checking initial render
     expect(count).toEqual([0]);
     mockRaf.manySteps(4);
     expect(count).toEqual([
@@ -221,7 +221,7 @@ describe('Spring', () => {
     });
     TestUtils.renderIntoDocument(<App />);
 
-    // Initial render
+    // Checking initial render
     expect(count).toEqual([400]);
     mockRaf.manySteps(10); // Shouldn't matter, we stop rafing
     expect(count).toEqual([400, 400]);
@@ -243,7 +243,7 @@ describe('Spring', () => {
     });
     TestUtils.renderIntoDocument(<App />);
 
-    // Initial render
+    // Checking initial render
     expect(count).toEqual([0]);
     mockRaf.manySteps(4);
     expect(count).toEqual([
@@ -390,5 +390,248 @@ describe('Spring', () => {
         key3: { val: 0 },
       },
     ]);
+  });
+
+  it('should NOT warn when parent kills the child Spring', () => {
+    let count = [];
+    let shouldKill = false;
+    const App = React.createClass({
+      propTypes: {
+        kill: PropTypes.func.isRequired,
+      },
+
+      endValue() {
+        if (shouldKill) {
+          this.props.kill();
+        }
+
+        return {val: 400};
+      },
+
+      render() {
+        return (
+          <Spring defaultValue={{val: 0}} endValue={this.endValue}>
+            {({val}) => {
+              count.push(val);
+              return <div />;
+            }}
+          </Spring>
+        );
+      },
+    });
+
+    let Parent = React.createClass({
+      getInitialState() {
+        return {
+          isAlive: true,
+        };
+      },
+      render() {
+        if (shouldKill) {
+          expect(this.state.isAlive).toBe(false);
+        }
+        return this.state.isAlive && <App kill={() => this.setState({isAlive: false})}/>;
+      },
+    });
+
+    TestUtils.renderIntoDocument(<Parent />);
+
+    mockRaf.manySteps(4);
+    expect(count).toEqual([
+      0,
+      18.888888888888886,
+      47.589506172839506,
+      80.49479595336076,
+      114.22887257563632]);
+
+    shouldKill = true;
+
+    // We render once more which should trigger endValue, calling
+    // this.props.kill() which will setState of the parent thus killing the
+    // child
+    // This shouldn't warn
+    mockRaf.step();
+
+    // We haven't rendered the Spring since we unmounted
+    expect(count).toEqual([
+      0,
+      18.888888888888886,
+      47.589506172839506,
+      80.49479595336076,
+      114.22887257563632]);
+  });
+
+  it('should mount and unmount correctly (TransitionSpring)', () => {
+    let count = [];
+
+    const willEnterandLeave = {
+      val: 0,
+    };
+    let endValue = {
+      key1: { val: 10 },
+      key2: { val: 10 },
+    };
+    const App = React.createClass({
+      render() {
+        return (
+          <TransitionSpring
+            endValue={() => endValue}
+            willEnter={() => willEnterandLeave}
+            willLeave={() => willEnterandLeave}>
+            {currValue => {
+              count.push(currValue);
+              return (
+                <div>
+                  {Object.keys(currValue).map(key => {
+                    return <div key={key} />;
+                  })}
+                </div>
+              );
+            }}
+          </TransitionSpring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    // Checking initial render
+    expect(count).toEqual([endValue]);
+
+    // Mount a new key!
+    endValue = {
+      ...endValue,
+      key3: { val: 10 },
+    };
+
+    // Move in time by 88 steps because that's just enough to reach the endValue
+    mockRaf.manySteps(88);
+    expect(count.slice(0, 4)).toEqual([
+      {
+        key1: { val: 10 },
+        key2: { val: 10 },
+      }, {
+        key1: { val: 10 },
+        key2: { val: 10 },
+        key3: { val: 0 },
+      }, {
+        key1: { val: 10 },
+        key2: { val: 10 },
+        key3: { val: 0.4722222222222222 },
+      }, {
+        key1: { val: 10 },
+        key2: { val: 10 },
+        key3: { val: 1.1897376543209877 },
+      },
+    ]);
+
+    // We reached the end!
+    expect(count[count.length - 1]).toEqual({
+      key1: { val: 10 },
+      key2: { val: 10 },
+      key3: { val: 10 },
+    });
+
+
+    // Empty array
+    count = [];
+
+    // More steps won't do anything
+    mockRaf.manySteps(10);
+
+    // Trigger a render of the owner
+    TestUtils.renderIntoDocument(<App />);
+
+    // Unmount baby! (We raf once after the owner forces the TransitionSpring
+    // renders)
+    endValue = {
+      key1: { val: 10 },
+      key2: { val: 10 },
+    };
+
+    // Move until we reach endValue
+    mockRaf.manySteps(88);
+    expect(count.slice(0, 3)).toEqual([
+      {
+        key1: { val: 10 },
+        key2: { val: 10 },
+        key3: { val: 10 },
+      }, {
+        key1: { val: 10 },
+        key2: { val: 10 },
+        key3: { val: 9.527777777777779 },
+      }, {
+        key1: { val: 10 },
+        key2: { val: 10 },
+        key3: { val: 8.81026234567901 },
+      },
+    ]);
+
+    // Finally unmounted
+    expect(count[count.length - 1]).toEqual({
+      key1: { val: 10 },
+      key2: { val: 10 },
+    });
+  });
+
+  it('should reach destination value', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Spring defaultValue={0} endValue={400}>
+            {val => {
+              count.push(val);
+              return <div />;
+            }}
+          </Spring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    // Checking initial render
+    expect(count).toEqual([0]);
+
+    // Move "time" until we reach the endCalue
+    mockRaf.manySteps(111);
+    expect(count.slice(0, 5)).toEqual([
+      0,
+      18.888888888888886,
+      47.589506172839506,
+      80.49479595336076,
+      114.22887257563632]);
+
+    expect(count[count.length - 1]).toEqual(400);
+  });
+
+  it('should reach destination value TransitionSpring', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <TransitionSpring defaultValue={{key: {val: 0}}} endValue={{key: {val: 400}}}>
+            {({key: {val}}) => {
+              count.push(val);
+              return <div />;
+            }}
+          </TransitionSpring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    // Checking initial render
+    expect(count).toEqual([0]);
+
+    // Move "time" until we reach the endCalue
+    mockRaf.manySteps(111);
+    expect(count.slice(0, 5)).toEqual([
+      0,
+      18.888888888888886,
+      47.589506172839506,
+      80.49479595336076,
+      114.22887257563632]);
+
+    expect(count[count.length - 1]).toEqual(400);
   });
 });
