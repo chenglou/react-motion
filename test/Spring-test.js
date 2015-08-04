@@ -298,4 +298,41 @@ describe('Spring', () => {
     mockRaf.step();
     expect(count).toEqual([10, 400, 400, 10, 400]);
   });
+
+  it('should be able to move by two steps if Spring gets out of sync', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Spring defaultValue={{val: 0}} endValue={{val: 400}}>
+            {({val}) => {
+              count.push(val);
+              return <div />;
+            }}
+          </Spring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    // Initial render
+    expect(count).toEqual([0]);
+    mockRaf.manySteps(6);
+    expect(count).toEqual([
+      0,
+      18.888888888888886,
+      47.589506172839506,
+      80.49479595336076,
+      114.22887257563632,
+      146.83959701218743,
+      177.2738043339909]);
+      // Due to floating point errors when calculating the accumulated time
+      // inside the animationLoop, arriving at that last value the accumulated
+      // time will go barely beyond 1000/60 and so the animation loop will move
+      // by two frames but will only move by say 1% towards that 2nd frame.
+      // Before the for loop calculating more than one frame would just
+      // calculate the same frame over and over again, but we'd still move 1%
+      // towards that. So when the loop was broken, 177.2738043339909 would be
+      // 146.83959701218743
+  });
 });
