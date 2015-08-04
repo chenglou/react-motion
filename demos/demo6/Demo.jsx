@@ -7,7 +7,7 @@ import CodeMirror from 'react-codemirror';
 // component need to refer to the original names. Forunately babel doesn't
 // transform the `require`s into different names too
 const React = require('react');
-const {Spring} = require('../../src/Spring');
+const {Spring, TransitionSpring} = require('../../src/Spring');
 // loads js syntax
 import 'codemirror/mode/javascript/javascript';
 import l from '../../src/log';
@@ -237,6 +237,56 @@ React.render(<Demo />, mountNode);
 
 React.render(<Demo />, mountNode);
 `,
+
+    example4:
+`const Demo = React.createClass({
+  getInitialState() {
+    return {current: 0};
+  },
+  componentDidMount() {
+    this.interval = setInterval(() => {
+      this.setState({current: this.state.current + 1});
+    }, 1500);
+  },
+  componentWillUnmount: function() {
+    clearInterval(this.interval);
+  },
+  render() {
+    return (
+      <TransitionSpring
+        willEnter={key => ({top: {val: 200}, scale: {val: 0}})}
+        willLeave={key => ({top: {val: 0}, scale: {val: 0}})}
+        endValue={() => {
+          let endValue = {};
+          for (var i = 0; i < 3; i++) {
+            endValue['item' + (this.state.current + i)] = {
+              top: {val: i * 100},
+              scale: {val: 1},
+            };
+          }
+          return endValue;
+        }}>
+        {stuff => {
+          return (
+            <div style={{position: 'relative'}}>
+              {Object.keys(stuff).map(key =>
+                <div
+                  key={key}
+                  className="ts-block"
+                  style={{
+                    transform: \`translateY(\${stuff[key].top.val}px) scale(\${stuff[key].scale.val})\`,
+                  }} />
+              )}
+            </div>
+          );
+        }}
+      </TransitionSpring>
+    );
+  }
+});
+
+React.render(<Demo />, mountNode);
+`,
     };
   },
 
@@ -274,7 +324,7 @@ React.render(<Demo />, mountNode);
   },
 
   render() {
-    const {headerCode, example1, example2, example3} = this.state;
+    const {headerCode, example1, example2, example3, example4} = this.state;
 
     return (
       <div>
@@ -302,7 +352,7 @@ React.render(<Demo />, mountNode);
               padding: '0 10px',
               lineHeight: '50px',
             }}>
-              Demos
+              Gallery
             </div>
             <div style={{
               padding: '0 10px',
@@ -366,32 +416,13 @@ React.render(<Demo />, mountNode);
                   fontSize: 24,
                   margin: '10px 0 10px 0',
                 }}>
-                  asd
+                  Physics-based
                 </div>
                 <div style={{
                   margin: '10px 0 10px 0',
                   fontSize: '16px',
                 }}>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Impedit obcaecati, provident modi. Aspernatur placeat dolorum architecto dolorem rerum nesciunt, mollitia veniam incidunt. Doloribus harum earum, similique debitis pariatur dolore quam.
-                </div>
-              </div>
-              <div style={{
-                width: 280,
-                outline: '1px solid green',
-                // marginRight: 40,
-              }}>
-                <div style={{
-                  fontSize: 24,
-                  margin: '10px 0 10px 0',
-                  // marginRight: 40,
-                }}>
-                  asd
-                </div>
-                <div style={{
-                  margin: '10px 0 10px 0',
-                  fontSize: '16px',
-                }}>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod ex omnis, culpa quisquam eveniet quis nostrum deleniti et recusandae nulla tempore libero similique ipsum vel, accusantium nam, ullam provident non.
+                  Set up some constants, and let the magic of physics animate the rest.
                 </div>
               </div>
               <div style={{
@@ -402,13 +433,30 @@ React.render(<Demo />, mountNode);
                   fontSize: 24,
                   margin: '10px 0 10px 0',
                 }}>
-                  asd
+                  Simple API
                 </div>
                 <div style={{
                   margin: '10px 0 10px 0',
                   fontSize: '16px',
                 }}>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias neque tempore fuga distinctio enim cum labore, vitae dolorem. Nesciunt, dignissimos, voluptas. Nesciunt officia modi molestias, illo dolorem saepe autem earum!
+                  No manual interruption logic, no state, no side-effect.
+                </div>
+              </div>
+              <div style={{
+                width: 280,
+                outline: '1px solid green',
+              }}>
+                <div style={{
+                  fontSize: 24,
+                  margin: '10px 0 10px 0',
+                }}>
+                  Mount/Unmount
+                </div>
+                <div style={{
+                  margin: '10px 0 10px 0',
+                  fontSize: '16px',
+                }}>
+                  Just like TransitionGroup: animate a component that comes in/goes out.
                 </div>
               </div>
             </div>
@@ -498,6 +546,34 @@ React.render(<Demo />, mountNode);
                 </div>
 
                 <Example code={example3} />
+
+              </div>
+            </div>
+
+
+            <div className="playground">
+              <div style={{
+                marginTop: 60,
+                // display: 'flex',
+              }}>
+                <div style={{
+                  outline: '1px solid green',
+                  width: 600,
+                }}>
+                  <div style={{
+                    fontSize: '24px',
+                    marginBottom: 5,
+                  }}>
+                    A Simple Component
+                  </div>
+                  <div style={{
+                    margin: '0 0 25px 0',
+                  }}>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores totam, dolorum sunt aperiam nisi consequuntur soluta nostrum beatae qui error dolorem pariatur numquam eaque sint, debitis, aliquam quod, reprehenderit expedita.
+                  </div>
+                </div>
+
+                <Example code={example4} />
 
               </div>
             </div>

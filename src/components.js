@@ -162,6 +162,8 @@ export default function components(React) {
   });
 
 
+  // TODO: warn when obj uses numerical keys
+  // TODO: warn when endValue doesn't contain a val
   const TransitionSpring = React.createClass({
     propTypes: {
       defaultValue: PropTypes.objectOf(PropTypes.any),
