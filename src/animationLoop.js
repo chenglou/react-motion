@@ -58,14 +58,17 @@ export default function configAnimation(config = {}) {
     accumulatedTime = accumulatedTime - frameNumber * timeStep;
 
     // Render and filter in one iteration.
-    const newAnimRunning = [];
     const alpha = 1 + accumulatedTime / timeStep;
     for (let i = 0; i < animRunning.length; i++) {
-      const {render, active, nextState, prevState} = animRunning[i];
+      const {render, nextState, prevState} = animRunning[i];
 
       // Might mutate animRunning........
       render(alpha, nextState, prevState);
-      if (active) {
+    }
+
+    let newAnimRunning = [];
+    for (let i = 0; i < animRunning.length; i++) {
+      if (animRunning[i].active) {
         newAnimRunning.push(animRunning[i]);
       }
     }

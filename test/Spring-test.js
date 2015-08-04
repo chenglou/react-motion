@@ -277,26 +277,27 @@ describe('Spring', () => {
     });
     TestUtils.renderIntoDocument(<App />);
 
-    // Here's why we expect this with the current
-    // implementation (not necessarily good):
+    // Here's why we expect this with the current implementation:
     //
     // - mount <App />
-    // - render owner Spring           [10]
-    // - the above triggers the child  [10, 400]
-    //   Spring to render
-    // - step once (both Spring
-    //   calculations are done in the
-    //   same step)
-    // - render the child Spring       [10, 400, 400]
-    // - render the owner Spring       [10, 400, 400, 10]
-    // - the above triggers the child  [10, 400, 400, 10, 400]
-    //   Spring to render
+    // - render owner Spring                           [10]
+    // - the above triggers the child Spring to render [10, 400]
+    // - step once (both Spring calculations are done
+    //   in the same step)
+    // - render the child Spring                       [10, 400, 400]
+    // - render the owner Spring                       [10, 400, 400, 10]
+    // - the above triggers the child Spring to render [10, 400, 400, 10, 400]
+    // - step a second time which only affects the
+    //   child who registered one last raf in the step
+    //   above
 
     expect(count).toEqual([10, 400]);
     mockRaf.step();
     expect(count).toEqual([10, 400, 400, 10, 400]);
-    mockRaf.step();
-    expect(count).toEqual([10, 400, 400, 10, 400]);
+
+    // Step many times won't matter, the child only renders once more
+    mockRaf.manySteps(10);
+    expect(count).toEqual([10, 400, 400, 10, 400, 400]);
   });
 
   it('should be able to move by two steps if Spring gets out of sync', () => {
