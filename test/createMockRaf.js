@@ -10,7 +10,8 @@ export default function() {
     allCallbacks.push(cb);
   };
 
-  const step = (ms = 16) => {
+  const defaultTimeInterval = 1000 / 60;
+  const step = (ms = defaultTimeInterval) => {
     const allCallbacksBefore = allCallbacks;
     allCallbacks = [];
 
