@@ -1,5 +1,12 @@
 import React from 'react';
-import {Spring} from '../../src/Spring';
+import {Spring, utils} from '../../src/react-motion';
+
+const {rgbToHex, interpolateColor} = utils.color;
+
+const colors = {
+  close: rgbToHex(130, 181, 198),
+  open: rgbToHex(220, 57, 184),
+};
 
 const Demo = React.createClass({
   getInitialState() {
@@ -32,6 +39,7 @@ const Demo = React.createClass({
               <div className="demo0-block" style={{
                 WebkitTransform: `translate3d(${val}px, 0, 0)`,
                 transform: `translate3d(${val}px, 0, 0)`,
+                backgroundColor: interpolateColor(val, colors.close, colors.open, 0, 400),
               }} />
             </div>
           }
