@@ -28,7 +28,9 @@ export default function configAnimation(config = {}) {
 
     let frameNumber = Math.ceil(accumulatedTime / timeStep);
     for (let i = 0; i < animRunning.length; i++) {
-      const {active, step, prevState: prevPrevState, nextState: prevNextState} = animRunning[i];
+      const {active, step, prevState: prevPrevState} = animRunning[i];
+      let {nextState: prevNextState} = animRunning[i];
+
       if (!active) {
         continue;
       }
@@ -49,6 +51,7 @@ export default function configAnimation(config = {}) {
         for (let j = 0; j < frameNumber; j++) {
           animRunning[i].nextState = step(timeStep / 1000, prevNextState);
           animRunning[i].prevState = prevNextState;
+          prevNextState = animRunning[i].nextState;
         }
       }
     }
