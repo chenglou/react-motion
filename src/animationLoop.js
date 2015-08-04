@@ -50,8 +50,7 @@ export default function configAnimation(config = {}) {
       } else {
         for (let j = 0; j < frameNumber; j++) {
           animRunning[i].nextState = step(timeStep / 1000, prevNextState);
-          animRunning[i].prevState = prevNextState;
-          prevNextState = animRunning[i].nextState;
+          [animRunning[i].prevState, prevNextState] = [prevNextState, animRunning[i].nextState];
         }
       }
     }
