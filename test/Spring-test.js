@@ -335,4 +335,60 @@ describe('Spring', () => {
       // towards that. So when the loop was broken, 177.2738043339909 would be
       // 146.83959701218743
   });
+
+  it('should not mutate currValue when adding a new key (TransitionSpring)', () => {
+    let count = [];
+
+    const App = React.createClass({
+      getInitialState() {
+        return {
+          data: {
+            key1: { val: 10 },
+            key2: { val: 10 },
+          },
+        };
+      },
+
+      componentDidMount() {
+        this.setState({
+          data: {
+            key1: { val: 10 },
+            key2: { val: 10 },
+            key3: { val: 10 },
+          },
+        });
+      },
+
+      render() {
+        return (
+          <TransitionSpring
+            endValue={this.state.data}
+            willEnter={() => ({ val: 0 })}
+            willLeave={() => ({ val: 0 })}>
+            {currValue => {
+              count.push(currValue);
+              return null;
+            }}
+          </TransitionSpring>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    mockRaf.step();
+
+    expect(count).toEqual([
+      {
+        key1: { val: 10 },
+        key2: { val: 10 },
+      }, { // This second obj would be mutated
+        key1: { val: 10 },
+        key2: { val: 10 },
+      }, {
+        key1: { val: 10 },
+        key2: { val: 10 },
+        key3: { val: 0 },
+      },
+    ]);
+  });
 });

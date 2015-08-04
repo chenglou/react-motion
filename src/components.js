@@ -45,12 +45,20 @@ function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
       .forEach(key => {
         hasNewKey = true;
         const enterValue = willEnter(key, mergedValue[key], endValue, currValue, currVelocity);
-        currValue[key] = enterValue;
+
+        // We can mutate this here because mergeDiff returns a new Obj
         mergedValue[key] = enterValue;
-        currVelocity[key] = mapTree(zero, currValue[key]);
+
+        currValue = {
+          ...currValue,
+          [key]: enterValue,
+        };
+        currVelocity = {
+          ...currVelocity,
+          [key]: mapTree(zero, enterValue),
+        };
       });
   }
-
   const newCurrValue = updateCurrValue(timestep, currValue, currVelocity, mergedValue);
   const newCurrVelocity = updateCurrVelocity(timestep, currValue, currVelocity, mergedValue);
 
