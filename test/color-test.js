@@ -1,6 +1,6 @@
 import * as color from '../src/color';
 
-describe('Rebound Utilities', () => {
+describe('color utilities', () => {
   it('should convert from hex to rgb', () => {
     expect(color.hexToRGB('#fff')).toEqual({r: 255, g: 255, b: 255});
   });
