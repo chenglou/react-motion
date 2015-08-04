@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars, no-eval, no-shadow */
+/* global babel */
 
 // webpack trying to bundle babel errors, haven't checked why too much
-import babel from 'babel-browser-transform/dist/babel-browser-transform';
 import CodeMirror from 'react-codemirror';
 // React and Spring are transpiled into other names, but the evals in the
 // component need to refer to the original names. Forunately babel doesn't
