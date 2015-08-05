@@ -237,9 +237,7 @@ let Demo = React.createClass({
   },
 
   willLeave(key, value, endValue, currentValue, currentSpeed) {
-    if (currentValue[key].opacity.val === 0 && currentSpeed[key].opacity.val === 0) {
-      return null; // kill component when opacity reaches 0
-    }
+    // the key with this value is truly killed when the values reaches destination
     return {
       height: {val: 0},
       opacity: {val: 0},
