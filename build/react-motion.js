@@ -89,10 +89,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports["default"] = reorderKeys;
 	
 	function reorderKeys(obj, f) {
-	  return f(Object.keys(obj)).reduce(function (ret, key) {
+	  var newKeys = f(Object.keys(obj));
+	  var ret = {};
+	  for (var i = 0; i < newKeys.length; i++) {
+	    var key = newKeys[i];
 	    ret[key] = obj[key];
-	    return ret;
-	  }, {});
+	  }
+	
+	  return ret;
 	}
 	
 	module.exports = exports["default"];
@@ -128,6 +132,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	exports.__esModule = true;
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
 	exports['default'] = components;
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -197,14 +204,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Object.keys(mergedValue).filter(function (key) {
 	      return !currValue.hasOwnProperty(key);
 	    }).forEach(function (key) {
+	      var _extends2, _extends3;
+	
 	      hasNewKey = true;
 	      var enterValue = willEnter(key, mergedValue[key], endValue, currValue, currVelocity);
-	      currValue[key] = enterValue;
+	
+	      // We can mutate this here because mergeDiff returns a new Obj
 	      mergedValue[key] = enterValue;
-	      currVelocity[key] = _mapTree2['default'](_zero2['default'], currValue[key]);
+	
+	      currValue = _extends({}, currValue, (_extends2 = {}, _extends2[key] = enterValue, _extends2));
+	      currVelocity = _extends({}, currVelocity, (_extends3 = {}, _extends3[key] = _mapTree2['default'](_zero2['default'], enterValue), _extends3));
 	    });
 	  }
-	
 	  var newCurrValue = _updateTree.updateCurrValue(timestep, currValue, currVelocity, mergedValue);
 	  var newCurrVelocity = _updateTree.updateCurrVelocity(timestep, currValue, currVelocity, mergedValue);
 	
@@ -226,8 +237,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    displayName: 'Spring',
 	
 	    propTypes: {
-	      defaultValue: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-	      endValue: PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.array]).isRequired,
+	      defaultValue: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.number]),
+	      endValue: PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.array, PropTypes.number]).isRequired,
 	      children: PropTypes.func.isRequired
 	    },
 	
@@ -305,6 +316,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 	
+	  // TODO: warn when obj uses numerical keys
+	  // TODO: warn when endValue doesn't contain a val
 	  var TransitionSpring = React.createClass({
 	    displayName: 'TransitionSpring',
 	
@@ -1333,7 +1346,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var active = _animRunning$i.active;
 	      var step = _animRunning$i.step;
 	      var prevPrevState = _animRunning$i.prevState;
-	      var prevNextState = _animRunning$i.nextState;
+	      var prevNextState = animRunning[i].nextState;
 	
 	      if (!active) {
 	        continue;
@@ -1354,7 +1367,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        for (var j = 0; j < frameNumber; j++) {
 	          animRunning[i].nextState = step(timeStep / 1000, prevNextState);
-	          animRunning[i].prevState = prevNextState;
+	          var _ref = [prevNextState, animRunning[i].nextState];
+	          animRunning[i].prevState = _ref[0];
+	          prevNextState = _ref[1];
 	        }
 	      }
 	    }
@@ -1362,18 +1377,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    accumulatedTime = accumulatedTime - frameNumber * timeStep;
 	
 	    // Render and filter in one iteration.
-	    var newAnimRunning = [];
 	    var alpha = 1 + accumulatedTime / timeStep;
 	    for (var i = 0; i < animRunning.length; i++) {
 	      var _animRunning$i2 = animRunning[i];
 	
 	      // Might mutate animRunning........
 	      var render = _animRunning$i2.render;
-	      var active = _animRunning$i2.active;
 	      var nextState = _animRunning$i2.nextState;
 	      var prevState = _animRunning$i2.prevState;
 	      render(alpha, nextState, prevState);
-	      if (active) {
+	    }
+	
+	    var newAnimRunning = [];
+	    for (var i = 0; i < animRunning.length; i++) {
+	      if (animRunning[i].active) {
 	        newAnimRunning.push(animRunning[i]);
 	      }
 	    }
@@ -1732,9 +1749,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return nextValue;
 	}
 	
-	// TODO: refactor common logic with updateCurrVelocity
-	
-	function updateCurrValue(frameRate, currValue, currVelocity, endValue, k, b) {
+	// TODO: refactor common logic with _updateCurrVelocity
+	function _updateCurrValue(frameRate, currValue, currVelocity, endValue, k, b) {
 	  if (endValue == null) {
 	    return null;
 	  }
@@ -1755,7 +1771,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _b = _ref[1];
 	
 	    var ret = {
-	      val: updateCurrValue(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b)
+	      val: _updateCurrValue(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b)
 	    };
 	    if (endValue.config) {
 	      ret.config = endValue.config;
@@ -1764,19 +1780,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  if (Array.isArray(endValue)) {
 	    return endValue.map(function (_, i) {
-	      return updateCurrValue(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
+	      return _updateCurrValue(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
 	    });
 	  }
 	  if (_lodashIsplainobject2['default'](endValue)) {
 	    return Object.keys(endValue).reduce(function (ret, key) {
-	      ret[key] = updateCurrValue(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
+	      ret[key] = _updateCurrValue(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
 	      return ret;
 	    }, {});
 	  }
 	  return endValue;
 	}
 	
-	function updateCurrVelocity(frameRate, currValue, currVelocity, endValue, k, b) {
+	function updateCurrValue(frameRate, currValue, currVelocity, endValue) {
+	  if (typeof endValue === 'number') {
+	    var _presets$noWobble = _presets2['default'].noWobble;
+	    var k = _presets$noWobble[0];
+	    var b = _presets$noWobble[1];
+	
+	    return _stepper2['default'](frameRate, currValue, currVelocity, endValue, k, b)[0];
+	  }
+	
+	  return _updateCurrValue(frameRate, currValue, currVelocity, endValue);
+	}
+	
+	function _updateCurrVelocity(frameRate, currValue, currVelocity, endValue, k, b) {
 	  if (endValue == null) {
 	    return null;
 	  }
@@ -1797,7 +1825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _b = _ref2[1];
 	
 	    var ret = {
-	      val: updateCurrVelocity(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b)
+	      val: _updateCurrVelocity(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b)
 	    };
 	    if (endValue.config) {
 	      ret.config = endValue.config;
@@ -1806,16 +1834,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  if (Array.isArray(endValue)) {
 	    return endValue.map(function (_, i) {
-	      return updateCurrVelocity(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
+	      return _updateCurrVelocity(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
 	    });
 	  }
 	  if (_lodashIsplainobject2['default'](endValue)) {
 	    return Object.keys(endValue).reduce(function (ret, key) {
-	      ret[key] = updateCurrVelocity(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
+	      ret[key] = _updateCurrVelocity(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
 	      return ret;
 	    }, {});
 	  }
 	  return _mapTree2['default'](_zero2['default'], currVelocity);
+	}
+	
+	function updateCurrVelocity(frameRate, currValue, currVelocity, endValue) {
+	  if (typeof endValue === 'number') {
+	    var _presets$noWobble2 = _presets2['default'].noWobble;
+	    var k = _presets$noWobble2[0];
+	    var b = _presets$noWobble2[1];
+	
+	    return _stepper2['default'](frameRate, currValue, currVelocity, endValue, k, b)[1];
+	  }
+	
+	  return _updateCurrVelocity(frameRate, currValue, currVelocity, endValue);
 	}
 
 /***/ },
