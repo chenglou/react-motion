@@ -47,6 +47,7 @@ const Demo = React.createClass({
                     opacity: opacity.val,
                     scale: scale.val,
                     transform: `translate3d(${x.val}px, ${y.val}px, 0) scale(${scale.val})`,
+                    WebkitTransform: `translate3d(${x.val}px, ${y.val}px, 0) scale(${scale.val})`,
                 }} />
               );
             })}
