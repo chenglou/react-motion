@@ -18,7 +18,7 @@
     cursor: url('cursor.png') 39 39, auto;
   }
 
-  .demo8 {
+  .demo8-outer {
     background-color: #EEE;
     color: #FFF;
     position: absolute;
@@ -33,7 +33,7 @@
     -webkit-align-items: center;
   }
 
-  .demo8-inner {
+  .demo8 {
     width: 320px;
     height: 400px;
   }
@@ -62,15 +62,19 @@
     text-decoration: none;
     font: 14px/1em "Helvetica";
     padding: 10px;
+    top: 0;
+    left: 0;
   }
   </style>
 </head>
 
 <body>
-  <div id="content"></div>
-  <a class="link" href="http://framerjs.com/examples/preview/#list-sorting.framer">
-    Original Framer.js Example
-  </a>
+  <div class="demo8-outer">
+    <div id="content"></div>
+    <a class="link" href="http://framerjs.com/examples/preview/#list-sorting.framer">
+      Original Framer.js Example
+    </a>
+  </div>
   <script src="./all.js"></script>
 </body>
 

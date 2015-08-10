@@ -14,12 +14,11 @@ function clamp(n, min, max) {
   return Math.max(Math.min(n, max), min);
 }
 
-// TODO: start at center, not upper left
 const allColors = [
   '#EF767A', '#456990', '#49BEAA', '#49DCB1', '#EEB868', '#EF767A', '#456990',
   '#49BEAA', '#49DCB1', '#EEB868', '#EF767A',
 ];
-const [count, width, height, top, left] = [11, 70, 90, 100, 150];
+const [count, width, height] = [11, 70, 90];
 // indexed by visual position
 const layout = range(count).map(n => {
   const row = Math.floor(n / 3);
@@ -38,6 +37,13 @@ const Demo = React.createClass({
     };
   },
 
+  componentDidMount() {
+    window.addEventListener('touchmove', this.handleTouchMove);
+    window.addEventListener('touchend', this.handleMouseUp);
+    window.addEventListener('mousemove', this.handleMouseMove);
+    window.addEventListener('mouseup', this.handleMouseUp);
+  },
+
   handleTouchStart(key, pressLocation, e) {
     this.handleMouseDown(key, pressLocation, e.touches[0]);
   },
@@ -50,11 +56,12 @@ const Demo = React.createClass({
   handleMouseMove({pageX, pageY}) {
     const {order, lastPress, isPressed, delta: [dx, dy]} = this.state;
     if (isPressed) {
-      const col = clamp(Math.floor((pageX - left) / width), 0, 2);
-      const row = clamp(Math.floor((pageY - top) / height), 0, Math.floor(count / 3));
+      const mouse = [pageX - dx, pageY - dy];
+      const col = clamp(Math.floor(mouse[0] / width), 0, 2);
+      const row = clamp(Math.floor(mouse[1] / height), 0, Math.floor(count / 3));
       const index = row * 3 + col;
       const newOrder = reinsert(order, order.indexOf(lastPress), index);
-      this.setState({mouse: [pageX - dx, pageY - dy], order: newOrder});
+      this.setState({mouse: mouse, order: newOrder});
     }
   },
 
@@ -93,27 +100,22 @@ const Demo = React.createClass({
     return (
       <Spring endValue={this.getValues()}>
         {({order: currOrder, scales: {val: scales}}) =>
-          <div
-            className="demo2"
-            onTouchMove={this.handleTouchMove}
-            onTouchEnd={this.handleMouseUp}
-            onMouseMove={this.handleMouseMove}
-            onMouseUp={this.handleMouseUp}>
-              {currOrder.map(({val: [x, y]}, key) =>
-                <div
-                  key={key}
-                  onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
-                  onTouchStart={this.handleTouchStart.bind(null, key, [x, y])}
-                  className="demo2-ball"
-                  style={{
-                    backgroundColor: allColors[key],
-                    WebkitTransform: `translate3d(${x + left}px, ${y + top}px, 0) scale(${scales[key]})`,
-                    transform: `translate3d(${x + left}px, ${y + top}px, 0) scale(${scales[key]})`,
-                    zIndex: key === lastPress ? 99 : order.indexOf(key),
-                    boxShadow: `${(x - (3 * width - 50) / 2) / 15}px 5px 5px rgba(0,0,0,0.5)`,
-                  }}
-                />
-              )}
+          <div className="demo2">
+            {currOrder.map(({val: [x, y]}, key) =>
+              <div
+                key={key}
+                onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
+                onTouchStart={this.handleTouchStart.bind(null, key, [x, y])}
+                className="demo2-ball"
+                style={{
+                  backgroundColor: allColors[key],
+                  WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
+                  transform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
+                  zIndex: key === lastPress ? 99 : order.indexOf(key),
+                  boxShadow: `${(x - (3 * width - 50) / 2) / 15}px 5px 5px rgba(0,0,0,0.5)`,
+                }}
+              />
+            )}
           </div>
         }
       </Spring>

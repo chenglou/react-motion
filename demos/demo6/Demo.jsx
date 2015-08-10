@@ -14,12 +14,12 @@ import l from '../../src/log';
 
 const codeMirrorOpts = {
   mode: 'javascript',
-  lineNumbers: true,
+  // lineNumbers: true,
   lineWrapping: true,
   // javascript mode does bad things with jsx indents last time I checked
   smartIndent: false,
   matchBrackets: true,
-  theme: 'monokai',
+  theme: 'solarized-light',
 };
 
 const Example = React.createClass({
@@ -68,12 +68,10 @@ const Example = React.createClass({
   render() {
     return (
       <div style={{
-        outline: '1px solid red',
         display: 'flex',
         justifyContent: 'space-between',
       }}>
         <div style={{
-          outline: '1px solid black',
           width: 600,
         }}>
           <CodeMirror
@@ -83,7 +81,6 @@ const Example = React.createClass({
         </div>
 
         <div style={{
-          outline: '1px solid green',
           width: 280,
         }}>
           <div ref="mountNode" />
@@ -107,7 +104,6 @@ const Example = React.createClass({
 //           // display: 'flex',
 //         }}>
 //           <div style={{
-//             outline: '1px solid green',
 //             width: 600,
 //           }}>
 //             <div style={{
@@ -330,15 +326,15 @@ React.render(<Demo />, mountNode);
       <div>
         <div className="nav-main" style={{
           width: '100%',
-          outline: '1px solid black',
           display: 'flex',
           justifyContent: 'center',
           height: 50,
+          backgroundColor: '#eee',
+          color: '#666',
         }}>
           <div className="nav-inner" style={{
             width: 920,
             padding: '0 20px 0 20px',
-            outline: '1px solid red',
             display: 'flex',
             justifyContent: 'flex-end',
           }}>
@@ -358,13 +354,12 @@ React.render(<Demo />, mountNode);
               padding: '0 10px',
               lineHeight: '50px',
             }}>
-              Github
+              GitHub
             </div>
           </div>
         </div>
 
         <div style={{
-          outline: '1px solid red',
           padding: '50px 0 50px 0',
         }}>
           <div ref="headerText" style={{
@@ -402,15 +397,12 @@ React.render(<Demo />, mountNode);
             width: 960,
           }}>
             <div style={{
-              outline: '1px solid black',
               margin: '50px auto 50px auto',
               display: 'flex',
               justifyContent: 'space-between',
             }}>
               <div style={{
                 width: 280,
-                outline: '1px solid green',
-                // marginRight: 40,
               }}>
                 <div style={{
                   fontSize: 24,
@@ -427,7 +419,6 @@ React.render(<Demo />, mountNode);
               </div>
               <div style={{
                 width: 280,
-                outline: '1px solid green',
               }}>
                 <div style={{
                   fontSize: 24,
@@ -444,7 +435,6 @@ React.render(<Demo />, mountNode);
               </div>
               <div style={{
                 width: 280,
-                outline: '1px solid green',
               }}>
                 <div style={{
                   fontSize: 24,
@@ -462,7 +452,7 @@ React.render(<Demo />, mountNode);
             </div>
 
             <hr style={{
-              borderTopColor: 'black',
+              borderTopColor: '#bbb',
               width: 400,
             }}/>
 
@@ -473,19 +463,18 @@ React.render(<Demo />, mountNode);
                 // display: 'flex',
               }}>
                 <div style={{
-                  outline: '1px solid green',
                   width: 600,
                 }}>
                   <div style={{
                     fontSize: '24px',
                     marginBottom: 5,
                   }}>
-                    A Simple Component
+                    A Simple Transition
                   </div>
                   <div style={{
                     margin: '0 0 25px 0',
                   }}>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores totam, dolorum sunt aperiam nisi consequuntur soluta nostrum beatae qui error dolorem pariatur numquam eaque sint, debitis, aliquam quod, reprehenderit expedita.
+                    endValue is the value you're transitioning to. You don't
                   </div>
                 </div>
 
@@ -501,7 +490,6 @@ React.render(<Demo />, mountNode);
                 // display: 'flex',
               }}>
                 <div style={{
-                  outline: '1px solid green',
                   width: 600,
                 }}>
                   <div style={{
@@ -529,7 +517,6 @@ React.render(<Demo />, mountNode);
                 // display: 'flex',
               }}>
                 <div style={{
-                  outline: '1px solid green',
                   width: 600,
                 }}>
                   <div style={{
@@ -557,7 +544,6 @@ React.render(<Demo />, mountNode);
                 // display: 'flex',
               }}>
                 <div style={{
-                  outline: '1px solid green',
                   width: 600,
                 }}>
                   <div style={{

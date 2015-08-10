@@ -27,6 +27,13 @@ const Demo = React.createClass({
     };
   },
 
+  componentDidMount() {
+    window.addEventListener('touchmove', this.handleTouchMove);
+    window.addEventListener('touchend', this.handleMouseUp);
+    window.addEventListener('mousemove', this.handleMouseMove);
+    window.addEventListener('mouseup', this.handleMouseUp);
+  },
+
   handleTouchStart(key, pressLocation, e) {
     this.handleMouseDown(key, pressLocation, e.touches[0]);
   },
@@ -77,34 +84,27 @@ const Demo = React.createClass({
     });
 
     return (
-      <div
-        className="demo8"
-        onMouseMove={this.handleMouseMove}
-        onTouchMove={this.handleTouchMove}
-        onMouseUp={this.handleMouseUp}
-        onTouchEnd={this.handleMouseUp}>
-        <Spring endValue={endValue}>
-          {items =>
-            <div className="demo8-inner">
-              {items.map(({scale, shadow, y}, n) =>
-                <div
-                  key={n}
-                  className="demo8-item"
-                  onMouseDown={this.handleMouseDown.bind(null, n, y.val)}
-                  onTouchStart={this.handleTouchStart.bind(null, n, y.val)}
-                  style={{
-                    boxShadow: `rgba(0, 0, 0, 0.2) 0px ${shadow.val}px ${2 * shadow.val}px 0px`,
-                    transform: `translate3d(0, ${y.val}px, 0) scale(${scale.val})`,
-                    WebkitTransform: `translate3d(0, ${y.val}px, 0) scale(${scale.val})`,
-                    zIndex: n === lastPressed ? 99 : n,
-                  }}>
-                  {order.indexOf(n) + 1}
-                </div>
-              )}
-            </div>
-          }
-        </Spring>
-      </div>
+      <Spring endValue={endValue}>
+        {items =>
+          <div className="demo8">
+            {items.map(({scale, shadow, y}, n) =>
+              <div
+                key={n}
+                className="demo8-item"
+                onMouseDown={this.handleMouseDown.bind(null, n, y.val)}
+                onTouchStart={this.handleTouchStart.bind(null, n, y.val)}
+                style={{
+                  boxShadow: `rgba(0, 0, 0, 0.2) 0px ${shadow.val}px ${2 * shadow.val}px 0px`,
+                  transform: `translate3d(0, ${y.val}px, 0) scale(${scale.val})`,
+                  WebkitTransform: `translate3d(0, ${y.val}px, 0) scale(${scale.val})`,
+                  zIndex: n === lastPressed ? 99 : n,
+                }}>
+                {order.indexOf(n) + 1}
+              </div>
+            )}
+          </div>
+        }
+      </Spring>
     );
   },
 });

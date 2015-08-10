@@ -16,6 +16,11 @@ const Demo = React.createClass({
     });
   },
 
+  handleTouchMove(e) {
+    e.preventDefault();
+    this.handleMouseMove(e.touches[0]);
+  },
+
   willLeave(key, valOfKey) {
     return {
       ...valOfKey,
@@ -37,7 +42,10 @@ const Demo = React.createClass({
     return (
       <TransitionSpring willLeave={this.willLeave} endValue={endValue}>
         {circles =>
-          <div onMouseMove={this.handleMouseMove} className="demo7">
+          <div
+            onMouseMove={this.handleMouseMove}
+            onTouchMove={this.handleTouchMove}
+            className="demo7">
             {Object.keys(circles).map(key => {
               const {opacity, scale, x, y} = circles[key];
               return (

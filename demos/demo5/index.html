@@ -20,10 +20,24 @@
     font-weight: 300;
   }
 
-  .demo5 {
+  .demo5-outer {
     position: absolute;
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    display: -webkit-flex;
+    -webkit-flex-direction: column;
+    -webkit-justify-content: center;
+    -webkit-align-items: center;
+  }
+
+  .demo5 {
+    width: 900px;
+    height: 600px;
+    position: relative;
   }
 
   .demo5-cell {
@@ -96,8 +110,10 @@
 </head>
 
 <body>
-  <div>Default [stiffness, damping]: [170, 26]</div>
-  <div id="content"></div>
+  <div class="demo5-outer">
+    <div>Default [stiffness, damping]: [170, 26]</div>
+    <div id="content"></div>
+  </div>
   <script src="./all.js"></script>
 </body>
 
