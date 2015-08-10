@@ -14,6 +14,8 @@ function clamp(n, min, max) {
   return Math.max(Math.min(n, max), min);
 }
 
+const springConfig = [300, 50];
+
 const Demo = React.createClass({
   getInitialState() {
     return {
@@ -23,6 +25,15 @@ const Demo = React.createClass({
       lastPressed: 0,
       order: range(4),
     };
+  },
+
+  handleTouchStart(key, pressLocation, e) {
+    this.handleMouseDown(key, pressLocation, e.touches[0]);
+  },
+
+  handleTouchMove(e) {
+    e.preventDefault();
+    this.handleMouseMove(e.touches[0]);
   },
 
   handleMouseDown(pos, pressY, {pageY}) {
@@ -45,29 +56,23 @@ const Demo = React.createClass({
   },
 
   handleMouseUp() {
-    this.setState({
-      isPressed: false,
-      delta: 0,
-    });
+    this.setState({isPressed: false, delta: 0});
   },
 
   render() {
-    const {
-      mouse, isPressed, lastPressed, order,
-    } = this.state;
-
-    let endValue = order.map((n, i) => {
+    const {mouse, isPressed, lastPressed, order} = this.state;
+    const endValue = range(4).map(i => {
       if (lastPressed === i && isPressed) {
         return {
-          scale: {val: 1.1, config: [300, 50]},
-          shadow: {val: 16, config: [300, 50]},
+          scale: {val: 1.1, config: springConfig},
+          shadow: {val: 16, config: springConfig},
           y: {val: mouse, config: []},
         };
       }
       return {
-        scale: {val: 1, config: [300, 50]},
-        shadow: {val: 1, config: [300, 50]},
-        y: {val: order.indexOf(i) * 100, config: [300, 50]},
+        scale: {val: 1, config: springConfig},
+        shadow: {val: 1, config: springConfig},
+        y: {val: order.indexOf(i) * 100, config: springConfig},
       };
     });
 
@@ -75,27 +80,27 @@ const Demo = React.createClass({
       <div
         className="demo8"
         onMouseMove={this.handleMouseMove}
+        onTouchMove={this.handleTouchMove}
         onMouseUp={this.handleMouseUp}
-      >
+        onTouchEnd={this.handleMouseUp}>
         <Spring endValue={endValue}>
           {items =>
             <div className="demo8-inner">
-              {items.map(({scale, shadow, y}, n) => {
-                return (
-                  <div
-                    key={n}
-                    className="demo8-item"
-                    onMouseDown={this.handleMouseDown.bind(null, n, y.val)}
-                    style={{
-                      boxShadow: `rgba(0, 0, 0, 0.2) 0px ${shadow.val}px ${2 * shadow.val}px 0px`,
-                      transform: `translate3d(0, ${y.val}px, 0) scale(${scale.val})`,
-                      WebkitTransform: `translate3d(0, ${y.val}px, 0) scale(${scale.val})`,
-                      zIndex: n === lastPressed ? 99 : n,
-                    }}>
-                    {order.indexOf(n) + 1}
-                  </div>
-                );
-              })}
+              {items.map(({scale, shadow, y}, n) =>
+                <div
+                  key={n}
+                  className="demo8-item"
+                  onMouseDown={this.handleMouseDown.bind(null, n, y.val)}
+                  onTouchStart={this.handleTouchStart.bind(null, n, y.val)}
+                  style={{
+                    boxShadow: `rgba(0, 0, 0, 0.2) 0px ${shadow.val}px ${2 * shadow.val}px 0px`,
+                    transform: `translate3d(0, ${y.val}px, 0) scale(${scale.val})`,
+                    WebkitTransform: `translate3d(0, ${y.val}px, 0) scale(${scale.val})`,
+                    zIndex: n === lastPressed ? 99 : n,
+                  }}>
+                  {order.indexOf(n) + 1}
+                </div>
+              )}
             </div>
           }
         </Spring>
