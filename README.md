@@ -192,7 +192,7 @@ getEndValue: function(prevValue) {
 ### &lt;TransitionSpring />
 Like `Spring`, but can take two other props: `willEnter` and `willLeave`. Throughout this section, please remember that
 
-`defaultValue`: see `endValue` just below.
+`defaultValue`: similar to `Spring`'s `defaultValue`. For the object format, see `endValue` just below.
 
 `endValue`: now constrained to an object (or a callback `currentValue -> object`) of the shape `{key => yourStuff}` (the data is constrained to this shape, but that doesn't mean the way you use your interpolated value has to be). When `endValue` differs from the current interpolated value by an added/removed key:
 
