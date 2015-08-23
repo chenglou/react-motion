@@ -46,9 +46,6 @@
     "type": "git",
     "url": "https://github.com/chenglou/react-motion.git"
   },
-  "browser":{
-    "react": false
-  },
   "keywords": [
     "react",
     "component",
