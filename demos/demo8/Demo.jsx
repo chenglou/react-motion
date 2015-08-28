@@ -15,6 +15,7 @@ function clamp(n, min, max) {
 }
 
 const springConfig = [300, 50];
+const itemsCount = 4;
 
 const Demo = React.createClass({
   getInitialState() {
@@ -23,7 +24,7 @@ const Demo = React.createClass({
       mouse: 0,
       isPressed: false,
       lastPressed: 0,
-      order: range(4),
+      order: range(itemsCount),
     };
   },
 
@@ -56,7 +57,7 @@ const Demo = React.createClass({
     const {isPressed, delta, order, lastPressed} = this.state;
     if (isPressed) {
       const mouse = pageY - delta;
-      const row = clamp(Math.round(mouse / 100), 0, 3);
+      const row = clamp(Math.round(mouse / 100), 0, itemsCount - 1);
       const newOrder = reinsert(order, order.indexOf(lastPressed), row);
       this.setState({mouse: mouse, order: newOrder});
     }
@@ -68,7 +69,7 @@ const Demo = React.createClass({
 
   render() {
     const {mouse, isPressed, lastPressed, order} = this.state;
-    const endValue = range(4).map(i => {
+    const endValue = range(itemsCount).map(i => {
       if (lastPressed === i && isPressed) {
         return {
           scale: {val: 1.1, config: springConfig},
