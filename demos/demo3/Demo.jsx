@@ -76,7 +76,20 @@ const Demo = React.createClass({
   },
 
   // actual animation-related logic
-  getEndValue(prevValues) {
+  getDefaultValue() {
+    const {todos} = this.state;
+    return Object.keys(todos)
+      .reduce((configs, date) => {
+        configs[date] = {
+          height: {val: 0},
+          opacity: {val: 1},
+          data: todos[date],
+        };
+        return configs;
+      }, {});
+  },
+
+  getEndValue() {
     const {todos, value, selected} = this.state;
     return Object.keys(todos)
       .filter(date => {
@@ -88,7 +101,7 @@ const Demo = React.createClass({
       })
       .reduce((configs, date) => {
         configs[date] = {
-          height: {val: prevValues ? 60 : 0, config: presets.gentle},
+          height: {val: 60, config: presets.gentle},
           opacity: {val: 1, config: presets.gentle},
           data: todos[date],
         };
@@ -131,7 +144,7 @@ const Demo = React.createClass({
         </header>
         <section className="main">
           <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll} />
-          <TransitionSpring endValue={this.getEndValue} willLeave={this.willLeave}
+          <TransitionSpring defaultValue={this.getDefaultValue()} endValue={this.getEndValue()} willLeave={this.willLeave}
             willEnter={this.willEnter}>
             {configs =>
               <ul className="todo-list">
