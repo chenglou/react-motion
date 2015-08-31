@@ -43,7 +43,7 @@ export default function configAnimation(config = {}) {
       // part ways towards the nextState, but that's enterVal still. We render
       // say 75% between currValue (=== enterVal) and destValue (=== enterVal).
       // So we render the same value a second time.
-      // The solution bellow is to recalculate the destination state even when
+      // The solution below is to recalculate the destination state even when
       // you're moving partially towards it.
       if (accumulatedTime <= 0) {
         animRunning[i].nextState = step(timeStep / 1000, prevPrevState);
