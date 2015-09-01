@@ -308,6 +308,12 @@ Since `TransitionSpring` dictates `endValue` to be an object, manipulating keys 
 
 ## FAQ
 
+- How do I set the duration of my animation?
+[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo5/index.html) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
+
+- How do I mounting the TransitionSpring container itself?
+You don't. The container manages children's unmounting by essentially keeping them around internally until they finish animating. The TransitionSpring container itself (unless put in another TransitionSpring!) won't magically stay around after being unmounted. React's render is respected here.
+
 - How do I do staggering/chained animation where items animate in one after another?
 In most cases, what you want to express here is a relationship between animations, e.g. item 2 appears after item 1. Staggering/chained animation have hard-coded values and go against the spirit of a physics system. Check out [demo 1](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo1/index.html); each ball follows the one in front of it, creating a natural staggering animation. The code in `endValue` looks roughly so:
 
