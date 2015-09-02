@@ -351,6 +351,9 @@ describe('Spring', () => {
       },
 
       componentDidMount() {
+        this.update();
+      },
+      update() {
         this.setState({
           data: {
             key1: { val: 10 },
@@ -359,7 +362,6 @@ describe('Spring', () => {
           },
         });
       },
-
       render() {
         return (
           <TransitionSpring
