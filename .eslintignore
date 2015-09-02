@@ -7,3 +7,5 @@ webpack.*.js
 server.js
 karma.*.js
 test/integration
+native/index.js
+demo/demo6/babel.js
