@@ -314,7 +314,7 @@ Since `TransitionSpring` dictates `endValue` to be an object, manipulating keys 
 
 [Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo5/index.html) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
 
-- How do I mounting the TransitionSpring container itself?
+- How do I unmount the TransitionSpring container itself?
 
 You don't. The container manages children's unmounting by essentially keeping them around internally until they finish animating. The TransitionSpring container itself (unless put in another TransitionSpring!) won't magically stay around after being unmounted. React's render is respected here.
 
