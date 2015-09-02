@@ -14,6 +14,8 @@ const {Spring} = require("react-motion");
 
 Animate a counter from `0` `10`. For more advanced usage, see [below](#presets).
 
+_(Master is unstable. Please check the [stable releases](https://github.com/chenglou/react-motion/releases) or install through normal means below.)_
+
 Npm:
 `npm install react-motion`
 
