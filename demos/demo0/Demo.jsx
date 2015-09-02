@@ -1,5 +1,5 @@
 import React from 'react';
-import {Spring} from '../../src/Spring';
+import {Motion, spring} from '../../src/Spring';
 
 const Demo = React.createClass({
   getInitialState() {
@@ -24,18 +24,18 @@ const Demo = React.createClass({
           Toggle
         </button>
 
-        <Spring endValue={this.state.open ? 400 : 0}>
-          {val =>
+        <Motion style={{x: spring(this.state.open ? 400 : 0)}}>
+          {({x}) =>
             // children is a callback which should accept the current value of
-            // `endValue`
+            // `style`
             <div className="demo0">
               <div className="demo0-block" style={{
-                WebkitTransform: `translate3d(${val}px, 0, 0)`,
-                transform: `translate3d(${val}px, 0, 0)`,
+                WebkitTransform: `translate3d(${x.val}px, 0, 0)`,
+                transform: `translate3d(${x.val}px, 0, 0)`,
               }} />
             </div>
           }
-        </Spring>
+        </Motion>
       </div>
     );
   },
