@@ -72,6 +72,8 @@ function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
     currVelocity: newCurrVelocity,
   };
 }
+let hasWarnedForSpring = false;
+// let hasWarnedForTransitionSpring = false;
 
 export default function components(React) {
   const {PropTypes} = React;
@@ -92,72 +94,21 @@ export default function components(React) {
       children: PropTypes.func.isRequired,
     },
 
-    getInitialState() {
-      const {endValue, defaultValue} = this.props;
-      let currValue;
-      if (defaultValue == null) {
-        if (typeof endValue === 'function') {
-          // TODO: provide perf tip here when endValue argument count is 0
-          // (meaning you could have passed an obj)
-          currValue = endValue();
-        } else {
-          currValue = endValue;
+    componentWillMount() {
+      if (process.env.NODE_ENV === 'development') {
+        if (!hasWarnedForSpring) {
+          hasWarnedForSpring = true;
+          // TODO: check props, provide more descriptive warning.
+          console.error(
+            `Spring has now been renamed to Motion. Please see the release note
+for the upgrade path. Thank you!`
+          );
         }
-      } else {
-        currValue = defaultValue;
-      }
-      return {
-        currValue: currValue,
-        currVelocity: mapTree(zero, currValue),
-      };
-    },
-
-    componentDidMount() {
-      this.animationStep = animationStep.bind(null, false, () => this.stopAnimation(), () => this.props);
-      this.startAnimating();
-    },
-
-    componentWillReceiveProps() {
-      this.startAnimating();
-    },
-
-    stopAnimation: null,
-
-    // used in animationRender
-    hasUnmounted: false,
-
-    animationStep: null,
-
-    componentWillUnmount() {
-      this.stopAnimation();
-      this.hasUnmounted = true;
-    },
-
-    startAnimating() {
-      // Is smart enough to not start it twice
-      this.stopAnimation = startAnimation(
-        this.state,
-        this.animationStep,
-        this.animationRender,
-      );
-    },
-
-    animationRender(alpha, nextState, prevState) {
-      // `this.hasUnmounted` might be true in the following condition:
-      // user does some checks in `endValue` and calls an owner handler
-      // owner sets state in the callback, triggering a re-render
-      // re-render unmounts the Spring
-      if (!this.hasUnmounted) {
-        this.setState({
-          currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
-          currVelocity: nextState.currVelocity,
-        });
       }
     },
 
     render() {
-      const renderedChildren = this.props.children(this.state.currValue);
-      return renderedChildren && React.Children.only(renderedChildren);
+      return null;
     },
   });
 
