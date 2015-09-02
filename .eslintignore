@@ -8,4 +8,4 @@ server.js
 karma.*.js
 test/integration
 native/index.js
-demo/demo6/babel.js
+demos/demo6/babel.js
