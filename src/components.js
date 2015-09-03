@@ -352,6 +352,7 @@ for the upgrade path. Thank you!`
 
     componentWillUnmount() {
       this.stopAnimation();
+      this.hasUnmounted = true;
     },
 
     startAnimating() {
