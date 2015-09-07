@@ -30,8 +30,8 @@ const Demo = React.createClass({
             // `style`
             <div className="demo0">
               <div className="demo0-block" style={{
-                WebkitTransform: `translate3d(${x.val}px, 0, 0)`,
-                transform: `translate3d(${x.val}px, 0, 0)`,
+                WebkitTransform: `translate3d(${x}px, 0, 0)`,
+                transform: `translate3d(${x}px, 0, 0)`,
               }} />
             </div>
           }

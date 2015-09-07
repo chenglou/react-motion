@@ -167,6 +167,18 @@ function spring(val, config = presets.noWobble) {
   return {val, config};
 }
 
+// turn {x: {val: 1, config: [1, 2]}, y: 2} into {x: 1, y: 2}
+function stripStyle(style) {
+  let ret = {};
+  for (let key in style) {
+    if (!style.hasOwnProperty(key)) {
+      continue;
+    }
+    ret[key] = style[key].val == null ? style[key] : style[key].val;
+  }
+  return ret;
+}
+
 let hasWarnedForSpring = false;
 // let hasWarnedForTransitionSpring = false;
 
@@ -277,7 +289,8 @@ for the upgrade path. Thank you!`
     },
 
     render() {
-      const renderedChildren = this.props.children(this.state.currentStyle);
+      const strippedStyle = stripStyle(this.state.currentStyle);
+      const renderedChildren = this.props.children(strippedStyle);
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });

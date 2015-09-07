@@ -119,10 +119,10 @@ const Demo = React.createClass({
                     className="demo2-ball"
                     style={{
                       backgroundColor: allColors[key],
-                      WebkitTransform: `translate3d(${translateX.val}px, ${translateY.val}px, 0) scale(${scale.val})`,
-                      transform: `translate3d(${translateX.val}px, ${translateY.val}px, 0) scale(${scale.val})`,
+                      WebkitTransform: `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`,
+                      transform: `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`,
                       zIndex: zIndex,
-                      boxShadow: `${boxShadow.val}px 5px 5px rgba(0,0,0,0.5)`,
+                      boxShadow: `${boxShadow}px 5px 5px rgba(0,0,0,0.5)`,
                     }}
                   />
                 );
