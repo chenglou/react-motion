@@ -1,5 +1,5 @@
 import React from 'react';
-import {Spring} from '../../src/Spring';
+import {Motion, spring} from '../../src/Spring';
 import range from 'lodash.range';
 
 function reinsert(arr, from, to) {
@@ -78,47 +78,59 @@ const Demo = React.createClass({
     this.setState({isPressed: false, delta: [0, 0]});
   },
 
-  getValues() {
-    const {order, lastPress, isPressed, mouse} = this.state;
-    return {
-      order: order.map((_, key) => {
-        if (key === lastPress && isPressed) {
-          return {val: mouse, config: []};
-        }
-        const visualPosition = order.indexOf(key);
-        return {val: layout[visualPosition], config: [120, 17]};
-      }),
-      scales: {
-        val: range(count).map((_, key) => lastPress === key && isPressed ? 1.2 : 1),
-        config: [180, 10],
-      },
-    };
-  },
-
   render() {
-    const {order, lastPress} = this.state;
+    const {order, lastPress, isPressed, mouse} = this.state;
     return (
-      <Spring endValue={this.getValues()}>
-        {({order: currOrder, scales: {val: scales}}) =>
-          <div className="demo2">
-            {currOrder.map(({val: [x, y]}, key) =>
-              <div
-                key={key}
-                onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
-                onTouchStart={this.handleTouchStart.bind(null, key, [x, y])}
-                className="demo2-ball"
-                style={{
-                  backgroundColor: allColors[key],
-                  WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
-                  transform: `translate3d(${x}px, ${y}px, 0) scale(${scales[key]})`,
-                  zIndex: key === lastPress ? 99 : order.indexOf(key),
-                  boxShadow: `${(x - (3 * width - 50) / 2) / 15}px 5px 5px rgba(0,0,0,0.5)`,
-                }}
-              />
-            )}
-          </div>
-        }
-      </Spring>
+      <div className="demo2">
+        {order.map((_, key) => {
+          let style;
+          let x;
+          let y;
+          const visualPosition = order.indexOf(key);
+          if (key === lastPress && isPressed) {
+            [x, y] = mouse;
+            style = {
+              translateX: spring(x),
+              translateY: spring(y),
+              scale: spring(1.2, [180, 10]),
+            };
+          } else {
+            [x, y] = layout[visualPosition];
+            style = {
+              translateX: spring(x, [120, 17]),
+              translateY: spring(y, [120, 17]),
+              scale: spring(1, [180, 10]),
+            };
+          }
+          return (
+            <Motion
+              key={key}
+              style={{
+                ...style,
+                backgroundColor: allColors[key],
+                zIndex: key === lastPress ? 99 : visualPosition,
+                boxShadow: spring((x - (3 * width - 50) / 2) / 15, [180, 10]),
+              }}>
+              {({translateX, translateY, scale, zIndex, boxShadow}) => {
+                return (
+                  <div
+                    onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
+                    onTouchStart={this.handleTouchStart.bind(null, key, [x, y])}
+                    className="demo2-ball"
+                    style={{
+                      backgroundColor: allColors[key],
+                      WebkitTransform: `translate3d(${translateX.val}px, ${translateY.val}px, 0) scale(${scale.val})`,
+                      transform: `translate3d(${translateX.val}px, ${translateY.val}px, 0) scale(${scale.val})`,
+                      zIndex: zIndex,
+                      boxShadow: `${boxShadow.val}px 5px 5px rgba(0,0,0,0.5)`,
+                    }}
+                  />
+                );
+              }}
+            </Motion>
+          );
+        })}
+      </div>
     );
   },
 });
