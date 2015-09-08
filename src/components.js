@@ -183,27 +183,12 @@ function stripStyle(style) {
 }
 
 let hasWarnedForSpring = false;
-// let hasWarnedForTransitionSpring = false;
+let hasWarnedForTransitionSpring = false;
 
 export default function components(React) {
   const {PropTypes} = React;
 
   const Spring = React.createClass({
-    propTypes: {
-      defaultValue: PropTypes.oneOfType([
-        PropTypes.object,
-        PropTypes.array,
-        PropTypes.number,
-      ]),
-      endValue: PropTypes.oneOfType([
-        PropTypes.func,
-        PropTypes.object,
-        PropTypes.array,
-        PropTypes.number,
-      ]).isRequired,
-      children: PropTypes.func.isRequired,
-    },
-
     componentWillMount() {
       if (process.env.NODE_ENV === 'development') {
         if (!hasWarnedForSpring) {
@@ -212,6 +197,25 @@ export default function components(React) {
           console.error(
             `Spring has now been renamed to Motion. Please see the release note
 for the upgrade path. Thank you!`
+          );
+        }
+      }
+    },
+
+    render() {
+      return null;
+    },
+  });
+
+  const TransitionSpring = React.createClass({
+    componentWillMount() {
+      if (process.env.NODE_ENV === 'development') {
+        if (!hasWarnedForTransitionSpring) {
+          hasWarnedForTransitionSpring = true;
+          // TODO: check props, provide more descriptive warning.
+          console.error(
+            `TransitionSpring has now been renamed to Motion. Please see the
+release note for the upgrade path. Thank you!`
           );
         }
       }
@@ -301,7 +305,7 @@ for the upgrade path. Thank you!`
 
   // TODO: warn when obj uses numerical keys
   // TODO: warn when endValue doesn't contain a val
-  const TransitionSpring = React.createClass({
+  const TransitionMotion = React.createClass({
     propTypes: {
       defaultValue: PropTypes.objectOf(PropTypes.any),
       endValue: PropTypes.oneOfType([
