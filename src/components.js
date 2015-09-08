@@ -91,7 +91,8 @@ function updateCurrentStyle(frameRate, currentStyle, currentVelocity, style) {
     const [k, b] = style[key].config;
     const val = stepper(
       frameRate,
-      currentStyle[key].val,
+      // might have been a non-springed prop that just became one
+      currentStyle[key].val == null ? currentStyle[key] : currentStyle[key].val,
       currentVelocity[key],
       style[key].val,
       k,
@@ -113,13 +114,15 @@ function updateCurrentVelocity(frameRate, currentStyle, currentVelocity, style) 
     }
     if (!style[key].config) {
       // not a spring config, not something we want to interpolate
+      // console.log('asd', key);
       ret[key] = style[key];
       continue;
     }
     const [k, b] = style[key].config;
     const val = stepper(
       frameRate,
-      currentStyle[key].val,
+      // might have been a non-springed prop that just became one
+      currentStyle[key].val == null ? currentStyle[key] : currentStyle[key].val,
       currentVelocity[key],
       style[key].val,
       k,

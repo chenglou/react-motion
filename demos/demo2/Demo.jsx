@@ -90,9 +90,10 @@ const Demo = React.createClass({
           if (key === lastPress && isPressed) {
             [x, y] = mouse;
             style = {
-              translateX: spring(x),
-              translateY: spring(y),
+              translateX: x,
+              translateY: y,
               scale: spring(1.2, [180, 10]),
+              boxShadow: spring((x - (3 * width - 50) / 2) / 15, [180, 10]),
             };
           } else {
             [x, y] = layout[visualPosition];
@@ -100,33 +101,25 @@ const Demo = React.createClass({
               translateX: spring(x, [120, 17]),
               translateY: spring(y, [120, 17]),
               scale: spring(1, [180, 10]),
+              boxShadow: spring((x - (3 * width - 50) / 2) / 15, [180, 10]),
             };
           }
           return (
-            <Motion
-              key={key}
-              style={{
-                ...style,
-                backgroundColor: allColors[key],
-                zIndex: key === lastPress ? 99 : visualPosition,
-                boxShadow: spring((x - (3 * width - 50) / 2) / 15, [180, 10]),
-              }}>
-              {({translateX, translateY, scale, zIndex, boxShadow}) => {
-                return (
-                  <div
-                    onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
-                    onTouchStart={this.handleTouchStart.bind(null, key, [x, y])}
-                    className="demo2-ball"
-                    style={{
-                      backgroundColor: allColors[key],
-                      WebkitTransform: `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`,
-                      transform: `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`,
-                      zIndex: zIndex,
-                      boxShadow: `${boxShadow}px 5px 5px rgba(0,0,0,0.5)`,
-                    }}
-                  />
-                );
-              }}
+            <Motion key={key} style={style}>
+              {({translateX, translateY, scale, boxShadow}) =>
+                <div
+                  onMouseDown={this.handleMouseDown.bind(null, key, [x, y])}
+                  onTouchStart={this.handleTouchStart.bind(null, key, [x, y])}
+                  className="demo2-ball"
+                  style={{
+                    backgroundColor: allColors[key],
+                    WebkitTransform: `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`,
+                    transform: `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`,
+                    zIndex: key === lastPress ? 99 : visualPosition,
+                    boxShadow: `${boxShadow}px 5px 5px rgba(0,0,0,0.5)`,
+                  }}
+                />
+              }
             </Motion>
           );
         })}
