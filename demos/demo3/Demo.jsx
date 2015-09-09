@@ -1,5 +1,5 @@
 import React from 'react';
-import {TransitionSpring} from '../../src/Spring';
+import {TransitionMotion, spring} from '../../src/Spring';
 import presets from '../../src/presets';
 
 const Demo = React.createClass({
@@ -81,8 +81,8 @@ const Demo = React.createClass({
     return Object.keys(todos)
       .reduce((configs, date) => {
         configs[date] = {
-          height: {val: 0},
-          opacity: {val: 1},
+          height: spring(0),
+          opacity: spring(1),
           data: todos[date],
         };
         return configs;
@@ -101,8 +101,8 @@ const Demo = React.createClass({
       })
       .reduce((configs, date) => {
         configs[date] = {
-          height: {val: 60, config: presets.gentle},
-          opacity: {val: 1, config: presets.gentle},
+          height: spring(60, presets.gentle),
+          opacity: spring(1, presets.gentle),
           data: todos[date],
         };
         return configs;
@@ -111,8 +111,8 @@ const Demo = React.createClass({
 
   willEnter(date) {
     return {
-      height: {val: 0},
-      opacity: {val: 1},
+      height: spring(0),
+      opacity: spring(1),
       data: this.state.todos[date],
     };
   },
@@ -120,8 +120,8 @@ const Demo = React.createClass({
   // TODO: change naming
   willLeave(date, valueThatJustLeft) {
     return {
-      height: {val: 0},
-      opacity: {val: 0},
+      height: spring(0),
+      opacity: spring(0),
       data: valueThatJustLeft.data,
     };
   },
@@ -144,14 +144,13 @@ const Demo = React.createClass({
         </header>
         <section className="main">
           <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll} />
-          <TransitionSpring defaultValue={this.getDefaultValue()} endValue={this.getEndValue()} willLeave={this.willLeave}
+          <TransitionMotion defaultStyles={this.getDefaultValue()} styles={this.getEndValue()} willLeave={this.willLeave}
             willEnter={this.willEnter}>
             {configs =>
               <ul className="todo-list">
                 {Object.keys(configs).map(date => {
                   const config = configs[date];
-                  const {data: {isDone, text}, height, opacity} = config;
-                  const style = {height: height.val, opacity: opacity.val};
+                  const {data: {isDone, text}, ...style} = config;
                   return (
                     <li key={date} style={style} className={isDone ? 'completed' : ''}>
                       <div className="view">
@@ -172,7 +171,7 @@ const Demo = React.createClass({
                 })}
               </ul>
             }
-          </TransitionSpring>
+          </TransitionMotion>
         </section>
         <footer className="footer">
           <span className="todo-count">
