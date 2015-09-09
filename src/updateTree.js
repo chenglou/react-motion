@@ -1,8 +1,5 @@
 import isPlainObject from 'lodash.isplainobject';
-import mapTree from './mapTree';
 import stepper from './stepper';
-import zero from './zero';
-import presets from './presets';
 
 // TODO: refactor common logic with updateCurrValue and updateCurrVelocity
 export function interpolateValue(alpha, nextValue, prevValue) {
@@ -40,95 +37,59 @@ export function interpolateValue(alpha, nextValue, prevValue) {
   return nextValue;
 }
 
-// TODO: refactor common logic with _updateCurrVelocity
-function _updateCurrValue(frameRate, currValue, currVelocity, endValue, k, b) {
-  if (endValue == null) {
-    return null;
-  }
-  if (typeof endValue === 'number') {
-    if (k == null || b == null) {
-      return endValue;
+// TODO: refactor common logic with updateCurrentVelocity
+export function updateCurrentStyle(frameRate, currentStyle, currentVelocity, style) {
+  let ret = {};
+  for (let key in style) {
+    if (!style.hasOwnProperty(key)) {
+      continue;
     }
-    // TODO: do something to stepper to make this not allocate (2 steppers?)
-    return stepper(frameRate, currValue, currVelocity, endValue, k, b)[0];
-  }
-  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
-    return endValue;
-  }
-  if (endValue.val != null) {
-    const [_k, _b] = endValue.config || presets.noWobble;
-    let ret = {
-      val: _updateCurrValue(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b),
+    if (!style[key].config) {
+      ret[key] = style[key];
+      // not a spring config, not something we want to interpolate
+      continue;
+    }
+    const [k, b] = style[key].config;
+    const val = stepper(
+      frameRate,
+      // might have been a non-springed prop that just became one
+      currentStyle[key].val == null ? currentStyle[key] : currentStyle[key].val,
+      currentVelocity[key],
+      style[key].val,
+      k,
+      b,
+    )[0];
+    ret[key] = {
+      val: val,
+      config: style[key].config,
     };
-    if (endValue.config) {
-      ret.config = endValue.config;
-    }
-    return ret;
   }
-  if (Array.isArray(endValue)) {
-    return endValue.map((_, i) => _updateCurrValue(frameRate, currValue[i], currVelocity[i], endValue[i], k, b));
-  }
-  if (isPlainObject(endValue)) {
-    return Object.keys(endValue).reduce((ret, key) => {
-      ret[key] = _updateCurrValue(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
-      return ret;
-    }, {});
-  }
-  return endValue;
+  return ret;
 }
 
-export function updateCurrValue(frameRate, currValue, currVelocity, endValue) {
-  if (typeof endValue === 'number') {
-    const [k, b] = presets.noWobble;
-
-    return stepper(frameRate, currValue, currVelocity, endValue, k, b)[0];
-  }
-
-  return _updateCurrValue(frameRate, currValue, currVelocity, endValue);
-}
-
-function _updateCurrVelocity(frameRate, currValue, currVelocity, endValue, k, b) {
-  if (endValue == null) {
-    return null;
-  }
-  if (typeof endValue === 'number') {
-    if (k == null || b == null) {
-      return mapTree(zero, currVelocity);
+export function updateCurrentVelocity(frameRate, currentStyle, currentVelocity, style) {
+  let ret = {};
+  for (let key in style) {
+    if (!style.hasOwnProperty(key)) {
+      continue;
     }
-    // TODO: do something to stepper to make this not allocate (2 steppers?)
-    return stepper(frameRate, currValue, currVelocity, endValue, k, b)[1];
-  }
-  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
-    return mapTree(zero, currVelocity);
-  }
-  if (endValue.val != null) {
-    const [_k, _b] = endValue.config || presets.noWobble;
-    let ret = {
-      val: _updateCurrVelocity(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b),
-    };
-    if (endValue.config) {
-      ret.config = endValue.config;
+    if (!style[key].config) {
+      // not a spring config, not something we want to interpolate
+      // console.log('asd', key);
+      ret[key] = style[key];
+      continue;
     }
-    return ret;
+    const [k, b] = style[key].config;
+    const val = stepper(
+      frameRate,
+      // might have been a non-springed prop that just became one
+      currentStyle[key].val == null ? currentStyle[key] : currentStyle[key].val,
+      currentVelocity[key],
+      style[key].val,
+      k,
+      b,
+    )[1];
+    ret[key] = val;
   }
-  if (Array.isArray(endValue)) {
-    return endValue.map((_, i) => _updateCurrVelocity(frameRate, currValue[i], currVelocity[i], endValue[i], k, b));
-  }
-  if (isPlainObject(endValue)) {
-    return Object.keys(endValue).reduce((ret, key) => {
-      ret[key] = _updateCurrVelocity(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
-      return ret;
-    }, {});
-  }
-  return mapTree(zero, currVelocity);
-}
-
-export function updateCurrVelocity(frameRate, currValue, currVelocity, endValue) {
-  if (typeof endValue === 'number') {
-    const [k, b] = presets.noWobble;
-
-    return stepper(frameRate, currValue, currVelocity, endValue, k, b)[1];
-  }
-
-  return _updateCurrVelocity(frameRate, currValue, currVelocity, endValue);
+  return ret;
 }

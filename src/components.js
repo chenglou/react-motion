@@ -1,13 +1,10 @@
-import mapTree from './mapTree';
 import noVelocity from './noVelocity';
 import compareTrees from './compareTrees';
 import mergeDiff from './mergeDiff';
 import configAnimation from './animationLoop';
 import zero from './zero';
-import {interpolateValue, updateCurrValue, updateCurrVelocity} from './updateTree';
+import {interpolateValue, updateCurrentStyle, updateCurrentVelocity} from './updateTree';
 import presets from './presets';
-import stepper from './stepper';
-
 
 const startAnimation = configAnimation();
 
@@ -32,128 +29,6 @@ function everyObj(f, obj) {
     }
   }
   return true;
-}
-
-function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
-  let {currValue, currVelocity} = state;
-  let {willEnter, willLeave, endValue} = getProps();
-
-  if (typeof endValue === 'function') {
-    endValue = endValue(currValue);
-  }
-
-  let mergedValue = endValue; // set mergedValue to endValue as the default
-  let hasNewKey = false;
-
-  if (shouldMerge) {
-    mergedValue = mergeDiff(
-      currValue,
-      endValue,
-      // TODO: stop allocating like crazy in this whole code path
-      key => {
-        const res = willLeave(key, currValue[key], endValue, currValue, currVelocity);
-        if (res == null) {
-          // For legacy reason. We won't allow returning null soon
-          // TODO: remove, after next release
-          return null;
-        }
-
-        if (noVelocity(currVelocity[key]) && compareTrees(currValue[key], res)) {
-          return null;
-        }
-        return res;
-      }
-    );
-
-    Object.keys(mergedValue)
-      .filter(key => !currValue.hasOwnProperty(key))
-      .forEach(key => {
-        hasNewKey = true;
-        const enterValue = willEnter(key, mergedValue[key], endValue, currValue, currVelocity);
-
-        // We can mutate this here because mergeDiff returns a new Obj
-        mergedValue[key] = enterValue;
-
-        currValue = {
-          ...currValue,
-          [key]: enterValue,
-        };
-        currVelocity = {
-          ...currVelocity,
-          [key]: mapTree(zero, enterValue),
-        };
-      });
-  }
-  const newCurrValue = updateCurrValue(timestep, currValue, currVelocity, mergedValue);
-  const newCurrVelocity = updateCurrVelocity(timestep, currValue, currVelocity, mergedValue);
-
-  if (!hasNewKey && noVelocity(currVelocity) && noVelocity(newCurrVelocity)) {
-    // check explanation in `Spring.animationRender`
-    stopAnimation(); // Nasty side effects....
-  }
-
-  return {
-    currValue: newCurrValue,
-    currVelocity: newCurrVelocity,
-  };
-}
-
-// temporary forks of updateCurrVal, updateCurrVelocity and animationStep
-// don't be scared by the amount of code! It's mostly duplicate for now
-function updateCurrentStyle(frameRate, currentStyle, currentVelocity, style) {
-  let ret = {};
-  for (let key in style) {
-    if (!style.hasOwnProperty(key)) {
-      continue;
-    }
-    if (!style[key].config) {
-      ret[key] = style[key];
-      // not a spring config, not something we want to interpolate
-      continue;
-    }
-    const [k, b] = style[key].config;
-    const val = stepper(
-      frameRate,
-      // might have been a non-springed prop that just became one
-      currentStyle[key].val == null ? currentStyle[key] : currentStyle[key].val,
-      currentVelocity[key],
-      style[key].val,
-      k,
-      b,
-    )[0];
-    ret[key] = {
-      val: val,
-      config: style[key].config,
-    };
-  }
-  return ret;
-}
-
-function updateCurrentVelocity(frameRate, currentStyle, currentVelocity, style) {
-  let ret = {};
-  for (let key in style) {
-    if (!style.hasOwnProperty(key)) {
-      continue;
-    }
-    if (!style[key].config) {
-      // not a spring config, not something we want to interpolate
-      // console.log('asd', key);
-      ret[key] = style[key];
-      continue;
-    }
-    const [k, b] = style[key].config;
-    const val = stepper(
-      frameRate,
-      // might have been a non-springed prop that just became one
-      currentStyle[key].val == null ? currentStyle[key] : currentStyle[key].val,
-      currentVelocity[key],
-      style[key].val,
-      k,
-      b,
-    )[1];
-    ret[key] = val;
-  }
-  return ret;
 }
 
 // Temporary new loop for the Motion component
