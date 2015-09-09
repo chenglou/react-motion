@@ -157,7 +157,7 @@ function updateCurrentVelocity(frameRate, currentStyle, currentVelocity, style) 
 }
 
 // Temporary new loop for the Motion component
-function animationStepMotion(shouldMerge, stopAnimation, getProps, timestep, state) {
+function animationStepMotion(stopAnimation, getProps, timestep, state) {
   let {currentStyle, currentVelocity} = state;
   let {style} = getProps();
 
@@ -166,7 +166,8 @@ function animationStepMotion(shouldMerge, stopAnimation, getProps, timestep, sta
   const newCurrentVelocity =
     updateCurrentVelocity(timestep, currentStyle, currentVelocity, style);
 
-  if (noVelocity(currentVelocity) && noVelocity(newCurrentVelocity)) {
+  if (noVelocity(currentVelocity, newCurrentStyle) &&
+      noVelocity(newCurrentVelocity, newCurrentStyle)) {
     // check explanation in `Motion.animationRender`
     stopAnimation(); // Nasty side effects....
   }
@@ -177,15 +178,75 @@ function animationStepMotion(shouldMerge, stopAnimation, getProps, timestep, sta
   };
 }
 
-function mapObject(f, obj) {
-  let ret = {};
-  for (let key in obj) {
-    if (!obj.hasOwnProperty(key)) {
-      continue;
-    }
-    ret[key] = f(obj[key], key);
+function animationStepTransitionMotion(stopAnimation, getProps, timestep, state) {
+  let {currentStyles, currentVelocities} = state;
+  let {styles, willEnter, willLeave} = getProps();
+
+  if (typeof styles === 'function') {
+    styles = styles(currentStyles);
   }
-  return ret;
+
+  let mergedStyles = styles; // set mergedStyles to styles as the default
+  let hasNewKey = false;
+
+  mergedStyles = mergeDiff(
+    currentStyles,
+    styles,
+    // TODO: stop allocating like crazy in this whole code path
+    key => {
+      const res = willLeave(key, currentStyles[key], styles, currentStyles, currentVelocities);
+      if (res == null) {
+        // For legacy reason. We won't allow returning null soon
+        // TODO: remove, after next release
+        return null;
+      }
+
+      // TODO: kill compareTrees
+      if (noVelocity(currentVelocities[key], currentStyles[key]) &&
+          compareTrees(currentStyles[key], res)) {
+        return null;
+      }
+      return res;
+    }
+  );
+
+  Object.keys(mergedStyles)
+    .filter(key => !currentStyles.hasOwnProperty(key))
+    .forEach(key => {
+      hasNewKey = true;
+      const enterStyle = willEnter(key, mergedStyles[key], styles, currentStyles, currentVelocities);
+
+      // We can mutate this here because mergeDiff returns a new Obj
+      mergedStyles[key] = enterStyle;
+
+      currentStyles = {
+        ...currentStyles,
+        [key]: enterStyle,
+      };
+      currentVelocities = {
+        ...currentVelocities,
+        [key]: mapObject(zero, enterStyle),
+      };
+    });
+
+  const newCurrentStyles = mapObject((mergedStyle, key) => {
+    return updateCurrentStyle(timestep, currentStyles[key], currentVelocities[key], mergedStyle);
+  }, mergedStyles);
+  const newCurrentVelocities = mapObject((mergedStyle, key) => {
+    return updateCurrentVelocity(timestep, currentStyles[key], currentVelocities[key], mergedStyle);
+  }, mergedStyles);
+
+  if (!hasNewKey &&
+      everyObj((v, k) => noVelocity(v, currentStyles[k]), currentVelocities) &&
+      everyObj((v, k) => noVelocity(v, newCurrentStyles[k]), newCurrentVelocities)) {
+    // check explanation in `Motion.animationRender`
+    stopAnimation(); // Nasty side effects....
+  }
+
+  return {
+    currentStyles: newCurrentStyles,
+    currentVelocities: newCurrentVelocities,
+  };
 }
 
 // instead of exposing {val: bla, config: bla}, use a helper
@@ -269,7 +330,6 @@ release note for the upgrade path. Thank you!`
     componentDidMount() {
       this.animationStep = animationStepMotion.bind(
         null,
-        false,
         () => this.stopAnimation(),
         () => this.props,
       );
@@ -330,24 +390,17 @@ release note for the upgrade path. Thank you!`
   // TODO: warn when endValue doesn't contain a val
   const TransitionMotion = React.createClass({
     propTypes: {
-      defaultValue: PropTypes.objectOf(PropTypes.any),
-      endValue: PropTypes.oneOfType([
+      defaultStyles: PropTypes.objectOf(PropTypes.any),
+      // TODO: warn for style
+      styles: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.objectOf(PropTypes.any.isRequired),
-        // PropTypes.arrayOf(PropTypes.shape({
-        //   key: PropTypes.any.isRequired,
-        // })),
-        // PropTypes.arrayOf(PropTypes.element),
       ]).isRequired,
       willLeave: PropTypes.oneOfType([
         PropTypes.func,
-        // PropTypes.object,
-        // PropTypes.array,
       ]),
       willEnter: PropTypes.oneOfType([
         PropTypes.func,
-        // PropTypes.object,
-        // PropTypes.array,
       ]),
       children: PropTypes.func.isRequired,
     },
@@ -360,30 +413,35 @@ release note for the upgrade path. Thank you!`
     },
 
     getInitialState() {
-      const {endValue, defaultValue} = this.props;
-      let currValue;
-      if (defaultValue == null) {
-        if (typeof endValue === 'function') {
-          currValue = endValue();
+      const {styles, defaultStyles} = this.props;
+      let currentStyles;
+      if (defaultStyles == null) {
+        if (typeof styles === 'function') {
+          currentStyles = styles();
         } else {
-          currValue = endValue;
+          currentStyles = styles;
         }
       } else {
-        currValue = defaultValue;
+        currentStyles = defaultStyles;
       }
       return {
-        currValue: currValue,
-        currVelocity: mapTree(zero, currValue),
+        currentStyles: currentStyles,
+        currentVelocities: mapObject(s => mapObject(zero, s), currentStyles),
       };
     },
 
     componentDidMount() {
-      this.animationStep = animationStep.bind(null, true, () => this.stopAnimation(), () => this.props);
+      this.animationStep = animationStepTransitionMotion.bind(
+        null,
+        () => this.stopAnimation(),
+        () => this.props,
+      );
       this.startAnimating();
     },
 
     componentWillReceiveProps() {
       this.startAnimating();
+      // TODO: accept PR.
     },
 
     stopAnimation: null,
@@ -409,14 +467,19 @@ release note for the upgrade path. Thank you!`
       // See comment in Motion.
       if (!this.hasUnmounted) {
         this.setState({
-          currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
-          currVelocity: nextState.currVelocity,
+          currentStyles: interpolateValue(
+            alpha,
+            nextState.currentStyles,
+            prevState.currentStyles,
+          ),
+          currentVelocities: nextState.currentVelocities,
         });
       }
     },
 
     render() {
-      const renderedChildren = this.props.children(this.state.currValue);
+      const strippedStyle = mapObject(stripStyle, this.state.currentStyles);
+      const renderedChildren = this.props.children(strippedStyle);
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });
