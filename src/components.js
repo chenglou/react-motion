@@ -11,6 +11,29 @@ import stepper from './stepper';
 
 const startAnimation = configAnimation();
 
+function mapObject(f, obj) {
+  let ret = {};
+  for (let key in obj) {
+    if (!obj.hasOwnProperty(key)) {
+      continue;
+    }
+    ret[key] = f(obj[key], key);
+  }
+  return ret;
+}
+
+function everyObj(f, obj) {
+  for (let key in obj) {
+    if (!obj.hasOwnProperty(key)) {
+      continue;
+    }
+    if (!f(obj[key], key)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
   let {currValue, currVelocity} = state;
   let {willEnter, willLeave, endValue} = getProps();
@@ -282,7 +305,7 @@ release note for the upgrade path. Thank you!`
       // `this.hasUnmounted` might be true in the following condition:
       // user does some checks in `style` and calls an owner handler
       // owner sets state in the callback, triggering a re-render
-      // re-render unmounts the Spring
+      // unmounts Motion
       if (!this.hasUnmounted) {
         this.setState({
           currentStyle: interpolateValue(
@@ -383,7 +406,7 @@ release note for the upgrade path. Thank you!`
     },
 
     animationRender(alpha, nextState, prevState) {
-      // See comment in Spring.
+      // See comment in Motion.
       if (!this.hasUnmounted) {
         this.setState({
           currValue: interpolateValue(alpha, nextState.currValue, prevState.currValue),
@@ -398,5 +421,5 @@ release note for the upgrade path. Thank you!`
     },
   });
 
-  return {Spring, TransitionSpring, Motion, spring};
+  return {Spring, TransitionSpring, Motion, TransitionMotion, spring};
 }
