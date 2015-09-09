@@ -1,5 +1,5 @@
 import noVelocity from './noVelocity';
-import compareTrees from './compareTrees';
+import hasReachedStyle from './hasReachedStyle';
 import mergeDiff from './mergeDiff';
 import configAnimation from './animationLoop';
 import zero from './zero';
@@ -76,9 +76,8 @@ function animationStepTransitionMotion(stopAnimation, getProps, timestep, state)
         return null;
       }
 
-      // TODO: kill compareTrees
       if (noVelocity(currentVelocities[key], currentStyles[key]) &&
-          compareTrees(currentStyles[key], res)) {
+          hasReachedStyle(currentStyles[key], res)) {
         return null;
       }
       return res;
