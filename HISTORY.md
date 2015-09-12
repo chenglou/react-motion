@@ -5,7 +5,9 @@ Legend:
 - [I]: Improvement
 
 ### Upcoming
-- [I] `Spring` `endValue` and `defaultValue` now support passing a simple number. You no longer have to do `endValue={{val: 10}}`.
+- [B] `Spring` and `TransitionSpring` and now renamed to `Motion` and `TransitionMotion`, respectively.
+- [B] Some API changes, will document fully soon.
+- **TODO: make sure native works!**
 
 ### 0.2.7 (August 6th 2015)
 - [F] Small bug where nested springs don't animate. #123
