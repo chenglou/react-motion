@@ -5,6 +5,7 @@ import configAnimation from './animationLoop';
 import zero from './zero';
 import {interpolateValue, updateCurrentStyle, updateCurrentVelocity} from './updateTree';
 import presets from './presets';
+import deprecatedSprings from './deprecatedSprings';
 
 const startAnimation = configAnimation();
 
@@ -31,7 +32,6 @@ function everyObj(f, obj) {
   return true;
 }
 
-// Temporary new loop for the Motion component
 function animationStepMotion(stopAnimation, getProps, timestep, state) {
   let {currentStyle, currentVelocity} = state;
   let {style} = getProps();
@@ -140,52 +140,11 @@ function stripStyle(style) {
   return ret;
 }
 
-let hasWarnedForSpring = false;
-let hasWarnedForTransitionSpring = false;
-
 export default function components(React) {
   const {PropTypes} = React;
 
-  const Spring = React.createClass({
-    componentWillMount() {
-      if (process.env.NODE_ENV === 'development') {
-        if (!hasWarnedForSpring) {
-          hasWarnedForSpring = true;
-          // TODO: check props, provide more descriptive warning.
-          console.error(
-            `Spring has now been renamed to Motion. Please see the release note
-for the upgrade path. Thank you!`
-          );
-        }
-      }
-    },
-
-    render() {
-      return null;
-    },
-  });
-
-  const TransitionSpring = React.createClass({
-    componentWillMount() {
-      if (process.env.NODE_ENV === 'development') {
-        if (!hasWarnedForTransitionSpring) {
-          hasWarnedForTransitionSpring = true;
-          // TODO: check props, provide more descriptive warning.
-          console.error(
-            `TransitionSpring has now been renamed to Motion. Please see the
-release note for the upgrade path. Thank you!`
-          );
-        }
-      }
-    },
-
-    render() {
-      return null;
-    },
-  });
-
-  // this is mostly the same code as SPring, again, temporary!
   const Motion = React.createClass({
+    // TODO: check props, provide more descriptive warning.
     propTypes: {
       defaultStyle: PropTypes.object,
       style: PropTypes.object,
@@ -357,6 +316,8 @@ release note for the upgrade path. Thank you!`
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });
+
+  const {Spring, TransitionSpring} = deprecatedSprings(React);
 
   return {Spring, TransitionSpring, Motion, TransitionMotion, spring};
 }
