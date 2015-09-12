@@ -11,9 +11,9 @@ export default function deprecatedSprings(React) {
         if (!hasWarnedForSpring[ownerName]) {
           hasWarnedForSpring[ownerName] = true;
           console.error(
-            `Spring (used in %s's render) has now been renamed to Motion. Please
-see the release note for the upgrade path. Thank you!`,
-            ownerName,
+            'Spring (used in %srender) has now been renamed to Motion. ' +
+            'Please see the release note for the upgrade path. Thank you!',
+            ownerName ? ownerName + '\'s ' : 'React.',
           );
         }
       }
@@ -32,11 +32,11 @@ see the release note for the upgrade path. Thank you!`,
           this._reactInternalInstance._currentElement._owner.getName();
         if (!hasWarnedForTransitionSpring[ownerName]) {
           hasWarnedForTransitionSpring[ownerName] = true;
-          // TODO: check props, provide more descriptive warning.
           console.error(
-            `TransitionSpring (used in %s's render) has now been renamed to
-Motion. Please see the release note for the upgrade path. Thank you!`,
-            ownerName,
+            'TransitionSpring (used in %srender) has now been renamed to ' +
+            'TransitionMotion. Please see the release note for the upgrade ' +
+            'path. Thank you!',
+            ownerName ? ownerName + '\'s ' : 'React.',
           );
         }
       }
