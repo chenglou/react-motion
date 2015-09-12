@@ -37,7 +37,7 @@
     "build-demos": "NODE_ENV=production webpack -p",
     "lint": "eslint --ext .js,.jsx .",
     "prerelease": "babel src --out-dir lib && babel native/non-compiled.js > native/index.js && NODE_ENV=production webpack --config webpack.prod.config.js",
-    "karma": "karma start ./karma.conf.js",
+    "karma": "NODE_ENV=development karma start ./karma.conf.js",
     "test": "npm run karma --  --single-run --reporters nyan",
     "test:dev": "npm run karma -- --no-single-run --auto-watch --reporters nyan",
     "test:cov": "COVERAGE=1 npm run karma -- --single-run --reporters coverage"
