@@ -1,6 +1,5 @@
 import {updateCurrentStyle, updateCurrentVelocity} from '../src/updateTree';
 import {spring} from '../src/react-motion';
-import React from 'react';
 
 const FRAME_RATE = 1 / 60;
 

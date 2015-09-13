@@ -1,5 +1,4 @@
 import React, {addons, PropTypes} from 'react/addons';
-
 import createMockRaf from './createMockRaf';
 
 const TestUtils = addons.TestUtils;
@@ -7,72 +6,72 @@ const TestUtils = addons.TestUtils;
 const injector = require('inject!../src/components');
 const injectorAnimationLoop = require('inject!../src/animationLoop');
 
-describe('Spring', () => {
-  let Spring;
-  let TransitionSpring;
+describe('Motion', () => {
+  let Motion;
+  let TransitionMotion;
+  let spring;
   let mockRaf;
 
   beforeEach(() => {
     mockRaf = createMockRaf();
-    const bothSprings = injector({
+    const components = injector({
       './animationLoop': injectorAnimationLoop({
         raf: mockRaf.raf,
         'performance-now': mockRaf.now,
       }),
     })(React);
 
-    Spring = bothSprings.Spring;
-    TransitionSpring = bothSprings.TransitionSpring;
+    Motion = components.Motion;
+    TransitionMotion = components.TransitionMotion;
+    spring = components.spring;
   });
 
   it('should allow returning null from children function', () => {
     const App = React.createClass({
       render() {
         // shouldn't throw here
-        return <Spring endValue={{val: 0}}>{() => null}</Spring>;
+        return <Motion style={{a: 0}}>{() => null}</Motion>;
       },
     });
     TestUtils.renderIntoDocument(<App />);
   });
 
-  it('should allow returning null from children function TransitionSpring', () => {
+  it('should allow returning null from children function TransitionMotion', () => {
     const App2 = React.createClass({
       render() {
         // shouldn't throw here
         return (
-          <TransitionSpring endValue={{a: {}}}>
-            {() => null}
-          </TransitionSpring>
+          <TransitionMotion styles={{a: {}}}>{() => null}</TransitionMotion>
         );
       },
     });
     TestUtils.renderIntoDocument(<App2 />);
   });
 
-  it('should not throw on unmount', () => {
+  xit('should not throw on unmount', () => {
     const App = React.createClass({
       render() {
         return (
-          <Spring endValue={() => TestUtils.renderIntoDocument(<div />)}>
+          <Motion style={() => TestUtils.renderIntoDocument(<div />)}>
             {() => null}
-          </Spring>
+          </Motion>
         );
       },
     });
     TestUtils.renderIntoDocument(<App />);
   });
 
-  it('should allow a defaultValue', () => {
+  it('should allow a defaultStyle', () => {
     let count = [];
     const App = React.createClass({
       render() {
         return (
-          <Spring defaultValue={{val: 0}} endValue={{val: 10}}>
-            {({val}) => {
-              count.push(val);
+          <Motion defaultStyle={{a: 0}} style={{a: spring(10)}}>
+            {({a}) => {
+              count.push(a);
               return null;
             }}
-          </Spring>
+          </Motion>
         );
       },
     });
@@ -80,7 +79,6 @@ describe('Spring', () => {
 
     // Checking initial render
     expect(count).toEqual([0]);
-
     // Move "time" by 8 steps, which is equivalent to 8 calls to `raf`
     mockRaf.manySteps(4);
     expect(count).toEqual([
@@ -88,121 +86,98 @@ describe('Spring', () => {
       0.4722222222222222,
       1.1897376543209877,
       2.0123698988340193,
-      2.8557218143909084]);
+      2.8557218143909084,
+    ]);
   });
 
-  it('should allow a defaultValue for TransitionSpring', () => {
+  it('should allow a defaultStyles for TransitionMotion', () => {
     let count = [];
     const App = React.createClass({
       render() {
         return (
-          <TransitionSpring defaultValue={{val: 0}} endValue={{val: 10}}>
-            {({val}) => {
-              count.push(val);
-
+          <TransitionMotion
+            defaultStyles={{k: {a: 0}}}
+            styles={{k: {a: spring(10)}}}>
+            {({k}) => {
+              count.push(k);
               return null;
             }}
-          </TransitionSpring>
+          </TransitionMotion>
         );
       },
     });
 
     TestUtils.renderIntoDocument(<App />);
 
-    // Checking initial render
-    expect(count).toEqual([0]);
+    expect(count).toEqual([{a: 0}]);
     mockRaf.manySteps(4);
     expect(count).toEqual([
-      0,
-      0.4722222222222222,
-      1.1897376543209877,
-      2.0123698988340193,
-      2.8557218143909084]);
+      {a: 0},
+      {a: 0.4722222222222222},
+      {a: 1.1897376543209877},
+      {a: 2.0123698988340193},
+      {a: 2.8557218143909084},
+    ]);
   });
 
-  it('should interpolate nested objects', () => {
+  it('should interpolate many values', () => {
     let count = [];
     const App = React.createClass({
       render() {
         return (
-          <Spring defaultValue={{a: {val: 0}, b: {c: {val: 0}}}} endValue={{a: {val: 10}, b: {c: {val: 400}}}}>
-            {({a: {val}, b: {c: {val: val2}}}) => {
-              count.push([val, val2]);
-
+          <Motion
+            defaultStyle={{a: 0, b: 10}}
+            style={{a: spring(10), b: spring(410)}}>
+            {({a, b}) => {
+              count.push([a, b]);
               return null;
             }}
-          </Spring>
+          </Motion>
         );
       },
     });
 
     TestUtils.renderIntoDocument(<App />);
 
-    // Checking initial render
-    expect(count).toEqual([[0, 0]]);
+    expect(count).toEqual([[0, 10]]);
     mockRaf.manySteps(4);
     expect(count).toEqual([
-      [0, 0],
-      [0.4722222222222222, 18.888888888888886],
-      [1.1897376543209877, 47.589506172839506],
-      [2.0123698988340193, 80.49479595336076],
-      [2.8557218143909084, 114.22887257563632]]);
+      [0, 10],
+      [0.4722222222222222, 28.888888888888886],
+      [1.1897376543209877, 57.589506172839506],
+      [2.0123698988340193, 90.49479595336076],
+      [2.8557218143909084, 124.22887257563632],
+    ]);
   });
 
-  it('should interpolate nested objects TransitionSpring', () => {
+  it('should interpolate many values TransitionMotion', () => {
     let count = [];
     const App = React.createClass({
       render() {
         return (
-          <TransitionSpring defaultValue={{a: {val: 0}, b: {c: {val: 0}}}} endValue={{a: {val: 10}, b: {c: {val: 400}}}}>
-            {({a: {val}, b: {c: {val: val2}}}) => {
-              count.push([val, val2]);
-
-              return null;
-            }}
-          </TransitionSpring>
-        );
-      },
-    });
-
-    TestUtils.renderIntoDocument(<App />);
-
-    // Checking initial render
-    expect(count).toEqual([[0, 0]]);
-    mockRaf.manySteps(4);
-    expect(count).toEqual([
-      [0, 0],
-      [0.4722222222222222, 18.888888888888886],
-      [1.1897376543209877, 47.589506172839506],
-      [2.0123698988340193, 80.49479595336076],
-      [2.8557218143909084, 114.22887257563632]]);
-  });
-
-  it('should allow interpolating scalar numbers', () => {
-    let count = [];
-    const App = React.createClass({
-      render() {
-        return (
-          <Spring defaultValue={0} endValue={10}>
+          <TransitionMotion
+            defaultStyles={{k1: {a: 0, b: 10}, k2: {c: 20}}}
+            styles={{k1: {a: spring(10), b: spring(410)}, k2: {c: spring(420)}}}>
             {val => {
               count.push(val);
-              return <div />;
+              return null;
             }}
-          </Spring>
+          </TransitionMotion>
         );
       },
     });
+
     TestUtils.renderIntoDocument(<App />);
 
-    // Checking initial render
-    expect(count).toEqual([0]);
+    expect(count).toEqual([{k1: {a: 0, b: 10}, k2: {c: 20}}]);
     mockRaf.manySteps(4);
     expect(count).toEqual([
-      0,
-      0.4722222222222222,
-      1.1897376543209877,
-      2.0123698988340193,
-      2.8557218143909084]);
+      {k1: {a: 0, b: 10}, k2: {c: 20}},
+      {k1: {a: 0.4722222222222222, b: 28.888888888888886}, k2: {c: 38.888888888888886}},
+      {k1: {a: 1.1897376543209877, b: 57.589506172839506}, k2: {c: 67.589506172839506}},
+      {k1: {a: 2.0123698988340193, b: 90.49479595336076}, k2: {c: 100.49479595336076}},
+      {k1: {a: 2.8557218143909084, b: 124.22887257563632}, k2: {c: 134.22887257563632}},
+    ]);
   });
 
   it('should call raf one more time after it is done animating', () => {
@@ -210,12 +185,12 @@ describe('Spring', () => {
     const App = React.createClass({
       render() {
         return (
-          <Spring endValue={{val: 400}}>
+          <Motion style={{val: 400}}>
             {({val}) => {
               count.push(val);
-              return <div />;
+              return null;
             }}
-          </Spring>
+          </Motion>
         );
       },
     });
@@ -227,51 +202,24 @@ describe('Spring', () => {
     expect(count).toEqual([400, 400]);
   });
 
-  it('should pass the new value', () => {
+  it('should work with nested Motions', () => {
     let count = [];
     const App = React.createClass({
       render() {
         return (
-          <Spring defaultValue={{val: 0}} endValue={{val: 400}}>
-            {({val}) => {
-              count.push(val);
-              return <div />;
-            }}
-          </Spring>
-        );
-      },
-    });
-    TestUtils.renderIntoDocument(<App />);
-
-    // Checking initial render
-    expect(count).toEqual([0]);
-    mockRaf.manySteps(4);
-    expect(count).toEqual([
-      0,
-      18.888888888888886,
-      47.589506172839506,
-      80.49479595336076,
-      114.22887257563632]);
-  });
-
-  it('should work with nested springs', () => {
-    let count = [];
-    const App = React.createClass({
-      render() {
-        return (
-          <Spring endValue={{ownerVal: 10}}>
-          {({ownerVal}) => {
-            count.push(ownerVal);
+          <Motion style={{owner: 10}}>
+          {({owner}) => {
+            count.push(owner);
             return (
-              <Spring endValue={{val: 400}}>
-                {({val}) => {
-                  count.push(val);
-                  return <div />;
+              <Motion style={{child: 400}}>
+                {({child}) => {
+                  count.push(child);
+                  return null;
                 }}
-              </Spring>
+              </Motion>
             );
           }}
-          </Spring>
+          </Motion>
         );
       },
     });
@@ -280,13 +228,13 @@ describe('Spring', () => {
     // Here's why we expect this with the current implementation:
     //
     // - mount <App />
-    // - render owner Spring                           [10]
-    // - the above triggers the child Spring to render [10, 400]
-    // - step once (both Spring calculations are done
+    // - render owner Motion                           [10]
+    // - the above triggers the child Motion to render [10, 400]
+    // - step once (both Motion calculations are done
     //   in the same step)
-    // - render the child Spring                       [10, 400, 400]
-    // - render the owner Spring                       [10, 400, 400, 10]
-    // - the above triggers the child Spring to render [10, 400, 400, 10, 400]
+    // - render the child Motion                       [10, 400, 400]
+    // - render the owner Motion                       [10, 400, 400, 10]
+    // - the above triggers the child Motion to render [10, 400, 400, 10, 400]
     // - step a second time which only affects the
     //   child who registered one last raf in the step
     //   above
@@ -300,17 +248,17 @@ describe('Spring', () => {
     expect(count).toEqual([10, 400, 400, 10, 400, 400]);
   });
 
-  it('should be able to move by two steps if Spring gets out of sync', () => {
+  it('should be able to move by two steps if Motion gets out of sync', () => {
     let count = [];
     const App = React.createClass({
       render() {
         return (
-          <Spring defaultValue={{val: 0}} endValue={{val: 400}}>
-            {({val}) => {
-              count.push(val);
-              return <div />;
+          <Motion defaultStyle={{a: 0}} style={{a: spring(400)}}>
+            {({a}) => {
+              count.push(a);
+              return null;
             }}
-          </Spring>
+          </Motion>
         );
       },
     });
@@ -326,26 +274,25 @@ describe('Spring', () => {
       80.49479595336076,
       114.22887257563632,
       146.83959701218743,
-      177.2738043339909]);
-      // Due to floating point errors when calculating the accumulated time
-      // inside the animationLoop, arriving at that last value the accumulated
-      // time will go barely beyond 1000/60 and so the animation loop will move
-      // by two frames but will only move by say 1% towards that 2nd frame.
-      // Before the for loop calculating more than one frame would just
-      // calculate the same frame over and over again, but we'd still move 1%
-      // towards that. So when the loop was broken, 177.2738043339909 would be
-      // 146.83959701218743
+      177.2738043339909,
+    ]);
+    // Due to floating point errors when calculating the accumulated time inside
+    // the animationLoop, arriving at that last value the accumulated time will
+    // go barely beyond 1000/60 and so the animation loop will move by two
+    // frames but will only move by say 1% towards that 2nd frame. Before the
+    // for loop calculating more than one frame would just calculate the same
+    // frame over and over again, but we'd still move 1% towards that. So when
+    // the loop was broken, 177.2738043339909 would be 146.83959701218743
   });
 
-  it('should not mutate currValue when adding a new key (TransitionSpring)', () => {
+  it('should not mutate currValue when adding a new key (TransitionMotion)', () => {
     let count = [];
-
     const App = React.createClass({
       getInitialState() {
         return {
           data: {
-            key1: { val: 10 },
-            key2: { val: 10 },
+            key1: {a: 10},
+            key2: {a: 10},
           },
         };
       },
@@ -356,46 +303,47 @@ describe('Spring', () => {
       update() {
         this.setState({
           data: {
-            key1: { val: 10 },
-            key2: { val: 10 },
-            key3: { val: 10 },
+            key1: {a: 10},
+            key2: {a: 10},
+            key3: {a: 10},
           },
         });
       },
       render() {
         return (
-          <TransitionSpring
-            endValue={this.state.data}
-            willEnter={() => ({ val: 0 })}
-            willLeave={() => ({ val: 0 })}>
-            {currValue => {
-              count.push(currValue);
+          <TransitionMotion
+            styles={this.state.data}
+            willEnter={() => ({a: 0})}
+            willLeave={() => ({a: 0})}>
+            {a => {
+              count.push(a);
               return null;
             }}
-          </TransitionSpring>
+          </TransitionMotion>
         );
       },
     });
     TestUtils.renderIntoDocument(<App />);
 
     mockRaf.step();
-
     expect(count).toEqual([
       {
-        key1: { val: 10 },
-        key2: { val: 10 },
-      }, { // This second obj would be mutated
-        key1: { val: 10 },
-        key2: { val: 10 },
-      }, {
-        key1: { val: 10 },
-        key2: { val: 10 },
-        key3: { val: 0 },
+        key1: {a: 10},
+        key2: {a: 10},
+      },
+      { // This second obj would be mutated
+        key1: {a: 10},
+        key2: {a: 10},
+      },
+      {
+        key1: {a: 10},
+        key2: {a: 10},
+        key3: {a: 0},
       },
     ]);
   });
 
-  it('should NOT warn when parent kills the child Spring', () => {
+  xit('should NOT warn when parent kills the child Motion', () => {
     let count = [];
     let shouldKill = false;
     const App = React.createClass({
@@ -403,7 +351,7 @@ describe('Spring', () => {
         kill: PropTypes.func.isRequired,
       },
 
-      endValue() {
+      style() {
         if (shouldKill) {
           this.props.kill();
         }
@@ -413,12 +361,12 @@ describe('Spring', () => {
 
       render() {
         return (
-          <Spring defaultValue={{val: 0}} endValue={this.endValue}>
+          <Motion defaultStyle={{val: 0}} style={this.style}>
             {({val}) => {
               count.push(val);
-              return <div />;
+              return null;
             }}
-          </Spring>
+          </Motion>
         );
       },
     });
@@ -449,13 +397,13 @@ describe('Spring', () => {
 
     shouldKill = true;
 
-    // We render once more which should trigger endValue, calling
+    // We render once more which should trigger style, calling
     // this.props.kill() which will setState of the parent thus killing the
     // child
     // This shouldn't warn
     mockRaf.step();
 
-    // We haven't rendered the Spring since we unmounted
+    // We haven't rendered the Motion since we unmounted
     expect(count).toEqual([
       0,
       18.888888888888886,
@@ -464,76 +412,67 @@ describe('Spring', () => {
       114.22887257563632]);
   });
 
-  it('should mount and unmount correctly (TransitionSpring)', () => {
+  it('should mount and unmount correctly (TransitionMotion)', () => {
     let count = [];
-
-    const willEnterandLeave = {
-      val: 0,
-    };
-    let endValue = {
-      key1: { val: 10 },
-      key2: { val: 10 },
+    let styles = {
+      key1: {a: spring(10)},
+      key2: {a: spring(10)},
     };
     const App = React.createClass({
       render() {
         return (
-          <TransitionSpring
-            endValue={() => endValue}
-            willEnter={() => willEnterandLeave}
-            willLeave={() => willEnterandLeave}>
-            {currValue => {
-              count.push(currValue);
-              return (
-                <div>
-                  {Object.keys(currValue).map(key => {
-                    return <div key={key} />;
-                  })}
-                </div>
-              );
+          <TransitionMotion
+            styles={() => styles}
+            // bad
+            willEnter={() => ({a: 0})}
+            willLeave={() => ({a: spring(0)})}>
+            {val => {
+              count.push(val);
+              return null;
             }}
-          </TransitionSpring>
+          </TransitionMotion>
         );
       },
     });
     TestUtils.renderIntoDocument(<App />);
 
-    // Checking initial render
-    expect(count).toEqual([endValue]);
-
+    expect(count).toEqual([{key1: {a: 10}, key2: {a: 10}}]);
     // Mount a new key!
-    endValue = {
-      ...endValue,
-      key3: { val: 10 },
+    styles = {
+      ...styles,
+      key3: {a: spring(10)},
     };
 
-    // Move in time by 88 steps because that's just enough to reach the endValue
+    // Move in time by 88 steps because that's just enough to reach the styles
     mockRaf.manySteps(88);
     expect(count.slice(0, 4)).toEqual([
       {
-        key1: { val: 10 },
-        key2: { val: 10 },
-      }, {
-        key1: { val: 10 },
-        key2: { val: 10 },
-        key3: { val: 0 },
-      }, {
-        key1: { val: 10 },
-        key2: { val: 10 },
-        key3: { val: 0.4722222222222222 },
-      }, {
-        key1: { val: 10 },
-        key2: { val: 10 },
-        key3: { val: 1.1897376543209877 },
+        key1: {a: 10},
+        key2: {a: 10},
+      },
+      {
+        key1: {a: 10},
+        key2: {a: 10},
+        key3: {a: 0},
+      },
+      {
+        key1: {a: 10},
+        key2: {a: 10},
+        key3: {a: 0.4722222222222222},
+      },
+      {
+        key1: {a: 10},
+        key2: {a: 10},
+        key3: {a: 1.1897376543209877},
       },
     ]);
 
     // We reached the end!
     expect(count[count.length - 1]).toEqual({
-      key1: { val: 10 },
-      key2: { val: 10 },
-      key3: { val: 10 },
+      key1: {a: 10},
+      key2: {a: 10},
+      key3: {a: 10},
     });
-
 
     // Empty array
     count = [];
@@ -544,35 +483,35 @@ describe('Spring', () => {
     // Trigger a render of the owner
     TestUtils.renderIntoDocument(<App />);
 
-    // Unmount baby! (We raf once after the owner forces the TransitionSpring
+    // Unmount baby! (We raf once after the owner forces the TransitionMotion
     // renders)
-    endValue = {
-      key1: { val: 10 },
-      key2: { val: 10 },
+    styles = {
+      key1: {a: spring(10)},
+      key2: {a: spring(10)},
     };
 
-    // Move until we reach endValue
+    // Move until we reach styles
     mockRaf.manySteps(88);
     expect(count.slice(0, 3)).toEqual([
       {
-        key1: { val: 10 },
-        key2: { val: 10 },
-        key3: { val: 10 },
+        key1: {a: 10},
+        key2: {a: 10},
+        key3: {a: 10},
       }, {
-        key1: { val: 10 },
-        key2: { val: 10 },
-        key3: { val: 9.527777777777779 },
+        key1: {a: 10},
+        key2: {a: 10},
+        key3: {a: 9.527777777777779},
       }, {
-        key1: { val: 10 },
-        key2: { val: 10 },
-        key3: { val: 8.81026234567901 },
+        key1: {a: 10},
+        key2: {a: 10},
+        key3: {a: 8.81026234567901},
       },
     ]);
 
     // Finally unmounted
     expect(count[count.length - 1]).toEqual({
-      key1: { val: 10 },
-      key2: { val: 10 },
+      key1: {a: 10},
+      key2: {a: 10},
     });
   });
 
@@ -581,60 +520,58 @@ describe('Spring', () => {
     const App = React.createClass({
       render() {
         return (
-          <Spring defaultValue={0} endValue={400}>
-            {val => {
-              count.push(val);
-              return <div />;
+          <Motion defaultStyle={{a: 0}} style={{a: spring(400)}}>
+            {({a}) => {
+              count.push(a);
+              return null;
             }}
-          </Spring>
+          </Motion>
         );
       },
     });
     TestUtils.renderIntoDocument(<App />);
 
-    // Checking initial render
     expect(count).toEqual([0]);
-
-    // Move "time" until we reach the endCalue
+    // Move "time" until we reach the final style value
     mockRaf.manySteps(111);
     expect(count.slice(0, 5)).toEqual([
       0,
       18.888888888888886,
       47.589506172839506,
       80.49479595336076,
-      114.22887257563632]);
-
+      114.22887257563632,
+    ]);
     expect(count[count.length - 1]).toEqual(400);
   });
 
-  it('should reach destination value TransitionSpring', () => {
+  it('should reach destination value TransitionMotion', () => {
     let count = [];
     const App = React.createClass({
       render() {
         return (
-          <TransitionSpring defaultValue={{key: {val: 0}}} endValue={{key: {val: 400}}}>
-            {({key: {val}}) => {
-              count.push(val);
-              return <div />;
+          <TransitionMotion
+            defaultStyles={{key: {a: 0}}}
+            styles={{key: {a: spring(400)}}}>
+            {({key: {a}}) => {
+              count.push(a);
+              return null;
             }}
-          </TransitionSpring>
+          </TransitionMotion>
         );
       },
     });
     TestUtils.renderIntoDocument(<App />);
 
-    // Checking initial render
     expect(count).toEqual([0]);
-
-    // Move "time" until we reach the endCalue
+    // Move "time" until we reach the final styles value
     mockRaf.manySteps(111);
     expect(count.slice(0, 5)).toEqual([
       0,
       18.888888888888886,
       47.589506172839506,
       80.49479595336076,
-      114.22887257563632]);
-
+      114.22887257563632,
+    ]);
     expect(count[count.length - 1]).toEqual(400);
   });
 });

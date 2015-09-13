@@ -145,6 +145,7 @@ export default function components(React) {
 
   const Motion = React.createClass({
     // TODO: check props, provide more descriptive warning.
+    // warn against endValue/defaultValue
     propTypes: {
       defaultStyle: PropTypes.object,
       style: PropTypes.object,
