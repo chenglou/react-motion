@@ -63,7 +63,6 @@ describe('Motion', () => {
     });
     TestUtils.renderIntoDocument(<App />);
 
-    // Checking initial render
     expect(count).toEqual([0]);
     // Move "time" by 8 steps, which is equivalent to 8 calls to `raf`
     mockRaf.manySteps(4);
@@ -73,6 +72,33 @@ describe('Motion', () => {
       1.1897376543209877,
       2.0123698988340193,
       2.8557218143909084,
+    ]);
+  });
+
+  it('should accept different spring configs', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Motion defaultStyle={{a: 0}} style={{a: spring(10, [100, 50])}}>
+            {({a}) => {
+              count.push(a);
+              return null;
+            }}
+          </Motion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    // Checking initial render
+    expect(count).toEqual([0]);
+    // Move "time" by 8 steps, which is equivalent to 8 calls to `raf`
+    mockRaf.manySteps(2);
+    expect(count).toEqual([
+      0,
+      0.2777777777777778,
+      0.5941358024691358,
     ]);
   });
 
@@ -367,6 +393,34 @@ describe('TransitionMotion', () => {
       {a: 1.1897376543209877},
       {a: 2.0123698988340193},
       {a: 2.8557218143909084},
+    ]);
+  });
+
+  it('should accept different spring configs', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <TransitionMotion
+            defaultStyles={{key: {a: 0}}}
+            styles={{key: {a: spring(10, [100, 50])}}}>
+            {({key: {a}}) => {
+              count.push(a);
+              return null;
+            }}
+          </TransitionMotion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    expect(count).toEqual([0]);
+    // Move "time" by 8 steps, which is equivalent to 8 calls to `raf`
+    mockRaf.manySteps(2);
+    expect(count).toEqual([
+      0,
+      0.2777777777777778,
+      0.5941358024691358,
     ]);
   });
 
