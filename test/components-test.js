@@ -1,4 +1,5 @@
 import React, {addons, PropTypes} from 'react/addons';
+import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
 
 const TestUtils = addons.TestUtils;
@@ -8,7 +9,6 @@ const injectorAnimationLoop = require('inject!../src/animationLoop');
 
 describe('Motion', () => {
   let Motion;
-  let spring;
   let mockRaf;
 
   beforeEach(() => {
@@ -21,7 +21,6 @@ describe('Motion', () => {
     })(React);
 
     Motion = components.Motion;
-    spring = components.spring;
   });
 
   it('should allow returning null from children function', () => {
@@ -338,7 +337,6 @@ describe('Motion', () => {
 
 describe('TransitionMotion', () => {
   let TransitionMotion;
-  let spring;
   let mockRaf;
 
   beforeEach(() => {
@@ -351,7 +349,6 @@ describe('TransitionMotion', () => {
     })(React);
 
     TransitionMotion = components.TransitionMotion;
-    spring = components.spring;
   });
 
   it('should allow returning null from children function', () => {

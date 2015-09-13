@@ -4,7 +4,6 @@ import mergeDiff from './mergeDiff';
 import configAnimation from './animationLoop';
 import zero from './zero';
 import {interpolateValue, updateCurrentStyle, updateCurrentVelocity} from './updateTree';
-import presets from './presets';
 import deprecatedSprings from './deprecatedSprings';
 
 const startAnimation = configAnimation();
@@ -121,11 +120,6 @@ function animationStepTransitionMotion(stopAnimation, getProps, timestep, state)
     currentStyles: newCurrentStyles,
     currentVelocities: newCurrentVelocities,
   };
-}
-
-// instead of exposing {val: bla, config: bla}, use a helper
-function spring(val, config = presets.noWobble) {
-  return {val, config};
 }
 
 // turn {x: {val: 1, config: [1, 2]}, y: 2} into {x: 1, y: 2}
@@ -320,5 +314,5 @@ export default function components(React) {
 
   const {Spring, TransitionSpring} = deprecatedSprings(React);
 
-  return {Spring, TransitionSpring, Motion, TransitionMotion, spring};
+  return {Spring, TransitionSpring, Motion, TransitionMotion};
 }
