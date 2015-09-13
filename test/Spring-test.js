@@ -8,7 +8,6 @@ const injectorAnimationLoop = require('inject!../src/animationLoop');
 
 describe('Motion', () => {
   let Motion;
-  let TransitionMotion;
   let spring;
   let mockRaf;
 
@@ -22,7 +21,6 @@ describe('Motion', () => {
     })(React);
 
     Motion = components.Motion;
-    TransitionMotion = components.TransitionMotion;
     spring = components.spring;
   });
 
@@ -34,18 +32,6 @@ describe('Motion', () => {
       },
     });
     TestUtils.renderIntoDocument(<App />);
-  });
-
-  it('should allow returning null from children function TransitionMotion', () => {
-    const App2 = React.createClass({
-      render() {
-        // shouldn't throw here
-        return (
-          <TransitionMotion styles={{a: {}}}>{() => null}</TransitionMotion>
-        );
-      },
-    });
-    TestUtils.renderIntoDocument(<App2 />);
   });
 
   xit('should not throw on unmount', () => {
@@ -90,36 +76,6 @@ describe('Motion', () => {
     ]);
   });
 
-  it('should allow a defaultStyles for TransitionMotion', () => {
-    let count = [];
-    const App = React.createClass({
-      render() {
-        return (
-          <TransitionMotion
-            defaultStyles={{k: {a: 0}}}
-            styles={{k: {a: spring(10)}}}>
-            {({k}) => {
-              count.push(k);
-              return null;
-            }}
-          </TransitionMotion>
-        );
-      },
-    });
-
-    TestUtils.renderIntoDocument(<App />);
-
-    expect(count).toEqual([{a: 0}]);
-    mockRaf.manySteps(4);
-    expect(count).toEqual([
-      {a: 0},
-      {a: 0.4722222222222222},
-      {a: 1.1897376543209877},
-      {a: 2.0123698988340193},
-      {a: 2.8557218143909084},
-    ]);
-  });
-
   it('should interpolate many values', () => {
     let count = [];
     const App = React.createClass({
@@ -147,36 +103,6 @@ describe('Motion', () => {
       [1.1897376543209877, 57.589506172839506],
       [2.0123698988340193, 90.49479595336076],
       [2.8557218143909084, 124.22887257563632],
-    ]);
-  });
-
-  it('should interpolate many values TransitionMotion', () => {
-    let count = [];
-    const App = React.createClass({
-      render() {
-        return (
-          <TransitionMotion
-            defaultStyles={{k1: {a: 0, b: 10}, k2: {c: 20}}}
-            styles={{k1: {a: spring(10), b: spring(410)}, k2: {c: spring(420)}}}>
-            {val => {
-              count.push(val);
-              return null;
-            }}
-          </TransitionMotion>
-        );
-      },
-    });
-
-    TestUtils.renderIntoDocument(<App />);
-
-    expect(count).toEqual([{k1: {a: 0, b: 10}, k2: {c: 20}}]);
-    mockRaf.manySteps(4);
-    expect(count).toEqual([
-      {k1: {a: 0, b: 10}, k2: {c: 20}},
-      {k1: {a: 0.4722222222222222, b: 28.888888888888886}, k2: {c: 38.888888888888886}},
-      {k1: {a: 1.1897376543209877, b: 57.589506172839506}, k2: {c: 67.589506172839506}},
-      {k1: {a: 2.0123698988340193, b: 90.49479595336076}, k2: {c: 100.49479595336076}},
-      {k1: {a: 2.8557218143909084, b: 124.22887257563632}, k2: {c: 134.22887257563632}},
     ]);
   });
 
@@ -285,64 +211,6 @@ describe('Motion', () => {
     // the loop was broken, 177.2738043339909 would be 146.83959701218743
   });
 
-  it('should not mutate currValue when adding a new key (TransitionMotion)', () => {
-    let count = [];
-    const App = React.createClass({
-      getInitialState() {
-        return {
-          data: {
-            key1: {a: 10},
-            key2: {a: 10},
-          },
-        };
-      },
-
-      componentDidMount() {
-        this.update();
-      },
-      update() {
-        this.setState({
-          data: {
-            key1: {a: 10},
-            key2: {a: 10},
-            key3: {a: 10},
-          },
-        });
-      },
-      render() {
-        return (
-          <TransitionMotion
-            styles={this.state.data}
-            willEnter={() => ({a: 0})}
-            willLeave={() => ({a: 0})}>
-            {a => {
-              count.push(a);
-              return null;
-            }}
-          </TransitionMotion>
-        );
-      },
-    });
-    TestUtils.renderIntoDocument(<App />);
-
-    mockRaf.step();
-    expect(count).toEqual([
-      {
-        key1: {a: 10},
-        key2: {a: 10},
-      },
-      { // This second obj would be mutated
-        key1: {a: 10},
-        key2: {a: 10},
-      },
-      {
-        key1: {a: 10},
-        key2: {a: 10},
-        key3: {a: 0},
-      },
-    ]);
-  });
-
   xit('should NOT warn when parent kills the child Motion', () => {
     let count = [];
     let shouldKill = false;
@@ -410,6 +278,184 @@ describe('Motion', () => {
       47.589506172839506,
       80.49479595336076,
       114.22887257563632]);
+  });
+
+  it('should reach destination value', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Motion defaultStyle={{a: 0}} style={{a: spring(400)}}>
+            {({a}) => {
+              count.push(a);
+              return null;
+            }}
+          </Motion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    expect(count).toEqual([0]);
+    // Move "time" until we reach the final style value
+    mockRaf.manySteps(111);
+    expect(count.slice(0, 5)).toEqual([
+      0,
+      18.888888888888886,
+      47.589506172839506,
+      80.49479595336076,
+      114.22887257563632,
+    ]);
+    expect(count[count.length - 1]).toEqual(400);
+  });
+});
+
+describe('TransitionMotion', () => {
+  let TransitionMotion;
+  let spring;
+  let mockRaf;
+
+  beforeEach(() => {
+    mockRaf = createMockRaf();
+    const components = injector({
+      './animationLoop': injectorAnimationLoop({
+        raf: mockRaf.raf,
+        'performance-now': mockRaf.now,
+      }),
+    })(React);
+
+    TransitionMotion = components.TransitionMotion;
+    spring = components.spring;
+  });
+
+  it('should allow returning null from children function', () => {
+    const App2 = React.createClass({
+      render() {
+        // shouldn't throw here
+        return (
+          <TransitionMotion styles={{a: {}}}>{() => null}</TransitionMotion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App2 />);
+  });
+
+  it('should allow a defaultStyles', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <TransitionMotion
+            defaultStyles={{k: {a: 0}}}
+            styles={{k: {a: spring(10)}}}>
+            {({k}) => {
+              count.push(k);
+              return null;
+            }}
+          </TransitionMotion>
+        );
+      },
+    });
+
+    TestUtils.renderIntoDocument(<App />);
+
+    expect(count).toEqual([{a: 0}]);
+    mockRaf.manySteps(4);
+    expect(count).toEqual([
+      {a: 0},
+      {a: 0.4722222222222222},
+      {a: 1.1897376543209877},
+      {a: 2.0123698988340193},
+      {a: 2.8557218143909084},
+    ]);
+  });
+
+  it('should interpolate many values', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <TransitionMotion
+            defaultStyles={{k1: {a: 0, b: 10}, k2: {c: 20}}}
+            styles={{k1: {a: spring(10), b: spring(410)}, k2: {c: spring(420)}}}>
+            {val => {
+              count.push(val);
+              return null;
+            }}
+          </TransitionMotion>
+        );
+      },
+    });
+
+    TestUtils.renderIntoDocument(<App />);
+
+    expect(count).toEqual([{k1: {a: 0, b: 10}, k2: {c: 20}}]);
+    mockRaf.manySteps(4);
+    expect(count).toEqual([
+      {k1: {a: 0, b: 10}, k2: {c: 20}},
+      {k1: {a: 0.4722222222222222, b: 28.888888888888886}, k2: {c: 38.888888888888886}},
+      {k1: {a: 1.1897376543209877, b: 57.589506172839506}, k2: {c: 67.589506172839506}},
+      {k1: {a: 2.0123698988340193, b: 90.49479595336076}, k2: {c: 100.49479595336076}},
+      {k1: {a: 2.8557218143909084, b: 124.22887257563632}, k2: {c: 134.22887257563632}},
+    ]);
+  });
+
+  it('should not mutate currValue when adding a new key (TransitionMotion)', () => {
+    let count = [];
+    const App = React.createClass({
+      getInitialState() {
+        return {
+          data: {
+            key1: {a: 10},
+            key2: {a: 10},
+          },
+        };
+      },
+
+      componentDidMount() {
+        this.update();
+      },
+      update() {
+        this.setState({
+          data: {
+            key1: {a: 10},
+            key2: {a: 10},
+            key3: {a: 10},
+          },
+        });
+      },
+      render() {
+        return (
+          <TransitionMotion
+            styles={this.state.data}
+            willEnter={() => ({a: 0})}
+            willLeave={() => ({a: 0})}>
+            {a => {
+              count.push(a);
+              return null;
+            }}
+          </TransitionMotion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    mockRaf.step();
+    expect(count).toEqual([
+      {
+        key1: {a: 10},
+        key2: {a: 10},
+      },
+      { // This second obj would be mutated
+        key1: {a: 10},
+        key2: {a: 10},
+      },
+      {
+        key1: {a: 10},
+        key2: {a: 10},
+        key3: {a: 0},
+      },
+    ]);
   });
 
   it('should mount and unmount correctly (TransitionMotion)', () => {
@@ -513,35 +559,6 @@ describe('Motion', () => {
       key1: {a: 10},
       key2: {a: 10},
     });
-  });
-
-  it('should reach destination value', () => {
-    let count = [];
-    const App = React.createClass({
-      render() {
-        return (
-          <Motion defaultStyle={{a: 0}} style={{a: spring(400)}}>
-            {({a}) => {
-              count.push(a);
-              return null;
-            }}
-          </Motion>
-        );
-      },
-    });
-    TestUtils.renderIntoDocument(<App />);
-
-    expect(count).toEqual([0]);
-    // Move "time" until we reach the final style value
-    mockRaf.manySteps(111);
-    expect(count.slice(0, 5)).toEqual([
-      0,
-      18.888888888888886,
-      47.589506172839506,
-      80.49479595336076,
-      114.22887257563632,
-    ]);
-    expect(count[count.length - 1]).toEqual(400);
   });
 
   it('should reach destination value TransitionMotion', () => {
