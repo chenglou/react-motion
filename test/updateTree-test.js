@@ -1,118 +1,92 @@
+import {updateCurrentStyle, updateCurrentVelocity} from '../src/updateTree';
+import {spring} from '../src/react-motion';
 import React from 'react';
-import {updateCurrValue, updateCurrVelocity} from '../src/updateTree';
 
 const FRAME_RATE = 1 / 60;
 
-describe('updateCurrValue', () => {
-  it('should not error on null', () => {
-    expect(updateCurrValue(FRAME_RATE, {val: null}, {val: null}, {val: null}))
-      .toEqual({val: null});
+describe('updateCurrentStyle', () => {
+  it('should jump to style when there is no config', () => {
+    const currentStyle = {a: 0};
+    const currentVelocity = {a: 1};
+    const style = {a: 100};
+    expect(updateCurrentStyle(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: 100});
   });
 
-  it('should jump to endValue when there is no val wrapper correctly', () => {
-    const currValue = {count: 0};
-    const currVelocity = {count: 1};
-    const endValue = {count: 100};
-    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue))
-      .toEqual({count: 100});
-  });
-
-  it('should jump to endValue when config is []', () => {
-    const currValue = {count: {val: 1, config: []}};
-    const currVelocity = {count: {val: 5, config: []}};
-    const endValue = {count: {val: 10, config: []}};
-    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue))
-      .toEqual({count: {val: 10, config: []}});
-  });
-
-  it('should do top-level updates', () => {
-    const currValue = {val: [1, 2, 3]};
-    const currVelocity = {val: [5, 5, 5]};
-    const endValue = {val: [10, 10, 10]};
-    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
-      val: [1.4722222222222223, 2.425, 3.3777777777777778],
-    });
+  it('should interpolate correctly with config and non-configs mixed', () => {
+    const currentStyle = {a: 0, b: spring(3)};
+    const currentVelocity = {a: 1, b: 1};
+    const style = {a: 100, b: spring(10)};
+    expect(updateCurrentStyle(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: 100, b: {val: 3.34, config: [170, 26]}});
   });
 
   it('should do negative numbers', () => {
-    const currValue = {val: 1};
-    const currVelocity = {val: 100};
-    const endValue = {val: -1000};
-    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
-      val: -45.325,
-    });
+    const currentStyle = {a: 0, b: spring(-3)};
+    const currentVelocity = {a: 1, b: -1};
+    const style = {a: 100, b: spring(-10)};
+    expect(updateCurrentStyle(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: 100, b: {val: -3.34, config: [170, 26]}});
   });
 
-  it('should do nested updates, with a default config', () => {
-    const currValue = {count: {val: [1, 2, {a: 3}]}};
-    const currVelocity = {count: {val: [10, 20, {a: 30}]}};
-    const endValue = {count: {val: [100, 200, {a: 300}]}};
-    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
-      count: {
-        val: [5.769444444444445, 11.53888888888889, {a: 17.308333333333334}],
-      },
-    });
+  it('should pass from configured to non-configured', () => {
+    const currentStyle = {a: spring(10)};
+    const currentVelocity = {a: 1};
+    const style = {a: 0};
+    expect(updateCurrentStyle(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: 0});
   });
 
-  it('should have nested val override upper ones', () => {
-    let currValue = {val: [2, {val: 2, config: [100, 10]}]};
-    let currVelocity = {val: [10, {val: 10, config: [100, 10]}]};
-    let endValue = {val: [2, {val: 2, config: [100, 10]}]};
-    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
-      val: [2.0944444444444446, {val: 2.138888888888889, config: [100, 10]}],
-    });
-
-    currValue = {val: [1, {val: 1, config: []}]};
-    currVelocity = {val: [5, {val: 5, config: []}]};
-    endValue = {val: [10, {val: 10, config: []}]};
-    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
-      val: [1.4722222222222223, {val: 10, config: []}],
-    });
-  });
-
-  it('should skip non-numerical values', () => {
-    const comp = <div key="1" />;
-    const currValue = {val: [2, 'hi', comp]};
-    const currVelocity = {val: [5, 'hi', comp]};
-    const endValue = {val: [10, 'hi', comp]};
-    expect(updateCurrValue(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
-      val: [2.425, 'hi', comp],
-    });
+  it('should pass from non-configured to configured', () => {
+    const currentStyle = {a: 10};
+    const currentVelocity = {a: 5};
+    const style = {a: spring(0)};
+    expect(updateCurrentStyle(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: {val: 9.575, config: [170, 26]}});
   });
 });
 
-describe('updateCurrVelocity', () => {
-  it('should not error on null', () => {
-    expect(updateCurrVelocity(FRAME_RATE, {val: null}, {val: null}, {val: null}))
-      .toEqual({val: null});
-  });
-
+describe('updateCurrentVelocity', () => {
   // to potential contributors: these behaviors are not set in stone, but don't
   // matter right now. It's debatable that we should e.g. in the below test keep
-  // currVelocity to {count: 0}
+  // currentVelocity to {a: 0}
   it('should have a velocity of 0 for non-updating values', () => {
-    const currValue = {count: 0};
-    const currVelocity = {count: 1};
-    const endValue = {count: 100};
-    expect(updateCurrVelocity(FRAME_RATE, currValue, currVelocity, endValue))
-      .toEqual({count: 0});
+    const currentStyle = {a: 0};
+    const currentVelocity = {a: 1};
+    const style = {a: 100};
+    expect(updateCurrentVelocity(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: 0});
   });
 
-  it('should have a velocity of 0 for config []', () => {
-    const currValue = {count: {val: 1, config: []}};
-    const currVelocity = {count: {val: 5, config: []}};
-    const endValue = {count: {val: 10, config: []}};
-    expect(updateCurrVelocity(FRAME_RATE, currValue, currVelocity, endValue))
-      .toEqual({count: {val: 0, config: []}});
+  it('should set velocity correctly with config and non-configs mixed', () => {
+    const currentStyle = {a: 0, b: spring(3)};
+    const currentVelocity = {a: 1, b: 1};
+    const style = {a: 100, b: spring(10)};
+    expect(updateCurrentVelocity(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: 0, b: 20.4});
   });
 
-  it('should leave non-numerical values alone', () => {
-    const comp = <div key="1" />;
-    const currValue = {val: [1, ['hi'], comp]};
-    const currVelocity = {val: [1, ['hi'], comp]};
-    const endValue = {val: [10, ['hi'], comp]};
-    expect(updateCurrVelocity(FRAME_RATE, currValue, currVelocity, endValue)).toEqual({
-      val: [26.066666666666666, ['hi'], comp],
-    });
+  it('should do negative numbers', () => {
+    const currentStyle = {a: 0, b: spring(-3)};
+    const currentVelocity = {a: 1, b: -1};
+    const style = {a: 100, b: spring(-10)};
+    expect(updateCurrentVelocity(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: 0, b: -20.4});
+  });
+
+  it('should pass from configured to non-configured', () => {
+    const currentStyle = {a: spring(10)};
+    const currentVelocity = {a: 1};
+    const style = {a: 0};
+    expect(updateCurrentVelocity(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: 0});
+  });
+
+  it('should pass from non-configured to configured', () => {
+    const currentStyle = {a: 10};
+    const currentVelocity = {a: 5};
+    const style = {a: spring(0)};
+    expect(updateCurrentVelocity(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: -25.5});
   });
 });

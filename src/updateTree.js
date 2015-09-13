@@ -75,8 +75,7 @@ export function updateCurrentVelocity(frameRate, currentStyle, currentVelocity, 
     }
     if (!style[key].config) {
       // not a spring config, not something we want to interpolate
-      // console.log('asd', key);
-      ret[key] = style[key];
+      ret[key] = 0;
       continue;
     }
     const [k, b] = style[key].config;
