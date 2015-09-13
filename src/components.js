@@ -274,7 +274,6 @@ export default function components(React) {
 
     componentWillReceiveProps() {
       this.startAnimating();
-      // TODO: accept PR.
     },
 
     stopAnimation: null,

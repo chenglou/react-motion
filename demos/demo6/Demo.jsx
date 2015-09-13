@@ -7,7 +7,7 @@ import CodeMirror from 'react-codemirror';
 // component need to refer to the original names. Forunately babel doesn't
 // transform the `require`s into different names too
 const React = require('react');
-const {Spring, TransitionSpring} = require('../../src/Spring');
+const {Spring, TransitionSpring} = require('../../src/react-motion');
 // loads js syntax
 import 'codemirror/mode/javascript/javascript';
 import l from '../../src/log';

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Motion, spring} from '../../src/Spring';
+import {Motion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 
 function reinsert(arr, from, to) {

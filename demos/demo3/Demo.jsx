@@ -1,5 +1,5 @@
 import React from 'react';
-import {TransitionMotion, spring} from '../../src/Spring';
+import {TransitionMotion, spring} from '../../src/react-motion';
 import presets from '../../src/presets';
 
 const Demo = React.createClass({
