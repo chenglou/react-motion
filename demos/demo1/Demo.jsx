@@ -1,5 +1,5 @@
 import React from 'react';
-import {Spring} from '../../src/react-motion';
+import {StaggeredMotion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 import presets from '../../src/presets';
 
@@ -21,24 +21,27 @@ const Demo = React.createClass({
     this.handleMouseMove(touches[0]);
   },
 
-  getEndValue(prevValue) {
-    // `prevValue` is the interpolated value of the last tick
-    const endValue = prevValue.map((_, i) => {
+  getStyles(prevStyles) {
+    // `prevStyles` is the interpolated value of the last tick
+    const endValue = prevStyles.map((_, i) => {
       return i === 0
-        ? {val: this.state.mouse, config: []}
-        : {val: prevValue[i - 1].val, config: presets.gentle};
+        ? {x: this.state.mouse[0], y: this.state.mouse[1]}
+        : {
+            x: spring(prevStyles[i - 1].x, presets.gentle),
+            y: spring(prevStyles[i - 1].y, presets.gentle),
+          };
     });
     return endValue;
   },
 
   render() {
     return (
-      <Spring
-        defaultValue={range(6).map(() => ({val: [0, 0]}))}
-        endValue={this.getEndValue}>
+      <StaggeredMotion
+        defaultStyles={range(6).map(() => ({x: 0, y: 0}))}
+        styles={this.getStyles}>
         {balls =>
           <div className="demo1">
-            {balls.map(({val: [x, y]}, i) =>
+            {balls.map(({x, y}, i) =>
               <div
                 key={i}
                 className={`demo1-ball ball-${i}`}
@@ -50,7 +53,7 @@ const Demo = React.createClass({
             )}
           </div>
         }
-      </Spring>
+      </StaggeredMotion>
     );
   },
 });
