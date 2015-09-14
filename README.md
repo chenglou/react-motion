@@ -4,6 +4,8 @@
 [![Bower version](https://badge.fury.io/bo/react-motion.svg)](http://badge.fury.io/bo/react-motion)
 [![react-motion channel on slack](https://img.shields.io/badge/slack-react--motion%40reactiflux-61DAAA.svg?style=flat)](http://reactiflux.herokuapp.com)
 
+**(Master is unstable. Please check the [stable releases](https://github.com/chenglou/react-motion/releases) or install through normal means below.)**
+
 ```js
 const {Spring} = require("react-motion");
 
@@ -13,8 +15,6 @@ const {Spring} = require("react-motion");
 ```
 
 Animate a counter from `0` `10`. For more advanced usage, see [below](#presets).
-
-_(Master is unstable. Please check the [stable releases](https://github.com/chenglou/react-motion/releases) or install through normal means below.)_
 
 Npm:
 `npm install react-motion`
