@@ -451,7 +451,7 @@ describe('TransitionMotion', () => {
     ]);
   });
 
-  it('should not mutate currValue when adding a new key (TransitionMotion)', () => {
+  it('should not mutate currValue when adding a new key', () => {
     let count = [];
     const App = React.createClass({
       getInitialState() {
@@ -509,7 +509,7 @@ describe('TransitionMotion', () => {
     ]);
   });
 
-  it('should mount and unmount correctly (TransitionMotion)', () => {
+  it('should mount and unmount correctly', () => {
     let count = [];
     let styles = {
       key1: {a: spring(10)},
@@ -612,7 +612,7 @@ describe('TransitionMotion', () => {
     });
   });
 
-  it('should reach destination value TransitionMotion', () => {
+  it('should reach destination value', () => {
     let count = [];
     const App = React.createClass({
       render() {

@@ -65,6 +65,7 @@ function animationStepStaggeredMotion(stopAnimation, getProps, timestep, state) 
     return updateCurrentVelocity(timestep, currentStyle, currentVelocities[i], styles[i]);
   });
 
+  // TODO: is this right?
   if (currentVelocities.every((v, k) => noVelocity(v, currentStyles[k])) &&
       newCurrentVelocities.every((v, k) => noVelocity(v, newCurrentStyles[k]))) {
     stopAnimation();
