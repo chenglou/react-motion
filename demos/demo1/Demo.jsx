@@ -5,7 +5,7 @@ import presets from '../../src/presets';
 
 const Demo = React.createClass({
   getInitialState() {
-    return {mouse: [250, 300]};
+    return {x: 250, y: 300};
   },
 
   componentDidMount() {
@@ -13,8 +13,8 @@ const Demo = React.createClass({
     window.addEventListener('touchmove', this.handleTouchMove);
   },
 
-  handleMouseMove({pageX, pageY}) {
-    this.setState({mouse: [pageX, pageY]});
+  handleMouseMove({pageX: x, pageY: y}) {
+    this.setState({x, y});
   },
 
   handleTouchMove({touches}) {
@@ -25,7 +25,7 @@ const Demo = React.createClass({
     // `prevStyles` is the interpolated value of the last tick
     const endValue = prevStyles.map((_, i) => {
       return i === 0
-        ? {x: this.state.mouse[0], y: this.state.mouse[1]}
+        ? this.state
         : {
             x: spring(prevStyles[i - 1].x, presets.gentle),
             y: spring(prevStyles[i - 1].y, presets.gentle),

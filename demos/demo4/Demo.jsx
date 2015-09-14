@@ -1,5 +1,5 @@
 import React from 'react';
-import {TransitionSpring} from '../../src/react-motion';
+import {TransitionMotion, spring} from '../../src/react-motion';
 
 const Demo = React.createClass({
   getInitialState() {
@@ -36,7 +36,7 @@ const Demo = React.createClass({
     }
   },
 
-  getEndValue() {
+  getStyles() {
     const {photos, currPhoto} = this.state;
     const keys = Object.keys(photos);
     const currKey = keys[currPhoto];
@@ -56,16 +56,14 @@ const Demo = React.createClass({
     keys.reduce((prevLeft, key, i) => {
       const [origW, origH] = photos[key];
       configs[key] = {
-        val: {
-          left: prevLeft,
-          height: height,
-          width: height / origH * origW,
-        },
-        config: [170, 26],
+        left: spring(prevLeft, [170, 26]),
+        height: spring(height, [170, 26]),
+        width: spring(height / origH * origW, [170, 26]),
       };
       return prevLeft + widths[i];
     }, offset);
-    configs.container = {val: {height, width}};
+    configs.container = {height: spring(height), width: spring(width)};
+
     return configs;
   },
 
@@ -81,21 +79,21 @@ const Demo = React.createClass({
           value={currPhoto}
           onChange={this.handleChange} />
         {currPhoto}
-        <TransitionSpring endValue={this.getEndValue()}>
+        <TransitionMotion styles={this.getStyles()}>
           {({container, ...rest}) =>
             <div className="demo4">
-              <div className="demo4-inner" style={container.val}>
+              <div className="demo4-inner" style={container}>
                 {Object.keys(rest).map((key) =>
                   <img
                     className="demo4-photo"
                     key={key}
                     src={key}
-                    style={rest[key].val} />
+                    style={rest[key]} />
                 )}
               </div>
             </div>
           }
-        </TransitionSpring>
+        </TransitionMotion>
       </div>
     );
   },
