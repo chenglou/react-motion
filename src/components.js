@@ -32,14 +32,15 @@ function everyObj(f, obj) {
 }
 
 function animationStepMotion(stopAnimation, getProps, timestep, state) {
-  let {currentStyle, currentVelocity} = state;
-  let {style} = getProps();
+  const {currentStyle, currentVelocity} = state;
+  const {style} = getProps();
 
   const newCurrentStyle =
     updateCurrentStyle(timestep, currentStyle, currentVelocity, style);
   const newCurrentVelocity =
     updateCurrentVelocity(timestep, currentStyle, currentVelocity, style);
 
+  // TOOD: this isn't necessary anymore. It was used only against endValue func
   if (noVelocity(currentVelocity, newCurrentStyle) &&
       noVelocity(newCurrentVelocity, newCurrentStyle)) {
     // check explanation in `Motion.animationRender`
@@ -52,6 +53,28 @@ function animationStepMotion(stopAnimation, getProps, timestep, state) {
   };
 }
 
+function animationStepStaggeredMotion(stopAnimation, getProps, timestep, state) {
+  const {currentStyles, currentVelocities} = state;
+  const styles = getProps().styles(currentStyles.map(stripStyle));
+
+  const newCurrentStyles = currentStyles.map((currentStyle, i) => {
+    return updateCurrentStyle(timestep, currentStyle, currentVelocities[i], styles[i]);
+  });
+  const newCurrentVelocities = currentStyles.map((currentStyle, i) => {
+    return updateCurrentVelocity(timestep, currentStyle, currentVelocities[i], styles[i]);
+  });
+
+  if (currentVelocities.every((v, k) => noVelocity(v, currentStyles[k])) &&
+      newCurrentVelocities.every((v, k) => noVelocity(v, newCurrentStyles[k]))) {
+    stopAnimation();
+  }
+
+  return {
+    currentStyles: newCurrentStyles,
+    currentVelocities: newCurrentVelocities,
+  };
+}
+
 function animationStepTransitionMotion(stopAnimation, getProps, timestep, state) {
   let {currentStyles, currentVelocities} = state;
   let {styles, willEnter, willLeave} = getProps();
@@ -60,6 +83,7 @@ function animationStepTransitionMotion(stopAnimation, getProps, timestep, state)
     styles = styles(currentStyles);
   }
 
+  // TODO: huh?
   let mergedStyles = styles; // set mergedStyles to styles as the default
   let hasNewKey = false;
 
@@ -141,6 +165,7 @@ export default function components(React) {
     // TODO: check props, provide more descriptive warning.
     // warn against endValue/defaultValue
     propTypes: {
+      // TOOD: warn against putting a config in here
       defaultStyle: PropTypes.object,
       style: PropTypes.object,
       children: PropTypes.func,
@@ -217,7 +242,8 @@ export default function components(React) {
     // TODO: check props, provide more descriptive warning.
     // warn against endValue/defaultValue
     propTypes: {
-      defaultStyles: PropTypes.objectOf(PropTypes.any),
+      // TOOD: warn against putting configs in here
+      defaultStyles: PropTypes.arrayOf(PropTypes.object),
       // TODO: warn for endValue
       styles: PropTypes.func.isRequired,
       children: PropTypes.func.isRequired,
@@ -228,12 +254,12 @@ export default function components(React) {
       const currentStyles = defaultStyles ? defaultStyles : styles();
       return {
         currentStyles: currentStyles,
-        currentVelocities: mapObject(s => mapObject(zero, s), currentStyles),
+        currentVelocities: currentStyles.map(s => mapObject(zero, s)),
       };
     },
 
     componentDidMount() {
-      this.animationStep = animationStepTransitionMotion.bind(
+      this.animationStep = animationStepStaggeredMotion.bind(
         null,
         () => this.stopAnimation(),
         () => this.props,
@@ -280,7 +306,7 @@ export default function components(React) {
     },
 
     render() {
-      const strippedStyle = mapObject(stripStyle, this.state.currentStyles);
+      const strippedStyle = this.state.currentStyles.map(stripStyle);
       const renderedChildren = this.props.children(strippedStyle);
       return renderedChildren && React.Children.only(renderedChildren);
     },
@@ -288,6 +314,7 @@ export default function components(React) {
 
   const TransitionMotion = React.createClass({
     propTypes: {
+      // TOOD: warn against putting configs in here
       defaultStyles: PropTypes.objectOf(PropTypes.any),
       // TODO: warn for style
       styles: PropTypes.oneOfType([
@@ -297,6 +324,7 @@ export default function components(React) {
       willLeave: PropTypes.oneOfType([
         PropTypes.func,
       ]),
+      // TOOD: warn against putting configs in here
       willEnter: PropTypes.oneOfType([
         PropTypes.func,
       ]),
@@ -315,6 +343,7 @@ export default function components(React) {
       let currentStyles;
       if (defaultStyles == null) {
         if (typeof styles === 'function') {
+          // TODO: stagger this?
           currentStyles = styles();
         } else {
           currentStyles = styles;
