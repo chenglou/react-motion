@@ -5,6 +5,7 @@ import configAnimation from './animationLoop';
 import zero from './zero';
 import {interpolateValue, updateCurrentStyle, updateCurrentVelocity} from './updateTree';
 import deprecatedSprings from './deprecatedSprings';
+import stripStyle from './stripStyle';
 
 const startAnimation = configAnimation();
 
@@ -144,18 +145,6 @@ function animationStepTransitionMotion(stopAnimation, getProps, timestep, state)
     currentStyles: newCurrentStyles,
     currentVelocities: newCurrentVelocities,
   };
-}
-
-// turn {x: {val: 1, config: [1, 2]}, y: 2} into {x: 1, y: 2}
-function stripStyle(style) {
-  let ret = {};
-  for (let key in style) {
-    if (!style.hasOwnProperty(key)) {
-      continue;
-    }
-    ret[key] = style[key].val == null ? style[key] : style[key].val;
-  }
-  return ret;
 }
 
 export default function components(React) {
