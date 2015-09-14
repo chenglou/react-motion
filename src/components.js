@@ -213,9 +213,79 @@ export default function components(React) {
     },
   });
 
+  const StaggeredMotion = React.createClass({
+    // TODO: check props, provide more descriptive warning.
+    // warn against endValue/defaultValue
+    propTypes: {
+      defaultStyles: PropTypes.objectOf(PropTypes.any),
+      // TODO: warn for endValue
+      styles: PropTypes.func.isRequired,
+      children: PropTypes.func.isRequired,
+    },
 
-  // TODO: warn when obj uses numerical keys
-  // TODO: warn when endValue doesn't contain a val
+    getInitialState() {
+      const {styles, defaultStyles} = this.props;
+      const currentStyles = defaultStyles ? defaultStyles : styles();
+      return {
+        currentStyles: currentStyles,
+        currentVelocities: mapObject(s => mapObject(zero, s), currentStyles),
+      };
+    },
+
+    componentDidMount() {
+      this.animationStep = animationStepTransitionMotion.bind(
+        null,
+        () => this.stopAnimation(),
+        () => this.props,
+      );
+      this.startAnimating();
+    },
+
+    componentWillReceiveProps() {
+      this.startAnimating();
+    },
+
+    stopAnimation: null,
+
+    // used in animationRender
+    hasUnmounted: false,
+
+    animationStep: null,
+
+    componentWillUnmount() {
+      this.stopAnimation();
+      this.hasUnmounted = true;
+    },
+
+    startAnimating() {
+      this.stopAnimation = startAnimation(
+        this.state,
+        this.animationStep,
+        this.animationRender,
+      );
+    },
+
+    animationRender(alpha, nextState, prevState) {
+      // See comment in Motion.
+      if (!this.hasUnmounted) {
+        this.setState({
+          currentStyles: interpolateValue(
+            alpha,
+            nextState.currentStyles,
+            prevState.currentStyles,
+          ),
+          currentVelocities: nextState.currentVelocities,
+        });
+      }
+    },
+
+    render() {
+      const strippedStyle = mapObject(stripStyle, this.state.currentStyles);
+      const renderedChildren = this.props.children(strippedStyle);
+      return renderedChildren && React.Children.only(renderedChildren);
+    },
+  });
+
   const TransitionMotion = React.createClass({
     propTypes: {
       defaultStyles: PropTypes.objectOf(PropTypes.any),
@@ -314,5 +384,5 @@ export default function components(React) {
 
   const {Spring, TransitionSpring} = deprecatedSprings(React);
 
-  return {Spring, TransitionSpring, Motion, TransitionMotion};
+  return {Spring, TransitionSpring, Motion, StaggeredMotion, TransitionMotion};
 }
