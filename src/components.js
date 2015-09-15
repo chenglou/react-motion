@@ -223,6 +223,9 @@ export default function components(React) {
 
     render() {
       const strippedStyle = stripStyle(this.state.currentStyle);
+      if (Number.isNaN(strippedStyle.x)) {
+        debugger;
+      }
       const renderedChildren = this.props.children(strippedStyle);
       return renderedChildren && React.Children.only(renderedChildren);
     },
