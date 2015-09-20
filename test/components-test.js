@@ -64,7 +64,7 @@ describe('Motion', () => {
 
     expect(count).toEqual([0]);
     // Move "time" by 8 steps, which is equivalent to 8 calls to `raf`
-    mockRaf.manySteps(4);
+    mockRaf.step(4);
     expect(count).toEqual([
       0,
       0.4722222222222222,
@@ -93,7 +93,7 @@ describe('Motion', () => {
     // Checking initial render
     expect(count).toEqual([0]);
     // Move "time" by 8 steps, which is equivalent to 8 calls to `raf`
-    mockRaf.manySteps(2);
+    mockRaf.step(2);
     expect(count).toEqual([
       0,
       0.2777777777777778,
@@ -121,7 +121,7 @@ describe('Motion', () => {
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([[0, 10]]);
-    mockRaf.manySteps(4);
+    mockRaf.step(4);
     expect(count).toEqual([
       [0, 10],
       [0.4722222222222222, 28.888888888888886],
@@ -149,7 +149,7 @@ describe('Motion', () => {
 
     // Checking initial render
     expect(count).toEqual([400]);
-    mockRaf.manySteps(10); // Shouldn't matter, we stop rafing
+    mockRaf.step(10); // Shouldn't matter, we stop rafing
     expect(count).toEqual([400, 400]);
   });
 
@@ -195,7 +195,7 @@ describe('Motion', () => {
     expect(count).toEqual([10, 400, 400, 10, 400]);
 
     // Step many times won't matter, the child only renders once more
-    mockRaf.manySteps(10);
+    mockRaf.step(10);
     expect(count).toEqual([10, 400, 400, 10, 400, 400]);
   });
 
@@ -217,7 +217,7 @@ describe('Motion', () => {
 
     // Initial render
     expect(count).toEqual([0]);
-    mockRaf.manySteps(6);
+    mockRaf.step(6);
     expect(count).toEqual([
       0,
       18.888888888888886,
@@ -280,7 +280,7 @@ describe('Motion', () => {
 
     TestUtils.renderIntoDocument(<Parent />);
 
-    mockRaf.manySteps(4);
+    mockRaf.step(4);
     expect(count).toEqual([
       0,
       18.888888888888886,
@@ -323,7 +323,7 @@ describe('Motion', () => {
 
     expect(count).toEqual([0]);
     // Move "time" until we reach the final style value
-    mockRaf.manySteps(111);
+    mockRaf.step(111);
     expect(count.slice(0, 5)).toEqual([
       0,
       18.888888888888886,
@@ -383,7 +383,7 @@ describe('TransitionMotion', () => {
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([{a: 0}]);
-    mockRaf.manySteps(4);
+    mockRaf.step(4);
     expect(count).toEqual([
       {a: 0},
       {a: 0.4722222222222222},
@@ -413,7 +413,7 @@ describe('TransitionMotion', () => {
 
     expect(count).toEqual([0]);
     // Move "time" by 8 steps, which is equivalent to 8 calls to `raf`
-    mockRaf.manySteps(2);
+    mockRaf.step(2);
     expect(count).toEqual([
       0,
       0.2777777777777778,
@@ -441,7 +441,7 @@ describe('TransitionMotion', () => {
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([{k1: {a: 0, b: 10}, k2: {c: 20}}]);
-    mockRaf.manySteps(4);
+    mockRaf.step(4);
     expect(count).toEqual([
       {k1: {a: 0, b: 10}, k2: {c: 20}},
       {k1: {a: 0.4722222222222222, b: 28.888888888888886}, k2: {c: 38.888888888888886}},
@@ -541,7 +541,7 @@ describe('TransitionMotion', () => {
     };
 
     // Move in time by 88 steps because that's just enough to reach the styles
-    mockRaf.manySteps(88);
+    mockRaf.step(88);
     expect(count.slice(0, 4)).toEqual([
       {
         key1: {a: 10},
@@ -575,7 +575,7 @@ describe('TransitionMotion', () => {
     count = [];
 
     // More steps won't do anything
-    mockRaf.manySteps(10);
+    mockRaf.step(10);
 
     // Trigger a render of the owner
     TestUtils.renderIntoDocument(<App />);
@@ -588,7 +588,7 @@ describe('TransitionMotion', () => {
     };
 
     // Move until we reach styles
-    mockRaf.manySteps(88);
+    mockRaf.step(88);
     expect(count.slice(0, 3)).toEqual([
       {
         key1: {a: 10},
@@ -632,7 +632,7 @@ describe('TransitionMotion', () => {
 
     expect(count).toEqual([0]);
     // Move "time" until we reach the final styles value
-    mockRaf.manySteps(111);
+    mockRaf.step(111);
     expect(count.slice(0, 5)).toEqual([
       0,
       18.888888888888886,

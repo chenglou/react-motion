@@ -11,7 +11,7 @@ export default function() {
   };
 
   const defaultTimeInterval = 1000 / 60;
-  const step = (ms = defaultTimeInterval) => {
+  const _step = ms => {
     const allCallbacksBefore = allCallbacks;
     allCallbacks = [];
 
@@ -20,11 +20,11 @@ export default function() {
     prevTime += ms;
   };
 
-  const manySteps = (num = 1) => {
-    for (let i = 0; i < num; i++) {
-      step();
+  const step = (howMany = 1, ms = defaultTimeInterval) => {
+    for (let i = 0; i < howMany; i++) {
+      _step(ms);
     }
   };
 
-  return {now, raf, step, manySteps};
+  return {now, raf, step};
 }
