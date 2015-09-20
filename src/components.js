@@ -32,122 +32,6 @@ function everyObj(f, obj) {
   return true;
 }
 
-function animationStepMotion(stopAnimation, getProps, timestep, state) {
-  const {currentStyle, currentVelocity} = state;
-  const {style} = getProps();
-
-  const newCurrentStyle =
-    updateCurrentStyle(timestep, currentStyle, currentVelocity, style);
-  const newCurrentVelocity =
-    updateCurrentVelocity(timestep, currentStyle, currentVelocity, style);
-
-  // TOOD: this isn't necessary anymore. It was used only against endValue func
-  if (noVelocity(currentVelocity, newCurrentStyle) &&
-      noVelocity(newCurrentVelocity, newCurrentStyle)) {
-    // check explanation in `Motion.animationRender`
-    stopAnimation(); // Nasty side effects....
-  }
-
-  return {
-    currentStyle: newCurrentStyle,
-    currentVelocity: newCurrentVelocity,
-  };
-}
-
-function animationStepStaggeredMotion(stopAnimation, getProps, timestep, state) {
-  const {currentStyles, currentVelocities} = state;
-  const styles = getProps().styles(currentStyles.map(stripStyle));
-
-  const newCurrentStyles = currentStyles.map((currentStyle, i) => {
-    return updateCurrentStyle(timestep, currentStyle, currentVelocities[i], styles[i]);
-  });
-  const newCurrentVelocities = currentStyles.map((currentStyle, i) => {
-    return updateCurrentVelocity(timestep, currentStyle, currentVelocities[i], styles[i]);
-  });
-
-  // TODO: is this right?
-  if (currentVelocities.every((v, k) => noVelocity(v, currentStyles[k])) &&
-      newCurrentVelocities.every((v, k) => noVelocity(v, newCurrentStyles[k]))) {
-    stopAnimation();
-  }
-
-  return {
-    currentStyles: newCurrentStyles,
-    currentVelocities: newCurrentVelocities,
-  };
-}
-
-function animationStepTransitionMotion(stopAnimation, getProps, timestep, state) {
-  let {currentStyles, currentVelocities} = state;
-  let {styles, willEnter, willLeave} = getProps();
-
-  if (typeof styles === 'function') {
-    styles = styles(currentStyles);
-  }
-
-  // TODO: huh?
-  let mergedStyles = styles; // set mergedStyles to styles as the default
-  let hasNewKey = false;
-
-  mergedStyles = mergeDiff(
-    currentStyles,
-    styles,
-    // TODO: stop allocating like crazy in this whole code path
-    key => {
-      const res = willLeave(key, currentStyles[key], styles, currentStyles, currentVelocities);
-      if (res == null) {
-        // For legacy reason. We won't allow returning null soon
-        // TODO: remove, after next release
-        return null;
-      }
-
-      if (noVelocity(currentVelocities[key], currentStyles[key]) &&
-          hasReachedStyle(currentStyles[key], res)) {
-        return null;
-      }
-      return res;
-    }
-  );
-
-  Object.keys(mergedStyles)
-    .filter(key => !currentStyles.hasOwnProperty(key))
-    .forEach(key => {
-      hasNewKey = true;
-      const enterStyle = willEnter(key, mergedStyles[key], styles, currentStyles, currentVelocities);
-
-      // We can mutate this here because mergeDiff returns a new Obj
-      mergedStyles[key] = enterStyle;
-
-      currentStyles = {
-        ...currentStyles,
-        [key]: enterStyle,
-      };
-      currentVelocities = {
-        ...currentVelocities,
-        [key]: mapObject(zero, enterStyle),
-      };
-    });
-
-  const newCurrentStyles = mapObject((mergedStyle, key) => {
-    return updateCurrentStyle(timestep, currentStyles[key], currentVelocities[key], mergedStyle);
-  }, mergedStyles);
-  const newCurrentVelocities = mapObject((mergedStyle, key) => {
-    return updateCurrentVelocity(timestep, currentStyles[key], currentVelocities[key], mergedStyle);
-  }, mergedStyles);
-
-  if (!hasNewKey &&
-      everyObj((v, k) => noVelocity(v, currentStyles[k]), currentVelocities) &&
-      everyObj((v, k) => noVelocity(v, newCurrentStyles[k]), newCurrentVelocities)) {
-    // check explanation in `Motion.animationRender`
-    stopAnimation(); // Nasty side effects....
-  }
-
-  return {
-    currentStyles: newCurrentStyles,
-    currentVelocities: newCurrentVelocities,
-  };
-}
-
 export default function components(React) {
   const {PropTypes} = React;
 
@@ -171,11 +55,6 @@ export default function components(React) {
     },
 
     componentDidMount() {
-      this.animationStep = animationStepMotion.bind(
-        null,
-        () => this.stopAnimation(),
-        () => this.props,
-      );
       this.startAnimating();
     },
 
@@ -183,12 +62,32 @@ export default function components(React) {
       this.startAnimating();
     },
 
+    animationStep(timestep, state) {
+      const {currentStyle, currentVelocity} = state;
+      const {style} = this.props;
+
+      const newCurrentStyle =
+        updateCurrentStyle(timestep, currentStyle, currentVelocity, style);
+      const newCurrentVelocity =
+        updateCurrentVelocity(timestep, currentStyle, currentVelocity, style);
+
+      // TOOD: this isn't necessary anymore. It was used only against endValue func
+      if (noVelocity(currentVelocity, newCurrentStyle) &&
+          noVelocity(newCurrentVelocity, newCurrentStyle)) {
+        // check explanation in `Motion.animationRender`
+        this.stopAnimation(); // Nasty side effects....
+      }
+
+      return {
+        currentStyle: newCurrentStyle,
+        currentVelocity: newCurrentVelocity,
+      };
+    },
+
     stopAnimation: null,
 
     // used in animationRender
     hasUnmounted: false,
-
-    animationStep: null,
 
     componentWillUnmount() {
       this.stopAnimation();
@@ -252,11 +151,6 @@ export default function components(React) {
     },
 
     componentDidMount() {
-      this.animationStep = animationStepStaggeredMotion.bind(
-        null,
-        () => this.stopAnimation(),
-        () => this.props,
-      );
       this.startAnimating();
     },
 
@@ -264,12 +158,33 @@ export default function components(React) {
       this.startAnimating();
     },
 
+    animationStep(timestep, state) {
+      const {currentStyles, currentVelocities} = state;
+      const styles = this.props.styles(currentStyles.map(stripStyle));
+
+      const newCurrentStyles = currentStyles.map((currentStyle, i) => {
+        return updateCurrentStyle(timestep, currentStyle, currentVelocities[i], styles[i]);
+      });
+      const newCurrentVelocities = currentStyles.map((currentStyle, i) => {
+        return updateCurrentVelocity(timestep, currentStyle, currentVelocities[i], styles[i]);
+      });
+
+      // TODO: is this right?
+      if (currentVelocities.every((v, k) => noVelocity(v, currentStyles[k])) &&
+          newCurrentVelocities.every((v, k) => noVelocity(v, newCurrentStyles[k]))) {
+        this.stopAnimation();
+      }
+
+      return {
+        currentStyles: newCurrentStyles,
+        currentVelocities: newCurrentVelocities,
+      };
+    },
+
     stopAnimation: null,
 
     // used in animationRender
     hasUnmounted: false,
-
-    animationStep: null,
 
     componentWillUnmount() {
       this.stopAnimation();
@@ -351,11 +266,6 @@ export default function components(React) {
     },
 
     componentDidMount() {
-      this.animationStep = animationStepTransitionMotion.bind(
-        null,
-        () => this.stopAnimation(),
-        () => this.props,
-      );
       this.startAnimating();
     },
 
@@ -363,12 +273,81 @@ export default function components(React) {
       this.startAnimating();
     },
 
+    animationStep(timestep, state) {
+      let {currentStyles, currentVelocities} = state;
+      let {styles, willEnter, willLeave} = this.props;
+
+      if (typeof styles === 'function') {
+        styles = styles(currentStyles);
+      }
+
+      // TODO: huh?
+      let mergedStyles = styles; // set mergedStyles to styles as the default
+      let hasNewKey = false;
+
+      mergedStyles = mergeDiff(
+        currentStyles,
+        styles,
+        // TODO: stop allocating like crazy in this whole code path
+        key => {
+          const res = willLeave(key, currentStyles[key], styles, currentStyles, currentVelocities);
+          if (res == null) {
+            // For legacy reason. We won't allow returning null soon
+            // TODO: remove, after next release
+            return null;
+          }
+
+          if (noVelocity(currentVelocities[key], currentStyles[key]) &&
+              hasReachedStyle(currentStyles[key], res)) {
+            return null;
+          }
+          return res;
+        }
+      );
+
+      Object.keys(mergedStyles)
+        .filter(key => !currentStyles.hasOwnProperty(key))
+        .forEach(key => {
+          hasNewKey = true;
+          const enterStyle = willEnter(key, mergedStyles[key], styles, currentStyles, currentVelocities);
+
+          // We can mutate this here because mergeDiff returns a new Obj
+          mergedStyles[key] = enterStyle;
+
+          currentStyles = {
+            ...currentStyles,
+            [key]: enterStyle,
+          };
+          currentVelocities = {
+            ...currentVelocities,
+            [key]: mapObject(zero, enterStyle),
+          };
+        });
+
+      const newCurrentStyles = mapObject((mergedStyle, key) => {
+        return updateCurrentStyle(timestep, currentStyles[key], currentVelocities[key], mergedStyle);
+      }, mergedStyles);
+      const newCurrentVelocities = mapObject((mergedStyle, key) => {
+        return updateCurrentVelocity(timestep, currentStyles[key], currentVelocities[key], mergedStyle);
+      }, mergedStyles);
+
+      if (!hasNewKey &&
+          everyObj((v, k) => noVelocity(v, currentStyles[k]), currentVelocities) &&
+          everyObj((v, k) => noVelocity(v, newCurrentStyles[k]), newCurrentVelocities)) {
+        // check explanation in `Motion.animationRender`
+        this.stopAnimation(); // Nasty side effects....
+      }
+
+      return {
+        currentStyles: newCurrentStyles,
+        currentVelocities: newCurrentVelocities,
+      };
+    },
+
     stopAnimation: null,
 
     // used in animationRender
     hasUnmounted: false,
-
-    animationStep: null,
 
     componentWillUnmount() {
       this.stopAnimation();
