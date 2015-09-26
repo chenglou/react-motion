@@ -1,40 +1,26 @@
-import isPlainObject from 'lodash.isplainobject';
 import stepper from './stepper';
 
 // TODO: refactor common logic with updateCurrValue and updateCurrVelocity
-export function interpolateValue(alpha, nextValue, prevValue) {
-  if (nextValue == null) {
-    return null;
-  }
-  if (prevValue == null) {
-    return nextValue;
-  }
-  if (typeof nextValue === 'number') {
-    // https://github.com/chenglou/react-motion/pull/57#issuecomment-121924628
-    return nextValue * alpha + prevValue * (1 - alpha);
-  }
-  if (nextValue.val != null && nextValue.config && nextValue.config.length === 0) {
-    return nextValue;
-  }
-  if (nextValue.val != null) {
-    let ret = {
-      val: interpolateValue(alpha, nextValue.val, prevValue.val),
-    };
-    if (nextValue.config) {
-      ret.config = nextValue.config;
+export function interpolateValue(alpha, nextStyle, prevStyle) {
+  // assume nextStyle and prevStyle have same shape
+  let ret = {};
+  for (let key in nextStyle) {
+    if (!nextStyle.hasOwnProperty(key)) {
+      continue;
     }
-    return ret;
+
+    if (!nextStyle[key].config) {
+      ret[key] = nextStyle[key];
+      // not a spring config, not something we want to interpolate
+      continue;
+    }
+    const prevValue = prevStyle[key].config ? prevStyle[key].val : prevStyle[key];
+    ret[key] = {
+      val: nextStyle[key].val * alpha + prevValue * (1 - alpha),
+      config: nextStyle[key].config,
+    };
   }
-  if (Array.isArray(nextValue)) {
-    return nextValue.map((_, i) => interpolateValue(alpha, nextValue[i], prevValue[i]));
-  }
-  if (isPlainObject(nextValue)) {
-    return Object.keys(nextValue).reduce((ret, key) => {
-      ret[key] = interpolateValue(alpha, nextValue[key], prevValue[key]);
-      return ret;
-    }, {});
-  }
-  return nextValue;
+  return ret;
 }
 
 // TODO: refactor common logic with updateCurrentVelocity

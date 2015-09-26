@@ -61,7 +61,6 @@
   "author": "chenglou",
   "license": "MIT",
   "dependencies": {
-    "lodash.isplainobject": "^3.2.0",
     "performance-now": "^0.2.0",
     "raf": "^3.1.0"
   }

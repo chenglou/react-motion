@@ -122,9 +122,6 @@ export default function components(React) {
 
     render() {
       const strippedStyle = stripStyle(this.state.currentStyle);
-      if (Number.isNaN(strippedStyle.x)) {
-        debugger;
-      }
       const renderedChildren = this.props.children(strippedStyle);
       return renderedChildren && React.Children.only(renderedChildren);
     },
@@ -202,12 +199,11 @@ export default function components(React) {
     animationRender(alpha, nextState, prevState) {
       // See comment in Motion.
       if (!this.hasUnmounted) {
+        const currentStyles = nextState.currentStyles.map((style, i) => {
+          return interpolateValue(alpha, style, prevState.currentStyles[i]);
+        });
         this.setState({
-          currentStyles: interpolateValue(
-            alpha,
-            nextState.currentStyles,
-            prevState.currentStyles,
-          ),
+          currentStyles,
           currentVelocities: nextState.currentVelocities,
         });
       }
@@ -365,12 +361,11 @@ export default function components(React) {
     animationRender(alpha, nextState, prevState) {
       // See comment in Motion.
       if (!this.hasUnmounted) {
+        const currentStyles = mapObject((style, key) => {
+          return interpolateValue(alpha, style, prevState.currentStyles[key]);
+        }, nextState.currentStyles);
         this.setState({
-          currentStyles: interpolateValue(
-            alpha,
-            nextState.currentStyles,
-            prevState.currentStyles,
-          ),
+          currentStyles,
           currentVelocities: nextState.currentVelocities,
         });
       }
