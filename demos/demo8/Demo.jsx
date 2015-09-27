@@ -1,5 +1,5 @@
 import React from 'react';
-import {Spring} from '../../src/react-motion';
+import {Motion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 
 function reinsert(arr, from, to) {
@@ -69,43 +69,41 @@ const Demo = React.createClass({
 
   render() {
     const {mouse, isPressed, lastPressed, order} = this.state;
-    const endValue = range(itemsCount).map(i => {
-      if (lastPressed === i && isPressed) {
-        return {
-          scale: {val: 1.1, config: springConfig},
-          shadow: {val: 16, config: springConfig},
-          y: {val: mouse, config: []},
-        };
-      }
-      return {
-        scale: {val: 1, config: springConfig},
-        shadow: {val: 1, config: springConfig},
-        y: {val: order.indexOf(i) * 100, config: springConfig},
-      };
-    });
 
     return (
-      <Spring endValue={endValue}>
-        {items =>
-          <div className="demo8">
-            {items.map(({scale, shadow, y}, n) =>
-              <div
-                key={n}
-                className="demo8-item"
-                onMouseDown={this.handleMouseDown.bind(null, n, y.val)}
-                onTouchStart={this.handleTouchStart.bind(null, n, y.val)}
-                style={{
-                  boxShadow: `rgba(0, 0, 0, 0.2) 0px ${shadow.val}px ${2 * shadow.val}px 0px`,
-                  transform: `translate3d(0, ${y.val}px, 0) scale(${scale.val})`,
-                  WebkitTransform: `translate3d(0, ${y.val}px, 0) scale(${scale.val})`,
-                  zIndex: n === lastPressed ? 99 : n,
-                }}>
-                {order.indexOf(n) + 1}
-              </div>
-            )}
-          </div>
-        }
-      </Spring>
+      <div className="demo8">
+        {range(itemsCount).map(i => {
+          const style = lastPressed === i && isPressed
+            ? {
+                scale: spring(1.1, springConfig),
+                shadow: spring(16, springConfig),
+                y: mouse,
+              }
+            : {
+                scale: spring(1, springConfig),
+                shadow: spring(1, springConfig),
+                y: spring(order.indexOf(i) * 100, springConfig),
+              };
+          return (
+            <Motion style={style} key={i}>
+              {({scale, shadow, y}) =>
+                <div
+                  onMouseDown={this.handleMouseDown.bind(null, i, y)}
+                  onTouchStart={this.handleTouchStart.bind(null, i, y)}
+                  className="demo8-item"
+                  style={{
+                    boxShadow: `rgba(0, 0, 0, 0.2) 0px ${shadow}px ${2 * shadow}px 0px`,
+                    transform: `translate3d(0, ${y}px, 0) scale(${scale})`,
+                    WebkitTransform: `translate3d(0, ${y}px, 0) scale(${scale})`,
+                    zIndex: i === lastPressed ? 99 : i,
+                  }}>
+                  {order.indexOf(i) + 1}
+                </div>
+              }
+            </Motion>
+          );
+        })}
+      </div>
     );
   },
 });
