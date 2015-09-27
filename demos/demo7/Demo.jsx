@@ -1,5 +1,5 @@
 import React from 'react';
-import {TransitionSpring} from '../../src/react-motion';
+import {TransitionMotion, spring} from '../../src/react-motion';
 
 const Demo = React.createClass({
   getInitialState() {
@@ -24,23 +24,23 @@ const Demo = React.createClass({
   willLeave(key, valOfKey) {
     return {
       ...valOfKey,
-      opacity: {val: 0, config: [60, 15]},
-      scale: {val: 2, config: [60, 15]},
+      opacity: spring(0, [60, 15]),
+      scale: spring(2, [60, 15]),
     };
   },
 
   render() {
     const {mouse: [mouseX, mouseY], now} = this.state;
-    const endValue = mouseX == null ? {} : {
+    const styles = mouseX == null ? {} : {
       [now]: {
-        opacity: {val: 1},
-        scale: {val: 0},
-        x: {val: mouseX},
-        y: {val: mouseY},
+        opacity: spring(1),
+        scale: spring(0),
+        x: spring(mouseX),
+        y: spring(mouseY),
       },
     };
     return (
-      <TransitionSpring willLeave={this.willLeave} endValue={endValue}>
+      <TransitionMotion willLeave={this.willLeave} styles={styles}>
         {circles =>
           <div
             onMouseMove={this.handleMouseMove}
@@ -50,18 +50,19 @@ const Demo = React.createClass({
               const {opacity, scale, x, y} = circles[key];
               return (
                 <div
+                  key={key}
                   className="demo7-ball"
                   style={{
-                    opacity: opacity.val,
-                    scale: scale.val,
-                    transform: `translate3d(${x.val}px, ${y.val}px, 0) scale(${scale.val})`,
-                    WebkitTransform: `translate3d(${x.val}px, ${y.val}px, 0) scale(${scale.val})`,
+                    opacity: opacity,
+                    scale: scale,
+                    transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
+                    WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
                 }} />
               );
             })}
           </div>
         }
-      </TransitionSpring>
+      </TransitionMotion>
     );
   },
 });
