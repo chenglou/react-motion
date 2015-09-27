@@ -2,7 +2,11 @@ import stepper from './stepper';
 
 // TODO: refactor common logic with updateCurrValue and updateCurrVelocity
 export function interpolateValue(alpha, nextStyle, prevStyle) {
-  // assume nextStyle and prevStyle have same shape
+  // might be used by a TransitionMotion, where prevStyle might not exist anymore
+  if (!prevStyle) {
+    return nextStyle;
+  }
+
   let ret = {};
   for (let key in nextStyle) {
     if (!nextStyle.hasOwnProperty(key)) {
@@ -20,6 +24,7 @@ export function interpolateValue(alpha, nextStyle, prevStyle) {
       config: nextStyle[key].config,
     };
   }
+
   return ret;
 }
 
