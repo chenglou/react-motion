@@ -41,7 +41,7 @@ export default function components(React) {
     propTypes: {
       // TOOD: warn against putting a config in here
       defaultStyle: PropTypes.object,
-      style: PropTypes.object,
+      style: PropTypes.object.isRequired,
       children: PropTypes.func,
     },
 
