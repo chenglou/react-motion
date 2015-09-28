@@ -117,12 +117,11 @@ const Demo = React.createClass({
     };
   },
 
-  // TODO: change naming
-  willLeave(date, valueThatJustLeft) {
+  willLeave(date, styleThatJustLeft) {
     return {
       height: spring(0),
       opacity: spring(0),
-      data: valueThatJustLeft.data,
+      data: styleThatJustLeft.data,
     };
   },
 
