@@ -56,7 +56,7 @@ export default function components(React) {
       },
       defaultStyle: PropTypes.object,
       style: PropTypes.object.isRequired,
-      children: PropTypes.func,
+      children: PropTypes.func.isRequired,
     },
 
     getInitialState() {
@@ -142,12 +142,23 @@ export default function components(React) {
   });
 
   const StaggeredMotion = React.createClass({
-    // TODO: check props, provide more descriptive warning.
-    // warn against endValue/defaultValue
     propTypes: {
+      defaultStyle: (prop, propName) => {
+        if (prop[propName]) {
+          return new Error(
+            'You forgot the "s" for `StaggeredMotion`\'s `defaultStyles`.'
+          );
+        }
+      },
+      style: (prop, propName) => {
+        if (prop[propName]) {
+          return new Error(
+            'You forgot the "s" for `StaggeredMotion`\'s `styles`.'
+          );
+        }
+      },
       // TOOD: warn against putting configs in here
       defaultStyles: PropTypes.arrayOf(PropTypes.object),
-      // TODO: warn for endValue
       styles: PropTypes.func.isRequired,
       children: PropTypes.func.isRequired,
     },
@@ -249,9 +260,22 @@ export default function components(React) {
           );
         }
       },
+      defaultStyle: (prop, propName) => {
+        if (prop[propName]) {
+          return new Error(
+            'You forgot the "s" for `TransitionMotion`\'s `defaultStyles`.'
+          );
+        }
+      },
+      style: (prop, propName) => {
+        if (prop[propName]) {
+          return new Error(
+            'You forgot the "s" for `TransitionMotion`\'s `styles`.'
+          );
+        }
+      },
       // TOOD: warn against putting configs in here
       defaultStyles: PropTypes.objectOf(PropTypes.any),
-      // TODO: warn for style
       styles: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.objectOf(PropTypes.any.isRequired),
