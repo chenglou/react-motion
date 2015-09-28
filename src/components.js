@@ -36,10 +36,24 @@ export default function components(React) {
   const {PropTypes} = React;
 
   const Motion = React.createClass({
-    // TODO: check props, provide more descriptive warning.
-    // warn against endValue/defaultValue
     propTypes: {
       // TOOD: warn against putting a config in here
+      defaultValue: (prop, propName) => {
+        if (prop[propName]) {
+          return new Error(
+            'Spring\'s `defaultValue` has been changed to `defaultStyle`. ' +
+            'Its format received a few (easy to update!) changes as well.'
+          );
+        }
+      },
+      endValue: (prop, propName) => {
+        if (prop[propName]) {
+          return new Error(
+            'Spring\'s `endValue` has been changed to `style`. Its format ' +
+            'received a few (easy to update!) changes as well.'
+          );
+        }
+      },
       defaultStyle: PropTypes.object,
       style: PropTypes.object.isRequired,
       children: PropTypes.func,
@@ -218,6 +232,23 @@ export default function components(React) {
 
   const TransitionMotion = React.createClass({
     propTypes: {
+      defaultValue: (prop, propName) => {
+        if (prop[propName]) {
+          return new Error(
+            'TransitionSpring\'s `defaultValue` has been changed to ' +
+            '`defaultStyles`. Its format received a few (easy to update!) ' +
+            'changes as well.'
+          );
+        }
+      },
+      endValue: (prop, propName) => {
+        if (prop[propName]) {
+          return new Error(
+            'TransitionSpring\'s `endValue` has been changed to `styles`. ' +
+            'Its format received a few (easy to update!) changes as well.'
+          );
+        }
+      },
       // TOOD: warn against putting configs in here
       defaultStyles: PropTypes.objectOf(PropTypes.any),
       // TODO: warn for style
@@ -247,7 +278,6 @@ export default function components(React) {
       let currentStyles;
       if (defaultStyles == null) {
         if (typeof styles === 'function') {
-          // TODO: stagger this?
           currentStyles = styles();
         } else {
           currentStyles = styles;
