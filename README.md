@@ -26,7 +26,7 @@ Bower:
 `<script src="path/to/react-motion/build/react-motion.js"></script>`
 (Module exposed as `ReactMotion`)
 
-Or build it yourself from the repo: `git clone https://github.com/chenglou/react-motion.git && npm i && npm run prerelease`
+Or build it yourself from the repo: `git clone https://github.com/chenglou/react-motion.git && cd react-motion && npm i && npm run prerelease`
 
 **For React-native**, instead of `require('react-motion')`, do `require('react-motion/native')`.
 
