@@ -19,6 +19,7 @@
     "eslint-plugin-react": "^2.7.0",
     "inject-loader": "^2.0.1",
     "isparta-loader": "^0.2.0",
+    "jasmine-core": "^2.3.4",
     "karma": "^0.12.37",
     "karma-coverage": "^0.4.2",
     "karma-jasmine": "^0.3.6",
