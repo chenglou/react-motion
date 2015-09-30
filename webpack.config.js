@@ -45,7 +45,8 @@ module.exports = {
   output: {
     filename: '[name]/all.js',
     publicPath: '/demos/',
-    path: __dirname + '/demos/'
+    path: __dirname + '/demos/',
+    libraryTarget: 'umd'
   },
   module: {
     loaders: [{
@@ -61,5 +62,13 @@ module.exports = {
     extensions: ['', '.js', '.jsx']
   },
   plugins: plugins,
-  eslint: {configFile: '.eslintrc'}
+  eslint: {configFile: '.eslintrc'},
+  externals: {
+    react: {
+      root: 'React',
+      commonjs2: 'react',
+      commonjs: 'react',
+      amd: 'react'
+    },
+  },
 };
