@@ -33,14 +33,14 @@ Or build it yourself from the repo: `git clone https://github.com/chenglou/react
 _(P.S. Don't forget to compile for production when you test your animation's performance!)_
 
 ## Demos
-- [Simple Transition](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo0/index.html)
-- [Chat Heads](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo1/index.html)
-- [Draggable Balls](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo2/index.html)
-- [TodoMVC List Transition](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo3/index.html)
-- [Photo Gallery](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo4/index.html)
-- [Spring Parameters Chooser](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo5/index.html)
-- [Water Ripples](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo7/index.html)
-- [Draggable List](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo8/index.html)
+- [Simple Transition](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo0/index.html)
+- [Chat Heads](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo1/index.html)
+- [Draggable Balls](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo2/index.html)
+- [TodoMVC List Transition](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo3/index.html)
+- [Photo Gallery](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo4/index.html)
+- [Spring Parameters Chooser](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo5/index.html)
+- [Water Ripples](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo7/index.html)
+- [Draggable List](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo8/index.html)
 
 ## What does this library try to solve?
 
@@ -213,7 +213,7 @@ const Demo = React.createClass({
 ```
 
 ### `presets`
-Some tasteful, commonly used spring presets you can plug into your `style` like so: `{val: 10, config: presets.wobbly}`. [See here](https://github.com/chenglou/react-motion/blob/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/src/presets.js).
+Some tasteful, commonly used spring presets you can plug into your `style` like so: `{val: 10, config: presets.wobbly}`. [See here](https://github.com/chenglou/react-motion/blob/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/src/presets.js).
 
 ### `utils`
 Since `TransitionMotion` dictates `styles` to be an object, manipulating keys could be a little more tedious than manipulating arrays. Here are the common scenarios' solutions:
@@ -233,7 +233,7 @@ Since `TransitionMotion` dictates `styles` to be an object, manipulating keys co
 
 - How do I set the duration of my animation?
 
-[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](https://cdn.rawgit.com/chenglou/react-motion/e8f42dcd9678a8cea8648a3cf4f994583a99e7f7/demos/demo5/index.html) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
+[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo5/index.html) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
 
 - How do I unmount the `TransitionMotion` container itself?
 
