@@ -35,7 +35,7 @@
   },
   "scripts": {
     "start": "NODE_ENV=development node server.js",
-    "build-demos": "NODE_ENV=production webpack -p",
+    "build-demos": "NODE_ENV=production webpack",
     "lint": "eslint --ext .js,.jsx .",
     "prerelease": "babel src --out-dir lib && babel native/non-compiled.js > native/index.js && NODE_ENV=production webpack --config webpack.prod.config.js",
     "karma": "NODE_ENV=development karma start ./karma.conf.js",
