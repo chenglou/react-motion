@@ -3,6 +3,7 @@ var webpack = require('webpack');
 var loaders = ['babel'];
 var port = process.env.PORT || 3000;
 
+var devtool;
 var plugins = [
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
@@ -21,7 +22,7 @@ var entry = {
 };
 
 if (process.env.NODE_ENV === 'development') {
-  devtool = 'eval-source-map';
+  devtool ='eval-source-map';
   loaders = ['react-hot'].concat(loaders);
   plugins = plugins.concat([
     new webpack.HotModuleReplacementPlugin()
@@ -35,18 +36,19 @@ if (process.env.NODE_ENV === 'development') {
     return result;
   }, {});
 } else {
+  devtool ='source-map';
   plugins = plugins.concat([
     new webpack.optimize.OccurenceOrderPlugin()
   ]);
 }
 
 module.exports = {
+  devtool: devtool,
   entry: entry,
   output: {
     filename: '[name]/all.js',
     publicPath: '/demos/',
     path: __dirname + '/demos/',
-    libraryTarget: 'umd'
   },
   module: {
     loaders: [{
@@ -63,12 +65,4 @@ module.exports = {
   },
   plugins: plugins,
   eslint: {configFile: '.eslintrc'},
-  externals: {
-    react: {
-      root: 'React',
-      commonjs2: 'react',
-      commonjs: 'react',
-      amd: 'react'
-    },
-  },
 };

@@ -34,10 +34,7 @@
     "webpack-dev-server": "^1.10.1"
   },
   "scripts": {
-    "copy-react": "cp -f ./node_modules/react/dist/react.min.js ./demos/",
-    "prestart": "npm run copy-react -s",
     "start": "NODE_ENV=development node server.js",
-    "prebuild-demos": "npm run copy-react -s",
     "build-demos": "NODE_ENV=production webpack",
     "lint": "eslint --ext .js,.jsx .",
     "prerelease": "babel src --out-dir lib && babel native/non-compiled.js > native/index.js && NODE_ENV=production webpack --config webpack.prod.config.js",
