@@ -7,7 +7,7 @@
 		exports["ReactMotion"] = factory(require("react"));
 	else
 		root["ReactMotion"] = factory(root["React"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_3__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -60,16 +60,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _reorderKeys = __webpack_require__(1);
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _components2 = __webpack_require__(2);
+	
+	var _components3 = _interopRequireDefault(_components2);
+	
+	var _reorderKeys = __webpack_require__(15);
 	
 	var _reorderKeys2 = _interopRequireDefault(_reorderKeys);
 	
-	var _Spring = __webpack_require__(2);
+	var _components = _components3['default'](_react2['default']);
 	
-	exports.Spring = _Spring.Spring;
-	exports.TransitionSpring = _Spring.TransitionSpring;
+	var Spring = _components.Spring;
+	var TransitionSpring = _components.TransitionSpring;
+	var Motion = _components.Motion;
+	var StaggeredMotion = _components.StaggeredMotion;
+	var TransitionMotion = _components.TransitionMotion;
+	exports.Spring = Spring;
+	exports.TransitionSpring = TransitionSpring;
+	exports.Motion = Motion;
+	exports.StaggeredMotion = StaggeredMotion;
+	exports.TransitionMotion = TransitionMotion;
 	
-	var _presets2 = __webpack_require__(21);
+	var _spring2 = __webpack_require__(16);
+	
+	var _spring3 = _interopRequireDefault(_spring2);
+	
+	exports.spring = _spring3['default'];
+	
+	var _presets2 = __webpack_require__(17);
 	
 	var _presets3 = _interopRequireDefault(_presets2);
 	
@@ -83,50 +105,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports) {
 
-	"use strict";
-	
-	exports.__esModule = true;
-	exports["default"] = reorderKeys;
-	
-	function reorderKeys(obj, f) {
-	  var newKeys = f(Object.keys(obj));
-	  var ret = {};
-	  for (var i = 0; i < newKeys.length; i++) {
-	    var key = newKeys[i];
-	    ret[key] = obj[key];
-	  }
-	
-	  return ret;
-	}
-	
-	module.exports = exports["default"];
+	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
 /***/ },
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _react = __webpack_require__(3);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _components = __webpack_require__(4);
-	
-	var _components2 = _interopRequireDefault(_components);
-	
-	module.exports = _components2['default'](_react2['default']);
-
-/***/ },
-/* 3 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
-
-/***/ },
-/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -139,140 +121,97 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _mapTree = __webpack_require__(5);
-	
-	var _mapTree2 = _interopRequireDefault(_mapTree);
-	
-	var _noVelocity = __webpack_require__(11);
+	var _noVelocity = __webpack_require__(3);
 	
 	var _noVelocity2 = _interopRequireDefault(_noVelocity);
 	
-	var _compareTrees = __webpack_require__(12);
+	var _hasReachedStyle = __webpack_require__(4);
 	
-	var _compareTrees2 = _interopRequireDefault(_compareTrees);
+	var _hasReachedStyle2 = _interopRequireDefault(_hasReachedStyle);
 	
-	var _mergeDiff = __webpack_require__(13);
+	var _mergeDiff = __webpack_require__(5);
 	
 	var _mergeDiff2 = _interopRequireDefault(_mergeDiff);
 	
-	var _animationLoop = __webpack_require__(14);
+	var _animationLoop = __webpack_require__(6);
 	
 	var _animationLoop2 = _interopRequireDefault(_animationLoop);
 	
-	var _zero = __webpack_require__(18);
+	var _zero = __webpack_require__(10);
 	
 	var _zero2 = _interopRequireDefault(_zero);
 	
-	var _updateTree = __webpack_require__(19);
+	var _updateTree = __webpack_require__(11);
+	
+	var _deprecatedSprings2 = __webpack_require__(13);
+	
+	var _deprecatedSprings3 = _interopRequireDefault(_deprecatedSprings2);
+	
+	var _stripStyle = __webpack_require__(14);
+	
+	var _stripStyle2 = _interopRequireDefault(_stripStyle);
 	
 	var startAnimation = _animationLoop2['default']();
 	
-	function animationStep(shouldMerge, stopAnimation, getProps, timestep, state) {
-	  var currValue = state.currValue;
-	  var currVelocity = state.currVelocity;
-	
-	  var _getProps = getProps();
-	
-	  var willEnter = _getProps.willEnter;
-	  var willLeave = _getProps.willLeave;
-	  var endValue = _getProps.endValue;
-	
-	  if (typeof endValue === 'function') {
-	    endValue = endValue(currValue);
+	function mapObject(f, obj) {
+	  var ret = {};
+	  for (var key in obj) {
+	    if (!obj.hasOwnProperty(key)) {
+	      continue;
+	    }
+	    ret[key] = f(obj[key], key);
 	  }
+	  return ret;
+	}
 	
-	  var mergedValue = endValue; // set mergedValue to endValue as the default
-	  var hasNewKey = false;
-	
-	  if (shouldMerge) {
-	    mergedValue = _mergeDiff2['default'](currValue, endValue,
-	    // TODO: stop allocating like crazy in this whole code path
-	    function (key) {
-	      var res = willLeave(key, currValue[key], endValue, currValue, currVelocity);
-	      if (res == null) {
-	        // For legacy reason. We won't allow returning null soon
-	        // TODO: remove, after next release
-	        return null;
-	      }
-	
-	      if (_noVelocity2['default'](currVelocity[key]) && _compareTrees2['default'](currValue[key], res)) {
-	        return null;
-	      }
-	      return res;
-	    });
-	
-	    Object.keys(mergedValue).filter(function (key) {
-	      return !currValue.hasOwnProperty(key);
-	    }).forEach(function (key) {
-	      var _extends2, _extends3;
-	
-	      hasNewKey = true;
-	      var enterValue = willEnter(key, mergedValue[key], endValue, currValue, currVelocity);
-	
-	      // We can mutate this here because mergeDiff returns a new Obj
-	      mergedValue[key] = enterValue;
-	
-	      currValue = _extends({}, currValue, (_extends2 = {}, _extends2[key] = enterValue, _extends2));
-	      currVelocity = _extends({}, currVelocity, (_extends3 = {}, _extends3[key] = _mapTree2['default'](_zero2['default'], enterValue), _extends3));
-	    });
+	function everyObj(f, obj) {
+	  for (var key in obj) {
+	    if (!obj.hasOwnProperty(key)) {
+	      continue;
+	    }
+	    if (!f(obj[key], key)) {
+	      return false;
+	    }
 	  }
-	  var newCurrValue = _updateTree.updateCurrValue(timestep, currValue, currVelocity, mergedValue);
-	  var newCurrVelocity = _updateTree.updateCurrVelocity(timestep, currValue, currVelocity, mergedValue);
-	
-	  if (!hasNewKey && _noVelocity2['default'](currVelocity) && _noVelocity2['default'](newCurrVelocity)) {
-	    // check explanation in `Spring.animationRender`
-	    stopAnimation(); // Nasty side effects....
-	  }
-	
-	  return {
-	    currValue: newCurrValue,
-	    currVelocity: newCurrVelocity
-	  };
+	  return true;
 	}
 	
 	function components(React) {
 	  var PropTypes = React.PropTypes;
 	
-	  var Spring = React.createClass({
-	    displayName: 'Spring',
+	  var Motion = React.createClass({
+	    displayName: 'Motion',
 	
 	    propTypes: {
-	      defaultValue: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.number]),
-	      endValue: PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.array, PropTypes.number]).isRequired,
+	      // TOOD: warn against putting a config in here
+	      defaultValue: function defaultValue(prop, propName) {
+	        if (prop[propName]) {
+	          return new Error('Spring\'s `defaultValue` has been changed to `defaultStyle`. ' + 'Its format received a few (easy to update!) changes as well.');
+	        }
+	      },
+	      endValue: function endValue(prop, propName) {
+	        if (prop[propName]) {
+	          return new Error('Spring\'s `endValue` has been changed to `style`. Its format ' + 'received a few (easy to update!) changes as well.');
+	        }
+	      },
+	      defaultStyle: PropTypes.object,
+	      style: PropTypes.object.isRequired,
 	      children: PropTypes.func.isRequired
 	    },
 	
 	    getInitialState: function getInitialState() {
 	      var _props = this.props;
-	      var endValue = _props.endValue;
-	      var defaultValue = _props.defaultValue;
+	      var defaultStyle = _props.defaultStyle;
+	      var style = _props.style;
 	
-	      var currValue = undefined;
-	      if (defaultValue == null) {
-	        if (typeof endValue === 'function') {
-	          // TODO: provide perf tip here when endValue argument count is 0
-	          // (meaning you could have passed an obj)
-	          currValue = endValue();
-	        } else {
-	          currValue = endValue;
-	        }
-	      } else {
-	        currValue = defaultValue;
-	      }
+	      var currentStyle = defaultStyle || style;
 	      return {
-	        currValue: currValue,
-	        currVelocity: _mapTree2['default'](_zero2['default'], currValue)
+	        currentStyle: currentStyle,
+	        currentVelocity: mapObject(_zero2['default'], currentStyle)
 	      };
 	    },
 	
 	    componentDidMount: function componentDidMount() {
-	      var _this = this;
-	
-	      this.animationStep = animationStep.bind(null, false, function () {
-	        return _this.stopAnimation();
-	      }, function () {
-	        return _this.props;
-	      });
 	      this.startAnimating();
 	    },
 	
@@ -280,12 +219,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.startAnimating();
 	    },
 	
+	    animationStep: function animationStep(timestep, state) {
+	      var currentStyle = state.currentStyle;
+	      var currentVelocity = state.currentVelocity;
+	      var style = this.props.style;
+	
+	      var newCurrentStyle = _updateTree.updateCurrentStyle(timestep, currentStyle, currentVelocity, style);
+	      var newCurrentVelocity = _updateTree.updateCurrentVelocity(timestep, currentStyle, currentVelocity, style);
+	
+	      // TOOD: this isn't necessary anymore. It was used only against endValue func
+	      if (_noVelocity2['default'](currentVelocity, newCurrentStyle) && _noVelocity2['default'](newCurrentVelocity, newCurrentStyle)) {
+	        // check explanation in `Motion.animationRender`
+	        this.stopAnimation(); // Nasty side effects....
+	      }
+	
+	      return {
+	        currentStyle: newCurrentStyle,
+	        currentVelocity: newCurrentVelocity
+	      };
+	    },
+	
 	    stopAnimation: null,
 	
 	    // used in animationRender
 	    hasUnmounted: false,
-	
-	    animationStep: null,
 	
 	    componentWillUnmount: function componentWillUnmount() {
 	      this.stopAnimation();
@@ -299,44 +256,158 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    animationRender: function animationRender(alpha, nextState, prevState) {
 	      // `this.hasUnmounted` might be true in the following condition:
-	      // user does some checks in `endValue` and calls an owner handler
+	      // user does some checks in `style` and calls an owner handler
 	      // owner sets state in the callback, triggering a re-render
-	      // re-render unmounts the Spring
+	      // unmounts Motion
 	      if (!this.hasUnmounted) {
 	        this.setState({
-	          currValue: _updateTree.interpolateValue(alpha, nextState.currValue, prevState.currValue),
-	          currVelocity: nextState.currVelocity
+	          currentStyle: _updateTree.interpolateValue(alpha, nextState.currentStyle, prevState.currentStyle),
+	          currentVelocity: nextState.currentVelocity
 	        });
 	      }
 	    },
 	
 	    render: function render() {
-	      var renderedChildren = this.props.children(this.state.currValue);
+	      var strippedStyle = _stripStyle2['default'](this.state.currentStyle);
+	      var renderedChildren = this.props.children(strippedStyle);
 	      return renderedChildren && React.Children.only(renderedChildren);
 	    }
 	  });
 	
-	  // TODO: warn when obj uses numerical keys
-	  // TODO: warn when endValue doesn't contain a val
-	  var TransitionSpring = React.createClass({
-	    displayName: 'TransitionSpring',
+	  var StaggeredMotion = React.createClass({
+	    displayName: 'StaggeredMotion',
 	
 	    propTypes: {
-	      defaultValue: PropTypes.objectOf(PropTypes.any),
-	      endValue: PropTypes.oneOfType([PropTypes.func, PropTypes.objectOf(PropTypes.any.isRequired)]).
-	      // PropTypes.arrayOf(PropTypes.shape({
-	      //   key: PropTypes.any.isRequired,
-	      // })),
-	      // PropTypes.arrayOf(PropTypes.element),
-	      isRequired,
+	      defaultStyle: function defaultStyle(prop, propName) {
+	        if (prop[propName]) {
+	          return new Error('You forgot the "s" for `StaggeredMotion`\'s `defaultStyles`.');
+	        }
+	      },
+	      style: function style(prop, propName) {
+	        if (prop[propName]) {
+	          return new Error('You forgot the "s" for `StaggeredMotion`\'s `styles`.');
+	        }
+	      },
+	      // TOOD: warn against putting configs in here
+	      defaultStyles: PropTypes.arrayOf(PropTypes.object),
+	      styles: PropTypes.func.isRequired,
+	      children: PropTypes.func.isRequired
+	    },
+	
+	    getInitialState: function getInitialState() {
+	      var _props2 = this.props;
+	      var styles = _props2.styles;
+	      var defaultStyles = _props2.defaultStyles;
+	
+	      var currentStyles = defaultStyles ? defaultStyles : styles();
+	      return {
+	        currentStyles: currentStyles,
+	        currentVelocities: currentStyles.map(function (s) {
+	          return mapObject(_zero2['default'], s);
+	        })
+	      };
+	    },
+	
+	    componentDidMount: function componentDidMount() {
+	      this.startAnimating();
+	    },
+	
+	    componentWillReceiveProps: function componentWillReceiveProps() {
+	      this.startAnimating();
+	    },
+	
+	    animationStep: function animationStep(timestep, state) {
+	      var currentStyles = state.currentStyles;
+	      var currentVelocities = state.currentVelocities;
+	
+	      var styles = this.props.styles(currentStyles.map(_stripStyle2['default']));
+	
+	      var newCurrentStyles = currentStyles.map(function (currentStyle, i) {
+	        return _updateTree.updateCurrentStyle(timestep, currentStyle, currentVelocities[i], styles[i]);
+	      });
+	      var newCurrentVelocities = currentStyles.map(function (currentStyle, i) {
+	        return _updateTree.updateCurrentVelocity(timestep, currentStyle, currentVelocities[i], styles[i]);
+	      });
+	
+	      // TODO: is this right?
+	      if (currentVelocities.every(function (v, k) {
+	        return _noVelocity2['default'](v, currentStyles[k]);
+	      }) && newCurrentVelocities.every(function (v, k) {
+	        return _noVelocity2['default'](v, newCurrentStyles[k]);
+	      })) {
+	        this.stopAnimation();
+	      }
+	
+	      return {
+	        currentStyles: newCurrentStyles,
+	        currentVelocities: newCurrentVelocities
+	      };
+	    },
+	
+	    stopAnimation: null,
+	
+	    // used in animationRender
+	    hasUnmounted: false,
+	
+	    componentWillUnmount: function componentWillUnmount() {
+	      this.stopAnimation();
+	      this.hasUnmounted = true;
+	    },
+	
+	    startAnimating: function startAnimating() {
+	      this.stopAnimation = startAnimation(this.state, this.animationStep, this.animationRender);
+	    },
+	
+	    animationRender: function animationRender(alpha, nextState, prevState) {
+	      // See comment in Motion.
+	      if (!this.hasUnmounted) {
+	        var currentStyles = nextState.currentStyles.map(function (style, i) {
+	          return _updateTree.interpolateValue(alpha, style, prevState.currentStyles[i]);
+	        });
+	        this.setState({
+	          currentStyles: currentStyles,
+	          currentVelocities: nextState.currentVelocities
+	        });
+	      }
+	    },
+	
+	    render: function render() {
+	      var strippedStyle = this.state.currentStyles.map(_stripStyle2['default']);
+	      var renderedChildren = this.props.children(strippedStyle);
+	      return renderedChildren && React.Children.only(renderedChildren);
+	    }
+	  });
+	
+	  var TransitionMotion = React.createClass({
+	    displayName: 'TransitionMotion',
+	
+	    propTypes: {
+	      defaultValue: function defaultValue(prop, propName) {
+	        if (prop[propName]) {
+	          return new Error('TransitionSpring\'s `defaultValue` has been changed to ' + '`defaultStyles`. Its format received a few (easy to update!) ' + 'changes as well.');
+	        }
+	      },
+	      endValue: function endValue(prop, propName) {
+	        if (prop[propName]) {
+	          return new Error('TransitionSpring\'s `endValue` has been changed to `styles`. ' + 'Its format received a few (easy to update!) changes as well.');
+	        }
+	      },
+	      defaultStyle: function defaultStyle(prop, propName) {
+	        if (prop[propName]) {
+	          return new Error('You forgot the "s" for `TransitionMotion`\'s `defaultStyles`.');
+	        }
+	      },
+	      style: function style(prop, propName) {
+	        if (prop[propName]) {
+	          return new Error('You forgot the "s" for `TransitionMotion`\'s `styles`.');
+	        }
+	      },
+	      // TOOD: warn against putting configs in here
+	      defaultStyles: PropTypes.objectOf(PropTypes.any),
+	      styles: PropTypes.oneOfType([PropTypes.func, PropTypes.objectOf(PropTypes.any.isRequired)]).isRequired,
 	      willLeave: PropTypes.oneOfType([PropTypes.func]),
-	
-	      // PropTypes.object,
-	      // PropTypes.array,
+	      // TOOD: warn against putting configs in here
 	      willEnter: PropTypes.oneOfType([PropTypes.func]),
-	
-	      // PropTypes.object,
-	      // PropTypes.array,
 	      children: PropTypes.func.isRequired
 	    },
 	
@@ -352,34 +423,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    getInitialState: function getInitialState() {
-	      var _props2 = this.props;
-	      var endValue = _props2.endValue;
-	      var defaultValue = _props2.defaultValue;
+	      var _props3 = this.props;
+	      var styles = _props3.styles;
+	      var defaultStyles = _props3.defaultStyles;
 	
-	      var currValue = undefined;
-	      if (defaultValue == null) {
-	        if (typeof endValue === 'function') {
-	          currValue = endValue();
+	      var currentStyles = undefined;
+	      if (defaultStyles == null) {
+	        if (typeof styles === 'function') {
+	          currentStyles = styles();
 	        } else {
-	          currValue = endValue;
+	          currentStyles = styles;
 	        }
 	      } else {
-	        currValue = defaultValue;
+	        currentStyles = defaultStyles;
 	      }
 	      return {
-	        currValue: currValue,
-	        currVelocity: _mapTree2['default'](_zero2['default'], currValue)
+	        currentStyles: currentStyles,
+	        currentVelocities: mapObject(function (s) {
+	          return mapObject(_zero2['default'], s);
+	        }, currentStyles)
 	      };
 	    },
 	
 	    componentDidMount: function componentDidMount() {
-	      var _this2 = this;
-	
-	      this.animationStep = animationStep.bind(null, true, function () {
-	        return _this2.stopAnimation();
-	      }, function () {
-	        return _this2.props;
-	      });
 	      this.startAnimating();
 	    },
 	
@@ -387,15 +453,83 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.startAnimating();
 	    },
 	
+	    animationStep: function animationStep(timestep, state) {
+	      var currentStyles = state.currentStyles;
+	      var currentVelocities = state.currentVelocities;
+	      var _props4 = this.props;
+	      var styles = _props4.styles;
+	      var willEnter = _props4.willEnter;
+	      var willLeave = _props4.willLeave;
+	
+	      if (typeof styles === 'function') {
+	        styles = styles(currentStyles);
+	      }
+	
+	      // TODO: huh?
+	      var mergedStyles = styles; // set mergedStyles to styles as the default
+	      var hasNewKey = false;
+	
+	      mergedStyles = _mergeDiff2['default'](currentStyles, styles,
+	      // TODO: stop allocating like crazy in this whole code path
+	      function (key) {
+	        var res = willLeave(key, currentStyles[key], styles, currentStyles, currentVelocities);
+	        if (res == null) {
+	          // For legacy reason. We won't allow returning null soon
+	          // TODO: remove, after next release
+	          return null;
+	        }
+	
+	        if (_noVelocity2['default'](currentVelocities[key], currentStyles[key]) && _hasReachedStyle2['default'](currentStyles[key], res)) {
+	          return null;
+	        }
+	        return res;
+	      });
+	
+	      Object.keys(mergedStyles).filter(function (key) {
+	        return !currentStyles.hasOwnProperty(key);
+	      }).forEach(function (key) {
+	        var _extends2, _extends3;
+	
+	        hasNewKey = true;
+	        var enterStyle = willEnter(key, mergedStyles[key], styles, currentStyles, currentVelocities);
+	
+	        // We can mutate this here because mergeDiff returns a new Obj
+	        mergedStyles[key] = enterStyle;
+	
+	        currentStyles = _extends({}, currentStyles, (_extends2 = {}, _extends2[key] = enterStyle, _extends2));
+	        currentVelocities = _extends({}, currentVelocities, (_extends3 = {}, _extends3[key] = mapObject(_zero2['default'], enterStyle), _extends3));
+	      });
+	
+	      var newCurrentStyles = mapObject(function (mergedStyle, key) {
+	        return _updateTree.updateCurrentStyle(timestep, currentStyles[key], currentVelocities[key], mergedStyle);
+	      }, mergedStyles);
+	      var newCurrentVelocities = mapObject(function (mergedStyle, key) {
+	        return _updateTree.updateCurrentVelocity(timestep, currentStyles[key], currentVelocities[key], mergedStyle);
+	      }, mergedStyles);
+	
+	      if (!hasNewKey && everyObj(function (v, k) {
+	        return _noVelocity2['default'](v, currentStyles[k]);
+	      }, currentVelocities) && everyObj(function (v, k) {
+	        return _noVelocity2['default'](v, newCurrentStyles[k]);
+	      }, newCurrentVelocities)) {
+	        // check explanation in `Motion.animationRender`
+	        this.stopAnimation(); // Nasty side effects....
+	      }
+	
+	      return {
+	        currentStyles: newCurrentStyles,
+	        currentVelocities: newCurrentVelocities
+	      };
+	    },
+	
 	    stopAnimation: null,
 	
 	    // used in animationRender
 	    hasUnmounted: false,
 	
-	    animationStep: null,
-	
 	    componentWillUnmount: function componentWillUnmount() {
 	      this.stopAnimation();
+	      this.hasUnmounted = true;
 	    },
 	
 	    startAnimating: function startAnimating() {
@@ -403,783 +537,95 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	
 	    animationRender: function animationRender(alpha, nextState, prevState) {
-	      // See comment in Spring.
+	      // See comment in Motion.
 	      if (!this.hasUnmounted) {
+	        var currentStyles = mapObject(function (style, key) {
+	          return _updateTree.interpolateValue(alpha, style, prevState.currentStyles[key]);
+	        }, nextState.currentStyles);
 	        this.setState({
-	          currValue: _updateTree.interpolateValue(alpha, nextState.currValue, prevState.currValue),
-	          currVelocity: nextState.currVelocity
+	          currentStyles: currentStyles,
+	          currentVelocities: nextState.currentVelocities
 	        });
 	      }
 	    },
 	
 	    render: function render() {
-	      var renderedChildren = this.props.children(this.state.currValue);
+	      var strippedStyle = mapObject(_stripStyle2['default'], this.state.currentStyles);
+	      var renderedChildren = this.props.children(strippedStyle);
 	      return renderedChildren && React.Children.only(renderedChildren);
 	    }
 	  });
 	
-	  return { Spring: Spring, TransitionSpring: TransitionSpring };
+	  var _deprecatedSprings = _deprecatedSprings3['default'](React);
+	
+	  var Spring = _deprecatedSprings.Spring;
+	  var TransitionSpring = _deprecatedSprings.TransitionSpring;
+	
+	  return { Spring: Spring, TransitionSpring: TransitionSpring, Motion: Motion, StaggeredMotion: StaggeredMotion, TransitionMotion: TransitionMotion };
 	}
 	
 	module.exports = exports['default'];
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	// currentStyle keeps the info about whether a prop is configured as a spring
+	// or if it's just a random prop that happens to be present on the style
+	"use strict";
+	
+	exports.__esModule = true;
+	exports["default"] = noVelocity;
+	
+	function noVelocity(currentVelocity, currentStyle) {
+	  for (var key in currentVelocity) {
+	    if (!currentVelocity.hasOwnProperty(key)) {
+	      continue;
+	    }
+	    if (currentStyle[key].config && currentVelocity[key] !== 0) {
+	      return false;
+	    }
+	  }
+	  return true;
+	}
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	exports["default"] = hasReachedStyle;
+	
+	function hasReachedStyle(currentStyle, style) {
+	  for (var key in style) {
+	    if (!style.hasOwnProperty(key)) {
+	      continue;
+	    }
+	    var currentValue = currentStyle[key];
+	    var destValue = style[key];
+	    if (!destValue.config) {
+	      // not a spring config
+	      continue;
+	    }
+	    if (currentValue.config && currentValue.val !== destValue.val) {
+	      return false;
+	    }
+	    if (!currentValue.config && currentValue !== destValue.val) {
+	      return false;
+	    }
+	  }
+	
+	  return true;
+	}
+	
+	module.exports = exports["default"];
 
 /***/ },
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	exports.__esModule = true;
-	exports['default'] = mapTree;
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _lodashIsplainobject = __webpack_require__(6);
-	
-	// currenly a helper used for producing a tree of the same shape as the
-	// input(s),  but with different values. It's technically not a real `map`
-	// equivalent for trees, since it skips calling f on non-numbers.
-	
-	// TODO: probably doesn't need path, stop allocating uselessly
-	// TODO: don't need to map over many trees anymore
-	// TODO: skipping non-numbers is weird and non-generic. Use pre-order traversal
-	// assume trees are of the same shape
-	
-	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
-	
-	function _mapTree(path, f, trees) {
-	  var t1 = trees[0];
-	  if (typeof t1 === 'number') {
-	    return f.apply(undefined, [path].concat(trees));
-	  }
-	  if (Array.isArray(t1)) {
-	    return t1.map(function (_, i) {
-	      return _mapTree([].concat(path, [i]), f, trees.map(function (val) {
-	        return val[i];
-	      }));
-	    });
-	  }
-	  if (_lodashIsplainobject2['default'](t1)) {
-	    return Object.keys(t1).reduce(function (newTree, key) {
-	      newTree[key] = _mapTree([].concat(path, [key]), f, trees.map(function (val) {
-	        return val[key];
-	      }));
-	      return newTree;
-	    }, {});
-	  }
-	  // return last one just because
-	  return trees[trees.length - 1];
-	}
-	
-	function mapTree(f) {
-	  for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	    rest[_key - 1] = arguments[_key];
-	  }
-	
-	  return _mapTree([], f, rest);
-	}
-	
-	module.exports = exports['default'];
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * lodash 3.2.0 (Custom Build) <https://lodash.com/>
-	 * Build: `lodash modern modularize exports="npm" -o ./`
-	 * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
-	 */
-	'use strict';
-	
-	var baseFor = __webpack_require__(7),
-	    isArguments = __webpack_require__(8),
-	    keysIn = __webpack_require__(9);
-	
-	/** `Object#toString` result references. */
-	var objectTag = '[object Object]';
-	
-	/**
-	 * Checks if `value` is object-like.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-	 */
-	function isObjectLike(value) {
-	  return !!value && typeof value == 'object';
-	}
-	
-	/** Used for native method references. */
-	var objectProto = Object.prototype;
-	
-	/** Used to check objects for own properties. */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-	
-	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var objToString = objectProto.toString;
-	
-	/**
-	 * The base implementation of `_.forIn` without support for callback
-	 * shorthands and `this` binding.
-	 *
-	 * @private
-	 * @param {Object} object The object to iterate over.
-	 * @param {Function} iteratee The function invoked per iteration.
-	 * @returns {Object} Returns `object`.
-	 */
-	function baseForIn(object, iteratee) {
-	  return baseFor(object, iteratee, keysIn);
-	}
-	
-	/**
-	 * Checks if `value` is a plain object, that is, an object created by the
-	 * `Object` constructor or one with a `[[Prototype]]` of `null`.
-	 *
-	 * **Note:** This method assumes objects created by the `Object` constructor
-	 * have no inherited enumerable properties.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
-	 * @example
-	 *
-	 * function Foo() {
-	 *   this.a = 1;
-	 * }
-	 *
-	 * _.isPlainObject(new Foo);
-	 * // => false
-	 *
-	 * _.isPlainObject([1, 2, 3]);
-	 * // => false
-	 *
-	 * _.isPlainObject({ 'x': 0, 'y': 0 });
-	 * // => true
-	 *
-	 * _.isPlainObject(Object.create(null));
-	 * // => true
-	 */
-	function isPlainObject(value) {
-	  var Ctor;
-	
-	  // Exit early for non `Object` objects.
-	  if (!(isObjectLike(value) && objToString.call(value) == objectTag && !isArguments(value)) || !hasOwnProperty.call(value, 'constructor') && (Ctor = value.constructor, typeof Ctor == 'function' && !(Ctor instanceof Ctor))) {
-	    return false;
-	  }
-	  // IE < 9 iterates inherited properties before own properties. If the first
-	  // iterated property is an object's own property then there are no inherited
-	  // enumerable properties.
-	  var result;
-	  // In most environments an object's own properties are iterated before
-	  // its inherited properties. If the last iterated property is an object's
-	  // own property then there are no inherited enumerable properties.
-	  baseForIn(value, function (subValue, key) {
-	    result = key;
-	  });
-	  return result === undefined || hasOwnProperty.call(value, result);
-	}
-	
-	module.exports = isPlainObject;
-
-/***/ },
-/* 7 */
-/***/ function(module, exports) {
-
-	/**
-	 * lodash 3.0.2 (Custom Build) <https://lodash.com/>
-	 * Build: `lodash modern modularize exports="npm" -o ./`
-	 * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
-	 */
-	
-	/**
-	 * The base implementation of `baseForIn` and `baseForOwn` which iterates
-	 * over `object` properties returned by `keysFunc` invoking `iteratee` for
-	 * each property. Iteratee functions may exit iteration early by explicitly
-	 * returning `false`.
-	 *
-	 * @private
-	 * @param {Object} object The object to iterate over.
-	 * @param {Function} iteratee The function invoked per iteration.
-	 * @param {Function} keysFunc The function to get the keys of `object`.
-	 * @returns {Object} Returns `object`.
-	 */
-	'use strict';
-	
-	var baseFor = createBaseFor();
-	
-	/**
-	 * Creates a base function for `_.forIn` or `_.forInRight`.
-	 *
-	 * @private
-	 * @param {boolean} [fromRight] Specify iterating from right to left.
-	 * @returns {Function} Returns the new base function.
-	 */
-	function createBaseFor(fromRight) {
-	  return function (object, iteratee, keysFunc) {
-	    var iterable = toObject(object),
-	        props = keysFunc(object),
-	        length = props.length,
-	        index = fromRight ? length : -1;
-	
-	    while (fromRight ? index-- : ++index < length) {
-	      var key = props[index];
-	      if (iteratee(iterable[key], key, iterable) === false) {
-	        break;
-	      }
-	    }
-	    return object;
-	  };
-	}
-	
-	/**
-	 * Converts `value` to an object if it's not one.
-	 *
-	 * @private
-	 * @param {*} value The value to process.
-	 * @returns {Object} Returns the object.
-	 */
-	function toObject(value) {
-	  return isObject(value) ? value : Object(value);
-	}
-	
-	/**
-	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(1);
-	 * // => false
-	 */
-	function isObject(value) {
-	  // Avoid a V8 JIT bug in Chrome 19-20.
-	  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-	  var type = typeof value;
-	  return !!value && (type == 'object' || type == 'function');
-	}
-	
-	module.exports = baseFor;
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	/**
-	 * lodash 3.0.4 (Custom Build) <https://lodash.com/>
-	 * Build: `lodash modern modularize exports="npm" -o ./`
-	 * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
-	 */
-	
-	/**
-	 * Checks if `value` is object-like.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-	 */
-	'use strict';
-	
-	function isObjectLike(value) {
-	  return !!value && typeof value == 'object';
-	}
-	
-	/** Used for native method references. */
-	var objectProto = Object.prototype;
-	
-	/** Used to check objects for own properties. */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-	
-	/** Native method references. */
-	var propertyIsEnumerable = objectProto.propertyIsEnumerable;
-	
-	/**
-	 * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
-	 * of an array-like value.
-	 */
-	var MAX_SAFE_INTEGER = 9007199254740991;
-	
-	/**
-	 * The base implementation of `_.property` without support for deep paths.
-	 *
-	 * @private
-	 * @param {string} key The key of the property to get.
-	 * @returns {Function} Returns the new function.
-	 */
-	function baseProperty(key) {
-	  return function (object) {
-	    return object == null ? undefined : object[key];
-	  };
-	}
-	
-	/**
-	 * Gets the "length" property value of `object`.
-	 *
-	 * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
-	 * that affects Safari on at least iOS 8.1-8.3 ARM64.
-	 *
-	 * @private
-	 * @param {Object} object The object to query.
-	 * @returns {*} Returns the "length" value.
-	 */
-	var getLength = baseProperty('length');
-	
-	/**
-	 * Checks if `value` is array-like.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
-	 */
-	function isArrayLike(value) {
-	  return value != null && isLength(getLength(value));
-	}
-	
-	/**
-	 * Checks if `value` is a valid array-like length.
-	 *
-	 * **Note:** This function is based on [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
-	 */
-	function isLength(value) {
-	  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-	}
-	
-	/**
-	 * Checks if `value` is classified as an `arguments` object.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
-	 * @example
-	 *
-	 * _.isArguments(function() { return arguments; }());
-	 * // => true
-	 *
-	 * _.isArguments([1, 2, 3]);
-	 * // => false
-	 */
-	function isArguments(value) {
-	  return isObjectLike(value) && isArrayLike(value) && hasOwnProperty.call(value, 'callee') && !propertyIsEnumerable.call(value, 'callee');
-	}
-	
-	module.exports = isArguments;
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * lodash 3.0.8 (Custom Build) <https://lodash.com/>
-	 * Build: `lodash modern modularize exports="npm" -o ./`
-	 * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
-	 */
-	'use strict';
-	
-	var isArguments = __webpack_require__(8),
-	    isArray = __webpack_require__(10);
-	
-	/** Used to detect unsigned integer values. */
-	var reIsUint = /^\d+$/;
-	
-	/** Used for native method references. */
-	var objectProto = Object.prototype;
-	
-	/** Used to check objects for own properties. */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-	
-	/**
-	 * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
-	 * of an array-like value.
-	 */
-	var MAX_SAFE_INTEGER = 9007199254740991;
-	
-	/**
-	 * Checks if `value` is a valid array-like index.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
-	 * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
-	 */
-	function isIndex(value, length) {
-	  value = typeof value == 'number' || reIsUint.test(value) ? +value : -1;
-	  length = length == null ? MAX_SAFE_INTEGER : length;
-	  return value > -1 && value % 1 == 0 && value < length;
-	}
-	
-	/**
-	 * Checks if `value` is a valid array-like length.
-	 *
-	 * **Note:** This function is based on [`ToLength`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength).
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
-	 */
-	function isLength(value) {
-	  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-	}
-	
-	/**
-	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(1);
-	 * // => false
-	 */
-	function isObject(value) {
-	  // Avoid a V8 JIT bug in Chrome 19-20.
-	  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-	  var type = typeof value;
-	  return !!value && (type == 'object' || type == 'function');
-	}
-	
-	/**
-	 * Creates an array of the own and inherited enumerable property names of `object`.
-	 *
-	 * **Note:** Non-object values are coerced to objects.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Object
-	 * @param {Object} object The object to query.
-	 * @returns {Array} Returns the array of property names.
-	 * @example
-	 *
-	 * function Foo() {
-	 *   this.a = 1;
-	 *   this.b = 2;
-	 * }
-	 *
-	 * Foo.prototype.c = 3;
-	 *
-	 * _.keysIn(new Foo);
-	 * // => ['a', 'b', 'c'] (iteration order is not guaranteed)
-	 */
-	function keysIn(object) {
-	  if (object == null) {
-	    return [];
-	  }
-	  if (!isObject(object)) {
-	    object = Object(object);
-	  }
-	  var length = object.length;
-	  length = length && isLength(length) && (isArray(object) || isArguments(object)) && length || 0;
-	
-	  var Ctor = object.constructor,
-	      index = -1,
-	      isProto = typeof Ctor == 'function' && Ctor.prototype === object,
-	      result = Array(length),
-	      skipIndexes = length > 0;
-	
-	  while (++index < length) {
-	    result[index] = index + '';
-	  }
-	  for (var key in object) {
-	    if (!(skipIndexes && isIndex(key, length)) && !(key == 'constructor' && (isProto || !hasOwnProperty.call(object, key)))) {
-	      result.push(key);
-	    }
-	  }
-	  return result;
-	}
-	
-	module.exports = keysIn;
-
-/***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-	/**
-	 * lodash 3.0.4 (Custom Build) <https://lodash.com/>
-	 * Build: `lodash modern modularize exports="npm" -o ./`
-	 * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
-	 */
-	
-	/** `Object#toString` result references. */
-	'use strict';
-	
-	var arrayTag = '[object Array]',
-	    funcTag = '[object Function]';
-	
-	/** Used to detect host constructors (Safari > 5). */
-	var reIsHostCtor = /^\[object .+?Constructor\]$/;
-	
-	/**
-	 * Checks if `value` is object-like.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-	 */
-	function isObjectLike(value) {
-	  return !!value && typeof value == 'object';
-	}
-	
-	/** Used for native method references. */
-	var objectProto = Object.prototype;
-	
-	/** Used to resolve the decompiled source of functions. */
-	var fnToString = Function.prototype.toString;
-	
-	/** Used to check objects for own properties. */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-	
-	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var objToString = objectProto.toString;
-	
-	/** Used to detect if a method is native. */
-	var reIsNative = RegExp('^' + fnToString.call(hasOwnProperty).replace(/[\\^$.*+?()[\]{}|]/g, '\\$&').replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$');
-	
-	/* Native method references for those with the same name as other `lodash` methods. */
-	var nativeIsArray = getNative(Array, 'isArray');
-	
-	/**
-	 * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
-	 * of an array-like value.
-	 */
-	var MAX_SAFE_INTEGER = 9007199254740991;
-	
-	/**
-	 * Gets the native function at `key` of `object`.
-	 *
-	 * @private
-	 * @param {Object} object The object to query.
-	 * @param {string} key The key of the method to get.
-	 * @returns {*} Returns the function if it's native, else `undefined`.
-	 */
-	function getNative(object, key) {
-	  var value = object == null ? undefined : object[key];
-	  return isNative(value) ? value : undefined;
-	}
-	
-	/**
-	 * Checks if `value` is a valid array-like length.
-	 *
-	 * **Note:** This function is based on [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
-	 */
-	function isLength(value) {
-	  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-	}
-	
-	/**
-	 * Checks if `value` is classified as an `Array` object.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
-	 * @example
-	 *
-	 * _.isArray([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isArray(function() { return arguments; }());
-	 * // => false
-	 */
-	var isArray = nativeIsArray || function (value) {
-	  return isObjectLike(value) && isLength(value.length) && objToString.call(value) == arrayTag;
-	};
-	
-	/**
-	 * Checks if `value` is classified as a `Function` object.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
-	 * @example
-	 *
-	 * _.isFunction(_);
-	 * // => true
-	 *
-	 * _.isFunction(/abc/);
-	 * // => false
-	 */
-	function isFunction(value) {
-	  // The use of `Object#toString` avoids issues with the `typeof` operator
-	  // in older versions of Chrome and Safari which return 'function' for regexes
-	  // and Safari 8 equivalents which return 'object' for typed array constructors.
-	  return isObject(value) && objToString.call(value) == funcTag;
-	}
-	
-	/**
-	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(1);
-	 * // => false
-	 */
-	function isObject(value) {
-	  // Avoid a V8 JIT bug in Chrome 19-20.
-	  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-	  var type = typeof value;
-	  return !!value && (type == 'object' || type == 'function');
-	}
-	
-	/**
-	 * Checks if `value` is a native function.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a native function, else `false`.
-	 * @example
-	 *
-	 * _.isNative(Array.prototype.push);
-	 * // => true
-	 *
-	 * _.isNative(_);
-	 * // => false
-	 */
-	function isNative(value) {
-	  if (value == null) {
-	    return false;
-	  }
-	  if (isFunction(value)) {
-	    return reIsNative.test(fnToString.call(value));
-	  }
-	  return isObjectLike(value) && reIsHostCtor.test(value);
-	}
-	
-	module.exports = isArray;
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	exports.__esModule = true;
-	exports['default'] = noVelocity;
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _lodashIsplainobject = __webpack_require__(6);
-	
-	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
-	
-	function noVelocity(coll) {
-	  if (Array.isArray(coll)) {
-	    return coll.every(noVelocity);
-	  }
-	  if (_lodashIsplainobject2['default'](coll)) {
-	    return Object.keys(coll).every(function (key) {
-	      return key === 'config' ? true : noVelocity(coll[key]);
-	    });
-	  }
-	  return typeof coll === 'number' ? coll === 0 : true;
-	}
-	
-	module.exports = exports['default'];
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	exports.__esModule = true;
-	exports['default'] = compareTrees;
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _lodashIsplainobject = __webpack_require__(6);
-	
-	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
-	
-	function compareTrees(a, b) {
-	  if (Array.isArray(a)) {
-	    return a.every(function (v, i) {
-	      return compareTrees(v, b[i]);
-	    });
-	  }
-	
-	  if (_lodashIsplainobject2['default'](a)) {
-	    return Object.keys(a).every(function (key) {
-	      return key === 'config' ? true : compareTrees(a[key], b[key]);
-	    });
-	  }
-	
-	  return a === b;
-	}
-	
-	module.exports = exports['default'];
-
-/***/ },
-/* 13 */
 /***/ function(module, exports) {
 
 	// this function is allocation-less thanks to babel, which transforms the tail
@@ -1293,7 +739,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 14 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1303,11 +749,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _performanceNow = __webpack_require__(15);
+	var _performanceNow = __webpack_require__(7);
 	
 	var _performanceNow2 = _interopRequireDefault(_performanceNow);
 	
-	var _raf = __webpack_require__(17);
+	var _raf = __webpack_require__(9);
 	
 	var _raf2 = _interopRequireDefault(_raf);
 	
@@ -1344,7 +790,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    for (var i = 0; i < animRunning.length; i++) {
 	      var _animRunning$i = animRunning[i];
 	      var active = _animRunning$i.active;
-	      var step = _animRunning$i.step;
+	      var animationStep = _animRunning$i.animationStep;
 	      var prevPrevState = _animRunning$i.prevState;
 	      var prevNextState = animRunning[i].nextState;
 	
@@ -1360,13 +806,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // part ways towards the nextState, but that's enterVal still. We render
 	      // say 75% between currValue (=== enterVal) and destValue (=== enterVal).
 	      // So we render the same value a second time.
-	      // The solution bellow is to recalculate the destination state even when
+	      // The solution below is to recalculate the destination state even when
 	      // you're moving partially towards it.
 	      if (accumulatedTime <= 0) {
-	        animRunning[i].nextState = step(timeStep / 1000, prevPrevState);
+	        animRunning[i].nextState = animationStep(timeStep / 1000, prevPrevState);
 	      } else {
 	        for (var j = 0; j < frameNumber; j++) {
-	          animRunning[i].nextState = step(timeStep / 1000, prevNextState);
+	          animRunning[i].nextState = animationStep(timeStep / 1000, prevNextState);
 	          var _ref = [prevNextState, animRunning[i].nextState];
 	          animRunning[i].prevState = _ref[0];
 	          prevNextState = _ref[1];
@@ -1380,22 +826,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var alpha = 1 + accumulatedTime / timeStep;
 	    for (var i = 0; i < animRunning.length; i++) {
 	      var _animRunning$i2 = animRunning[i];
-	
-	      // Might mutate animRunning........
-	      var render = _animRunning$i2.render;
+	      var animationRender = _animRunning$i2.animationRender;
 	      var nextState = _animRunning$i2.nextState;
 	      var prevState = _animRunning$i2.prevState;
-	      render(alpha, nextState, prevState);
+	
+	      // Might mutate animRunning........
+	      animationRender(alpha, nextState, prevState);
 	    }
 	
-	    var newAnimRunning = [];
-	    for (var i = 0; i < animRunning.length; i++) {
-	      if (animRunning[i].active) {
-	        newAnimRunning.push(animRunning[i]);
-	      }
-	    }
-	
-	    animRunning = newAnimRunning;
+	    animRunning = animRunning.filter(function (_ref2) {
+	      var active = _ref2.active;
+	      return active;
+	    });
 	
 	    if (animRunning.length === 0) {
 	      running = false;
@@ -1413,10 +855,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	
-	  return function startAnimation(state, step, render) {
+	  return function startAnimation(state, animationStep, animationRender) {
 	    for (var i = 0; i < animRunning.length; i++) {
 	      var val = animRunning[i];
-	      if (val.step === step) {
+	      if (val.animationStep === animationStep) {
 	        val.active = true;
 	        val.prevState = state;
 	        start();
@@ -1425,8 +867,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    var newAnim = {
-	      step: step,
-	      render: render,
+	      animationStep: animationStep,
+	      animationRender: animationRender,
 	      prevState: state,
 	      nextState: state,
 	      active: true
@@ -1446,7 +888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 15 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {// Generated by CoffeeScript 1.7.1
@@ -1482,10 +924,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    loadTime = new Date().getTime();
 	  }
 	}).call(undefined);
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ },
-/* 16 */
+/* 8 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -1522,7 +964,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        currentQueue = queue;
 	        queue = [];
 	        while (++queueIndex < len) {
-	            currentQueue[queueIndex].run();
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
 	        }
 	        queueIndex = -1;
 	        len = queue.length;
@@ -1574,7 +1018,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    throw new Error('process.binding is not supported');
 	};
 	
-	// TODO(shtylman)
 	process.cwd = function () {
 	    return '/';
 	};
@@ -1586,12 +1029,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 17 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var now = __webpack_require__(15),
+	var now = __webpack_require__(7),
 	    global = typeof window === 'undefined' ? {} : window,
 	    vendors = ['moz', 'webkit'],
 	    suffix = 'AnimationFrame',
@@ -1662,7 +1105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 18 */
+/* 10 */
 /***/ function(module, exports) {
 
 	// used by the tree-walking updates and springs. Avoids some allocations
@@ -1678,188 +1121,104 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 19 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	exports.__esModule = true;
 	exports.interpolateValue = interpolateValue;
-	exports.updateCurrValue = updateCurrValue;
-	exports.updateCurrVelocity = updateCurrVelocity;
+	exports.updateCurrentStyle = updateCurrentStyle;
+	exports.updateCurrentVelocity = updateCurrentVelocity;
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _lodashIsplainobject = __webpack_require__(6);
-	
-	var _lodashIsplainobject2 = _interopRequireDefault(_lodashIsplainobject);
-	
-	var _mapTree = __webpack_require__(5);
-	
-	var _mapTree2 = _interopRequireDefault(_mapTree);
-	
-	var _stepper = __webpack_require__(20);
+	var _stepper = __webpack_require__(12);
 	
 	var _stepper2 = _interopRequireDefault(_stepper);
 	
-	var _zero = __webpack_require__(18);
-	
-	var _zero2 = _interopRequireDefault(_zero);
-	
-	var _presets = __webpack_require__(21);
-	
 	// TODO: refactor common logic with updateCurrValue and updateCurrVelocity
 	
-	var _presets2 = _interopRequireDefault(_presets);
+	function interpolateValue(alpha, nextStyle, prevStyle) {
+	  // might be used by a TransitionMotion, where prevStyle might not exist anymore
+	  if (!prevStyle) {
+	    return nextStyle;
+	  }
 	
-	function interpolateValue(alpha, nextValue, prevValue) {
-	  if (nextValue == null) {
-	    return null;
-	  }
-	  if (prevValue == null) {
-	    return nextValue;
-	  }
-	  if (typeof nextValue === 'number') {
-	    // https://github.com/chenglou/react-motion/pull/57#issuecomment-121924628
-	    return nextValue * alpha + prevValue * (1 - alpha);
-	  }
-	  if (nextValue.val != null && nextValue.config && nextValue.config.length === 0) {
-	    return nextValue;
-	  }
-	  if (nextValue.val != null) {
-	    var ret = {
-	      val: interpolateValue(alpha, nextValue.val, prevValue.val)
+	  var ret = {};
+	  for (var key in nextStyle) {
+	    if (!nextStyle.hasOwnProperty(key)) {
+	      continue;
+	    }
+	
+	    if (!nextStyle[key].config) {
+	      ret[key] = nextStyle[key];
+	      // not a spring config, not something we want to interpolate
+	      continue;
+	    }
+	    var prevValue = prevStyle[key].config ? prevStyle[key].val : prevStyle[key];
+	    ret[key] = {
+	      val: nextStyle[key].val * alpha + prevValue * (1 - alpha),
+	      config: nextStyle[key].config
 	    };
-	    if (nextValue.config) {
-	      ret.config = nextValue.config;
-	    }
-	    return ret;
 	  }
-	  if (Array.isArray(nextValue)) {
-	    return nextValue.map(function (_, i) {
-	      return interpolateValue(alpha, nextValue[i], prevValue[i]);
-	    });
-	  }
-	  if (_lodashIsplainobject2['default'](nextValue)) {
-	    return Object.keys(nextValue).reduce(function (ret, key) {
-	      ret[key] = interpolateValue(alpha, nextValue[key], prevValue[key]);
-	      return ret;
-	    }, {});
-	  }
-	  return nextValue;
+	
+	  return ret;
 	}
 	
-	// TODO: refactor common logic with _updateCurrVelocity
-	function _updateCurrValue(frameRate, currValue, currVelocity, endValue, k, b) {
-	  if (endValue == null) {
-	    return null;
-	  }
-	  if (typeof endValue === 'number') {
-	    if (k == null || b == null) {
-	      return endValue;
+	// TODO: refactor common logic with updateCurrentVelocity
+	
+	function updateCurrentStyle(frameRate, currentStyle, currentVelocity, style) {
+	  var ret = {};
+	  for (var key in style) {
+	    if (!style.hasOwnProperty(key)) {
+	      continue;
 	    }
-	    // TODO: do something to stepper to make this not allocate (2 steppers?)
-	    return _stepper2['default'](frameRate, currValue, currVelocity, endValue, k, b)[0];
-	  }
-	  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
-	    return endValue;
-	  }
-	  if (endValue.val != null) {
-	    var _ref = endValue.config || _presets2['default'].noWobble;
+	    if (!style[key].config) {
+	      ret[key] = style[key];
+	      // not a spring config, not something we want to interpolate
+	      continue;
+	    }
+	    var _style$key$config = style[key].config;
+	    var k = _style$key$config[0];
+	    var b = _style$key$config[1];
 	
-	    var _k = _ref[0];
-	    var _b = _ref[1];
-	
-	    var ret = {
-	      val: _updateCurrValue(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b)
+	    var val = _stepper2['default'](frameRate,
+	    // might have been a non-springed prop that just became one
+	    currentStyle[key].val == null ? currentStyle[key] : currentStyle[key].val, currentVelocity[key], style[key].val, k, b)[0];
+	    ret[key] = {
+	      val: val,
+	      config: style[key].config
 	    };
-	    if (endValue.config) {
-	      ret.config = endValue.config;
-	    }
-	    return ret;
 	  }
-	  if (Array.isArray(endValue)) {
-	    return endValue.map(function (_, i) {
-	      return _updateCurrValue(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
-	    });
-	  }
-	  if (_lodashIsplainobject2['default'](endValue)) {
-	    return Object.keys(endValue).reduce(function (ret, key) {
-	      ret[key] = _updateCurrValue(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
-	      return ret;
-	    }, {});
-	  }
-	  return endValue;
+	  return ret;
 	}
 	
-	function updateCurrValue(frameRate, currValue, currVelocity, endValue) {
-	  if (typeof endValue === 'number') {
-	    var _presets$noWobble = _presets2['default'].noWobble;
-	    var k = _presets$noWobble[0];
-	    var b = _presets$noWobble[1];
-	
-	    return _stepper2['default'](frameRate, currValue, currVelocity, endValue, k, b)[0];
-	  }
-	
-	  return _updateCurrValue(frameRate, currValue, currVelocity, endValue);
-	}
-	
-	function _updateCurrVelocity(frameRate, currValue, currVelocity, endValue, k, b) {
-	  if (endValue == null) {
-	    return null;
-	  }
-	  if (typeof endValue === 'number') {
-	    if (k == null || b == null) {
-	      return _mapTree2['default'](_zero2['default'], currVelocity);
+	function updateCurrentVelocity(frameRate, currentStyle, currentVelocity, style) {
+	  var ret = {};
+	  for (var key in style) {
+	    if (!style.hasOwnProperty(key)) {
+	      continue;
 	    }
-	    // TODO: do something to stepper to make this not allocate (2 steppers?)
-	    return _stepper2['default'](frameRate, currValue, currVelocity, endValue, k, b)[1];
-	  }
-	  if (endValue.val != null && endValue.config && endValue.config.length === 0) {
-	    return _mapTree2['default'](_zero2['default'], currVelocity);
-	  }
-	  if (endValue.val != null) {
-	    var _ref2 = endValue.config || _presets2['default'].noWobble;
-	
-	    var _k = _ref2[0];
-	    var _b = _ref2[1];
-	
-	    var ret = {
-	      val: _updateCurrVelocity(frameRate, currValue.val, currVelocity.val, endValue.val, _k, _b)
-	    };
-	    if (endValue.config) {
-	      ret.config = endValue.config;
+	    if (!style[key].config) {
+	      // not a spring config, not something we want to interpolate
+	      ret[key] = 0;
+	      continue;
 	    }
-	    return ret;
-	  }
-	  if (Array.isArray(endValue)) {
-	    return endValue.map(function (_, i) {
-	      return _updateCurrVelocity(frameRate, currValue[i], currVelocity[i], endValue[i], k, b);
-	    });
-	  }
-	  if (_lodashIsplainobject2['default'](endValue)) {
-	    return Object.keys(endValue).reduce(function (ret, key) {
-	      ret[key] = _updateCurrVelocity(frameRate, currValue[key], currVelocity[key], endValue[key], k, b);
-	      return ret;
-	    }, {});
-	  }
-	  return _mapTree2['default'](_zero2['default'], currVelocity);
-	}
+	    var _style$key$config2 = style[key].config;
+	    var k = _style$key$config2[0];
+	    var b = _style$key$config2[1];
 	
-	function updateCurrVelocity(frameRate, currValue, currVelocity, endValue) {
-	  if (typeof endValue === 'number') {
-	    var _presets$noWobble2 = _presets2['default'].noWobble;
-	    var k = _presets$noWobble2[0];
-	    var b = _presets$noWobble2[1];
-	
-	    return _stepper2['default'](frameRate, currValue, currVelocity, endValue, k, b)[1];
+	    var val = _stepper2['default'](frameRate,
+	    // might have been a non-springed prop that just became one
+	    currentStyle[key].val == null ? currentStyle[key] : currentStyle[key].val, currentVelocity[key], style[key].val, k, b)[1];
+	    ret[key] = val;
 	  }
-	
-	  return _updateCurrVelocity(frameRate, currValue, currVelocity, endValue);
+	  return ret;
 	}
 
 /***/ },
-/* 20 */
+/* 12 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1896,7 +1255,131 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 21 */
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+	
+	exports.__esModule = true;
+	exports['default'] = deprecatedSprings;
+	var hasWarnedForSpring = {};
+	var hasWarnedForTransitionSpring = {};
+	
+	function deprecatedSprings(React) {
+	  var Spring = React.createClass({
+	    displayName: 'Spring',
+	
+	    componentWillMount: function componentWillMount() {
+	      if (process.env.NODE_ENV === 'development') {
+	        var ownerName = this._reactInternalInstance._currentElement._owner && this._reactInternalInstance._currentElement._owner.getName();
+	        if (!hasWarnedForSpring[ownerName]) {
+	          hasWarnedForSpring[ownerName] = true;
+	          console.error('Spring (used in %srender) has now been renamed to Motion. ' + 'Please see the release note for the upgrade path. Thank you!', ownerName ? ownerName + '\'s ' : 'React.');
+	        }
+	      }
+	    },
+	
+	    render: function render() {
+	      return null;
+	    }
+	  });
+	
+	  var TransitionSpring = React.createClass({
+	    displayName: 'TransitionSpring',
+	
+	    componentWillMount: function componentWillMount() {
+	      if (process.env.NODE_ENV === 'development') {
+	        var ownerName = this._reactInternalInstance._currentElement._owner && this._reactInternalInstance._currentElement._owner.getName();
+	        if (!hasWarnedForTransitionSpring[ownerName]) {
+	          hasWarnedForTransitionSpring[ownerName] = true;
+	          console.error('TransitionSpring (used in %srender) has now been renamed to ' + 'TransitionMotion. Please see the release note for the upgrade ' + 'path. Thank you!', ownerName ? ownerName + '\'s ' : 'React.');
+	        }
+	      }
+	    },
+	
+	    render: function render() {
+	      return null;
+	    }
+	  });
+	
+	  return { Spring: Spring, TransitionSpring: TransitionSpring };
+	}
+	
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	// turn {x: {val: 1, config: [1, 2]}, y: 2} into {x: 1, y: 2}
+	"use strict";
+	
+	exports.__esModule = true;
+	exports["default"] = stripStyle;
+	
+	function stripStyle(style) {
+	  var ret = {};
+	  for (var key in style) {
+	    if (!style.hasOwnProperty(key)) {
+	      continue;
+	    }
+	    ret[key] = style[key].val == null ? style[key] : style[key].val;
+	  }
+	  return ret;
+	}
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	exports["default"] = reorderKeys;
+	
+	function reorderKeys(obj, f) {
+	  var newKeys = f(Object.keys(obj));
+	  var ret = {};
+	  for (var i = 0; i < newKeys.length; i++) {
+	    var key = newKeys[i];
+	    ret[key] = obj[key];
+	  }
+	
+	  return ret;
+	}
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	exports.__esModule = true;
+	exports['default'] = spring;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _presets = __webpack_require__(17);
+	
+	var _presets2 = _interopRequireDefault(_presets);
+	
+	// instead of exposing {val: bla, config: bla}, use a helper
+	
+	function spring(val) {
+	  var config = arguments.length <= 1 || arguments[1] === undefined ? _presets2['default'].noWobble : arguments[1];
+	
+	  return { val: val, config: config };
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 17 */
 /***/ function(module, exports) {
 
 	// [stiffness, damping]
