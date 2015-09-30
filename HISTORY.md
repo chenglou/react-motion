@@ -4,10 +4,8 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
-### Upcoming
-- [B] `Spring` and `TransitionSpring` and now renamed to `Motion` and `TransitionMotion`, respectively.
-- [B] Some API changes, will document fully soon.
-- **TODO: make sure native works!**
+### 0.3.0 (September 30th 2015)
+- [B] API revamp! See https://github.com/chenglou/react-motion/wiki for more details. Thanks!
 
 ### 0.2.7 (August 6th 2015)
 - [F] Small bug where nested springs don't animate. #123
