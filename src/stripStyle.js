@@ -5,7 +5,7 @@ export default function stripStyle(style) {
     if (!style.hasOwnProperty(key)) {
       continue;
     }
-    ret[key] = style[key].val == null ? style[key] : style[key].val;
+    ret[key] = style[key] == null || style[key].val == null ? style[key] : style[key].val;
   }
   return ret;
 }

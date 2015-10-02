@@ -5,7 +5,7 @@ export default function noVelocity(currentVelocity, currentStyle) {
     if (!currentVelocity.hasOwnProperty(key)) {
       continue;
     }
-    if (currentStyle[key].config && currentVelocity[key] !== 0) {
+    if (currentStyle[key] != null && currentStyle[key].config && currentVelocity[key] !== 0) {
       return false;
     }
   }

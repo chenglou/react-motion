@@ -10,6 +10,10 @@ describe('hasReachedStyle', () => {
     expect(hasReachedStyle({a: 10}, {a: 5})).toBe(true);
   });
 
+  it('should ignore `undefined`', () => {
+    expect(hasReachedStyle({a: undefined}, {a: undefined})).toBe(true);
+  });
+
   it('should return true of the final value is reached', () => {
     const currentStyle = {
       a: spring(2),

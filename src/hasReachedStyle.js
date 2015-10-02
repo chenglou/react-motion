@@ -5,7 +5,7 @@ export default function hasReachedStyle(currentStyle, style) {
     }
     const currentValue = currentStyle[key];
     const destValue = style[key];
-    if (!destValue.config) {
+    if (destValue == null || !destValue.config) {
       // not a spring config
       continue;
     }
