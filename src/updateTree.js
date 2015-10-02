@@ -13,7 +13,7 @@ export function interpolateValue(alpha, nextStyle, prevStyle) {
       continue;
     }
 
-    if (!nextStyle[key].config) {
+    if (nextStyle[key] == null || !nextStyle[key].config) {
       ret[key] = nextStyle[key];
       // not a spring config, not something we want to interpolate
       continue;
@@ -35,7 +35,7 @@ export function updateCurrentStyle(frameRate, currentStyle, currentVelocity, sty
     if (!style.hasOwnProperty(key)) {
       continue;
     }
-    if (!style[key].config) {
+    if (style[key] == null || !style[key].config) {
       ret[key] = style[key];
       // not a spring config, not something we want to interpolate
       continue;
@@ -64,7 +64,7 @@ export function updateCurrentVelocity(frameRate, currentStyle, currentVelocity, 
     if (!style.hasOwnProperty(key)) {
       continue;
     }
-    if (!style[key].config) {
+    if (style[key] == null || !style[key].config) {
       // not a spring config, not something we want to interpolate
       ret[key] = 0;
       continue;

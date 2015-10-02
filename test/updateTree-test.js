@@ -1,7 +1,15 @@
-import {updateCurrentStyle, updateCurrentVelocity} from '../src/updateTree';
+import {interpolateValue, updateCurrentStyle, updateCurrentVelocity} from '../src/updateTree';
 import {spring} from '../src/react-motion';
 
 const FRAME_RATE = 1 / 60;
+
+describe('interpolateValue', () => {
+  it('should handle `undefined`', () => {
+    const nextStyle = {a: undefined};
+    const prevStyle = {a: undefined};
+    expect(interpolateValue(1, nextStyle, prevStyle)).toEqual({a: undefined});
+  });
+});
 
 describe('updateCurrentStyle', () => {
   it('should jump to style when there is no config', () => {
@@ -18,6 +26,14 @@ describe('updateCurrentStyle', () => {
     const style = {a: 100, b: spring(10)};
     expect(updateCurrentStyle(FRAME_RATE, currentStyle, currentVelocity, style))
       .toEqual({a: 100, b: {val: 3.34, config: [170, 26]}});
+  });
+
+  it('should handle `undefined`', () => {
+    const currentStyle = {a: undefined};
+    const currentVelocity = {a: undefined};
+    const style = {a: undefined};
+    expect(updateCurrentStyle(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: undefined});
   });
 
   it('should do negative numbers', () => {
@@ -63,6 +79,14 @@ describe('updateCurrentVelocity', () => {
     const style = {a: 100, b: spring(10)};
     expect(updateCurrentVelocity(FRAME_RATE, currentStyle, currentVelocity, style))
       .toEqual({a: 0, b: 20.4});
+  });
+
+  it('should handle `undefined`', () => {
+    const currentStyle = {a: undefined};
+    const currentVelocity = {a: undefined};
+    const style = {a: undefined};
+    expect(updateCurrentVelocity(FRAME_RATE, currentStyle, currentVelocity, style))
+      .toEqual({a: 0});
   });
 
   it('should do negative numbers', () => {
