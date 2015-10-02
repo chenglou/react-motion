@@ -213,7 +213,7 @@ const Demo = React.createClass({
 ```
 
 ### `presets`
-Some tasteful, commonly used spring presets you can plug into your `style` like so: `{val: 10, config: presets.wobbly}`. [See here](https://github.com/chenglou/react-motion/blob/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/src/presets.js).
+Some tasteful, commonly used spring presets you can plug into your `style` like so: `spring(10, presets.wobbly)`. [See here](https://github.com/chenglou/react-motion/blob/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/src/presets.js).
 
 ### `utils`
 Since `TransitionMotion` dictates `styles` to be an object, manipulating keys could be a little more tedious than manipulating arrays. Here are the common scenarios' solutions:

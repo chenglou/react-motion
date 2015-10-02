@@ -136,9 +136,9 @@ describe('Motion', () => {
     const App = React.createClass({
       render() {
         return (
-          <Motion style={{val: 400}}>
-            {({val}) => {
-              count.push(val);
+          <Motion style={{a: 400}}>
+            {({a}) => {
+              count.push(a);
               return null;
             }}
           </Motion>
@@ -249,14 +249,14 @@ describe('Motion', () => {
           this.props.kill();
         }
 
-        return {val: 400};
+        return spring(400);
       },
 
       render() {
         return (
-          <Motion defaultStyle={{val: 0}} style={this.style}>
-            {({val}) => {
-              count.push(val);
+          <Motion defaultStyle={{a: 0}} style={this.style}>
+            {({a}) => {
+              count.push(a);
               return null;
             }}
           </Motion>
@@ -429,8 +429,8 @@ describe('TransitionMotion', () => {
           <TransitionMotion
             defaultStyles={{k1: {a: 0, b: 10}, k2: {c: 20}}}
             styles={{k1: {a: spring(10), b: spring(410)}, k2: {c: spring(420)}}}>
-            {val => {
-              count.push(val);
+            {a => {
+              count.push(a);
               return null;
             }}
           </TransitionMotion>
@@ -523,8 +523,8 @@ describe('TransitionMotion', () => {
             // bad
             willEnter={() => ({a: 0})}
             willLeave={() => ({a: spring(0)})}>
-            {val => {
-              count.push(val);
+            {a => {
+              count.push(a);
               return null;
             }}
           </TransitionMotion>

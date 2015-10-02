@@ -1,4 +1,5 @@
 import stepper from './stepper';
+import spring from './spring';
 
 // TODO: refactor common logic with updateCurrValue and updateCurrVelocity
 export function interpolateValue(alpha, nextStyle, prevStyle) {
@@ -19,10 +20,10 @@ export function interpolateValue(alpha, nextStyle, prevStyle) {
       continue;
     }
     const prevValue = prevStyle[key].config ? prevStyle[key].val : prevStyle[key];
-    ret[key] = {
-      val: nextStyle[key].val * alpha + prevValue * (1 - alpha),
-      config: nextStyle[key].config,
-    };
+    ret[key] = spring(
+      nextStyle[key].val * alpha + prevValue * (1 - alpha),
+      nextStyle[key].config,
+    );
   }
 
   return ret;
@@ -50,10 +51,7 @@ export function updateCurrentStyle(frameRate, currentStyle, currentVelocity, sty
       k,
       b,
     )[0];
-    ret[key] = {
-      val: val,
-      config: style[key].config,
-    };
+    ret[key] = spring(val, style[key].config);
   }
   return ret;
 }

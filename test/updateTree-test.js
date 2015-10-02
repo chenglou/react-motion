@@ -25,7 +25,7 @@ describe('updateCurrentStyle', () => {
     const currentVelocity = {a: 1, b: 1};
     const style = {a: 100, b: spring(10)};
     expect(updateCurrentStyle(FRAME_RATE, currentStyle, currentVelocity, style))
-      .toEqual({a: 100, b: {val: 3.34, config: [170, 26]}});
+      .toEqual({a: 100, b: spring(3.34, [170, 26])});
   });
 
   it('should handle `undefined`', () => {
@@ -41,7 +41,7 @@ describe('updateCurrentStyle', () => {
     const currentVelocity = {a: 1, b: -1};
     const style = {a: 100, b: spring(-10)};
     expect(updateCurrentStyle(FRAME_RATE, currentStyle, currentVelocity, style))
-      .toEqual({a: 100, b: {val: -3.34, config: [170, 26]}});
+      .toEqual({a: 100, b: spring(-3.34, [170, 26])});
   });
 
   it('should pass from configured to non-configured', () => {
@@ -57,7 +57,7 @@ describe('updateCurrentStyle', () => {
     const currentVelocity = {a: 5};
     const style = {a: spring(0)};
     expect(updateCurrentStyle(FRAME_RATE, currentStyle, currentVelocity, style))
-      .toEqual({a: {val: 9.575, config: [170, 26]}});
+      .toEqual({a: spring(9.575, [170, 26])});
   });
 });
 
