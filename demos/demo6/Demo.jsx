@@ -10,7 +10,6 @@ const React = require('react');
 const {Spring, TransitionSpring} = require('../../src/react-motion');
 // loads js syntax
 import 'codemirror/mode/javascript/javascript';
-import l from '../../src/log';
 
 const codeMirrorOpts = {
   mode: 'javascript',
