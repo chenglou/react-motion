@@ -1,4 +1,6 @@
-export default function hasReachedStyle(currentStyle, style) {
+/* @flow */
+export default function hasReachedStyle(currentStyle: Object,
+                                        style: Object): boolean {
   for (let key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;

@@ -1,3 +1,4 @@
+/* @flow */
 // this function is allocation-less thanks to babel, which transforms the tail
 // calls into loops
 function mergeDiffArr(arrA, arrB, collB, indexA, indexB, onRemove, accum) {
@@ -40,7 +41,9 @@ function mergeDiffArr(arrA, arrB, collB, indexA, indexB, onRemove, accum) {
   return mergeDiffArr(arrA, arrB, collB, indexA + 1, indexB, onRemove, accum);
 }
 
-export default function mergeDiff(a, b, onRemove) {
+export default function mergeDiff(a: Object,
+                                  b: Object,
+                                  onRemove: (key: string) => Object): Object {
   let ret = {};
   // if anyone can make this work without allocating the arrays here, we'll
   // give you a medal
