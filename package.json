@@ -42,7 +42,7 @@
     "test": "npm run karma -- --single-run --reporters nyan",
     "test:travis": "npm run karma -- --single-run",
     "test:dev": "npm run karma -- --no-single-run --auto-watch --reporters nyan",
-    "test:cov": "COVERAGE=1 npm run karma -- --single-run --reporters coverage"
+    "test:cov": "npm run karma -- --single-run --reporters coverage"
   },
   "repository": {
     "type": "git",
