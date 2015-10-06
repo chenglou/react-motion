@@ -34,15 +34,15 @@
     "webpack-dev-server": "^1.10.1"
   },
   "scripts": {
-    "start": "NODE_ENV=development node server.js",
-    "build-demos": "NODE_ENV=production webpack",
+    "start": "node server.js",
+    "build-demos": "webpack",
     "lint": "eslint --ext .js,.jsx .",
-    "prerelease": "babel src --out-dir lib && babel native/non-compiled.js > native/index.js && NODE_ENV=production webpack --config webpack.prod.config.js",
-    "karma": "NODE_ENV=development karma start ./karma.conf.js",
-    "test": "npm run karma --  --single-run --reporters nyan",
-    "test:travis": "npm run karma --  --single-run",
+    "prerelease": "babel src --out-dir lib && babel native/non-compiled.js > native/index.js && webpack --config webpack.prod.config.js",
+    "karma": "karma start ./karma.conf.js",
+    "test": "npm run karma -- --single-run --reporters nyan",
+    "test:travis": "npm run karma -- --single-run",
     "test:dev": "npm run karma -- --no-single-run --auto-watch --reporters nyan",
-    "test:cov": "COVERAGE=1 npm run karma -- --single-run --reporters coverage"
+    "test:cov": "npm run karma -- --single-run --reporters coverage"
   },
   "repository": {
     "type": "git",

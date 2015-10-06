@@ -1,7 +1,11 @@
 'use strict';
 
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 var path = require('path');
 var webpack = require('webpack');
+
+var withCoverage = process.argv.indexOf('coverage') !== -1 || process.env.COVERAGE;
 
 var webpackConfig = {
   devtool: 'eval',
@@ -9,7 +13,7 @@ var webpackConfig = {
     extensions: ['', '.js'],
   },
   module: {
-    loaders: process.env.COVERAGE ?
+    loaders: withCoverage ?
       [
         {test: /\.js$/, loader: 'babel', include: [path.resolve('./test')]},
         {test: /\.js$/, loader: 'isparta', include: [path.resolve('./src')]},
