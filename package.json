@@ -37,7 +37,7 @@
     "start": "node server.js",
     "build-demos": "webpack",
     "lint": "eslint --ext .js,.jsx .",
-    "prerelease": "babel src --out-dir lib && babel native/non-compiled.js > native/index.js && NODE_ENV=production webpack --config webpack.prod.config.js",
+    "prerelease": "babel src --out-dir lib && babel native/non-compiled.js > native/index.js && webpack --config webpack.prod.config.js",
     "karma": "NODE_ENV=development karma start ./karma.conf.js",
     "test": "npm run karma --  --single-run --reporters nyan",
     "test:travis": "npm run karma --  --single-run",
