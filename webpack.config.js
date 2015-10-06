@@ -23,6 +23,7 @@ var entry = {
   demo6: './demos/demo6/index.jsx',
   demo7: './demos/demo7/index.jsx',
   demo8: './demos/demo8/index.jsx',
+  demo9: './demos/demo9/index.jsx',  
 };
 
 if (process.env.NODE_ENV === 'development') {
