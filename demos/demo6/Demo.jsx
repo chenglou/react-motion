@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars, no-eval, no-shadow */
-/* global babel */
+
+import transform from 'babel-core/browser.js';
+
 
 // webpack trying to bundle babel errors, haven't checked why too much
 import CodeMirror from 'react-codemirror';
@@ -47,7 +49,7 @@ const Example = React.createClass({
     }
 
     try {
-      const jsCode = babel.transform(code).code;
+      const jsCode = transform(code).code;
       // evaled code might override Demo and Example which makes things weird
       (function doIt(Demo, Example) {
         eval(jsCode);
@@ -302,7 +304,7 @@ React.render(<Demo />, mountNode);
     }
 
     try {
-      const jsCode = babel.transform(headerCode).code;
+      const jsCode = transform(headerCode).code;
       (function doIt(Demo, Example) {
         eval(jsCode);
       })();

@@ -1,0 +1,43 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: none;
+  margin: 0;
+  padding: 0
+}
+
+html {
+  font-family: proxima-nova, "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+  line-height: 1.28;
+  background: #f9f9f9
+}
+
+.head {
+  background-color: rgb(240, 240, 232);
+  width: 100%;
+  height: 150px;
+}
+
+.demo6-error {
+  color: red;
+}
+
+.CodeMirror {
+  height: auto;
+}
+
+.block {
+  width: 150px;
+  height: 50px;
+  border-radius: 4px;
+  background-color: rgb(130, 181, 198);
+}
+
+.ts-block {
+  position: absolute;
+  height: 50px;
+  width: 50px;
+  border-radius: 4px;
+  background-color: rgb(130, 181, 198);
+}
