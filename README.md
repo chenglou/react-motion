@@ -34,14 +34,14 @@ Or build it yourself from the repo: `git clone https://github.com/chenglou/react
 _(P.S. Don't forget to compile for production when you test your animation's performance!)_
 
 ## Demos
-- [Simple Transition](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo0/index.html)
-- [Chat Heads](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo1/index.html)
-- [Draggable Balls](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo2/index.html)
-- [TodoMVC List Transition](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo3/index.html)
-- [Photo Gallery](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo4/index.html)
-- [Spring Parameters Chooser](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo5/index.html)
-- [Water Ripples](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo7/index.html)
-- [Draggable List](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo8/index.html)
+- [Simple Transition](http://chenglou.me/react-motion/demos/demo0-simple-transition)
+- [Chat Heads](http://chenglou.me/react-motion/demos/demo1-chat-heads)
+- [Draggable Balls](http://chenglou.me/react-motion/demos/demo2-draggable-balls)
+- [TodoMVC List Transition](http://chenglou.me/react-motion/demos/demo3-todomvc-list-transition)
+- [Photo Gallery](http://chenglou.me/react-motion/demos/demo4-photo-gallery)
+- [Spring Parameters Chooser](http://chenglou.me/react-motion/demos/demo5-spring-parameters-chooser)
+- [Water Ripples](http://chenglou.me/react-motion/demos/demo7-water-ripples)
+- [Draggable List](http://chenglou.me/react-motion/demos/demo8-draggable-list)
 
 ## What does this library try to solve?
 
@@ -234,7 +234,7 @@ Since `TransitionMotion` dictates `styles` to be an object, manipulating keys co
 
 - How do I set the duration of my animation?
 
-[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](https://cdn.rawgit.com/chenglou/react-motion/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/demos/demo5/index.html) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
+[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](http://chenglou.me/react-motion/demos/demo5-spring-parameters-chooserl) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
 
 - How do I unmount the `TransitionMotion` container itself?
 
