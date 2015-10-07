@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars, no-eval, no-shadow */
 
-import transform from 'babel-core/browser.js';
+import transform from 'babel-core/browser.min';
 
 
 // webpack trying to bundle babel errors, haven't checked why too much

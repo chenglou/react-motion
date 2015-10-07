@@ -7,6 +7,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 require('babel/polyfill');
 
 var webpack = require('webpack');
+var path = require('path');
 
 var loaders = ['babel'];
 var port = process.env.PORT || 3000;
@@ -69,6 +70,9 @@ module.exports = {
     }],
     preLoaders: [
       {test: /\.jsx?$/, loader: 'eslint', exclude: /build|lib|bower_components|node_modules/},
+    ],
+    noParse: [
+      path.join(__dirname, 'node_modules', 'babel-core', 'browser.min.js')
     ],
   },
   resolve: {
