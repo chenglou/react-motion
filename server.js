@@ -1,11 +1,11 @@
 'use strict';
 
+process.env.NODE_ENV = 'development';
+
 var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var config = require('./webpack.config');
 var port = process.env.PORT || 3000;
-
-process.env.NODE_ENV = 'development';
 
 new WebpackDevServer(webpack(config), {
   publicPath: config.output.publicPath,
