@@ -3,7 +3,6 @@
 /coverage/
 /demos/
 /native/non-compiled.js
-/src/
 /test/
 /.*
 /bower.json
