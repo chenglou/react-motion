@@ -2,7 +2,12 @@
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 
+// Temporary fix for css-loader/post-css
+// 'Module build failed: ReferenceError: Promise is not defined'
+require('babel/polyfill');
+
 var webpack = require('webpack');
+var path = require('path');
 
 var loaders = ['babel'];
 var port = process.env.PORT || 3000;
@@ -59,9 +64,15 @@ module.exports = {
       test: /\.jsx?$/,
       exclude: /build|lib|bower_components|node_modules/,
       loaders: loaders
+    }, {
+      test: /\.css$/,
+      loaders: ['style', 'css']
     }],
     preLoaders: [
       {test: /\.jsx?$/, loader: 'eslint', exclude: /build|lib|bower_components|node_modules/},
+    ],
+    noParse: [
+      path.join(__dirname, 'node_modules', 'babel-core', 'browser.min.js')
     ],
   },
   resolve: {
