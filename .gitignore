@@ -11,3 +11,5 @@ bower_components
 lib
 
 .DS_Store
+
+/demos/**/all.*
