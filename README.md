@@ -234,7 +234,7 @@ Since `TransitionMotion` dictates `styles` to be an object, manipulating keys co
 
 - How do I set the duration of my animation?
 
-[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](http://chenglou.me/react-motion/demos/demo5-spring-parameters-chooserl) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
+[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](http://chenglou.me/react-motion/demos/demo5-spring-parameters-chooser/) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
 
 - How do I unmount the `TransitionMotion` container itself?
 
