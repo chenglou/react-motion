@@ -178,7 +178,7 @@ const Demo = React.createClass({
 
   willLeave(key, style) {
     return {
-      opacity: spring(0), // make opacity teach 0, after which we can kill the key
+      opacity: spring(0), // make opacity reach 0, after which we can kill the key
       text: style.text,
     };
   },
