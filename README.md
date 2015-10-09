@@ -34,14 +34,14 @@ Or build it yourself from the repo: `git clone https://github.com/chenglou/react
 _(P.S. Don't forget to compile for production when you test your animation's performance!)_
 
 ## Demos
-- [Simple Transition](http://chenglou.me/react-motion/demos/demo0-simple-transition)
-- [Chat Heads](http://chenglou.me/react-motion/demos/demo1-chat-heads)
-- [Draggable Balls](http://chenglou.me/react-motion/demos/demo2-draggable-balls)
-- [TodoMVC List Transition](http://chenglou.me/react-motion/demos/demo3-todomvc-list-transition)
-- [Photo Gallery](http://chenglou.me/react-motion/demos/demo4-photo-gallery)
-- [Spring Parameters Chooser](http://chenglou.me/react-motion/demos/demo5-spring-parameters-chooser)
-- [Water Ripples](http://chenglou.me/react-motion/demos/demo7-water-ripples)
-- [Draggable List](http://chenglou.me/react-motion/demos/demo8-draggable-list)
+- [Simple Transition](http://chenglou.github.io/react-motion/demos/demo0-simple-transition)
+- [Chat Heads](http://chenglou.github.io/react-motion/demos/demo1-chat-heads)
+- [Draggable Balls](http://chenglou.github.io/react-motion/demos/demo2-draggable-balls)
+- [TodoMVC List Transition](http://chenglou.github.io/react-motion/demos/demo3-todomvc-list-transition)
+- [Photo Gallery](http://chenglou.github.io/react-motion/demos/demo4-photo-gallery)
+- [Spring Parameters Chooser](http://chenglou.github.io/react-motion/demos/demo5-spring-parameters-chooser)
+- [Water Ripples](http://chenglou.github.io/react-motion/demos/demo7-water-ripples)
+- [Draggable List](http://chenglou.github.io/react-motion/demos/demo8-draggable-list)
 
 ## What does this library try to solve?
 
@@ -234,7 +234,7 @@ Since `TransitionMotion` dictates `styles` to be an object, manipulating keys co
 
 - How do I set the duration of my animation?
 
-[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](http://chenglou.me/react-motion/demos/demo5-spring-parameters-chooser/) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
+[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](http://chenglou.github.io/react-motion/demos/demo5-spring-parameters-chooser/) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
 
 - How do I unmount the `TransitionMotion` container itself?
 
