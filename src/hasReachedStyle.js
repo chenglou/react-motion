@@ -1,5 +1,5 @@
 /* @flow */
-import type {Style} from './Types.js';
+import type {Style} from './Types';
 
 export default function hasReachedStyle(
   currentStyle: Style,

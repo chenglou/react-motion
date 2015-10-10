@@ -1,5 +1,5 @@
 /* @flow */
-import type {Style} from './Types.js';
+import type {Style, TransitionStyles} from './Types';
 
 // this function is allocation-less thanks to babel, which transforms the tail
 // calls into loops
@@ -46,7 +46,7 @@ function mergeDiffArr(arrA, arrB, collB, indexA, indexB, onRemove, accum) {
 export default function mergeDiff(
   a: Style,
   b: Style,
-  onRemove: (key: string) => ?Style): Object {
+  onRemove: (key: string) => ?Style): TransitionStyles {
   let ret = {};
   // if anyone can make this work without allocating the arrays here, we'll
   // give you a medal
