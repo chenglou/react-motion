@@ -1,8 +1,9 @@
 /* @flow */
 import type {Style} from './Types.js';
 
-export default function hasReachedStyle(currentStyle: Style,
-                                        style: Style): boolean {
+export default function hasReachedStyle(
+  currentStyle: Style,
+  style: Style): boolean {
   for (let key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;

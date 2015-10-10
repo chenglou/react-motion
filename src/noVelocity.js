@@ -1,8 +1,12 @@
 /* @flow */
 // currentStyle keeps the info about whether a prop is configured as a spring
 // or if it's just a random prop that happens to be present on the style
-export default function noVelocity(currentVelocity: Object,
-                                   currentStyle: Object): boolean {
+
+import type {Style} from './Types.js';
+
+export default function noVelocity(
+  currentVelocity: Object,
+  currentStyle: Style): boolean {
   for (let key in currentVelocity) {
     if (!currentVelocity.hasOwnProperty(key)) {
       continue;
