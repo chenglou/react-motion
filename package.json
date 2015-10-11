@@ -47,7 +47,7 @@
     "test:travis": "karma start ./karma.conf.js --single-run",
     "test:dev": "karma start ./karma.conf.js --no-single-run --auto-watch",
     "test:cov": "karma start ./karma.conf.js --single-run --reporters coverage",
-    "gh-pages": "git fetch origin && git checkout gh-pages && git rebase origin/master --force-rebase && npm run build-demos && git add . && git commit --amend --no-edit && git push origin gh-pages --force && git checkout master"
+    "gh-pages": "git fetch origin && git checkout gh-pages && git reset --hard origin/gh-pages && git rebase origin/master --force-rebase && npm run build-demos && git add . && git commit --amend --no-edit && git push origin gh-pages --force && git checkout master"
   },
   "repository": {
     "type": "git",
