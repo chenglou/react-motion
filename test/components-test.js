@@ -264,7 +264,7 @@ describe('Motion', () => {
       },
     });
 
-    let Parent = React.createClass({
+    const Parent = React.createClass({
       getInitialState() {
         return {
           isAlive: true,

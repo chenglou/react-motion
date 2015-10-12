@@ -9,7 +9,7 @@ export function interpolateValue(alpha, nextStyle, prevStyle) {
   }
 
   let ret = {};
-  for (let key in nextStyle) {
+  for (const key in nextStyle) {
     if (!nextStyle.hasOwnProperty(key)) {
       continue;
     }
@@ -32,7 +32,7 @@ export function interpolateValue(alpha, nextStyle, prevStyle) {
 // TODO: refactor common logic with updateCurrentVelocity
 export function updateCurrentStyle(frameRate, currentStyle, currentVelocity, style) {
   let ret = {};
-  for (let key in style) {
+  for (const key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;
     }
@@ -58,7 +58,7 @@ export function updateCurrentStyle(frameRate, currentStyle, currentVelocity, sty
 
 export function updateCurrentVelocity(frameRate, currentStyle, currentVelocity, style) {
   let ret = {};
-  for (let key in style) {
+  for (const key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;
     }

@@ -1,7 +1,7 @@
 import mergeDiff from '../src/mergeDiff';
 
-let t = () => true;
-let n = () => null;
+const t = () => true;
+const n = () => null;
 describe('mergeDiff', () => {
   it('should merge latter key value into former', () => {
     expect(mergeDiff({a: 1}, {a: 2}, t)).toEqual({a: 2});

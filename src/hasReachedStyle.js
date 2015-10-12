@@ -4,7 +4,7 @@ import type {Style} from './Types';
 export default function hasReachedStyle(
   currentStyle: Style,
   style: Style): boolean {
-  for (let key in style) {
+  for (const key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;
     }

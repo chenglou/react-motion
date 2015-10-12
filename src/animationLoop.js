@@ -2,7 +2,7 @@ import {default as defaultNow} from 'performance-now';
 import {default as defaultRaf} from 'raf';
 
 export default function configAnimation(config = {}) {
-  let {
+  const {
     timeStep = 1 / 60 * 1000,
     timeScale = 1,
     maxSteps = 10,
@@ -26,7 +26,7 @@ export default function configAnimation(config = {}) {
       accumulatedTime = 0;
     }
 
-    let frameNumber = Math.ceil(accumulatedTime / timeStep);
+    const frameNumber = Math.ceil(accumulatedTime / timeStep);
     for (let i = 0; i < animRunning.length; i++) {
       const {active, animationStep, prevState: prevPrevState} = animRunning[i];
       let {nextState: prevNextState} = animRunning[i];
