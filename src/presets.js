@@ -1,3 +1,4 @@
+/* @flow */
 // [stiffness, damping]
 export default {
   noWobble: [170, 26], // the default

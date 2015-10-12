@@ -1,5 +1,5 @@
 import React from 'react';
-import {TransitionMotion, spring} from '../../src/Spring';
+import {TransitionMotion, spring} from '../../src/react-motion';
 import presets from '../../src/presets';
 
 const Demo = React.createClass({
@@ -117,12 +117,11 @@ const Demo = React.createClass({
     };
   },
 
-  // TODO: change naming
-  willLeave(date, valueThatJustLeft) {
+  willLeave(date, styleThatJustLeft) {
     return {
       height: spring(0),
       opacity: spring(0),
-      data: valueThatJustLeft.data,
+      data: styleThatJustLeft.data,
     };
   },
 

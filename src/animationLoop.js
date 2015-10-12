@@ -28,7 +28,7 @@ export default function configAnimation(config = {}) {
 
     let frameNumber = Math.ceil(accumulatedTime / timeStep);
     for (let i = 0; i < animRunning.length; i++) {
-      const {active, step, prevState: prevPrevState} = animRunning[i];
+      const {active, animationStep, prevState: prevPrevState} = animRunning[i];
       let {nextState: prevNextState} = animRunning[i];
 
       if (!active) {
@@ -46,10 +46,10 @@ export default function configAnimation(config = {}) {
       // The solution below is to recalculate the destination state even when
       // you're moving partially towards it.
       if (accumulatedTime <= 0) {
-        animRunning[i].nextState = step(timeStep / 1000, prevPrevState);
+        animRunning[i].nextState = animationStep(timeStep / 1000, prevPrevState);
       } else {
         for (let j = 0; j < frameNumber; j++) {
-          animRunning[i].nextState = step(timeStep / 1000, prevNextState);
+          animRunning[i].nextState = animationStep(timeStep / 1000, prevNextState);
           [animRunning[i].prevState, prevNextState] = [prevNextState, animRunning[i].nextState];
         }
       }
@@ -60,20 +60,13 @@ export default function configAnimation(config = {}) {
     // Render and filter in one iteration.
     const alpha = 1 + accumulatedTime / timeStep;
     for (let i = 0; i < animRunning.length; i++) {
-      const {render, nextState, prevState} = animRunning[i];
+      const {animationRender, nextState, prevState} = animRunning[i];
 
       // Might mutate animRunning........
-      render(alpha, nextState, prevState);
+      animationRender(alpha, nextState, prevState);
     }
 
-    let newAnimRunning = [];
-    for (let i = 0; i < animRunning.length; i++) {
-      if (animRunning[i].active) {
-        newAnimRunning.push(animRunning[i]);
-      }
-    }
-
-    animRunning = newAnimRunning;
+    animRunning = animRunning.filter(({active}) => active);
 
     if (animRunning.length === 0) {
       running = false;
@@ -91,10 +84,10 @@ export default function configAnimation(config = {}) {
     }
   }
 
-  return function startAnimation(state, step, render) {
+  return function startAnimation(state, animationStep, animationRender) {
     for (let i = 0; i < animRunning.length; i++) {
       let val = animRunning[i];
-      if (val.step === step) {
+      if (val.animationStep === animationStep) {
         val.active = true;
         val.prevState = state;
         start();
@@ -103,8 +96,8 @@ export default function configAnimation(config = {}) {
     }
 
     let newAnim = {
-      step,
-      render,
+      animationStep,
+      animationRender,
       prevState: state,
       nextState: state,
       active: true,

@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars, no-eval, no-shadow */
-/* global babel */
+
+import transform from 'babel-core/browser.min';
+
 
 // webpack trying to bundle babel errors, haven't checked why too much
 import CodeMirror from 'react-codemirror';
@@ -7,10 +9,9 @@ import CodeMirror from 'react-codemirror';
 // component need to refer to the original names. Forunately babel doesn't
 // transform the `require`s into different names too
 const React = require('react');
-const {Spring, TransitionSpring} = require('../../src/Spring');
+const {Spring, TransitionSpring} = require('../../src/react-motion');
 // loads js syntax
 import 'codemirror/mode/javascript/javascript';
-import l from '../../src/log';
 
 const codeMirrorOpts = {
   mode: 'javascript',
@@ -48,7 +49,7 @@ const Example = React.createClass({
     }
 
     try {
-      const jsCode = babel.transform(code).code;
+      const jsCode = transform(code).code;
       // evaled code might override Demo and Example which makes things weird
       (function doIt(Demo, Example) {
         eval(jsCode);
@@ -303,7 +304,7 @@ React.render(<Demo />, mountNode);
     }
 
     try {
-      const jsCode = babel.transform(headerCode).code;
+      const jsCode = transform(headerCode).code;
       (function doIt(Demo, Example) {
         eval(jsCode);
       })();

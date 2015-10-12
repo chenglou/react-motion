@@ -1,0 +1,8 @@
+[ignore]
+.*/fbjs/flow/include/.*
+.*/npmconf/test/fixtures/package.json
+[include]
+
+[libs]
+
+[options]

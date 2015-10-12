@@ -1,5 +1,5 @@
 import React from 'react';
-import {Spring} from '../../src/Spring';
+import {Motion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 
 const gridWidth = 150;
@@ -87,7 +87,7 @@ const Demo = React.createClass({
       <div className="demo5">
         {grid.map((row, i) => {
           return row.map((cell, j) => {
-            const style = {
+            const cellStyle = {
               top: gridHeight * i,
               left: gridWidth * j,
               width: gridWidth,
@@ -95,8 +95,15 @@ const Demo = React.createClass({
             };
             const stiffness = s0 + i * 30;
             const damping = d0 + j * 2;
+            const motionStyle = isPressed
+              ? {x: mouse[0], y: mouse[1]}
+              : {
+                  x: spring(gridWidth / 2 - 25, [stiffness, damping]),
+                  y: spring(gridHeight / 2 - 25, [stiffness, damping]),
+                };
+
             return (
-              <div style={style} className="demo5-cell">
+              <div style={cellStyle} className="demo5-cell">
                 <input
                   type="range"
                   min={0}
@@ -111,16 +118,8 @@ const Demo = React.createClass({
                   value={damping}
                   onMouseDown={this.handleMouseDownInput.bind(null, 'damping', j)}
                   onChange={this.handleChange.bind(null, 'damping', j)} />
-                <Spring endValue={() => {
-                  if (isPressed) {
-                    return {val: mouse, config: []};
-                  }
-                  return {
-                    val: [gridWidth / 2 - 25, gridHeight / 2 - 25],
-                    config: [stiffness, damping],
-                  };
-                }}>
-                  {({val: [x, y]}) => {
+                <Motion style={motionStyle}>
+                  {({x, y}) => {
                     let thing;
                     if (dragged === 'stiffness') {
                       thing = i < num ? <div className="demo5-minus">-{(num - i) * 30}</div>
@@ -152,7 +151,7 @@ const Demo = React.createClass({
                       </div>
                     );
                   }}
-                </Spring>
+                </Motion>
               </div>
             );
           });

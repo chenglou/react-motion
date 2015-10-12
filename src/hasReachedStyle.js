@@ -1,12 +1,24 @@
-export default function hasReachedStyle(currentStyle, style) {
+/* @flow */
+import type {Style} from './Types';
+
+export default function hasReachedStyle(
+  currentStyle: Style,
+  style: Style): boolean {
   for (let key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;
     }
-    if (style[key].config) {
-      if (currentStyle[key].val !== style[key].val) {
-        return false;
-      }
+    const currentValue = currentStyle[key];
+    const destValue = style[key];
+    if (destValue == null || !destValue.config) {
+      // not a spring config
+      continue;
+    }
+    if (currentValue.config && currentValue.val !== destValue.val) {
+      return false;
+    }
+    if (!currentValue.config && currentValue !== destValue.val) {
+      return false;
     }
   }
 
