@@ -1,11 +1,18 @@
+/.*
+
 /bower_components/
+/bower.json
+
 /build/
 /coverage/
 /demos/
 /native/non-compiled.js
 /test/
-/.*
-/bower.json
+
 /karma.conf.js
-/server.js
 /webpack.*
+/server.js
+
+# sublime
+/*.sublime-project
+/*.sublime-workspace
