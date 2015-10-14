@@ -13,7 +13,7 @@ import {Motion, spring} from 'react-motion';
 </Motion>
 ```
 
-Animate a counter from `0` `10`. For more advanced usage, see below.
+Animate a counter from `0` to `10`. For more advanced usage, see below.
 
 ## Install
 
