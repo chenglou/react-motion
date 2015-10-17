@@ -57,7 +57,7 @@ const Demo = React.createClass({
                     scale: scale,
                     transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
                     WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
-                }} />
+                  }} />
               );
             })}
           </div>

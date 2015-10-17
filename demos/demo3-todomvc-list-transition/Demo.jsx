@@ -133,9 +133,9 @@ const Demo = React.createClass({
           <h1>todos</h1>
           <form onSubmit={this.handleSubmit}>
             <input
+              autoFocus={true}
               className="new-todo"
               placeholder="What needs to be done?"
-              autoFocus={true}
               value={value}
               onChange={this.handleChange}
             />

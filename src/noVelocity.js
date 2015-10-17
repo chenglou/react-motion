@@ -7,7 +7,7 @@ import type {Style, Velocity} from './Types';
 export default function noVelocity(
   currentVelocity: Velocity,
   currentStyle: Style): boolean {
-  for (let key in currentVelocity) {
+  for (const key in currentVelocity) {
     if (!currentVelocity.hasOwnProperty(key)) {
       continue;
     }

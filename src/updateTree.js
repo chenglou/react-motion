@@ -14,7 +14,7 @@ export function interpolateValue(
   }
 
   let ret = {};
-  for (let key in nextStyle) {
+  for (const key in nextStyle) {
     if (!nextStyle.hasOwnProperty(key)) {
       continue;
     }
@@ -41,7 +41,7 @@ export function updateCurrentStyle(
   currentVelocity: Velocity,
   style: Style): Style {
   let ret = {};
-  for (let key in style) {
+  for (const key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;
     }
@@ -71,7 +71,7 @@ export function updateCurrentVelocity(
   currentVelocity: Velocity,
   style: Style): Style {
   let ret = {};
-  for (let key in style) {
+  for (const key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;
     }
