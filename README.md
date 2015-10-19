@@ -111,7 +111,7 @@ Optional. The value when the component first renders (ignored in subsequent rend
 ##### `style: Style`
 Required. Must have the same keys throughout component's existence. Must have the same keys as `defaultStyle` (if provided). Similar to `defaultStyle`, but asks for a `spring` configuration as the destination value: `{x: spring(10), y: spring(20, [120, 17])}`.
 
-##### `children: (interpolated: Style) => ?React.Component`
+##### `children: (Style) => ?React.Component`
 Required, which is passed an interpolated style object, e.g. `{x: 5.2, y: 12.1}`. Must returns a React element to render.
 
 ```jsx
@@ -128,10 +128,10 @@ When you want to animate a list of items, you can certainly create an array of `
 ##### `defaultStyles?: Array<Style>`
 Optional. Similar to `Motion`'s `defaultStyle`, except an array of styles.
 
-##### `styles: (previous?: Array<Style>) => Array<Style>`
+##### `styles: (?Array<Style>) => Array<Style>`
 Required. Takes as argument the previous array of styles (which is `undefined` at first render, unless `defaultStyles` is provided!). Return the array of styles containing the destination values.
 
-##### `children: (interpolated: Array<Style>) => ?React.Component`
+##### `children: (Array<Style>) => ?React.Component`
 Required. Similar to `Motion`'s `children`, but accepts the array of interpolated styles instead, e.g. `[{x: 5}, {x: 6.4}, {x: 8.1}]`
 
 #### Example
@@ -174,20 +174,20 @@ Similar but simpler logic for `willEnter`.
 ##### `defaultStyles?: StylesMap`
 Optional. Accepts an object of the format `{myKey1: styleObject, myKey2: styleObject}` where each `styleObject` is similar to `Motion`'s `defaultStyle`.
 
-##### `styles: StylesMap | (previous?: StylesMap) => StylesMap`
-Required. Accepts an object similar to `defaultStyles`, but where `styleObject` has `spring` configurations: `{myKey1: {x: spring(10)}, myKey2: {y: spring(20)}}`. Alternatively, also accepts a function which takes a `prevStyles` parameter (just like `StaggeredMotion`; you can do staggered unmounting animation!), and returns the destination styles.
+##### `styles: StylesMap | (?StylesMap) => StylesMap`
+Required. Accepts an object similar to `defaultStyles`, but where `styleObject` has `spring` configurations: `{myKey1: {x: spring(10)}, myKey2: {y: spring(20)}}`. Alternatively, also accepts a function which takes the previous stylesr (just like `StaggeredMotion`; you can do staggered unmounting animation!), and returns the destination styles.
 
-##### `willEnter?: (enteredKey: string, enteredStyle: Style, styles: StylesMap, currentInterpolatedStyle: Style, currentSpeed: number) => Style`
+##### `willEnter?: (string, Style, StylesMap, Style, number) => Style`
 Optional. Pass a function that takes the arguments `(keyFromStylesThatJustEntered, correspondingStyleOfKey, styles, currentInterpolatedStyle, currentSpeed)`, and that returns a style object similar to a `defaultStyle`.
 
 Defaults to a function that returns `correspondingStyleOfKey`, in this case `{x: spring(20)}`.
 
-##### `willLeave?: (leftKey: string, leftStyle: Style, styles: StylesMap, currentInterpolatedStyle: Style, currentSpeed: number) => Style`
+##### `willLeave?: (string, Style, StylesMap, Style, number) => Style`
 Optional. Pass a function that takes the arguments `keyThatJustLeft, correspondingStyleOfKey, styles, currentInterpolatedStyle, currentSpeed)` and that return a style object containing some `SpringConfig` as the destination configuration.
 
 Optional, defaults to `correspondingStyleOfKey`, i.e. immediately killing the key from the interpolated values.
 
-##### `children: (interpolated: StylesMap) => ?React.Component`
+##### `children: (StylesMap) => ?React.Component`
 Required. Similar to `Motion`'s `children`, but accepts the object of interpolated styles instead.
 
 #### Example
