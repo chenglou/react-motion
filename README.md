@@ -101,7 +101,7 @@ let config = spring(10, [120, 17]);
 
 This is not the `SpringConfig` component in version <0.3.0 - this has been renamed to `Motion` (see below).
 
-### `class Motion extends React.Component`
+### `<Motion />`
 
 #### `props`
 
@@ -120,7 +120,7 @@ Required, which is passed an interpolated style object, e.g. `{x: 5.2, y: 12.1}`
 </Motion>
 ```
 
-### `class StaggeredMotion extends React.Component`
+### `<StaggeredMotion />`
 When you want to animate a list of items, you can certainly create an array of `Motion`s and animate each. However, you often want to "stagger" them, i.e. animate items in one after another with a delay. Hard-coding this duration goes against the very purpose of spring physics. Instead, here's a natural, physics-based alternative, where "the destination position of an item depends on the current position of another".
 
 #### `props`
@@ -154,7 +154,7 @@ Required. Similar to `Motion`'s `children`, but accepts the array of interpolate
 </StaggeredMotion>
 ```
 
-### `class TransitionMotion extends React.Component`
+### `<TransitionMotion />`
 **The magic component that helps you to do mounting and unmounting animation.** Unlike React's `TransitionGroup`, instead of retaining a few items in a list when they disappear, `TransitionMotion` diffs on the shape of its `styles` object prop.
 
 **The general idea**
