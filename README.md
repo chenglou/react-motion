@@ -4,6 +4,7 @@
 [![npm version](https://badge.fury.io/js/react-motion.svg)](https://www.npmjs.com/package/react-motion)
 [![Bower version](https://badge.fury.io/bo/react-motion.svg)](http://badge.fury.io/bo/react-motion)
 [![react-motion channel on slack](https://img.shields.io/badge/slack-react--motion%40reactiflux-61DAAA.svg?style=flat)](http://reactiflux.herokuapp.com)
+[![react-motion channel on discord](https://img.shields.io/badge/discord-react--motion%40reactiflux-61DAAA.svg?style=flat)](https://discordapp.com/invite/0ZcbPKXt5bYzmcI0)
 
 ```jsx
 import {Motion, spring} from 'react-motion';
