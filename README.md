@@ -117,9 +117,9 @@ Let `TransitionMotion`'s `styles` be `{myKey1: {x: spring(30)}, myKey2: {x: spri
 
 A few renders later, you kill `myKey1` and its style config, i.e. pass the new `styles` as `{myKey2: {x: spring(20)}}`. TransitionMotion detects a missing key, but **retains** the key in the interpolated values as `{myKey1: ..., myKey2: ...}`.
 
-This is when `TransitionMotion` calls the prop `willLeave` that you provide, passing `myKey2` as argument. You're asked to return a final style config (for example, `{x: spring(50)}`) for `myKey1`, representing the style values that, when `interpolatedStyles.myKey1` reaches them, allows `TransitionMotion` to truly kill `myKey1` and its style config from the interpolated styles.
+This is when `TransitionMotion` calls the prop `willLeave` that you provide, passing `myKey1` as argument. You're asked to return a final style config (for example, `{x: spring(50)}`) for `myKey1`, representing the style values that, when `interpolatedStyles.myKey1` reaches them, allows `TransitionMotion` to truly kill `myKey1` and its style config from the interpolated styles.
 
-In summary: `styles` is `{k1: {x: spring(30)}, k2: {x: spring(20)}}`. Next render, `styles` is `{k2: {x: spring(20)}}`. The interpolated styles passed to children aren't affected, but remember that the `k2: configReturnedFromWillLeave` (say, `{x: spring(50)}`) part doesn't exist in the actual `styles` anymore. Moments later, interpolated styles reach `{k1: {x: 50}, k2: {x: 19.2}}`; it then re-renders, kills `k1` and become `{k2: {x: 19.2}}`. All this time, you're mapping over the interpolate styles and rendering two items, until the last render.
+In summary: `styles` is `{k1: {x: spring(30)}, k2: {x: spring(20)}}`. Next render, `styles` is `{k2: {x: spring(20)}}`. The interpolated styles passed to children aren't affected, but remember that the `k1: configReturnedFromWillLeave` (say, `{x: spring(50)}`) part doesn't exist in the actual `styles` anymore. Moments later, interpolated styles reach `{k1: {x: 50}, k2: {x: 19.2}}`; it then re-renders, kills `k1` and become `{k2: {x: 19.2}}`. All this time, you're mapping over the interpolate styles and rendering two items, until the last render.
 
 Similar but simpler logic for `willEnter`.
 
