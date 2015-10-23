@@ -253,3 +253,9 @@ React string refs won't work:
 ```
 
 This is how React works. Here's the [callback ref solution](https://facebook.github.io/react/docs/more-about-refs.html#the-ref-callback-attribute).
+
+## Other Examples of React-Motion
+
+- [react-motion-ui-pack](https://github.com/souporserious/react-motion-ui-pack) Wrapper component around React Motion for easier UI transitions
+- [react-motion-example](https://github.com/bgryszko/react-motion-example) Using TransitionSpring
+- [Kabuki-Motion](https://github.com/bishopZ/kabuki-motion) Boilerplate for Web Animators
