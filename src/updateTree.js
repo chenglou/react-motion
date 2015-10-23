@@ -1,15 +1,20 @@
+/* @flow */
 import stepper from './stepper';
 import spring from './spring';
+import type {Style, Velocity} from './Types';
 
 // TODO: refactor common logic with updateCurrValue and updateCurrVelocity
-export function interpolateValue(alpha, nextStyle, prevStyle) {
+export function interpolateValue(
+  alpha: number,
+  nextStyle: Style,
+  prevStyle: Style): Style {
   // might be used by a TransitionMotion, where prevStyle might not exist anymore
   if (!prevStyle) {
     return nextStyle;
   }
 
   let ret = {};
-  for (let key in nextStyle) {
+  for (const key in nextStyle) {
     if (!nextStyle.hasOwnProperty(key)) {
       continue;
     }
@@ -30,9 +35,13 @@ export function interpolateValue(alpha, nextStyle, prevStyle) {
 }
 
 // TODO: refactor common logic with updateCurrentVelocity
-export function updateCurrentStyle(frameRate, currentStyle, currentVelocity, style) {
+export function updateCurrentStyle(
+  frameRate: number,
+  currentStyle: Style,
+  currentVelocity: Velocity,
+  style: Style): Style {
   let ret = {};
-  for (let key in style) {
+  for (const key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;
     }
@@ -56,9 +65,13 @@ export function updateCurrentStyle(frameRate, currentStyle, currentVelocity, sty
   return ret;
 }
 
-export function updateCurrentVelocity(frameRate, currentStyle, currentVelocity, style) {
+export function updateCurrentVelocity(
+  frameRate: number,
+  currentStyle: Style,
+  currentVelocity: Velocity,
+  style: Style): Style {
   let ret = {};
-  for (let key in style) {
+  for (const key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;
     }

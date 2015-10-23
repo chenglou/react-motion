@@ -11,7 +11,7 @@ const startAnimation = configAnimation();
 
 function mapObject(f, obj) {
   let ret = {};
-  for (let key in obj) {
+  for (const key in obj) {
     if (!obj.hasOwnProperty(key)) {
       continue;
     }
@@ -21,7 +21,7 @@ function mapObject(f, obj) {
 }
 
 function everyObj(f, obj) {
-  for (let key in obj) {
+  for (const key in obj) {
     if (!obj.hasOwnProperty(key)) {
       continue;
     }
@@ -325,8 +325,9 @@ export default function components(React) {
 
     animationStep(timestep, state) {
       let {currentStyles, currentVelocities} = state;
-      let {styles, willEnter, willLeave} = this.props;
+      const {willEnter, willLeave} = this.props;
 
+      let styles = this.props.styles;
       if (typeof styles === 'function') {
         styles = styles(currentStyles);
       }

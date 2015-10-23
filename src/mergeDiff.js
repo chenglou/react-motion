@@ -20,7 +20,7 @@ function mergeDiffArr(arrA, arrB, collB, indexA, indexB, onRemove, accum) {
   }
 
   if (endB) {
-    let fill = onRemove(keyA);
+    const fill = onRemove(keyA);
     if (fill != null) {
       accum[keyA] = fill;
     }
@@ -33,7 +33,7 @@ function mergeDiffArr(arrA, arrB, collB, indexA, indexB, onRemove, accum) {
   }
 
   if (!collB.hasOwnProperty(keyA)) {
-    let fill = onRemove(keyA);
+    const fill = onRemove(keyA);
     if (fill != null) {
       accum[keyA] = fill;
     }

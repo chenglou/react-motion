@@ -25,7 +25,6 @@ var entry = {
   'demo3-todomvc-list-transition': './demos/demo3-todomvc-list-transition/index.jsx',
   'demo4-photo-gallery': './demos/demo4-photo-gallery/index.jsx',
   'demo5-spring-parameters-chooser': './demos/demo5-spring-parameters-chooser/index.jsx',
-  'demo6': './demos/demo6/index.jsx',
   'demo7-water-ripples': './demos/demo7-water-ripples/index.jsx',
   'demo8-draggable-list': './demos/demo8-draggable-list/index.jsx',
 };

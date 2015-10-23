@@ -6,7 +6,7 @@ import type {Style} from './Types';
 
 export default function stripStyle(style: Style): Object {
   let ret = {};
-  for (let key in style) {
+  for (const key in style) {
     if (!style.hasOwnProperty(key)) {
       continue;
     }

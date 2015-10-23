@@ -4,6 +4,11 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### 0.3.1 (October 14th 2015)
+- [F] Handle `null` and `undefined` in `style`/`styles`. #181
+- [I] Library's now partially annotated with [Flow](http://flowtype.org).
+- [I] Related to above, the `src/` folder is now exposed on npm so that you can take advantage of Flow by using: `import {Motion} from 'react-motion/src/react-motion'` directly, instead of the old, prebuilt `import {Motion} from 'react-motion'`. **This is experimental** and intentionally undocumented. You'll have to adjust your webpack/browserify configurations to require these original source files correctly. No harm trying of course. It's just some type annotations =).
+
 ### 0.3.0 (September 30th 2015)
 - [B] API revamp! See https://github.com/chenglou/react-motion/wiki for more details. Thanks!
 
