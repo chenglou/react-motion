@@ -43,6 +43,8 @@ _(P.S. Don't forget to compile for production when you test your animation's per
 - [Water Ripples](http://chenglou.github.io/react-motion/demos/demo7-water-ripples)
 - [Draggable List](http://chenglou.github.io/react-motion/demos/demo8-draggable-list)
 
+[Check the wiki for more!](https://github.com/chenglou/react-motion/wiki/Gallery-of-third-party-React-Motion-demos)
+
 ## What does this library try to solve?
 
 [My React-Europe talk](https://www.youtube.com/watch?v=1tavDv5hXpo)
@@ -253,9 +255,3 @@ React string refs won't work:
 ```
 
 This is how React works. Here's the [callback ref solution](https://facebook.github.io/react/docs/more-about-refs.html#the-ref-callback-attribute).
-
-## Other Examples of React-Motion
-
-- [react-motion-ui-pack](https://github.com/souporserious/react-motion-ui-pack) Wrapper component around React Motion for easier UI transitions
-- [react-motion-example](https://github.com/bgryszko/react-motion-example) Using TransitionSpring
-- [Kabuki-Motion](https://github.com/bishopZ/kabuki-motion) Boilerplate for Web Animators
