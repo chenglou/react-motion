@@ -54,25 +54,67 @@ For 95% of use-cases of animating components, we don't have to resort to using h
 This library also provides an alternative, more powerful API for React's `TransitionGroup`.
 
 ## API
-The library exports `Motion`, `StaggeredMotion`, `TransitionMotion`, `presets`, `spring` and `utils`.
 
-#### `spring: number -> ?[stiffness, damping] -> ConfigurationObject`
-(**Note**: not the `Spring` component in version <0.3.0.)
-The pervasive helper used to specify the how to animate to the destination value, e.g. `spring(10, [120, 17])` returns an opaque configuration that describes "an animation to the value 10, with a physics spring's stiffness of 120 and damping of 17". `spring(10)` without the spring configuration array defaults to `[170, 26]`. See below for more usage and see [here](#presets) for a list of convenient configurations the library exports.
+### `type PhysicsConfig = [number, number]`
+A spring's stiffness and damping. For example, `[120, 17]` would define a stiffness of `120`, and a damping of `17`.
 
-### &lt;Motion />
-Props:
+### `type SpringConfig = {val: number, config: PhysicsConfig}`
+A configuration object that specifies how to animate to the destination `val`, and the physics `config` to apply during that interpolation. This is usually constructed using the `spring` function.
 
-#### `defaultStyle: ?Object`
+### `type Style = {[key: string]: (SpringConfig | any)}`
+A map of style configs to animate. If the supplied value is not a `SpringConfig` object, the animation will jump straight to that value instead of interpolating.
+
+#### Example
+
+```jsx
+let style = {x: 5.2, y: spring(12.1), text: "hi"};
+```
+
+### `type StylesMap = {[id: string]: Style}`
+A series of of styles to interpolate between.
+
+The keys must be unique _non-number_ IDs because the enumeration order of numeric keys is not defined, which is important when you map over it in the corresponding component's `children` prop.
+
+#### Example
+
+```jsx
+let styles = {k1: {x: spring(30)}, k2: {x: spring(20)}};
+```
+
+### `function spring(val: number, config?: PhysicsConfig): SpringConfig`
+
+The pervasive helper used to construct a `SpringConfig` object. `config` defaults to `presets.noWobble`. See below for more usage and see [here](#presets) for a list of convenient configurations the library exports.
+
+#### Examples
+
+An animation to the value `10`, using the default `presets.noWobble` physics:
+
+```jsx
+let config = spring(10);
+```
+
+An animation to the value `10`, with a stiffness of `120` and damping of `17`:
+
+```jsx
+let config = spring(10, [120, 17]);
+```
+
+#### Note
+
+This is not the `SpringConfig` component in version <0.3.0 - this has been renamed to `Motion` (see below).
+
+### `<Motion />`
+
+#### `props`
+
+##### `defaultStyle?: Style`
 Optional. The value when the component first renders (ignored in subsequent renders). Accepts an object of arbitrary keys, mapping to initial values you want to animate, e.g. `{x: 0, y: 10}`.
 
-#### `style: Object`
+##### `style: Style`
 Required. Must have the same keys throughout component's existence. Must have the same keys as `defaultStyle` (if provided). Similar to `defaultStyle`, but asks for a `spring` configuration as the destination value: `{x: spring(10), y: spring(20, [120, 17])}`.
 
-**If a plain number is provided rather than a `spring` config**, instead of giving an interpolated value in the children function param below, we'll jump straight to that number value.
-
-#### `children: Object -> ?ReactElement`
-Required **function**, which is passed an interpolated style object, e.g. `{x: 5.2, y: 12.1}`. Must returns a React element to render.
+##### `children: (Style) => ?React.Component`
+Required, which is passed an interpolated style object, e.g. `{x: 5.2, y: 12.1}`. Must returns a React element to render.
 
 ```jsx
 <Motion defaultStyle={{x: 0}} style={{x: spring(10, [120, 17])}}>
@@ -80,17 +122,21 @@ Required **function**, which is passed an interpolated style object, e.g. `{x: 5
 </Motion>
 ```
 
-### &lt;StaggeredMotion />
+### `<StaggeredMotion />`
 When you want to animate a list of items, you can certainly create an array of `Motion`s and animate each. However, you often want to "stagger" them, i.e. animate items in one after another with a delay. Hard-coding this duration goes against the very purpose of spring physics. Instead, here's a natural, physics-based alternative, where "the destination position of an item depends on the current position of another".
 
-#### `defaultStyles: ?Array<Object>`
+#### `props`
+
+##### `defaultStyles?: Array<Style>`
 Optional. Similar to `Motion`'s `defaultStyle`, except an array of styles.
 
-#### `styles: ?Array<Object> -> Array<Object>`
-Required **function**. Takes as argument the previous array of styles (which is `undefined` at first render, unless `defaultStyles` is provided!). Return the array of styles containing the destination values.
+##### `styles: (?Array<Style>) => Array<Style>`
+Required. Takes as argument the previous array of styles (which is `undefined` at first render, unless `defaultStyles` is provided!). Return the array of styles containing the destination values.
 
-#### `children: Array<Object> -> ?ReactElement`
-A required **function**. Similar to `Motion`'s `children`, but accepts the array of interpolated styles instead, e.g. `[{x: 5}, {x: 6.4}, {x: 8.1}]`
+##### `children: (Array<Style>) => ?React.Component`
+Required. Similar to `Motion`'s `children`, but accepts the array of interpolated styles instead, e.g. `[{x: 5}, {x: 6.4}, {x: 8.1}]`
+
+#### Example
 
 ```jsx
 <StaggeredMotion
@@ -110,14 +156,14 @@ A required **function**. Similar to `Motion`'s `children`, but accepts the array
 </StaggeredMotion>
 ```
 
-### &lt;TransitionMotion />
+### `<TransitionMotion />`
 **The magic component that helps you to do mounting and unmounting animation.** Unlike React's `TransitionGroup`, instead of retaining a few items in a list when they disappear, `TransitionMotion` diffs on the shape of its `styles` object prop.
 
 **The general idea**
 
 Let `TransitionMotion`'s `styles` be `{myKey1: {x: spring(30)}, myKey2: {x: spring(20)}}`. The interpolated styles passed to the `children` function, after a moment, would be `{myKey1: {x: 15.1}, myKey2: {x: 8.2}}`.
 
-A few renders later, you kill `myKey1` and its style config, i.e. pass the new `styles` as `{myKey2: {x: spring(20)}}`. TransitionMotion detects a missing key, but **retains** the key in the interpolated values as `{myKey1: ..., myKey2: ...}`.
+A few renders later, you kill `myKey1` and its style config, i.e. pass the new `styles` as `{myKey2: {x: spring(20)}}`. `TransitionMotion` detects a missing key, but **retains** the key in the interpolated values as `{myKey1: ..., myKey2: ...}`.
 
 This is when `TransitionMotion` calls the prop `willLeave` that you provide, passing `myKey1` as argument. You're asked to return a final style config (for example, `{x: spring(50)}`) for `myKey1`, representing the style values that, when `interpolatedStyles.myKey1` reaches them, allows `TransitionMotion` to truly kill `myKey1` and its style config from the interpolated styles.
 
@@ -125,25 +171,28 @@ In summary: `styles` is `{k1: {x: spring(30)}, k2: {x: spring(20)}}`. Next rende
 
 Similar but simpler logic for `willEnter`.
 
-#### `defaultStyles: ?Object<string, Object>`
-Optional. Accepts an object of the format `{myKey1: styleObject, myKey2: styleObject}` where each `styleObject` is similar to `Motion`'s `defaultStyle`. The keys must be unique **non-number** IDs (number keys in JS object screws with keys enumeration order, which is important when you map over it in `children` function).
+#### `props`
 
-#### `styles: Object | (?Object -> Object)`
-Required. Accepts an object similar to `defaultStyles`, but where `styleObject` has `spring` configurations: `{myKey1: {x: spring(10)}, myKey2: {y: spring(20)}}`. Alternatively, also accepts a function which takes a `prevStyles` parameter (just like `StaggeredMotion`; you can do staggered unmounting animation!), and returns the destination styles.
+##### `defaultStyles?: StylesMap`
+Optional. Accepts an object of the format `{myKey1: styleObject, myKey2: styleObject}` where each `styleObject` is similar to `Motion`'s `defaultStyle`.
 
-#### `willEnter: (string, Object, Object, Object, Object) -> Object`
-__Not a very helpful type definition...__
+##### `styles: StylesMap | (?StylesMap) => StylesMap`
+Required. Accepts an object similar to `defaultStyles`, but where `styleObject` has `spring` configurations: `{myKey1: {x: spring(10)}, myKey2: {y: spring(20)}}`. Alternatively, also accepts a function which takes the previous stylesr (just like `StaggeredMotion`; you can do staggered unmounting animation!), and returns the destination styles.
+
+##### `willEnter?: (string, Style, StylesMap, Style, number) => Style`
 Optional. Pass a function that takes the arguments `(keyFromStylesThatJustEntered, correspondingStyleOfKey, styles, currentInterpolatedStyle, currentSpeed)`, and that returns a style object similar to a `defaultStyle`.
 
 Defaults to a function that returns `correspondingStyleOfKey`, in this case `{x: spring(20)}`.
 
-#### `willLeave: (string, Object, Object, Object, Object) -> Object`
-Optional. Pass a function that takes the arguments `keyThatJustLeft, correspondingStyleOfKey, styles, currentInterpolatedStyle, currentSpeed)` and that return a style object containing some `spring(...)` as the destination configuration.
+##### `willLeave?: (string, Style, StylesMap, Style, number) => Style`
+Optional. Pass a function that takes the arguments `keyThatJustLeft, correspondingStyleOfKey, styles, currentInterpolatedStyle, currentSpeed)` and that return a style object containing some `SpringConfig` as the destination configuration.
 
 Optional, defaults to `correspondingStyleOfKey`, i.e. immediately killing the key from the interpolated values.
 
-#### `children: Object -> ?ReactElement`
-A required **function**. Similar to `Motion`'s `children`, but accepts the object of interpolated styles instead.
+##### `children: (StylesMap) => ?React.Component`
+Required. Similar to `Motion`'s `children`, but accepts the object of interpolated styles instead.
+
+#### Example
 
 ```jsx
 const Demo = React.createClass({
@@ -215,10 +264,22 @@ const Demo = React.createClass({
 });
 ```
 
-### `presets`
+### Modules
+
+#### `presets`
 Some tasteful, commonly used spring presets you can plug into your `style` like so: `spring(10, presets.wobbly)`. [See here](https://github.com/chenglou/react-motion/blob/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/src/presets.js).
 
-### `utils`
+##### `const noWobble: PhysicsConfig`
+
+The default value when calling `spring` without a `stringConfig`.
+
+##### `const gentle: PhysicsConfig`
+
+##### `const wobbly: PhysicsConfig`
+
+##### `const stiff: PhysicsConfig`
+
+#### `utils`
 Since `TransitionMotion` dictates `styles` to be an object, manipulating keys could be a little more tedious than manipulating arrays. Here are the common scenarios' solutions:
 
 - Insert item at the beginning: `{newKey: myConfigForThisKey, ...oldConfigs}`.
@@ -227,10 +288,12 @@ Since `TransitionMotion` dictates `styles` to be an object, manipulating keys co
 
 **Note**: object keys creation order is now guaranteed by the specs, except for integer keys, which follow ascending order and should not be used with `TransitionMotion`. Fortunately, you can just add a letter to your key to turn them into "true" strings.
 
-#### `reorderKeys: (Object, Function) -> Object`
-`utils.reorderKeys({a: 1, b: 2}, (keysArray) => ['b', 'a']) // gives {b: 2, a: 1}`
+##### `function reorderKeys(styles: StylesMap, reorder: (keys: Array<string>) => Array<string>): StylesMap`
+Returns a new `StylesMap` of the same shape as `styles`, but with the keys in the order that the `reorder` function dictated. For example:
 
-`Function` will receive, as arguments, the array of keys in `Object` and should return a new array of keys (with e.g. order changed and/or keys removed). `reorderKeys` will then return a new object of the same shape as `object`, but with the keys in the order `Function` dictated.
+```jsx
+utils.reorderKeys({a: 1, b: 2}, (keysArray) => ['b', 'a']) // returns {b: 2, a: 1}
+```
 
 ## FAQ
 
