@@ -58,7 +58,7 @@ The library exports `Motion`, `StaggeredMotion`, `TransitionMotion`, `presets`, 
 
 #### `spring: number -> ?[stiffness, damping] -> ConfigurationObject`
 (**Note**: not the `Spring` component in version <0.3.0.)
-The pervasive helper used to specify the how to animate to the destination value, e.g. `spring(10, [120, 17])` returns an opaque configuration that describes "an animation to the value 10, with a physics spring's stiffness of 120 and damping of 17". `spring(10)` without the spring configuration array defaults to `[170, 26]`. See below for more usage and see [here](#presets) for a list of convenient configurations the library exports.
+The pervasive helper used to specify the how to animate to the destination value, e.g. `spring(10, [120, 17])` returns a configuration object with private properties (don't mutate this object because it's representation is still evolving) that describes "an animation to the value 10, with a physics spring's [stiffness](https://en.wikipedia.org/wiki/Stiffness) of 120 and [damping](https://en.wikipedia.org/wiki/Damping) of 17". `spring(10)` without the spring configuration array defaults to `[170, 26]`. See below for more usage and see [here](#presets) for a list of convenient configurations the library exports.
 
 ### &lt;Motion />
 Props:
