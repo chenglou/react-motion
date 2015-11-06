@@ -244,7 +244,7 @@ You don't. Unless you put it in another `TransitionMotion`...
 
 - How do I do staggering/chained animation where items animate in one after another?
 
-See [`StaggeredMotion`](#StaggeredMotion)
+See [`StaggeredMotion`](#staggeredmotion-)
 
 - My `ref` doesn't work in the children function.
 
