@@ -1,5 +1,5 @@
 /* @flow */
-const errorMargin = 0.0001;
+const errorMargin = 0.001;
 
 export default function stepper(
   frameRate: number,
@@ -25,7 +25,7 @@ export default function stepper(
   const newV = v + a * frameRate;
   const newX = x + newV * frameRate;
 
-  if (Math.abs(newV - v) < errorMargin && Math.abs(newX - destX) < errorMargin) {
+  if (Math.abs(newV) < errorMargin && Math.abs(newX - destX) < errorMargin) {
     return [destX, 0];
   }
 
