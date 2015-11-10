@@ -25,7 +25,7 @@ export default function stepper(
   const newV = v + a * frameRate;
   const newX = x + newV * frameRate;
 
-  if (Math.abs(newV - v) < errorMargin && Math.abs(newX - x) < errorMargin) {
+  if (Math.abs(newV - v) < errorMargin && Math.abs(newX - destX) < errorMargin) {
     return [destX, 0];
   }
 
