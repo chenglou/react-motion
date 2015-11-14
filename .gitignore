@@ -13,3 +13,4 @@ lib
 .DS_Store
 
 /demos/**/all.*
+/build/
