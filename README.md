@@ -17,17 +17,44 @@ Animate a counter from `0` to `10`. For more advanced usage, see below.
 
 ## Install
 
-Npm:
-`npm install react-motion`
+#### Npm:
+```sh
+npm install --save react-motion
+```
 
-Bower:
-`bower install react-motion`
+#### Bower:
+```sh
+bower install --save https://npmcdn.com/react-motion/build/react-motion.js
+```
 
-1998 Script Tag:
-`<script src="path/to/react-motion/build/react-motion.js"></script>`
+or in `bower.json`
+
+```json
+{
+  "dependencies": {
+    "react-motion": "https://npmcdn.com/react-motion/build/react-motion.js"
+  }
+}
+```
+
+then include as
+```html
+<script src="bower_components/react-motion/index.js"></script>
+```
+
+#### 1998 Script Tag:
+```html
+<script src="https://npmcdn.com/react-motion/build/react-motion.js"></script>
 (Module exposed as `ReactMotion`)
+```
 
-Or build it yourself from the repo: `git clone https://github.com/chenglou/react-motion.git && cd react-motion && npm install && npm run prerelease`
+#### Or build it yourself from the repo:
+```sh
+git clone https://github.com/chenglou/react-motion.git
+cd react-motion
+npm install
+npm run prerelease
+```
 
 **For React-native**, instead of `require('react-motion')`, do `require('react-motion/native')`.
 
