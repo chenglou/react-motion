@@ -68,11 +68,21 @@ export default function components(React) {
       };
     },
 
+    componentWillMount() {
+      this.externalRender = true;
+    },
+
+    componentDidUpdate() {
+      this.externalRender = false;
+    },
+
     componentDidMount() {
+      this.externalRender = false;
       this.startAnimating();
     },
 
     componentWillReceiveProps() {
+      this.externalRender = true;
       this.startAnimating();
     },
 
@@ -136,7 +146,7 @@ export default function components(React) {
 
     render() {
       const strippedStyle = stripStyle(this.state.currentStyle);
-      const renderedChildren = this.props.children(strippedStyle);
+      const renderedChildren = this.props.children(strippedStyle, this.externalRender);
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });
@@ -172,11 +182,21 @@ export default function components(React) {
       };
     },
 
+    componentWillMount() {
+      this.externalRender = true;
+    },
+
+    componentDidUpdate() {
+      this.externalRender = false;
+    },
+
     componentDidMount() {
+      this.externalRender = false;
       this.startAnimating();
     },
 
     componentWillReceiveProps() {
+      this.externalRender = true;
       this.startAnimating();
     },
 
@@ -236,7 +256,7 @@ export default function components(React) {
 
     render() {
       const strippedStyle = this.state.currentStyles.map(stripStyle);
-      const renderedChildren = this.props.children(strippedStyle);
+      const renderedChildren = this.props.children(strippedStyle, this.externalRender);
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });
@@ -315,11 +335,21 @@ export default function components(React) {
       };
     },
 
+    componentWillMount() {
+      this.externalRender = true;
+    },
+
+    componentDidUpdate() {
+      this.externalRender = false;
+    },
+
     componentDidMount() {
+      this.externalRender = false;
       this.startAnimating();
     },
 
     componentWillReceiveProps() {
+      this.externalRender = true;
       this.startAnimating();
     },
 
@@ -428,12 +458,26 @@ export default function components(React) {
 
     render() {
       const strippedStyle = mapObject(stripStyle, this.state.currentStyles);
-      const renderedChildren = this.props.children(strippedStyle);
+      const renderedChildren = this.props.children(strippedStyle, this.externalRender);
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });
 
+  const MotionBoundary = React.createClass({
+    propTypes: {
+      externalRender: PropTypes.bool.isRequired,
+      children: PropTypes.node,
+    },
+    shouldComponentUpdate(nextProps) {
+      return nextProps.externalRender;
+    },
+    render() {
+      return this.props.children;
+    },
+  });
+
+
   const {Spring, TransitionSpring} = deprecatedSprings(React);
 
-  return {Spring, TransitionSpring, Motion, StaggeredMotion, TransitionMotion};
+  return {Spring, TransitionSpring, Motion, StaggeredMotion, TransitionMotion, MotionBoundary};
 }
