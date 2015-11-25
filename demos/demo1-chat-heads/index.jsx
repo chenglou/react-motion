@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Demo from './Demo';
 
-React.render(<Demo />, document.querySelector('#content'));
+ReactDOM.render(<Demo />, document.querySelector('#content'));
