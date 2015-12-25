@@ -5,6 +5,9 @@
 [![Bower version](https://badge.fury.io/bo/react-motion.svg)](http://badge.fury.io/bo/react-motion)
 [![react-motion channel on discord](https://img.shields.io/badge/discord-react--motion%40reactiflux-738bd7.svg?style=flat)](https://discordapp.com/invite/0ZcbPKXt5bYzmcI0)
 
+#### Note: this is the master branch README, which differs from the stable build README that's located [here](https://github.com/chenglou/react-motion/blob/cc852fe787bb15a8b4a9e51538e03c57d5543d2e/README.md)
+
+
 ```jsx
 import {Motion, spring} from 'react-motion';
 // In your render...
