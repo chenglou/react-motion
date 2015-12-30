@@ -1,5 +1,5 @@
 import React from 'react';
-import {TransitionMotion, spring} from '../../src/react-motion';
+import {TransitionMotion, spring, MotionBoundary} from '../../src/react-motion';
 import presets from '../../src/presets';
 
 const Demo = React.createClass({
@@ -145,13 +145,14 @@ const Demo = React.createClass({
           <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll} />
           <TransitionMotion defaultStyles={this.getDefaultValue()} styles={this.getEndValue()} willLeave={this.willLeave}
             willEnter={this.willEnter}>
-            {configs =>
+            {(configs, externalRender) =>
               <ul className="todo-list">
                 {Object.keys(configs).map(date => {
                   const config = configs[date];
                   const {data: {isDone, text}, ...style} = config;
                   return (
                     <li key={date} style={style} className={isDone ? 'completed' : ''}>
+                      <MotionBoundary externalRender={externalRender}>
                       <div className="view">
                         <input
                           className="toggle"
@@ -165,6 +166,7 @@ const Demo = React.createClass({
                           onClick={this.handleDestroy.bind(null, date)}
                         />
                       </div>
+                      </MotionBoundary>
                     </li>
                   );
                 })}
