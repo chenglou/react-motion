@@ -333,6 +333,114 @@ describe('Motion', () => {
     ]);
     expect(count[count.length - 1]).toEqual(400);
   });
+
+  it('should call onCompleted when Motion completes', (done) => {
+    const App = React.createClass({
+      onCompleted() {
+        done();
+      },
+      render() {
+        return (
+          <Motion defaultStyle={{a: 0}} style={{a: spring(400)}} onCompleted={this.onCompleted}>
+            {({}) => {
+              return null;
+            }}
+          </Motion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    // Move "time" until we reach the final style value
+    mockRaf.step(111);
+  });
+
+  it('should call onCompleted once per Motion completed', (done) => {
+    const App = React.createClass({
+      count: 0,
+      getStyles() {
+        return [
+          {a: spring(400), b: 0, c: 0},
+          {a: 400, b: spring(400), c: 0},
+          {a: 400, b: 400, c: spring(400)},
+        ];
+      },
+      onCompleted() {
+        this.count ++;
+        if (this.count === 3) {
+          done();
+        }
+      },
+      render() {
+        return (
+          <Motion defaultStyle={{a: 0, b: 0, c: 0}} style={this.getStyles()} onCompleted={this.onCompleted}>
+            {({}) => {
+              return null;
+            }}
+          </Motion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    // Move "time" until we reach the final style value
+    mockRaf.step(333);
+  });
+
+  it('should complete with all styles reaching their destination values', () => {
+    let counts = [[], []];
+    const App = React.createClass({
+      render() {
+        return (
+          <Motion defaultStyle={{a: 0, b: 0}} style={[{a: spring(400), b: 0}, {a: 400, b: spring(400)}]}>
+            {({a, b}) => {
+              counts[0].push(a);
+              counts[1].push(b);
+              return null;
+            }}
+          </Motion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    expect(counts[0]).toEqual([0]);
+    expect(counts[1]).toEqual([0]);
+
+    // Move "time" until we reach the final style value
+    mockRaf.step(222);
+
+    expect(counts[0].slice(0, 5)).toEqual([
+      0,
+      18.888888888888886,
+      47.589506172839506,
+      80.49479595336076,
+      114.22887257563632,
+    ]);
+    expect(counts[0].slice(counts[0].length - 5, counts[0].length)).toEqual([
+      400,
+      400,
+      400,
+      400,
+      400,
+    ]);
+    expect(counts[1].slice(0, 5)).toEqual([
+      0,
+      0,
+      0,
+      0,
+      0,
+    ]);
+    expect(counts[1].slice(counts[1].length - 5, counts[1].length)).toEqual([
+      399.9998432254124,
+      399.99986482169055,
+      399.9998834430017,
+      400,
+      400,
+    ]);
+    expect(counts[0][counts[0].length - 1]).toEqual(400);
+    expect(counts[1][counts[1].length - 1]).toEqual(400);
+  });
 });
 
 describe('TransitionMotion', () => {
