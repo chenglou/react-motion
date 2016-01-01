@@ -1,6 +1,7 @@
 [ignore]
-.*/fbjs/flow/include/.*
-.*/npmconf/test/fixtures/package.json
+.*/node_modules/fbjs/lib/PromiseMap.js
+.*/node_modules/fbjs/lib/fetchWithRetries.js
+
 [include]
 
 [libs]
