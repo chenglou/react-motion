@@ -27,7 +27,7 @@ npm install --save react-motion
 
 #### Bower:
 ```sh
-bower install --save https://npmcdn.com/react-motion/build/react-motion.js
+bower install --save https://npmcdn.com/react-motion/bower.zip
 ```
 
 or in `bower.json`
@@ -35,14 +35,14 @@ or in `bower.json`
 ```json
 {
   "dependencies": {
-    "react-motion": "https://npmcdn.com/react-motion/build/react-motion.js"
+    "react-motion": "https://npmcdn.com/react-motion/bower.zip"
   }
 }
 ```
 
 then include as
 ```html
-<script src="bower_components/react-motion/index.js"></script>
+<script src="bower_components/react-motion/build/react-motion.js"></script>
 ```
 
 #### 1998 Script Tag:
