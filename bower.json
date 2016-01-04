@@ -6,9 +6,12 @@
     "chenglou"
   ],
   "description": "A spring that solves your animation problems.",
-  "main": ["build/react-motion.js"],
+  "main": [
+    "build/react-motion.js",
+    "build/react-motion.map"
+  ],
   "dependencies": {
-    "react": ">=0.13.2"
+    "react": ">=0.13.2 || ^0.14"
   },
   "keywords": [
     "react",
