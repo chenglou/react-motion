@@ -55,16 +55,22 @@ export default function components(React) {
         }
       },
       defaultStyle: PropTypes.object,
-      style: PropTypes.object.isRequired,
+      style: React.PropTypes.oneOfType([
+        React.PropTypes.object,
+        React.PropTypes.arrayOf(React.PropTypes.object),
+      ]).isRequired,
       children: PropTypes.func.isRequired,
+      onCompleted: PropTypes.func,
     },
 
     getInitialState() {
-      const {defaultStyle, style} = this.props;
-      const currentStyle = defaultStyle || style;
+      const defaultStyle = this.props.defaultStyle;
+      const style = [].concat(this.props.style);
+      const currentStyle = defaultStyle || style[0];
       return {
         currentStyle: currentStyle,
         currentVelocity: mapObject(zero, currentStyle),
+        currentIndex: 0,
       };
     },
 
@@ -77,26 +83,41 @@ export default function components(React) {
     },
 
     animationStep(timestep, state) {
-      const {currentStyle, currentVelocity} = state;
-      const {style} = this.props;
+      const {currentStyle, currentVelocity, currentIndex} = state;
+      const style = [].concat(this.props.style);
+      const nextStyle = style[currentIndex];
 
       const newCurrentStyle =
-        updateCurrentStyle(timestep, currentStyle, currentVelocity, style);
+        updateCurrentStyle(timestep, currentStyle, currentVelocity, nextStyle);
       const newCurrentVelocity =
-        updateCurrentVelocity(timestep, currentStyle, currentVelocity, style);
+        updateCurrentVelocity(timestep, currentStyle, currentVelocity, nextStyle);
+      const newCurrentIndex =
+        !this.firstPass &&
+        noVelocity(currentVelocity, newCurrentStyle) &&
+        noVelocity(newCurrentVelocity, newCurrentStyle) ? currentIndex + 1 : currentIndex;
 
       // TOOD: this isn't necessary anymore. It was used only against endValue func
       if (noVelocity(currentVelocity, newCurrentStyle) &&
           noVelocity(newCurrentVelocity, newCurrentStyle)) {
-        // check explanation in `Motion.animationRender`
-        this.stopAnimation(); // Nasty side effects....
+        if (!this.firstPass && this.props.onCompleted && currentIndex < style.length) {
+          this.props.onCompleted();
+        }
+        if (this.firstPass || currentIndex === style.length - 1) {
+          // check explanation in `Motion.animationRender`
+          this.stopAnimation(); // Nasty side effects....
+        }
       }
+
+      this.firstPass = false;
 
       return {
         currentStyle: newCurrentStyle,
         currentVelocity: newCurrentVelocity,
+        currentIndex: newCurrentIndex,
       };
     },
+
+    firstPass: true,
 
     stopAnimation: null,
 
