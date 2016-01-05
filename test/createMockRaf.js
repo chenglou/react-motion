@@ -1,12 +1,14 @@
-export default function() {
+/* @flow */
+
+type Callback = (now: number) => void;
+
+export default function(): Object {
   let allCallbacks = [];
   let prevTime = 0;
 
-  const now = () => {
-    return prevTime;
-  };
+  const now = () => prevTime;
 
-  const raf = cb => {
+  const raf = (cb: Callback) => {
     allCallbacks.push(cb);
   };
 
@@ -15,9 +17,8 @@ export default function() {
     const allCallbacksBefore = allCallbacks;
     allCallbacks = [];
 
-    allCallbacksBefore.forEach(cb => cb());
-
     prevTime += ms;
+    allCallbacksBefore.forEach(cb => cb(prevTime));
   };
 
   const step = (howMany = 1, ms = defaultTimeInterval) => {
