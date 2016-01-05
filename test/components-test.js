@@ -131,28 +131,6 @@ describe('Motion', () => {
     ]);
   });
 
-  it('should call raf one more time after it is done animating', () => {
-    let count = [];
-    const App = React.createClass({
-      render() {
-        return (
-          <Motion style={{a: 400}}>
-            {({a}) => {
-              count.push(a);
-              return null;
-            }}
-          </Motion>
-        );
-      },
-    });
-    TestUtils.renderIntoDocument(<App />);
-
-    // Checking initial render
-    expect(count).toEqual([400]);
-    mockRaf.step(10); // Shouldn't matter, we stop rafing
-    expect(count).toEqual([400, 400]);
-  });
-
   it('should work with nested Motions', () => {
     let count = [];
     const App = React.createClass({
