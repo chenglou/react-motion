@@ -1,15 +1,21 @@
+/* @flow */
 import noVelocity from './noVelocity';
 import hasReachedStyle from './hasReachedStyle';
 import mergeDiff from './mergeDiff';
-import configAnimation from './animationLoop';
+import * as animationLoop from './animationLoop';
 import zero from './zero';
 import {interpolateValue, updateCurrentStyle, updateCurrentVelocity} from './updateTree';
 import deprecatedSprings from './deprecatedSprings';
 import stripStyle from './stripStyle';
+import stepper from './stepper';
+import {default as defaultNow} from 'performance-now';
+import {default as defaultRaf} from 'raf';
 
-const startAnimation = configAnimation();
+import type {CurrentStyle, Style, Velocity} from './Types';
+const startAnimation = animationLoop.configAnimation();
+const msPerFrame = 1000 / 60;
 
-function mapObject(f, obj) {
+function mapObject(f, obj: Object): Object {
   let ret = {};
   for (const key in obj) {
     if (!obj.hasOwnProperty(key)) {
@@ -20,7 +26,7 @@ function mapObject(f, obj) {
   return ret;
 }
 
-function everyObj(f, obj) {
+function everyObj(f: (_: any) => boolean, obj: Object): boolean {
   for (const key in obj) {
     if (!obj.hasOwnProperty(key)) {
       continue;
@@ -344,5 +350,5 @@ export default function components(React: Object): Object {
 
   const {Spring, TransitionSpring} = deprecatedSprings(React);
 
-  return {Spring, TransitionSpring, Motion, StaggeredMotion, TransitionMotion};
+  return {Spring, TransitionSpring, StaggeredMotion, TransitionMotion};
 }
