@@ -32,114 +32,23 @@ function everyObj(f, obj) {
   return true;
 }
 
-export default function components(React) {
+export default function components(React: Object): Object {
   const {PropTypes} = React;
 
-  const Motion = React.createClass({
-    propTypes: {
-      // TOOD: warn against putting a config in here
-      defaultValue: (prop, propName) => {
-        if (prop[propName]) {
-          return new Error(
-            'Spring\'s `defaultValue` has been changed to `defaultStyle`. ' +
-            'Its format received a few (easy to update!) changes as well.'
-          );
-        }
-      },
-      endValue: (prop, propName) => {
-        if (prop[propName]) {
-          return new Error(
-            'Spring\'s `endValue` has been changed to `style`. Its format ' +
-            'received a few (easy to update!) changes as well.'
-          );
-        }
-      },
-      defaultStyle: PropTypes.object,
-      style: PropTypes.object.isRequired,
-      children: PropTypes.func.isRequired,
-    },
+  type CurrentStyles = Array<CurrentStyle>;
+  type Styles = Array<Style>;
+  type Velocities = Array<Velocity>;
 
-    getInitialState() {
-      const {defaultStyle, style} = this.props;
-      const currentStyle = defaultStyle || style;
-      return {
-        currentStyle: currentStyle,
-        currentVelocity: mapObject(zero, currentStyle),
-      };
-    },
+  type StaggerMotionState = {
+    currentStyles: CurrentStyles,
+    currentVelocities: Velocities,
+    previousIdealStyles: CurrentStyles,
+    previousIdealVelocities: Velocities,
+    nextIdealStyles: CurrentStyles,
+    nextIdealVelocities: Velocities,
+  };
 
-    componentDidMount() {
-      this.startAnimating();
-    },
-
-    componentWillReceiveProps() {
-      this.startAnimating();
-    },
-
-    animationStep(timestep, state) {
-      const {currentStyle, currentVelocity} = state;
-      const {style} = this.props;
-
-      const newCurrentStyle =
-        updateCurrentStyle(timestep, currentStyle, currentVelocity, style);
-      const newCurrentVelocity =
-        updateCurrentVelocity(timestep, currentStyle, currentVelocity, style);
-
-      // TOOD: this isn't necessary anymore. It was used only against endValue func
-      if (noVelocity(currentVelocity, newCurrentStyle) &&
-          noVelocity(newCurrentVelocity, newCurrentStyle)) {
-        // check explanation in `Motion.animationRender`
-        this.stopAnimation(); // Nasty side effects....
-      }
-
-      return {
-        currentStyle: newCurrentStyle,
-        currentVelocity: newCurrentVelocity,
-      };
-    },
-
-    stopAnimation: null,
-
-    // used in animationRender
-    hasUnmounted: false,
-
-    componentWillUnmount() {
-      this.stopAnimation();
-      this.hasUnmounted = true;
-    },
-
-    startAnimating() {
-      // Is smart enough to not start it twice
-      this.stopAnimation = startAnimation(
-        this.state,
-        this.animationStep,
-        this.animationRender,
-      );
-    },
-
-    animationRender(alpha, nextState, prevState) {
-      // `this.hasUnmounted` might be true in the following condition:
-      // user does some checks in `style` and calls an owner handler
-      // owner sets state in the callback, triggering a re-render
-      // unmounts Motion
-      if (!this.hasUnmounted) {
-        this.setState({
-          currentStyle: interpolateValue(
-            alpha,
-            nextState.currentStyle,
-            prevState.currentStyle,
-          ),
-          currentVelocity: nextState.currentVelocity,
-        });
-      }
-    },
-
-    render() {
-      const strippedStyle = stripStyle(this.state.currentStyle);
-      const renderedChildren = this.props.children(strippedStyle);
-      return renderedChildren && React.Children.only(renderedChildren);
-    },
-  });
+  type DestStylesFunc = (_: ?CurrentStyles) => Styles;
 
   const StaggeredMotion = React.createClass({
     propTypes: {
