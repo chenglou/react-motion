@@ -7,13 +7,8 @@ import zero from './zero';
 import {interpolateValue, updateCurrentStyle, updateCurrentVelocity} from './updateTree';
 import deprecatedSprings from './deprecatedSprings';
 import stripStyle from './stripStyle';
-import stepper from './stepper';
-import {default as defaultNow} from 'performance-now';
-import {default as defaultRaf} from 'raf';
 
-import type {CurrentStyle, Style, Velocity} from './Types';
 const startAnimation = animationLoop.configAnimation();
-const msPerFrame = 1000 / 60;
 
 function mapObject(f, obj: Object): Object {
   let ret = {};
@@ -40,121 +35,6 @@ function everyObj(f: (_: any) => boolean, obj: Object): boolean {
 
 export default function components(React: Object): Object {
   const {PropTypes} = React;
-
-  type CurrentStyles = Array<CurrentStyle>;
-  type Styles = Array<Style>;
-  type Velocities = Array<Velocity>;
-
-  type StaggerMotionState = {
-    currentStyles: CurrentStyles,
-    currentVelocities: Velocities,
-    previousIdealStyles: CurrentStyles,
-    previousIdealVelocities: Velocities,
-    nextIdealStyles: CurrentStyles,
-    nextIdealVelocities: Velocities,
-  };
-
-  type DestStylesFunc = (_: ?CurrentStyles) => Styles;
-
-  const StaggeredMotion = React.createClass({
-    propTypes: {
-      defaultStyle: (prop, propName) => {
-        if (prop[propName]) {
-          return new Error(
-            'You forgot the "s" for `StaggeredMotion`\'s `defaultStyles`.'
-          );
-        }
-      },
-      style: (prop, propName) => {
-        if (prop[propName]) {
-          return new Error(
-            'You forgot the "s" for `StaggeredMotion`\'s `styles`.'
-          );
-        }
-      },
-      // TOOD: warn against putting configs in here
-      defaultStyles: PropTypes.arrayOf(PropTypes.object),
-      styles: PropTypes.func.isRequired,
-      children: PropTypes.func.isRequired,
-    },
-
-    getInitialState() {
-      const {styles, defaultStyles} = this.props;
-      const currentStyles = defaultStyles ? defaultStyles : styles();
-      return {
-        currentStyles: currentStyles,
-        currentVelocities: currentStyles.map(s => mapObject(zero, s)),
-      };
-    },
-
-    componentDidMount() {
-      this.startAnimating();
-    },
-
-    componentWillReceiveProps() {
-      this.startAnimating();
-    },
-
-    animationStep(timestep, state) {
-      const {currentStyles, currentVelocities} = state;
-      const styles = this.props.styles(currentStyles.map(stripStyle));
-
-      const newCurrentStyles = currentStyles.map((currentStyle, i) => {
-        return updateCurrentStyle(timestep, currentStyle, currentVelocities[i], styles[i]);
-      });
-      const newCurrentVelocities = currentStyles.map((currentStyle, i) => {
-        return updateCurrentVelocity(timestep, currentStyle, currentVelocities[i], styles[i]);
-      });
-
-      // TODO: is this right?
-      if (currentVelocities.every((v, k) => noVelocity(v, currentStyles[k])) &&
-          newCurrentVelocities.every((v, k) => noVelocity(v, newCurrentStyles[k]))) {
-        this.stopAnimation();
-      }
-
-      return {
-        currentStyles: newCurrentStyles,
-        currentVelocities: newCurrentVelocities,
-      };
-    },
-
-    stopAnimation: null,
-
-    // used in animationRender
-    hasUnmounted: false,
-
-    componentWillUnmount() {
-      this.stopAnimation();
-      this.hasUnmounted = true;
-    },
-
-    startAnimating() {
-      this.stopAnimation = startAnimation(
-        this.state,
-        this.animationStep,
-        this.animationRender,
-      );
-    },
-
-    animationRender(alpha, nextState, prevState) {
-      // See comment in Motion.
-      if (!this.hasUnmounted) {
-        const currentStyles = nextState.currentStyles.map((style, i) => {
-          return interpolateValue(alpha, style, prevState.currentStyles[i]);
-        });
-        this.setState({
-          currentStyles,
-          currentVelocities: nextState.currentVelocities,
-        });
-      }
-    },
-
-    render() {
-      const strippedStyle = this.state.currentStyles.map(stripStyle);
-      const renderedChildren = this.props.children(strippedStyle);
-      return renderedChildren && React.Children.only(renderedChildren);
-    },
-  });
 
   const TransitionMotion = React.createClass({
     propTypes: {
@@ -350,5 +230,5 @@ export default function components(React: Object): Object {
 
   const {Spring, TransitionSpring} = deprecatedSprings(React);
 
-  return {Spring, TransitionSpring, StaggeredMotion, TransitionMotion};
+  return {Spring, TransitionSpring, TransitionMotion};
 }
