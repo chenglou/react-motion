@@ -5,11 +5,13 @@ type Callback = (now: number) => void;
 export default function(): Object {
   let allCallbacks = [];
   let prevTime = 0;
+  let id = 0;
 
   const now = () => prevTime;
 
   const raf = (cb: Callback) => {
     allCallbacks.push(cb);
+    return id++;
   };
 
   const defaultTimeInterval = 1000 / 60;
