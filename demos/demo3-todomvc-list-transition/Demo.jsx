@@ -81,8 +81,8 @@ const Demo = React.createClass({
     return Object.keys(todos)
       .reduce((configs, date) => {
         configs[date] = {
-          height: spring(0),
-          opacity: spring(1),
+          height: 0,
+          opacity: 1,
           data: todos[date],
         };
         return configs;
@@ -111,8 +111,8 @@ const Demo = React.createClass({
 
   willEnter(date) {
     return {
-      height: spring(0),
-      opacity: spring(1),
+      height: 0,
+      opacity: 1,
       data: this.state.todos[date],
     };
   },
