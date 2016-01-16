@@ -48,6 +48,33 @@ describe('animation loop', () => {
     ]);
   });
 
+  it('should work with negative numbers', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Motion defaultStyle={{a: -10}} style={{a: spring(-100)}}>
+            {({a}) => {
+              count.push(a);
+              return null;
+            }}
+          </Motion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    mockRaf.step(5);
+    expect(count).toEqual([
+      -10,
+      -14.25,
+      -20.70763888888889,
+      -28.11132908950617,
+      -35.70149632951818,
+      -43.038909327742175,
+    ]);
+  });
+
   it('should interpolate correctly when the timer is imperfect', () => {
     let count = [];
     const App = React.createClass({
