@@ -78,22 +78,6 @@ export default function makeStaggeredMotion(React: Object): Object {
   const StaggeredMotion = React.createClass({
     propTypes: {
       // TOOD: warn against putting a config in here
-      defaultValue: (prop, propName) => {
-        if (prop[propName]) {
-          return new Error(
-            'Spring\'s `defaultValue` has been changed to `defaultStyle`. ' +
-            'Its format received a few (easy to update!) changes as well.'
-          );
-        }
-      },
-      endValue: (prop, propName) => {
-        if (prop[propName]) {
-          return new Error(
-            'Spring\'s `endValue` has been changed to `style`. Its format ' +
-            'received a few (easy to update!) changes as well.'
-          );
-        }
-      },
       defaultStyles: PropTypes.arrayOf(PropTypes.object),
       styles: PropTypes.func.isRequired,
       children: PropTypes.func.isRequired,

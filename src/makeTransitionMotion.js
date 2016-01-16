@@ -188,22 +188,6 @@ export default function makeTransitionMotion(React: Object): Object {
   const TransitionMotion = React.createClass({
     propTypes: {
       // TOOD: warn against putting a config in here
-      defaultValue: (prop, propName) => {
-        if (prop[propName]) {
-          return new Error(
-            'Spring\'s `defaultValue` has been changed to `defaultStyle`. ' +
-            'Its format received a few (easy to update!) changes as well.'
-          );
-        }
-      },
-      endValue: (prop, propName) => {
-        if (prop[propName]) {
-          return new Error(
-            'Spring\'s `endValue` has been changed to `style`. Its format ' +
-            'received a few (easy to update!) changes as well.'
-          );
-        }
-      },
       defaultStyles: PropTypes.objectOf(PropTypes.object),
       styles: PropTypes.oneOfType([PropTypes.func, PropTypes.object]).isRequired,
       children: PropTypes.func.isRequired,

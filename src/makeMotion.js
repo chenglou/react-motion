@@ -56,22 +56,6 @@ export default function makeMotion(React: Object): Object {
   const Motion = React.createClass({
     propTypes: {
       // TOOD: warn against putting a config in here
-      defaultValue: (prop, propName) => {
-        if (prop[propName]) {
-          return new Error(
-            'Spring\'s `defaultValue` has been changed to `defaultStyle`. ' +
-            'Its format received a few (easy to update!) changes as well.'
-          );
-        }
-      },
-      endValue: (prop, propName) => {
-        if (prop[propName]) {
-          return new Error(
-            'Spring\'s `endValue` has been changed to `style`. Its format ' +
-            'received a few (easy to update!) changes as well.'
-          );
-        }
-      },
       defaultStyle: PropTypes.objectOf(PropTypes.number),
       style: PropTypes.object.isRequired,
       children: PropTypes.func.isRequired,
