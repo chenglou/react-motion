@@ -8,7 +8,7 @@ import {default as defaultRaf} from 'raf';
 import type {CurrentStyle, Style, Velocity} from './Types';
 const msPerFrame = 1000 / 60;
 
-function mapObject(f, obj: Object): Object {
+function mapObject<Val1, Val2>(f: (val: Val1, key: string) => Val2, obj: {[key: string]: Val1}): {[key: string]: Val2} {
   let ret = {};
   for (const key in obj) {
     if (!obj.hasOwnProperty(key)) {
@@ -80,7 +80,7 @@ export default function makeMotion(React: Object): Object {
     getInitialState(): MotionState {
       const {defaultStyle, style} = this.props;
       const currentStyle: CurrentStyle = defaultStyle || stripStyle(style);
-      const currentVelocity: Velocity = mapObject(zero, currentStyle);
+      const currentVelocity = mapObject(zero, currentStyle);
       return {
         currentStyle: currentStyle,
         currentVelocity: currentVelocity,
@@ -153,8 +153,6 @@ export default function makeMotion(React: Object): Object {
         }
         // console.log('dont stop, continue');
 
-        // if this is the first interpolation (wasn't animating), advance by one
-        // perfect frame
         const currentTime = defaultNow();
         const timeDelta = currentTime - this.prevTime;
         this.prevTime = currentTime;
@@ -172,17 +170,17 @@ export default function makeMotion(React: Object): Object {
           return;
         }
 
-        // TODO: no need to alloc so much. Optimize
-        let newLastIdealStyle: CurrentStyle = {...this.state.lastIdealStyle};
-        let newLastIdealVelocity: Velocity = {...this.state.lastIdealVelocity};
-        let newCurrentStyle: CurrentStyle = {};
-        let newCurrentVelocity: Velocity = {};
-
         let currentFrameCompletion =
           (this.accumulatedTime - Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
         const framesToCatchUp = Math.floor(this.accumulatedTime / msPerFrame);
 
         // console.log(currentFrameCompletion, this.accumulatedTime, framesToCatchUp, '-------------111');
+
+        // TODO: no need to alloc so much. Optimize
+        let newLastIdealStyle: CurrentStyle = {...this.state.lastIdealStyle};
+        let newLastIdealVelocity: Velocity = {...this.state.lastIdealVelocity};
+        let newCurrentStyle: CurrentStyle = {};
+        let newCurrentVelocity: Velocity = {};
 
         for (let key in this.props.style) {
           if (!this.props.style.hasOwnProperty(key)) {

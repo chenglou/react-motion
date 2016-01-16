@@ -3,15 +3,15 @@ import type {Style, TransitionStyles} from './Types';
 
 // this function is allocation-less thanks to babel, which transforms the tail
 // calls into loops
-function mergeDiffArr(arrA, arrB, collB, indexA, indexB, onRemove, accum) {
+function mergeDiffArr(arrA, arrB, collB, indexA, indexB, onRemove, accum): void {
   const endA = indexA === arrA.length;
   const endB = indexB === arrB.length;
   const keyA = arrA[indexA];
   const keyB = arrB[indexB];
   if (endA && endB) {
-    // returning null here, otherwise lint complains that we're not expecting
+    // returning undefined here, otherwise lint complains that we're not expecting
     // a return value in subsequent calls. We know what we're doing.
-    return null;
+    return undefined;
   }
 
   if (endA) {
@@ -44,8 +44,8 @@ function mergeDiffArr(arrA, arrB, collB, indexA, indexB, onRemove, accum) {
 }
 
 export default function mergeDiff(
-  a: Style,
-  b: Style,
+  a: TransitionStyles,
+  b: TransitionStyles,
   onRemove: (key: string) => ?Style): TransitionStyles {
   let ret = {};
   // if anyone can make this work without allocating the arrays here, we'll

@@ -21,7 +21,7 @@ type StaggeredMotionState = {
 
 type DestStylesFunc = (_: ?CurrentStyles) => Styles;
 
-function mapObject(f, obj: Object): Object {
+function mapObject<Val1, Val2>(f: (val: Val1, key: string) => Val2, obj: {[key: string]: Val1}): {[key: string]: Val2} {
   let ret = {};
   for (const key in obj) {
     if (!obj.hasOwnProperty(key)) {
@@ -32,7 +32,7 @@ function mapObject(f, obj: Object): Object {
   return ret;
 }
 
-function myClone(a: Array<Object>): Array<Object> {
+function myClone<A>(a: Array<A>): Array<A> {
   return a.map(obj => ({...obj}));
 }
 
@@ -102,7 +102,7 @@ export default function makeStaggeredMotion(React: Object): Object {
     getInitialState(): StaggeredMotionState {
       const {defaultStyles, styles} = this.props;
       const currentStyles: CurrentStyles = defaultStyles || styles().map(stripStyle);
-      const currentVelocities: Velocities = currentStyles.map(currentStyle => mapObject(zero, currentStyle));
+      const currentVelocities = currentStyles.map(currentStyle => mapObject(zero, currentStyle));
       return {
         currentStyles: currentStyles,
         currentVelocities: currentVelocities,
@@ -122,10 +122,10 @@ export default function makeStaggeredMotion(React: Object): Object {
     hasUnreadPropStyle: false,
 
     clearUnreadPropStyle(destStylesFunc: DestStylesFunc): void {
-      let newCurrentStyles: CurrentStyles = myClone(this.state.currentStyles);
-      let newCurrentVelocities: Velocities = myClone(this.state.currentVelocities);
-      let lastIdealStyles: CurrentStyles = myClone(this.state.lastIdealStyles);
-      let lastIdealVelocities: Velocities = myClone(this.state.lastIdealVelocities);
+      let newCurrentStyles = myClone(this.state.currentStyles);
+      let newCurrentVelocities = myClone(this.state.currentVelocities);
+      let lastIdealStyles = myClone(this.state.lastIdealStyles);
+      let lastIdealVelocities = myClone(this.state.lastIdealVelocities);
 
       const destStyles = destStylesFunc(this.state.lastIdealStyles);
       destStyles.forEach((destStyle, i) => {
@@ -179,8 +179,6 @@ export default function makeStaggeredMotion(React: Object): Object {
         }
         // console.log('dont stop, continue');
 
-        // if this is the first interpolation (wasn't animating), advance by one
-        // perfect frame
         const currentTime = defaultNow();
         const timeDelta = currentTime - this.prevTime;
         this.prevTime = currentTime;
@@ -198,17 +196,17 @@ export default function makeStaggeredMotion(React: Object): Object {
           return;
         }
 
-        // TODO: no need to alloc so much. Optimize
-        let newLastIdealStyles: CurrentStyles = myClone(this.state.lastIdealStyles);
-        let newLastIdealVelocities: Velocities = myClone(this.state.lastIdealVelocities);
-        let newCurrentStyles: CurrentStyles = myClone(this.state.currentStyles);
-        let newCurrentVelocities: Velocities = myClone(this.state.currentVelocities);
-
         let currentFrameCompletion =
           (this.accumulatedTime - Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
         const framesToCatchUp = Math.floor(this.accumulatedTime / msPerFrame);
 
         // console.log(currentFrameCompletion, this.accumulatedTime, framesToCatchUp, '-------------111');
+
+        // TODO: no need to alloc so much. Optimize
+        let newLastIdealStyles = myClone(this.state.lastIdealStyles);
+        let newLastIdealVelocities = myClone(this.state.lastIdealVelocities);
+        let newCurrentStyles = myClone(this.state.currentStyles);
+        let newCurrentVelocities = myClone(this.state.currentVelocities);
 
         destStyles.forEach((destStyle, i) => {
           let newCurrentStyle = newCurrentStyles[i];
