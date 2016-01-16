@@ -352,17 +352,14 @@ describe('Motion', () => {
     let setState = () => {};
     const App = React.createClass({
       getInitialState() {
-        return {p: 1};
+        return {a: spring(0)};
       },
       componentWillMount() {
         setState = this.setState.bind(this);
       },
       render() {
-        const p = this.state.p;
         return (
-          <Motion style={{
-            a: p === 1 ? spring(0) : p === 2 ? 400 : p === 3 ? spring(100) : spring(400),
-          }}>
+          <Motion style={this.state}>
             {({a}) => {
               count.push(a);
               return null;
@@ -374,10 +371,10 @@ describe('Motion', () => {
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([0]);
-    setState({p: 2});
-    setState({p: 3});
+    setState({a: 400});
+    setState({a: spring(100)});
     mockRaf.step(2);
-    setState({p: 4});
+    setState({a: spring(400)});
     mockRaf.step(2);
     expect(count).toEqual([
       0,
