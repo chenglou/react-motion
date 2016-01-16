@@ -158,6 +158,8 @@ function mergeAndSync(
     if (oldCurrentStyles.hasOwnProperty(id)) {
       return oldCurrentStyles[id];
     }
+    // TODO: willEnter now expects no spring() wrapper. Check HISTORY.md.
+    // provide warning soon
     return willEnter(
       id,
       destStyles[id],

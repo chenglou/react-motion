@@ -4,6 +4,9 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### 0.4.0
+- [B] `Motion`'s' `defaultStyle`, informally accepted the format `{x: spring(0)}`. This is now officially unsupported. The correct format has always been `{x: 0}`. Setting a default style of `{x: spring(whatever)}` did not make sense; the configuration only applies for a `style`, aka destination value. Same modification applies to `StaggeredMotion` and `TransitionMotion`'s `defaultStyles`.
+
 ### 0.3.1 (October 14th 2015)
 - [F] Handle `null` and `undefined` in `style`/`styles`. #181
 - [I] Library's now partially annotated with [Flow](http://flowtype.org).
