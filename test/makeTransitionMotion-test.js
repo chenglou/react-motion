@@ -1,8 +1,7 @@
-import React, {addons} from 'react/addons';
+import React from 'react';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
-
-const TestUtils = addons.TestUtils;
+import {default as TestUtils} from 'react-addons-test-utils';
 
 const injector = require('inject!../src/makeTransitionMotion');
 

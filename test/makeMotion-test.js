@@ -1,8 +1,7 @@
-import React, {addons} from 'react/addons';
+import React from 'react';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
-
-const TestUtils = addons.TestUtils;
+import {default as TestUtils} from 'react-addons-test-utils';
 
 const injector = require('inject!../src/makeMotion');
 
@@ -226,6 +225,37 @@ describe('Motion', () => {
             style={{a: spring(10), b: spring(410)}}>
             {({a, b}) => {
               count.push([a, b]);
+              return null;
+            }}
+          </Motion>
+        );
+      },
+    });
+
+    TestUtils.renderIntoDocument(<App />);
+
+    expect(count).toEqual([[0, 10]]);
+    mockRaf.step(4);
+    expect(count).toEqual([
+      [0, 10],
+      [0.4722222222222222, 28.888888888888886],
+      [1.1897376543209877, 57.589506172839506],
+      [2.0123698988340193, 90.49479595336075],
+      [2.8557218143909084, 124.22887257563633],
+    ]);
+  });
+
+  // TODO: remove support for this. No test for now
+  xit('should handle null values', () => {
+    let count = [];
+    const App = React.createClass({
+      render() {
+        return (
+          <Motion
+            defaultStyle={{a: 0, b: null, c: undefined}}
+            style={{a: spring(10), b: null, c: undefined}}>
+            {({a, b, c}) => {
+              count.push([a, b, c]);
               return null;
             }}
           </Motion>
