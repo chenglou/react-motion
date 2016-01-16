@@ -53,7 +53,15 @@ module.exports = function (config) {
     preprocessors: {
       'test/index.js': ['webpack'],
     },
-    reporters: ['progress'],
+    reporters: ['jasmine-diff', 'progress'],
+    jasmineDiffReporter: {
+      pretty: true,
+      color: {
+        expectedFg: 'grey',
+        actualFg: 'grey',
+        defaultFg: 'grey'
+      }
+    },
     coverageReporter: {
       dir: './coverage/',
       subdir: '.',
