@@ -57,8 +57,11 @@ module.exports = function (config) {
     jasmineDiffReporter: {
       pretty: true,
       color: {
-        expectedFg: 'grey',
-        actualFg: 'grey',
+        expectedBg: '',
+        expectedFg: 'red',
+        actualBg: '',
+        actualFg: 'green',
+        defaultBg: '',
         defaultFg: 'grey'
       }
     },

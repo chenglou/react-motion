@@ -24,7 +24,7 @@
     "karma": "^0.13.10",
     "karma-coverage": "^0.5.2",
     "karma-jasmine": "^0.3.6",
-    "karma-jasmine-diff-reporter": "^0.3.1",
+    "karma-jasmine-diff-reporter": "^0.3.2",
     "karma-phantomjs-launcher": "^0.2.0",
     "karma-webpack": "^1.7.0",
     "lodash.range": "^3.0.1",
