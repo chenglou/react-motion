@@ -4,6 +4,6 @@ import type {SpringConfig} from './Types';
 
 export default function spring(
   val: number,
-  config: [number, number] = presets.noWobble): SpringConfig {
-  return {val, config};
+  [stiffness, damping]: [number, number] = presets.noWobble): SpringConfig {
+  return {val, stiffness, damping};
 }

@@ -9,8 +9,4 @@ describe('stripStyle', () => {
   it('should ignore non-configured values', () => {
     expect(stripStyle({a: 10, b: 0})).toEqual({a: 10, b: 0});
   });
-
-  it('should ignore `undefined`', () => {
-    expect(stripStyle({a: undefined})).toEqual({a: undefined});
-  });
 });

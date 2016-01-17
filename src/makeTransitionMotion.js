@@ -55,9 +55,6 @@ function shouldStopAnimationEach(currentStyle: CurrentStyle, destStyle: Style, c
     if (!destStyle.hasOwnProperty(key)) {
       continue;
     }
-    if (destStyle[key] == null || (typeof destStyle[key] !== 'number' && destStyle[key].config == null)) {
-      continue;
-    }
     const destVal = typeof destStyle[key] === 'number'
       ? destStyle[key]
       : destStyle[key].val;
@@ -408,8 +405,6 @@ export default function makeTransitionMotion(React: Object): Object {
               }
               newLastIdealStyle[key] = destStyle[key];
               newLastIdealVelocity[key] = 0;
-            } else if (destStyle[key].config == null) {
-              continue;
             } else {
               for (let j = 0; j < framesToCatchUp; j++) {
                 const interpolated = stepper(
@@ -417,8 +412,8 @@ export default function makeTransitionMotion(React: Object): Object {
                   newLastIdealStyle[key],
                   newLastIdealVelocity[key],
                   destStyle[key].val,
-                  destStyle[key].config[0],
-                  destStyle[key].config[1],
+                  destStyle[key].stiffness,
+                  destStyle[key].damping,
                 );
 
                 newLastIdealStyle[key] = interpolated[0];
@@ -430,8 +425,8 @@ export default function makeTransitionMotion(React: Object): Object {
                 newLastIdealStyle[key],
                 newLastIdealVelocity[key],
                 destStyle[key].val,
-                destStyle[key].config[0],
-                destStyle[key].config[1],
+                destStyle[key].stiffness,
+                destStyle[key].damping,
               );
 
               newCurrentStyle[key] =

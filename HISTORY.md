@@ -5,6 +5,7 @@ Legend:
 - [I]: Improvement
 
 ### 0.4.0
+- [B] `style`, `styles` and `styles` of the three respective components now only accept either a number to interpolate, or a `spring` configuration to interpolate. Previously, it accepted (and ignored) random key/value pairs mixed in, such as `{x: spring(0), y: 'helloWorld'}`. `y` Doesn't belong there and should therefore be placed elsewhere, e.g. directly on the (actual react) style of the component you're assigning the interpolating values on. This doesn't make sense for`TransitionMotion`; see the migration guide for solution.
 - [B] `Motion`'s' `defaultStyle`, informally accepted the format `{x: spring(0)}`. This is now officially unsupported. The correct format has always been `{x: 0}`. Setting a default style of `{x: spring(whatever)}` did not make sense; the configuration only applies for a `style`, aka destination value. Same modification applies to `StaggeredMotion` and `TransitionMotion`'s `defaultStyles`.
 
 ### 0.3.1 (October 14th 2015)

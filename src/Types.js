@@ -1,8 +1,8 @@
 /* @flow */
-
 export type SpringConfig = {
   val: number,
-  config: [number, number],
+  stiffness: number,
+  damping: number,
 };
 export type Style = {
   [key: string]: number | SpringConfig,

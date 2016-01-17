@@ -218,8 +218,8 @@ export default function makeStaggeredMotion(React: Object): Object {
                   newLastIdealStyle[key],
                   newLastIdealVelocity[key],
                   destStyle[key].val,
-                  destStyle[key].config[0],
-                  destStyle[key].config[1],
+                  destStyle[key].stiffness,
+                  destStyle[key].damping,
                 );
 
                 newLastIdealStyle[key] = interpolated[0];
@@ -231,8 +231,8 @@ export default function makeStaggeredMotion(React: Object): Object {
                 newLastIdealStyle[key],
                 newLastIdealVelocity[key],
                 destStyle[key].val,
-                destStyle[key].config[0],
-                destStyle[key].config[1],
+                destStyle[key].stiffness,
+                destStyle[key].damping,
               );
 
               newCurrentStyle[key] =

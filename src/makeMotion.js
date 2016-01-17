@@ -124,9 +124,10 @@ export default function makeMotion(React: Object): Object {
       this.animationID = defaultRaf(() => {
         // console.log('one raf called');
         // check if we need to animate in the first place
+        const propsStyle: Style = this.props.style;
         if (shouldStopAnimation(
           this.state.currentStyle,
-          this.props.style,
+          propsStyle,
           this.state.currentVelocity,
         )) {
           // TODO: no need to cancel animationID here; shouldn't have any in
@@ -166,15 +167,18 @@ export default function makeMotion(React: Object): Object {
         let newCurrentStyle: CurrentStyle = {};
         let newCurrentVelocity: Velocity = {};
 
-        for (let key in this.props.style) {
-          if (!this.props.style.hasOwnProperty(key)) {
+        for (let key in propsStyle) {
+          if (!propsStyle.hasOwnProperty(key)) {
             continue;
           }
 
-          if (typeof this.props.style[key] === 'number') {
-            newCurrentStyle[key] = this.props.style[key];
+          if (typeof propsStyle[key] === 'number') {
+            newCurrentStyle[key] = propsStyle[key];
             newCurrentVelocity[key] = 0;
-            newLastIdealStyle[key] = this.props.style[key];
+            if (typeof propsStyle[key] !== 'number') {
+              throw new Error('flow plz');
+            }
+            newLastIdealStyle[key] = propsStyle[key];
             newLastIdealVelocity[key] = 0;
           } else {
             for (let i = 0; i < framesToCatchUp; i++) {
@@ -182,9 +186,9 @@ export default function makeMotion(React: Object): Object {
                 msPerFrame / 1000,
                 newLastIdealStyle[key],
                 newLastIdealVelocity[key],
-                this.props.style[key].val,
-                this.props.style[key].config[0],
-                this.props.style[key].config[1],
+                propsStyle[key].val,
+                propsStyle[key].stiffness,
+                propsStyle[key].damping,
               );
 
               newLastIdealStyle[key] = interpolated[0];
@@ -195,9 +199,9 @@ export default function makeMotion(React: Object): Object {
               msPerFrame / 1000,
               newLastIdealStyle[key],
               newLastIdealVelocity[key],
-              this.props.style[key].val,
-              this.props.style[key].config[0],
-              this.props.style[key].config[1],
+              propsStyle[key].val,
+              propsStyle[key].stiffness,
+              propsStyle[key].damping,
             );
 
             newCurrentStyle[key] =
