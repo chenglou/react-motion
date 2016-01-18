@@ -262,10 +262,6 @@ export default function makeTransitionMotion(React: Object): Object {
         throw new Error('impossible, flow');
       }
 
-      // const unreadPropStyle = typeof propStyles === 'function'
-      //   ? propStyles(this.state.lastIdealStyles)
-      //   : propStyles;
-
       let [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities] = mergeAndSync(
         this.props.willEnter,
         this.props.willLeave,

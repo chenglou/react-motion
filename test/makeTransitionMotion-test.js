@@ -309,6 +309,51 @@ describe('TransitionMotion', () => {
     ]);
   });
 
+  it('should behave well when many owner styles function updates come in-between rAFs', () => {
+    // same test as above, except `styles` is a funciton here
+    let count = [];
+    let setState = () => {};
+    const App = React.createClass({
+      getInitialState() {
+        return {a: {x: spring(0)}};
+      },
+      componentWillMount() {
+        setState = this.setState.bind(this);
+      },
+      render() {
+        return (
+          <TransitionMotion
+            styles={() => this.state}
+            willEnter={() => ({y: 0})}
+            willLeave={() => ({y: spring(0)})}>
+            {a => {
+              count.push(a);
+              return null;
+            }}
+          </TransitionMotion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    expect(count).toEqual([{a: {x: 0}}]);
+    setState({a: {x: 400}, b: {y: 10}});
+    setState({a: {x: spring(100)}});
+    mockRaf.step(2);
+    setState({a: {x: spring(400)}});
+    mockRaf.step(2);
+    expect(count).toEqual([
+      {a: {x: 0}},
+      {a: {x: 0}}, // this new 0 comes from owner update, causing TransitionMotion to re-render
+      {a: {x: 400}, b: {y: 10}},
+      {a: {x: 385.8333333333333}, b: {y: 10}},
+      {a: {x: 364.3078703703703}, b: {y: 10}},
+      {a: {x: 364.3078703703703}, b: {y: 10}},
+      {a: {x: 353.79556970164606}, b: {y: 10}},
+      {a: {x: 350.02047519790233}, b: {y: 10}},
+    ]);
+  });
+
   it('should transition things in/out at the beginning', () => {
     let count = [];
     const App = React.createClass({
