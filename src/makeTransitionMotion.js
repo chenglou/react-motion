@@ -49,7 +49,7 @@ function forEachObject<A>(f: (val: A, key: string) => void, obj: {[key: string]:
 }
 
 // usage assumption: currentStyle values have already been rendered but it says
-// nothing of whether currentStyle is stale (see Motion's hasUnreadPropStyle)
+// nothing of whether currentStyle is stale (see unreadpropstyle)
 function shouldStopAnimationEach(currentStyle: CurrentStyle, destStyle: Style, currentVelocity: Velocity): boolean {
   for (let key in destStyle) {
     if (!destStyle.hasOwnProperty(key)) {
@@ -252,23 +252,25 @@ export default function makeTransitionMotion(React: Object): Object {
     // at 0 (didn't have time to tick and interpolate even once). If we naively
     // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
     // In reality currentStyle should be 400
-    hasUnreadPropStyle: false,
-
-    clearUnreadPropStyle(propStyles: PropStyles): void {
+    unreadpropstyle: (null: ?Styles),
+    // after checking for unreadpropstyle != null, we manually go set the
+    // non-interpolating values (those that are a number, without a spring
+    // config)
+    clearUnreadPropStyle(unreadPropStyle: Styles): void {
       if (this.props.willEnter == null || this.props.willLeave == null) {
         // TODO: use classes so flow can recognize default props
         throw new Error('impossible, flow');
       }
 
-      const destStyles = typeof propStyles === 'function'
-        ? propStyles(this.state.lastIdealStyles)
-        : propStyles;
+      // const unreadPropStyle = typeof propStyles === 'function'
+      //   ? propStyles(this.state.lastIdealStyles)
+      //   : propStyles;
 
       let [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities] = mergeAndSync(
         this.props.willEnter,
         this.props.willLeave,
         this.state.mergedPropsStyles,
-        destStyles,
+        unreadPropStyle,
         this.state.currentStyles,
         this.state.currentVelocities,
         this.state.lastIdealStyles,
@@ -302,7 +304,7 @@ export default function makeTransitionMotion(React: Object): Object {
             newLastIdealVelocities[id][key] = 0;
           }
         }
-      }, destStyles);
+      }, unreadPropStyle);
 
       this.setState({
         currentStyles: newCurrentStyles,
@@ -469,7 +471,7 @@ export default function makeTransitionMotion(React: Object): Object {
           mergedPropsStyles: newMergedPropsStyles,
         });
 
-        this.hasUnreadPropStyle = false;
+        this.unreadpropstyle = null;
 
         this.startAnimationIfNecessary();
       });
@@ -480,12 +482,16 @@ export default function makeTransitionMotion(React: Object): Object {
       this.startAnimationIfNecessary();
     },
 
-    componentWillReceiveProps() {
-      if (this.hasUnreadPropStyle) {
-        this.clearUnreadPropStyle(this.props.styles);
+    componentWillReceiveProps(props) {
+      if (this.unreadpropstyle) {
+        // previous props haven't had the chance to be set yet; set them here
+        this.clearUnreadPropStyle(this.unreadpropstyle);
       }
 
-      this.hasUnreadPropStyle = true;
+      this.unreadpropstyle = typeof props.styles === 'function'
+        ? props.styles(this.state.lastIdealStyles)
+        : props.styles;
+
       if (this.animationID == null) {
         this.prevTime = defaultNow();
         this.startAnimationIfNecessary();

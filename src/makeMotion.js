@@ -20,7 +20,7 @@ function mapObject<Val1, Val2>(f: (val: Val1, key: string) => Val2, obj: {[key: 
 }
 
 // usage assumption: currentStyle values have already been rendered but it says
-// nothing of whether currentStyle is stale (see Motion's hasUnreadPropStyle)
+// nothing of whether currentStyle is stale (see unreadPropStyle)
 function shouldStopAnimation(currentStyle: CurrentStyle, destStyle: Style, currentVelocity: Velocity): boolean {
   for (let key in destStyle) {
     if (!destStyle.hasOwnProperty(key)) {
@@ -81,8 +81,10 @@ export default function makeMotion(React: Object): Object {
     // at 0 (didn't have time to tick and interpolate even once). If we naively
     // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
     // In reality currentStyle should be 400
-    hasUnreadPropStyle: false,
-
+    unreadPropStyle: (null: ?Style),
+    // after checking for unreadPropStyle != null, we manually go set the
+    // non-interpolating values (those that are a number, without a spring
+    // config)
     clearUnreadPropStyle(destStyle: Style): void {
       let newCurrentStyle: CurrentStyle = {...this.state.currentStyle};
       let newCurrentVelocity: Velocity = {...this.state.currentVelocity};
@@ -226,7 +228,7 @@ export default function makeMotion(React: Object): Object {
           lastIdealVelocity: newLastIdealVelocity,
         });
 
-        this.hasUnreadPropStyle = false;
+        this.unreadPropStyle = null;
 
         this.startAnimationIfNecessary();
       });
@@ -237,12 +239,13 @@ export default function makeMotion(React: Object): Object {
       this.startAnimationIfNecessary();
     },
 
-    componentWillReceiveProps() {
-      if (this.hasUnreadPropStyle) {
-        this.clearUnreadPropStyle(this.props.style);
+    componentWillReceiveProps(props) {
+      if (this.unreadPropStyle != null) {
+        // previous props haven't had the chance to be set yet; set them here
+        this.clearUnreadPropStyle(this.unreadPropStyle);
       }
 
-      this.hasUnreadPropStyle = true;
+      this.unreadPropStyle = props.style;
       if (this.animationID == null) {
         this.prevTime = defaultNow();
         this.startAnimationIfNecessary();
