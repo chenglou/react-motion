@@ -5,7 +5,7 @@ import stepper from './stepper';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
 
-import type {CurrentStyle, Style, Velocity} from './Types';
+import type {PlainStyle, Style, Velocity} from './Types';
 const msPerFrame = 1000 / 60;
 
 function mapObject<Val1, Val2>(f: (val: Val1, key: string) => Val2, obj: {[key: string]: Val1}): {[key: string]: Val2} {
@@ -21,7 +21,7 @@ function mapObject<Val1, Val2>(f: (val: Val1, key: string) => Val2, obj: {[key: 
 
 // usage assumption: currentStyle values have already been rendered but it says
 // nothing of whether currentStyle is stale (see unreadPropStyle)
-function shouldStopAnimation(currentStyle: CurrentStyle, destStyle: Style, currentVelocity: Velocity): boolean {
+function shouldStopAnimation(currentStyle: PlainStyle, destStyle: Style, currentVelocity: Velocity): boolean {
   for (let key in destStyle) {
     if (!destStyle.hasOwnProperty(key)) {
       continue;
@@ -47,9 +47,9 @@ export default function makeMotion(React: Object): Object {
   const {PropTypes} = React;
 
   type MotionState = {
-    currentStyle: CurrentStyle,
+    currentStyle: PlainStyle,
     currentVelocity: Velocity,
-    lastIdealStyle: CurrentStyle,
+    lastIdealStyle: PlainStyle,
     lastIdealVelocity: Velocity,
   };
 
@@ -63,7 +63,7 @@ export default function makeMotion(React: Object): Object {
 
     getInitialState(): MotionState {
       const {defaultStyle, style} = this.props;
-      const currentStyle: CurrentStyle = defaultStyle || stripStyle(style);
+      const currentStyle: PlainStyle = defaultStyle || stripStyle(style);
       const currentVelocity = mapObject(zero, currentStyle);
       return {
         currentStyle: currentStyle,
@@ -86,9 +86,9 @@ export default function makeMotion(React: Object): Object {
     // non-interpolating values (those that are a number, without a spring
     // config)
     clearUnreadPropStyle(destStyle: Style): void {
-      let newCurrentStyle: CurrentStyle = {...this.state.currentStyle};
+      let newCurrentStyle: PlainStyle = {...this.state.currentStyle};
       let newCurrentVelocity: Velocity = {...this.state.currentVelocity};
-      let lastIdealStyle: CurrentStyle = {...this.state.lastIdealStyle};
+      let lastIdealStyle: PlainStyle = {...this.state.lastIdealStyle};
       let lastIdealVelocity: Velocity = {...this.state.lastIdealVelocity};
 
       for (let key in destStyle) {
@@ -96,13 +96,11 @@ export default function makeMotion(React: Object): Object {
           continue;
         }
 
-        if (typeof destStyle[key] === 'number') {
-          newCurrentStyle[key] = destStyle[key];
+        const styleValue = destStyle[key];
+        if (typeof styleValue === 'number') {
+          newCurrentStyle[key] = styleValue;
           newCurrentVelocity[key] = 0;
-          if (typeof destStyle[key] !== 'number') {
-            throw new Error('flow plz');
-          }
-          lastIdealStyle[key] = destStyle[key];
+          lastIdealStyle[key] = styleValue;
           lastIdealVelocity[key] = 0;
         }
       }
@@ -117,6 +115,7 @@ export default function makeMotion(React: Object): Object {
 
     startAnimationIfNecessary(): void {
       // console.log('started');
+      // TODO: remove
       if (this.animationID != null) {
         throw new Error('Testing. Something wrong. animationID not null.');
       }
@@ -164,9 +163,9 @@ export default function makeMotion(React: Object): Object {
         // console.log(currentFrameCompletion, this.accumulatedTime, framesToCatchUp, '-------------111');
 
         // TODO: no need to alloc so much. Optimize
-        let newLastIdealStyle: CurrentStyle = {...this.state.lastIdealStyle};
+        let newLastIdealStyle: PlainStyle = {...this.state.lastIdealStyle};
         let newLastIdealVelocity: Velocity = {...this.state.lastIdealVelocity};
-        let newCurrentStyle: CurrentStyle = {};
+        let newCurrentStyle: PlainStyle = {};
         let newCurrentVelocity: Velocity = {};
 
         for (let key in propsStyle) {
@@ -174,13 +173,11 @@ export default function makeMotion(React: Object): Object {
             continue;
           }
 
-          if (typeof propsStyle[key] === 'number') {
-            newCurrentStyle[key] = propsStyle[key];
+          const styleValue = propsStyle[key];
+          if (typeof styleValue === 'number') {
+            newCurrentStyle[key] = styleValue;
             newCurrentVelocity[key] = 0;
-            if (typeof propsStyle[key] !== 'number') {
-              throw new Error('flow plz');
-            }
-            newLastIdealStyle[key] = propsStyle[key];
+            newLastIdealStyle[key] = styleValue;
             newLastIdealVelocity[key] = 0;
           } else {
             for (let i = 0; i < framesToCatchUp; i++) {
@@ -188,10 +185,10 @@ export default function makeMotion(React: Object): Object {
                 msPerFrame / 1000,
                 newLastIdealStyle[key],
                 newLastIdealVelocity[key],
-                propsStyle[key].val,
-                propsStyle[key].stiffness,
-                propsStyle[key].damping,
-                propsStyle[key].precision,
+                styleValue.val,
+                styleValue.stiffness,
+                styleValue.damping,
+                styleValue.precision,
               );
 
               newLastIdealStyle[key] = interpolated[0];
@@ -202,10 +199,10 @@ export default function makeMotion(React: Object): Object {
               msPerFrame / 1000,
               newLastIdealStyle[key],
               newLastIdealVelocity[key],
-              propsStyle[key].val,
-              propsStyle[key].stiffness,
-              propsStyle[key].damping,
-              propsStyle[key].precision,
+              styleValue.val,
+              styleValue.stiffness,
+              styleValue.damping,
+              styleValue.precision,
             );
 
             newCurrentStyle[key] =
@@ -262,9 +259,7 @@ export default function makeMotion(React: Object): Object {
     },
 
     render() {
-      const strippedStyle: CurrentStyle = this.state.currentStyle;
-      // console.log('rendered', strippedStyle);
-      const renderedChildren = this.props.children(strippedStyle);
+      const renderedChildren = this.props.children(this.state.currentStyle);
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });

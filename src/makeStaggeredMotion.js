@@ -5,21 +5,15 @@ import stepper from './stepper';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
 
-import type {CurrentStyle, Style, Velocity} from './Types';
+import type {PlainStyle, Style, Velocity, StaggeredPlainStyles, StaggeredStyles, StaggeredVelocities} from './Types';
 const msPerFrame = 1000 / 60;
 
-type CurrentStyles = Array<CurrentStyle>;
-type Styles = Array<Style>;
-type Velocities = Array<Velocity>;
-
 type StaggeredMotionState = {
-  currentStyles: CurrentStyles,
-  currentVelocities: Velocities,
-  lastIdealStyles: CurrentStyles,
-  lastIdealVelocities: Velocities,
+  currentStyles: StaggeredPlainStyles,
+  currentVelocities: StaggeredVelocities,
+  lastIdealStyles: StaggeredPlainStyles,
+  lastIdealVelocities: StaggeredVelocities,
 };
-
-// type DestStylesFunc = (_: ?CurrentStyles) => Styles;
 
 function mapObject<Val1, Val2>(f: (val: Val1, key: string) => Val2, obj: {[key: string]: Val1}): {[key: string]: Val2} {
   let ret = {};
@@ -38,7 +32,7 @@ function myClone<A>(a: Array<A>): Array<A> {
 
 // usage assumption: currentStyle values have already been rendered but it says
 // nothing of whether currentStyle is stale (see unreadPropStyle)
-function shouldStopAnimationEach(currentStyle: CurrentStyle, destStyle: Style, currentVelocity: Velocity): boolean {
+function shouldStopAnimationEach(currentStyle: PlainStyle, destStyle: Style, currentVelocity: Velocity): boolean {
   for (let key in destStyle) {
     if (!destStyle.hasOwnProperty(key)) {
       continue;
@@ -61,9 +55,9 @@ function shouldStopAnimationEach(currentStyle: CurrentStyle, destStyle: Style, c
 }
 
 function shouldStopAnimation(
-  currentStyles: CurrentStyles,
-  destStyles: Styles,
-  currentVelocities: Velocities,
+  currentStyles: StaggeredPlainStyles,
+  destStyles: StaggeredStyles,
+  currentVelocities: StaggeredVelocities,
 ): boolean {
   return currentStyles.every((currentStyle, key) => {
     const destStyle = destStyles[key];
@@ -85,7 +79,7 @@ export default function makeStaggeredMotion(React: Object): Object {
 
     getInitialState(): StaggeredMotionState {
       const {defaultStyles, styles} = this.props;
-      const currentStyles: CurrentStyles = defaultStyles || styles().map(stripStyle);
+      const currentStyles: StaggeredPlainStyles = defaultStyles || styles().map(stripStyle);
       const currentVelocities = currentStyles.map(currentStyle => mapObject(zero, currentStyle));
       return {
         currentStyles: currentStyles,
@@ -103,11 +97,11 @@ export default function makeStaggeredMotion(React: Object): Object {
     // at 0 (didn't have time to tick and interpolate even once). If we naively
     // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
     // In reality currentStyle should be 400
-    unreadPropStyle: (null: ?Styles),
+    unreadPropStyle: (null: ?StaggeredStyles),
     // after checking for unreadPropStyle != null, we manually go set the
     // non-interpolating values (those that are a number, without a spring
     // config)
-    clearUnreadPropStyle(unreadPropStyle: Styles): void {
+    clearUnreadPropStyle(unreadPropStyle: StaggeredStyles): void {
       let newCurrentStyles = myClone(this.state.currentStyles);
       let newCurrentVelocities = myClone(this.state.currentVelocities);
       let lastIdealStyles = myClone(this.state.lastIdealStyles);
@@ -119,13 +113,11 @@ export default function makeStaggeredMotion(React: Object): Object {
             continue;
           }
 
-          if (typeof destStyle[key] === 'number') {
-            newCurrentStyles[i][key] = destStyle[key];
+          const styleValue = destStyle[key];
+          if (typeof styleValue === 'number') {
+            newCurrentStyles[i][key] = styleValue;
             newCurrentVelocities[i][key] = 0;
-            if (typeof destStyle[key] !== 'number') {
-              throw new Error('flow plz');
-            }
-            lastIdealStyles[i][key] = destStyle[key];
+            lastIdealStyles[i][key] = styleValue;
             lastIdealVelocities[i][key] = 0;
           }
         }
@@ -141,6 +133,7 @@ export default function makeStaggeredMotion(React: Object): Object {
 
     startAnimationIfNecessary(): void {
       // console.log('started');
+      // TODO: remove
       if (this.animationID != null) {
         throw new Error('Testing. Something wrong. animationID not null.');
       }
@@ -149,7 +142,7 @@ export default function makeStaggeredMotion(React: Object): Object {
 
       this.animationID = defaultRaf(() => {
         // console.log('one raf called');
-        const destStyles: Styles = this.props.styles(this.state.lastIdealStyles);
+        const destStyles: StaggeredStyles = this.props.styles(this.state.lastIdealStyles);
 
         // check if we need to animate in the first place
         if (shouldStopAnimation(
@@ -205,13 +198,11 @@ export default function makeStaggeredMotion(React: Object): Object {
               continue;
             }
 
-            if (typeof destStyle[key] === 'number') {
-              newCurrentStyle[key] = destStyle[key];
+            const styleValue = destStyle[key];
+            if (typeof styleValue === 'number') {
+              newCurrentStyle[key] = styleValue;
               newCurrentVelocity[key] = 0;
-              if (typeof destStyle[key] !== 'number') {
-                throw new Error('flow plz');
-              }
-              newLastIdealStyle[key] = destStyle[key];
+              newLastIdealStyle[key] = styleValue;
               newLastIdealVelocity[key] = 0;
             } else {
               for (let j = 0; j < framesToCatchUp; j++) {
@@ -219,10 +210,10 @@ export default function makeStaggeredMotion(React: Object): Object {
                   msPerFrame / 1000,
                   newLastIdealStyle[key],
                   newLastIdealVelocity[key],
-                  destStyle[key].val,
-                  destStyle[key].stiffness,
-                  destStyle[key].damping,
-                  destStyle[key].precision,
+                  styleValue.val,
+                  styleValue.stiffness,
+                  styleValue.damping,
+                  styleValue.precision,
                 );
 
                 newLastIdealStyle[key] = interpolated[0];
@@ -233,18 +224,18 @@ export default function makeStaggeredMotion(React: Object): Object {
                 msPerFrame / 1000,
                 newLastIdealStyle[key],
                 newLastIdealVelocity[key],
-                destStyle[key].val,
-                destStyle[key].stiffness,
-                destStyle[key].damping,
-                destStyle[key].precision,
+                styleValue.val,
+                styleValue.stiffness,
+                styleValue.damping,
+                styleValue.precision,
               );
 
               newCurrentStyle[key] =
-              newLastIdealStyle[key] +
-              (nextIdeal[0] - newLastIdealStyle[key]) * currentFrameCompletion;
+                newLastIdealStyle[key] +
+                (nextIdeal[0] - newLastIdealStyle[key]) * currentFrameCompletion;
               newCurrentVelocity[key] =
-              newLastIdealVelocity[key] +
-              (nextIdeal[1] - newLastIdealVelocity[key]) * currentFrameCompletion;
+                newLastIdealVelocity[key] +
+                (nextIdeal[1] - newLastIdealVelocity[key]) * currentFrameCompletion;
             }
 
             // console.log(newCurrentStyle[key], newCurrentVelocity[key], '--------------------333');
@@ -294,9 +285,7 @@ export default function makeStaggeredMotion(React: Object): Object {
     },
 
     render() {
-      const strippedStyle: CurrentStyles = this.state.currentStyles;
-      // console.log('rendered', strippedStyle);
-      const renderedChildren = this.props.children(strippedStyle);
+      const renderedChildren = this.props.children(this.state.currentStyles);
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });

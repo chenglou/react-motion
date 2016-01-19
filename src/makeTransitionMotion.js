@@ -6,27 +6,16 @@ import mergeDiff from './mergeDiff';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
 
-import type {CurrentStyle, Style, Velocity} from './Types';
+import type {PlainStyle, Style, Velocity, TransitionPlainStyles, TransitionStyles, TransitionVelocities, WillEnter, WillLeave} from './Types';
 const msPerFrame = 1000 / 60;
 
-// TODO: put these types in Types.js? Needa rename
-type CurrentStyles = {[key: string]: CurrentStyle};
-type Styles = {[key: string]: Style};
-type Velocities = {[key: string]: Velocity};
-
 type TransitionMotionState = {
-  currentStyles: CurrentStyles,
-  currentVelocities: Velocities,
-  lastIdealStyles: CurrentStyles,
-  lastIdealVelocities: Velocities,
-  mergedPropsStyles: Styles,
+  currentStyles: TransitionPlainStyles,
+  currentVelocities: TransitionVelocities,
+  lastIdealStyles: TransitionPlainStyles,
+  lastIdealVelocities: TransitionVelocities,
+  mergedPropsStyles: TransitionStyles,
 };
-
-type DestStylesFunc = (_: ?CurrentStyles) => Styles;
-type PropStyles = Styles | DestStylesFunc;
-
-type WillEnter = (key: string, b: Style, c: Styles, d: CurrentStyles, e: Velocities) => CurrentStyle;
-type WillLeave = (key: string, b: Style, c: Styles, d: CurrentStyles, e: Velocities) => ?Style;
 
 function mapObject<A, B>(f: (val: A, key: string) => B, obj: {[key: string]: A}): {[key: string]: B} {
   let ret = {};
@@ -50,7 +39,7 @@ function forEachObject<A>(f: (val: A, key: string) => void, obj: {[key: string]:
 
 // usage assumption: currentStyle values have already been rendered but it says
 // nothing of whether currentStyle is stale (see unreadpropstyle)
-function shouldStopAnimationEach(currentStyle: CurrentStyle, destStyle: Style, currentVelocity: Velocity): boolean {
+function shouldStopAnimationEach(currentStyle: PlainStyle, destStyle: Style, currentVelocity: Velocity): boolean {
   for (let key in destStyle) {
     if (!destStyle.hasOwnProperty(key)) {
       continue;
@@ -73,9 +62,9 @@ function shouldStopAnimationEach(currentStyle: CurrentStyle, destStyle: Style, c
 }
 
 function shouldStopAnimation(
-  currentStyles: CurrentStyles,
-  destStyles: Styles,
-  currentVelocities: Velocities,
+  currentStyles: TransitionPlainStyles,
+  destStyles: TransitionStyles,
+  currentVelocities: TransitionVelocities,
 ): boolean {
   for (let key in currentStyles) {
     if (!currentStyles.hasOwnProperty(key)) {
@@ -122,13 +111,13 @@ function shouldStopAnimation(
 function mergeAndSync(
   willEnter: WillEnter,
   willLeave: WillLeave,
-  oldMergedPropsStyles: Styles,
-  destStyles: Styles,
-  oldCurrentStyles: CurrentStyles,
-  oldCurrentVelocities: Velocities,
-  oldLastIdealStyles: CurrentStyles,
-  oldLastIdealVelocities: Velocities,
-): [Styles, CurrentStyles, Velocities, CurrentStyles, Velocities] {
+  oldMergedPropsStyles: TransitionStyles,
+  destStyles: TransitionStyles,
+  oldCurrentStyles: TransitionPlainStyles,
+  oldCurrentVelocities: TransitionVelocities,
+  oldLastIdealStyles: TransitionPlainStyles,
+  oldLastIdealVelocities: TransitionVelocities,
+): [TransitionStyles, TransitionPlainStyles, TransitionVelocities, TransitionPlainStyles, TransitionVelocities] {
   const newMergedPropsStyles = mergeDiff(
     oldMergedPropsStyles,
     destStyles,
@@ -201,7 +190,7 @@ export default function makeTransitionMotion(React: Object): Object {
 
     getInitialState(): TransitionMotionState {
       const {defaultStyles, styles, willEnter, willLeave} = this.props;
-      const destStyles: Styles = typeof styles === 'function' ? styles() : styles;
+      const destStyles: TransitionStyles = typeof styles === 'function' ? styles() : styles;
 
       if (willEnter == null || willLeave == null) {
         // TODO: use classes so flow can recognize default props
@@ -252,11 +241,11 @@ export default function makeTransitionMotion(React: Object): Object {
     // at 0 (didn't have time to tick and interpolate even once). If we naively
     // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
     // In reality currentStyle should be 400
-    unreadpropstyle: (null: ?Styles),
+    unreadpropstyle: (null: ?TransitionStyles),
     // after checking for unreadpropstyle != null, we manually go set the
     // non-interpolating values (those that are a number, without a spring
     // config)
-    clearUnreadPropStyle(unreadPropStyle: Styles): void {
+    clearUnreadPropStyle(unreadPropStyle: TransitionStyles): void {
       if (this.props.willEnter == null || this.props.willLeave == null) {
         // TODO: use classes so flow can recognize default props
         throw new Error('impossible, flow');
@@ -286,17 +275,12 @@ export default function makeTransitionMotion(React: Object): Object {
             continue;
           }
 
-          if (typeof destStyle[key] === 'number') {
-            newCurrentStyles[id][key] = destStyle[key];
-            if (typeof destStyle[key] !== 'number') {
-              throw new Error('flow plz');
-            }
-            newMergedPropsStyles[id][key] = destStyle[key];
+          const styleValue = destStyle[key];
+          if (typeof styleValue === 'number') {
+            newCurrentStyles[id][key] = styleValue;
+            newMergedPropsStyles[id][key] = styleValue;
             newCurrentVelocities[id][key] = 0;
-            if (typeof destStyle[key] !== 'number') {
-              throw new Error('flow plz');
-            }
-            newLastIdealStyles[id][key] = destStyle[key];
+            newLastIdealStyles[id][key] = styleValue;
             newLastIdealVelocities[id][key] = 0;
           }
         }
@@ -313,6 +297,7 @@ export default function makeTransitionMotion(React: Object): Object {
 
     startAnimationIfNecessary(): void {
       // console.log('started');
+      // TODO: remove
       if (this.animationID != null) {
         throw new Error('Testing. Something wrong. animationID not null.');
       }
@@ -321,8 +306,8 @@ export default function makeTransitionMotion(React: Object): Object {
 
       this.animationID = defaultRaf(() => {
         // console.log('one raf called');
-        const propStyles: PropStyles = this.props.styles;
-        let destStyles: Styles = typeof propStyles === 'function'
+        const propStyles = this.props.styles;
+        let destStyles: TransitionStyles = typeof propStyles === 'function'
           ? propStyles(this.state.lastIdealStyles)
           : propStyles;
 
@@ -395,13 +380,11 @@ export default function makeTransitionMotion(React: Object): Object {
               continue;
             }
 
-            if (typeof destStyle[key] === 'number') {
-              newCurrentStyle[key] = destStyle[key];
+            const styleValue = destStyle[key];
+            if (typeof styleValue === 'number') {
+              newCurrentStyle[key] = styleValue;
               newCurrentVelocity[key] = 0;
-              if (typeof destStyle[key] !== 'number') {
-                throw new Error('flow plz');
-              }
-              newLastIdealStyle[key] = destStyle[key];
+              newLastIdealStyle[key] = styleValue;
               newLastIdealVelocity[key] = 0;
             } else {
               for (let j = 0; j < framesToCatchUp; j++) {
@@ -409,10 +392,10 @@ export default function makeTransitionMotion(React: Object): Object {
                   msPerFrame / 1000,
                   newLastIdealStyle[key],
                   newLastIdealVelocity[key],
-                  destStyle[key].val,
-                  destStyle[key].stiffness,
-                  destStyle[key].damping,
-                  destStyle[key].precision,
+                  styleValue.val,
+                  styleValue.stiffness,
+                  styleValue.damping,
+                  styleValue.precision,
                 );
 
                 newLastIdealStyle[key] = interpolated[0];
@@ -423,10 +406,10 @@ export default function makeTransitionMotion(React: Object): Object {
                 msPerFrame / 1000,
                 newLastIdealStyle[key],
                 newLastIdealVelocity[key],
-                destStyle[key].val,
-                destStyle[key].stiffness,
-                destStyle[key].damping,
-                destStyle[key].precision,
+                styleValue.val,
+                styleValue.stiffness,
+                styleValue.damping,
+                styleValue.precision,
               );
 
               newCurrentStyle[key] =
@@ -504,9 +487,7 @@ export default function makeTransitionMotion(React: Object): Object {
     },
 
     render() {
-      const strippedStyle: CurrentStyles = this.state.currentStyles;
-      // console.log('rendered', strippedStyle);
-      const renderedChildren = this.props.children(strippedStyle);
+      const renderedChildren = this.props.children(this.state.currentStyles);
       return renderedChildren && React.Children.only(renderedChildren);
     },
   });

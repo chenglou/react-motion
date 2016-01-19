@@ -4,6 +4,9 @@
     "es6": true,
     "jasmine": true
   },
+  "globals": {
+    "ReactElement": true
+  },
   "rules": {
     "eqeqeq": [2, "allow-null"],
     "id-length": 0,
