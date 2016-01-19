@@ -192,11 +192,6 @@ export default function makeTransitionMotion(React: Object): Object {
       const {defaultStyles, styles, willEnter, willLeave} = this.props;
       const destStyles: TransitionStyles = typeof styles === 'function' ? styles() : styles;
 
-      if (willEnter == null || willLeave == null) {
-        // TODO: use classes so flow can recognize default props
-        throw new Error('impossible, flow');
-      }
-
       // this is special. for the first time around, we don't have a comparison
       // between last (no last) and current merged props. we'll compute last so:
       // say default is {a, b} and styles (dest style) is {b, c}, we'll
@@ -214,7 +209,9 @@ export default function makeTransitionMotion(React: Object): Object {
       }
       // TODO: optimize
       const [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
+        // $FlowFixMe
         willEnter,
+        // $FlowFixMe
         willLeave,
         oldMergedPropsStyles,
         destStyles,
@@ -246,13 +243,10 @@ export default function makeTransitionMotion(React: Object): Object {
     // non-interpolating values (those that are a number, without a spring
     // config)
     clearUnreadPropStyle(unreadPropStyle: TransitionStyles): void {
-      if (this.props.willEnter == null || this.props.willLeave == null) {
-        // TODO: use classes so flow can recognize default props
-        throw new Error('impossible, flow');
-      }
-
       let [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities] = mergeAndSync(
+        // $FlowFixMe
         this.props.willEnter,
+        // $FlowFixMe
         this.props.willLeave,
         this.state.mergedPropsStyles,
         unreadPropStyle,
@@ -348,12 +342,10 @@ export default function makeTransitionMotion(React: Object): Object {
 
         // console.log(currentFrameCompletion, this.accumulatedTime, framesToCatchUp, '-------------111');
 
-        if (this.props.willEnter == null || this.props.willLeave == null) {
-          // TODO: use classes so flow can recognize default props
-          throw new Error('impossible, flow');
-        }
         let [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities] = mergeAndSync(
+          // $FlowFixMe
           this.props.willEnter,
+          // $FlowFixMe
           this.props.willLeave,
           this.state.mergedPropsStyles,
           destStyles,
