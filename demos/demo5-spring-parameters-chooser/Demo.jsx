@@ -98,8 +98,8 @@ const Demo = React.createClass({
             const motionStyle = isPressed
               ? {x: mouse[0], y: mouse[1]}
               : {
-                  x: spring(gridWidth / 2 - 25, [stiffness, damping]),
-                  y: spring(gridHeight / 2 - 25, [stiffness, damping]),
+                  x: spring(gridWidth / 2 - 25, {stiffness, damping}),
+                  y: spring(gridHeight / 2 - 25, {stiffness, damping}),
                 };
 
             return (

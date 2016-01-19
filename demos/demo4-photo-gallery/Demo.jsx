@@ -1,6 +1,7 @@
 import React from 'react';
 import {TransitionMotion, spring} from '../../src/react-motion';
 
+const springSettings = {stiffness: 170, damping: 26};
 const Demo = React.createClass({
   getInitialState() {
     return {
@@ -56,9 +57,9 @@ const Demo = React.createClass({
     keys.reduce((prevLeft, key, i) => {
       const [origW, origH] = photos[key];
       configs[key] = {
-        left: spring(prevLeft, [170, 26]),
-        height: spring(height, [170, 26]),
-        width: spring(height / origH * origW, [170, 26]),
+        left: spring(prevLeft, springSettings),
+        height: spring(height, springSettings),
+        width: spring(height / origH * origW, springSettings),
       };
       return prevLeft + widths[i];
     }, offset);

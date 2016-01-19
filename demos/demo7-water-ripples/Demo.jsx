@@ -1,6 +1,7 @@
 import React from 'react';
 import {TransitionMotion, spring} from '../../src/react-motion';
 
+const leavingSpringConfig = {stiffness: 60, damping: 15};
 const Demo = React.createClass({
   getInitialState() {
     return {mouse: [], now: 't' + 0};
@@ -24,8 +25,8 @@ const Demo = React.createClass({
   willLeave(key, valOfKey) {
     return {
       ...valOfKey,
-      opacity: spring(0, [60, 15]),
-      scale: spring(2, [60, 15]),
+      opacity: spring(0, leavingSpringConfig),
+      scale: spring(2, leavingSpringConfig),
     };
   },
 
