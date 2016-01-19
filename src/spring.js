@@ -2,12 +2,18 @@
 import presets from './presets';
 import type {SpringConfig} from './Types';
 
-export default function spring(
-  val: number,
-  config?: [number, number] = presets.noWobble): SpringConfig {
-  return {
-    val,
-    stiffness: config[0],
-    damping: config[1],
-  };
+type SpringHelperConfig = {
+  stiffness?: number,
+  damping?: number,
+  onRest?: () => void,
+  precision?: number,
+};
+
+const defaultConfig = {
+  ...presets.noWobble,
+  precision: 0.001,
+};
+
+export default function spring(val: number, config?: SpringHelperConfig): SpringConfig {
+  return {...defaultConfig, ...config, val};
 }

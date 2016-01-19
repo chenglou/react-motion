@@ -195,7 +195,9 @@ describe('Motion', () => {
     const App = React.createClass({
       render() {
         return (
-          <Motion defaultStyle={{a: 0}} style={{a: spring(10, [100, 50])}}>
+          <Motion
+              defaultStyle={{a: 0}}
+              style={{a: spring(10, {stiffness: 100, damping: 50, precision: 16})}}>
             {({a}) => {
               count.push(a);
               return null;
@@ -206,12 +208,17 @@ describe('Motion', () => {
     });
     TestUtils.renderIntoDocument(<App />);
 
-    expect(count).toEqual([0]);
-    mockRaf.step(2);
+    mockRaf.step(99);
     expect(count).toEqual([
       0,
       0.2777777777777778,
       0.5941358024691358,
+      0.9081361454046639,
+      1.213021309632678,
+      1.5079182450697726,
+      1.7929588941684615,
+      2.0684390330691236,
+      10,
     ]);
   });
 

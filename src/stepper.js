@@ -1,13 +1,12 @@
 /* @flow */
-const errorMargin = 0.001;
-
 export default function stepper(
-  frameRate: number,
+  secondPerFrame: number,
   x: number,
   v: number,
   destX: number,
   k: number,
-  b: number): [number, number] {
+  b: number,
+  precision: number): [number, number] {
   // Spring stiffness, in kg / s^2
 
   // for animations, destX is really spring length (spring at rest). initial
@@ -22,10 +21,10 @@ export default function stepper(
   // let a = (Fspring + Fdamper) / mass;
   const a = Fspring + Fdamper;
 
-  const newV = v + a * frameRate;
-  const newX = x + newV * frameRate;
+  const newV = v + a * secondPerFrame;
+  const newX = x + newV * secondPerFrame;
 
-  if (Math.abs(newV) < errorMargin && Math.abs(newX - destX) < errorMargin) {
+  if (Math.abs(newV) < precision && Math.abs(newX - destX) < precision) {
     return [destX, 0];
   }
 

@@ -191,6 +191,7 @@ export default function makeMotion(React: Object): Object {
                 propsStyle[key].val,
                 propsStyle[key].stiffness,
                 propsStyle[key].damping,
+                propsStyle[key].precision,
               );
 
               newLastIdealStyle[key] = interpolated[0];
@@ -204,6 +205,7 @@ export default function makeMotion(React: Object): Object {
               propsStyle[key].val,
               propsStyle[key].stiffness,
               propsStyle[key].damping,
+              propsStyle[key].precision,
             );
 
             newCurrentStyle[key] =
