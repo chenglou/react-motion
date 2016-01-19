@@ -2,8 +2,8 @@
 import zero from './zero';
 import stripStyle from './stripStyle';
 import stepper from './stepper';
-import {default as defaultNow} from 'performance-now';
-import {default as defaultRaf} from 'raf';
+import defaultNow from 'performance-now';
+import defaultRaf from 'raf';
 
 import type {CurrentStyle, Style, Velocity} from './Types';
 const msPerFrame = 1000 / 60;
