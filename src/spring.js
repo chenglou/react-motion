@@ -11,6 +11,7 @@ type SpringHelperConfig = {
 
 const defaultConfig = {
   ...presets.noWobble,
+  onRest: null,
   precision: 0.001,
 };
 

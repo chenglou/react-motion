@@ -4,7 +4,7 @@ export type SpringConfig = {
   stiffness: number,
   damping: number,
   precision: number,
-  onRest?: (() => void),
+  onRest: ?(() => void),
 };
 
 // Motion
