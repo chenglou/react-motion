@@ -31,21 +31,29 @@ describe('StaggeredMotion', () => {
     TestUtils.renderIntoDocument(<App />);
   });
 
-  // TODO: assert on console.warn/error
   it('should not throw on unmount', () => {
+    spyOn(console, 'error');
+    let kill = () => {};
     const App = React.createClass({
+      getInitialState() {
+        return {kill: false};
+      },
+      componentWillMount() {
+        kill = () => this.setState({kill: true});
+      },
       render() {
-        return (
-          <StaggeredMotion defaultStyles={[{a: 0}]} styles={() => [{a: 10}]}>
-            {() => null}
-          </StaggeredMotion>
-        );
+        return this.state.kill
+          ? null
+          : <StaggeredMotion defaultStyles={[{a: 0}]} styles={() => [{a: spring(10)}]}>
+              {() => null}
+            </StaggeredMotion>;
       },
     });
     TestUtils.renderIntoDocument(<App />);
+    mockRaf.step(2);
+    kill();
     mockRaf.step(3);
-    TestUtils.renderIntoDocument(<div />);
-    mockRaf.step(3);
+    expect(console.error).not.toHaveBeenCalled();
   });
 
   it('should allow a defaultStyles', () => {

@@ -27,23 +27,59 @@ describe('TransitionMotion', () => {
     TestUtils.renderIntoDocument(<App />);
   });
 
-  // TODO: assert on console.warn/error
   it('should not throw on unmount', () => {
+    spyOn(console, 'error');
+    let kill = () => {};
     const App = React.createClass({
+      getInitialState() {
+        return {kill: false};
+      },
+      componentWillMount() {
+        kill = () => this.setState({kill: true});
+      },
       render() {
-        return (
-          <TransitionMotion
-            defaultStyles={[{key: 1, style: {x: 0}}]}
-            styles={[{key: 1, style: {x: 10}}]}>
-            {() => null}
-          </TransitionMotion>
-        );
+        return this.state.kill
+          ? null
+          : <TransitionMotion
+              defaultStyles={[{key: 1, style: {x: 0}}]}
+              styles={[{key: 1, style: {x: spring(10)}}]}>
+              {() => null}
+            </TransitionMotion>;
       },
     });
     TestUtils.renderIntoDocument(<App />);
+    mockRaf.step(2);
+    kill();
     mockRaf.step(3);
-    TestUtils.renderIntoDocument(<div />);
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
+  it('should not throw on unmount with style function', () => {
+    // similar as above test
+    spyOn(console, 'error');
+    let kill = () => {};
+    const App = React.createClass({
+      getInitialState() {
+        return {kill: false};
+      },
+      componentWillMount() {
+        kill = () => this.setState({kill: true});
+      },
+      render() {
+        return this.state.kill
+          ? null
+          : <TransitionMotion
+              defaultStyles={[{key: 1, style: {x: 0}}]}
+              styles={() => [{key: 1, style: {x: spring(10)}}]}>
+              {() => null}
+            </TransitionMotion>;
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+    mockRaf.step(2);
+    kill();
     mockRaf.step(3);
+    expect(console.error).not.toHaveBeenCalled();
   });
 
   it('should allow a defaultStyles', () => {
