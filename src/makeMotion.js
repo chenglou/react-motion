@@ -1,5 +1,5 @@
 /* @flow */
-import zero from './zero';
+import mapToZero from './mapToZero';
 import stripStyle from './stripStyle';
 import stepper from './stepper';
 import defaultNow from 'performance-now';
@@ -7,17 +7,6 @@ import defaultRaf from 'raf';
 
 import type {PlainStyle, Style, Velocity} from './Types';
 const msPerFrame = 1000 / 60;
-
-function mapObject<Val1, Val2>(f: (val: Val1, key: string) => Val2, obj: {[key: string]: Val1}): {[key: string]: Val2} {
-  let ret = {};
-  for (const key in obj) {
-    if (!obj.hasOwnProperty(key)) {
-      continue;
-    }
-    ret[key] = f(obj[key], key);
-  }
-  return ret;
-}
 
 // usage assumption: currentStyle values have already been rendered but it says
 // nothing of whether currentStyle is stale (see unreadPropStyle)
@@ -64,7 +53,7 @@ export default function makeMotion(React: Object): Object {
     getInitialState(): MotionState {
       const {defaultStyle, style} = this.props;
       const currentStyle: PlainStyle = defaultStyle || stripStyle(style);
-      const currentVelocity = mapObject(zero, currentStyle);
+      const currentVelocity = mapToZero(currentStyle);
       return {
         currentStyle: currentStyle,
         currentVelocity: currentVelocity,

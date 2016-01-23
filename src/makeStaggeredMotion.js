@@ -1,5 +1,5 @@
 /* @flow */
-import zero from './zero';
+import mapToZero from './mapToZero';
 import stripStyle from './stripStyle';
 import stepper from './stepper';
 import defaultNow from 'performance-now';
@@ -14,17 +14,6 @@ type StaggeredMotionState = {
   lastIdealStyles: StaggeredPlainStyles,
   lastIdealVelocities: StaggeredVelocities,
 };
-
-function mapObject<Val1, Val2>(f: (val: Val1, key: string) => Val2, obj: {[key: string]: Val1}): {[key: string]: Val2} {
-  let ret = {};
-  for (const key in obj) {
-    if (!obj.hasOwnProperty(key)) {
-      continue;
-    }
-    ret[key] = f(obj[key], key);
-  }
-  return ret;
-}
 
 function myClone<A>(a: Array<A>): Array<A> {
   return a.map(obj => ({...obj}));
@@ -80,7 +69,7 @@ export default function makeStaggeredMotion(React: Object): Object {
     getInitialState(): StaggeredMotionState {
       const {defaultStyles, styles} = this.props;
       const currentStyles: StaggeredPlainStyles = defaultStyles || styles().map(stripStyle);
-      const currentVelocities = currentStyles.map(currentStyle => mapObject(zero, currentStyle));
+      const currentVelocities = currentStyles.map(currentStyle => mapToZero(currentStyle));
       return {
         currentStyles: currentStyles,
         currentVelocities: currentVelocities,

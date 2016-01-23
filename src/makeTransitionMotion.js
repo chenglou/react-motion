@@ -1,4 +1,5 @@
 /* @flow */
+import mapToZero from './mapToZero';
 import stripStyle from './stripStyle';
 import stepper from './stepper';
 import mergeDiff from './mergeDiff';
@@ -15,17 +16,6 @@ type TransitionMotionState = {
   lastIdealVelocities: TransitionVelocities,
   mergedPropsStyles: TransitionStyles,
 };
-
-function mapToZero(obj: Style | PlainStyle): PlainStyle {
-  let ret = {};
-  for (const key in obj) {
-    if (!obj.hasOwnProperty(key)) {
-      continue;
-    }
-    ret[key] = 0;
-  }
-  return ret;
-}
 
 function clone(a) {
   return JSON.parse(JSON.stringify(a));
@@ -208,6 +198,7 @@ export default function makeTransitionMotion(React: Object): Object {
       if (defaultStyles == null) {
         oldMergedPropsStyles = destStyles;
       } else {
+        // $FlowFixMe
         oldMergedPropsStyles = defaultStyles.map(defaultStyleCell => {
           // TODO: key search code
           for (let i = 0; i < destStyles.length; i++) {
