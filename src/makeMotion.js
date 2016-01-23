@@ -46,13 +46,16 @@ export default function makeMotion(React: Object): Object {
     propTypes: {
       // TOOD: warn against putting a config in here
       defaultStyle: PropTypes.objectOf(PropTypes.number),
-      style: PropTypes.object.isRequired,
+      style: PropTypes.objectOf(PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.object,
+      ])).isRequired,
       children: PropTypes.func.isRequired,
     },
 
     getInitialState(): MotionState {
       const {defaultStyle, style} = this.props;
-      const currentStyle: PlainStyle = defaultStyle || stripStyle(style);
+      const currentStyle = defaultStyle || stripStyle(style);
       const currentVelocity = mapToZero(currentStyle);
       return {
         currentStyle: currentStyle,

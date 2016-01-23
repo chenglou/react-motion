@@ -169,10 +169,16 @@ export default function makeTransitionMotion(React: Object): Object {
         key: PropTypes.any.isRequired,
         style: PropTypes.objectOf(PropTypes.number).isRequired,
       })),
-      styles: PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.any.isRequired,
-        style: PropTypes.object.isRequired,
-      }))]).isRequired,
+      styles: PropTypes.oneOfType([
+        PropTypes.func,
+        PropTypes.arrayOf(PropTypes.shape({
+          key: PropTypes.any.isRequired,
+          style: PropTypes.objectOf(PropTypes.oneOfType([
+            PropTypes.number,
+            PropTypes.object,
+          ])).isRequired,
+        }),
+      )]).isRequired,
       children: PropTypes.func.isRequired,
       willLeave: PropTypes.func,
       willEnter: PropTypes.func,

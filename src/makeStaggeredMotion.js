@@ -61,7 +61,7 @@ export default function makeStaggeredMotion(React: Object): Object {
   const StaggeredMotion = React.createClass({
     propTypes: {
       // TOOD: warn against putting a config in here
-      defaultStyles: PropTypes.arrayOf(PropTypes.object),
+      defaultStyles: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.number)),
       styles: PropTypes.func.isRequired,
       children: PropTypes.func.isRequired,
     },
