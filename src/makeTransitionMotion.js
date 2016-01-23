@@ -106,7 +106,7 @@ function mergeAndSync(
     oldMergedPropsStyles,
     destStyles,
     (oldIndex, oldMergedPropsStyle) => {
-      const leavingStyle = willLeave(oldMergedPropsStyle.style);
+      const leavingStyle = willLeave(oldMergedPropsStyle);
       if (leavingStyle == null) {
         return null;
       }
@@ -137,7 +137,7 @@ function mergeAndSync(
     if (found == null) {
       const stylesCell = {
         ...newMergedPropsStyleCell,
-        style: willEnter(newMergedPropsStyleCell.style),
+        style: willEnter(newMergedPropsStyleCell),
       };
       newCurrentStyles.push(stylesCell);
       newLastIdealStyles.push(stylesCell);
@@ -180,20 +180,19 @@ export default function makeTransitionMotion(React: Object): Object {
 
     getDefaultProps(): {willEnter: WillEnter, willLeave: WillLeave} {
       return {
-        willEnter: stripStyle,
+        willEnter: TransitionStylesWrap => stripStyle(TransitionStylesWrap.style),
         willLeave: () => null,
       };
     },
 
     getInitialState(): TransitionMotionState {
-      const {styles, willEnter, willLeave} = this.props;
+      const {defaultStyles, styles, willEnter, willLeave} = this.props;
       const destStyles: TransitionStyles = typeof styles === 'function' ? styles() : styles;
 
       // this is special. for the first time around, we don't have a comparison
       // between last (no last) and current merged props. we'll compute last so:
       // say default is {a, b} and styles (dest style) is {b, c}, we'll
       // fabricate last as {a, b}
-      const defaultStyles: ?TransitionPlainStyles = this.props.defaultStyles;
       let oldMergedPropsStyles: TransitionStyles;
       if (defaultStyles == null) {
         oldMergedPropsStyles = destStyles;
@@ -211,6 +210,7 @@ export default function makeTransitionMotion(React: Object): Object {
       }
       // TODO: optimize
       const oldCurrentStyles = defaultStyles == null
+        // $FlowFixMe
         ? destStyles.map(s => ({...s, style: stripStyle(s.style)}))
         : defaultStyles;
       const oldCurrentVelocities = defaultStyles == null

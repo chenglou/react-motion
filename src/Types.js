@@ -11,6 +11,7 @@ export type SpringConfig = {
 export type Style = {[key: string]: number | SpringConfig};
 export type PlainStyle = {[key: string]: number};
 export type Velocity = {[key: string]: number};
+
 export type MotionProps = {
   defaultStyle: PlainStyle,
   style: Style,
@@ -21,6 +22,7 @@ export type MotionProps = {
 export type StaggeredPlainStyles = Array<PlainStyle>;
 export type StaggeredStyles = Array<Style>;
 export type StaggeredVelocities = Array<Velocity>;
+
 export type StaggeredMotionProps = {
   defaultStyles: StaggeredPlainStyles,
   styles: (previousInterpolatedStyles: ?StaggeredPlainStyles) => StaggeredStyles,
@@ -29,10 +31,12 @@ export type StaggeredMotionProps = {
 
 // TransitionMotion
 export type TransitionPlainStyles = Array<{key: any, style: PlainStyle}>;
-export type TransitionStyles = Array<{key: any, style: Style}>;
+export type TransitionStyle = {key: any, style: Style};
+export type TransitionStyles = Array<TransitionStyle>;
 export type TransitionVelocities = Array<{key: any, style: Velocity}>;
-export type WillEnter = (style: Style) => PlainStyle;
-export type WillLeave = (style: Style) => ?Style;
+export type WillEnter = (style: TransitionStyle) => PlainStyle;
+export type WillLeave = (style: TransitionStyle) => ?Style;
+
 export type TransitionMotionProps = {
   defaultStyles: TransitionPlainStyles,
   styles: TransitionStyles | (previousInterpolatedStyles: ?TransitionPlainStyles) => TransitionStyles,
