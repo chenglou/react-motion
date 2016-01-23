@@ -10,8 +10,13 @@ export default function(): Object {
   const now = () => prevTime;
 
   const raf = (cb: Callback) => {
-    allCallbacks.push(cb);
-    return id++;
+    id++;
+    allCallbacks.push({id, cb});
+    return id;
+  };
+
+  raf.cancel = id2 => {
+    allCallbacks = allCallbacks.filter(item => item.id !== id2);
   };
 
   const defaultTimeInterval = 1000 / 60;
@@ -20,7 +25,7 @@ export default function(): Object {
     allCallbacks = [];
 
     prevTime += ms;
-    allCallbacksBefore.forEach(cb => cb(prevTime));
+    allCallbacksBefore.forEach(({cb}) => cb(prevTime));
   };
 
   const step = (howMany = 1, ms = defaultTimeInterval) => {
