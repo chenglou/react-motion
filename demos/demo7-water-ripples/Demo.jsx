@@ -22,9 +22,9 @@ const Demo = React.createClass({
     this.handleMouseMove(e.touches[0]);
   },
 
-  willLeave(key, valOfKey) {
+  willLeave(styleCell) {
     return {
-      ...valOfKey,
+      ...styleCell.style,
       opacity: spring(0, leavingSpringConfig),
       scale: spring(2, leavingSpringConfig),
     };
@@ -32,14 +32,15 @@ const Demo = React.createClass({
 
   render() {
     const {mouse: [mouseX, mouseY], now} = this.state;
-    const styles = mouseX == null ? {} : {
-      [now]: {
+    const styles = mouseX == null ? [] : [{
+      key: now,
+      style: {
         opacity: spring(1),
         scale: spring(0),
         x: spring(mouseX),
         y: spring(mouseY),
-      },
-    };
+      }
+    }];
     return (
       <TransitionMotion willLeave={this.willLeave} styles={styles}>
         {circles =>
@@ -47,20 +48,17 @@ const Demo = React.createClass({
             onMouseMove={this.handleMouseMove}
             onTouchMove={this.handleTouchMove}
             className="demo7">
-            {Object.keys(circles).map(key => {
-              const {opacity, scale, x, y} = circles[key];
-              return (
-                <div
-                  key={key}
-                  className="demo7-ball"
-                  style={{
-                    opacity: opacity,
-                    scale: scale,
-                    transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
-                    WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
-                  }} />
-              );
-            })}
+            {circles.map(({key, style: {opacity, scale, x, y}}) =>
+              <div
+                key={key}
+                className="demo7-ball"
+                style={{
+                  opacity: opacity,
+                  scale: scale,
+                  transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
+                  WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
+                }} />
+            )}
           </div>
         }
       </TransitionMotion>

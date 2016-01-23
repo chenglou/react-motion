@@ -130,25 +130,23 @@ const Demo = React.createClass({
             willEnter={this.willEnter}>
             {styles =>
               <ul className="todo-list">
-                {styles.map(({key, isDone, text, style}) => {
-                  return (
-                    <li key={key} style={style} className={isDone ? 'completed' : ''}>
-                      <div className="view">
-                        <input
-                          className="toggle"
-                          type="checkbox"
-                          onChange={this.handleDone.bind(null, key)}
-                          checked={isDone}
-                        />
-                        <label>{text}</label>
-                        <button
-                          className="destroy"
-                          onClick={this.handleDestroy.bind(null, key)}
-                        />
-                      </div>
-                    </li>
-                  );
-                })}
+                {styles.map(({key, isDone, text, style}) =>
+                  <li key={key} style={style} className={isDone ? 'completed' : ''}>
+                    <div className="view">
+                      <input
+                        className="toggle"
+                        type="checkbox"
+                        onChange={this.handleDone.bind(null, key)}
+                        checked={isDone}
+                      />
+                      <label>{text}</label>
+                      <button
+                        className="destroy"
+                        onClick={this.handleDestroy.bind(null, key)}
+                      />
+                    </div>
+                  </li>
+                )}
               </ul>
             }
           </TransitionMotion>
