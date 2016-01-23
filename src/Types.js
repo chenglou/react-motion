@@ -28,11 +28,11 @@ export type StaggeredMotionProps = {
 };
 
 // TransitionMotion
-export type TransitionPlainStyles = {[key: string]: PlainStyle};
-export type TransitionStyles = {[key: string]: Style};
-export type TransitionVelocities = {[key: string]: Velocity};
-export type WillEnter = (key: string, b: Style, c: TransitionStyles, d: TransitionPlainStyles, e: TransitionVelocities) => PlainStyle;
-export type WillLeave = (key: string, b: Style, c: TransitionStyles, d: TransitionPlainStyles, e: TransitionVelocities) => ?Style;
+export type TransitionPlainStyles = Array<{key: any, style: PlainStyle}>;
+export type TransitionStyles = Array<{key: any, style: Style}>;
+export type TransitionVelocities = Array<{key: any, style: Velocity}>;
+export type WillEnter = (style: Style) => PlainStyle;
+export type WillLeave = (style: Style) => ?Style;
 export type TransitionMotionProps = {
   defaultStyles: TransitionPlainStyles,
   styles: TransitionStyles | (previousInterpolatedStyles: ?TransitionPlainStyles) => TransitionStyles,
