@@ -5,20 +5,20 @@ import presets from '../../src/presets';
 const Demo = React.createClass({
   getInitialState() {
     return {
-      todos: {
+      todos: [
         // key is creation date
-        't1': {text: 'Board the plane', isDone: false},
-        't2': {text: 'Sleep', isDone: false},
-        't3': {text: 'Try to finish coneference slides', isDone: false},
-        't4': {text: 'Eat cheese and drink wine', isDone: false},
-        't5': {text: 'Go around in Uber', isDone: false},
-        't6': {text: 'Talk with conf attendees', isDone: false},
-        't7': {text: 'Show Demo 1', isDone: false},
-        't8': {text: 'Show Demo 2', isDone: false},
-        't9': {text: 'Lament about the state of animation', isDone: false},
-        't10': {text: 'Show Secret Demo', isDone: false},
-        't11': {text: 'Go home', isDone: false},
-      },
+        {key: 't1', text: 'Board the plane', isDone: false},
+        {key: 't2', text: 'Sleep', isDone: false},
+        {key: 't3', text: 'Try to finish coneference slides', isDone: false},
+        {key: 't4', text: 'Eat cheese and drink wine', isDone: false},
+        {key: 't5', text: 'Go around in Uber', isDone: false},
+        {key: 't6', text: 'Talk with conf attendees', isDone: false},
+        {key: 't7', text: 'Show Demo 1', isDone: false},
+        {key: 't8', text: 'Show Demo 2', isDone: false},
+        {key: 't9', text: 'Lament about the state of animation', isDone: false},
+        {key: 't10', text: 'Show Secret Demo', isDone: false},
+        {key: 't11', text: 'Go home', isDone: false},
+      ],
       value: '',
       selected: 'all',
     };
@@ -31,27 +31,28 @@ const Demo = React.createClass({
 
   handleSubmit(e) {
     e.preventDefault();
-    const {todos, value} = this.state;
-    this.setState({
-      todos: {
-        ['t' + Date.now()]: {text: value, isDone: false},
-        ...todos,
-      },
-    });
+    const newItem = {
+      key: 't' + Date.now(),
+      text: this.state.value,
+      isDone: false,
+    };
+    // append at head
+    this.setState({todos: [newItem].concat(this.state.todos)});
   },
 
   handleDone(key) {
-    const {todos} = this.state;
-    todos[key].isDone = !todos[key].isDone;
-    this.forceUpdate();
+    this.setState({
+      todos: this.state.todos.map(todo =>
+        todo.key === key ? {...todo, isDone: !todo.isDone} : todo
+      ),
+    });
   },
 
   handleToggleAll() {
-    const {todos} = this.state;
-    const keys = Object.keys(todos);
-    const allDone = keys.every(date => todos[date].isDone);
-    keys.forEach(date => todos[date].isDone = !allDone);
-    this.forceUpdate();
+    const allDone = this.state.todos.every(({isDone}) => isDone);
+    this.setState({
+      todos: this.state.todos.map(todo => ({...todo, isDone: allDone})),
+    });
   },
 
   handleSelect(selected) {
@@ -59,69 +60,48 @@ const Demo = React.createClass({
   },
 
   handleClearCompleted() {
-    const {todos} = this.state;
-    const newTodos = {};
-    for (const prop in todos) {
-      if (!todos[prop].isDone) {
-        newTodos[prop] = todos[prop];
-      }
-    }
-    this.setState({todos: newTodos});
+    this.setState({todos: this.state.todos.filter(({isDone}) => !isDone)});
   },
 
   handleDestroy(date) {
-    const {todos} = this.state;
-    delete todos[date];
-    this.forceUpdate();
+    this.setState({todos: this.state.todos.filter(({key}) => key === date)});
   },
 
   // actual animation-related logic
-  getDefaultValue() {
-    const {todos} = this.state;
-    return Object.keys(todos)
-      .reduce((configs, date) => {
-        configs[date] = {
-          height: 0,
-          opacity: 1,
-          data: todos[date],
-        };
-        return configs;
-      }, {});
+  getDefaultStyles() {
+    return this.state.todos.map(todo => ({...todo, style: {height: 0, opacity: 1}}));
   },
 
-  getEndValue() {
+  getStyles() {
     const {todos, value, selected} = this.state;
-    return Object.keys(todos)
-      .filter(date => {
-        const todo = todos[date];
-        return todo.text.toUpperCase().indexOf(value.toUpperCase()) >= 0 &&
-          (selected === 'completed' && todo.isDone ||
-          selected === 'active' && !todo.isDone ||
-          selected === 'all');
-      })
-      .reduce((configs, date) => {
-        configs[date] = {
+    return todos.filter(({isDone, text}) => {
+      return text.toUpperCase().indexOf(value.toUpperCase()) >= 0 &&
+        (selected === 'completed' && isDone ||
+        selected === 'active' && !isDone ||
+        selected === 'all');
+    })
+    .map(todo => {
+      return {
+        ...todo,
+        style: {
           height: spring(60, presets.gentle),
           opacity: spring(1, presets.gentle),
-          data: todos[date],
-        };
-        return configs;
-      }, {});
+        }
+      };
+    });
   },
 
-  willEnter(date) {
+  willEnter() {
     return {
       height: 0,
       opacity: 1,
-      data: this.state.todos[date],
     };
   },
 
-  willLeave(date, styleThatJustLeft) {
+  willLeave() {
     return {
       height: spring(0),
       opacity: spring(0),
-      data: styleThatJustLeft.data,
     };
   },
 
@@ -143,26 +123,27 @@ const Demo = React.createClass({
         </header>
         <section className="main">
           <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll} />
-          <TransitionMotion defaultStyles={this.getDefaultValue()} styles={this.getEndValue()} willLeave={this.willLeave}
+          <TransitionMotion
+            defaultStyles={this.getDefaultStyles()}
+            styles={this.getStyles()}
+            willLeave={this.willLeave}
             willEnter={this.willEnter}>
-            {configs =>
+            {styles =>
               <ul className="todo-list">
-                {Object.keys(configs).map(date => {
-                  const config = configs[date];
-                  const {data: {isDone, text}, ...style} = config;
+                {styles.map(({key, isDone, text, style}) => {
                   return (
-                    <li key={date} style={style} className={isDone ? 'completed' : ''}>
+                    <li key={key} style={style} className={isDone ? 'completed' : ''}>
                       <div className="view">
                         <input
                           className="toggle"
                           type="checkbox"
-                          onChange={this.handleDone.bind(null, date)}
+                          onChange={this.handleDone.bind(null, key)}
                           checked={isDone}
                         />
                         <label>{text}</label>
                         <button
                           className="destroy"
-                          onClick={this.handleDestroy.bind(null, date)}
+                          onClick={this.handleDestroy.bind(null, key)}
                         />
                       </div>
                     </li>
@@ -175,7 +156,7 @@ const Demo = React.createClass({
         <footer className="footer">
           <span className="todo-count">
             <strong>
-              {Object.keys(todos).filter(key => !todos[key].isDone).length}
+              {todos.filter(({isDone}) => !isDone).length}
             </strong> item left
           </span>
           <ul className="filters">
