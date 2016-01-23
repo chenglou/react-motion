@@ -300,7 +300,7 @@ describe('StaggeredMotion', () => {
       render() {
         return (
           <StaggeredMotion styles={() => [this.state]}>
-            {([{a}]) => {
+            {([a]) => {
               count.push(a);
               return null;
             }}
@@ -310,21 +310,21 @@ describe('StaggeredMotion', () => {
     });
     TestUtils.renderIntoDocument(<App />);
 
-    expect(count).toEqual([0]);
+    expect(count).toEqual([{a: 0}]);
     setState({a: 400});
     setState({a: spring(100)});
     mockRaf.step(2);
     setState({a: spring(400)});
     mockRaf.step(2);
     expect(count).toEqual([
-      0,
-      0, // this new 0 comes from owner update, causing StaggeredMotion to re-render
-      400,
-      385.8333333333333,
-      364.3078703703703,
-      364.3078703703703,
-      353.79556970164606,
-      350.02047519790233,
+      {a: 0},
+      {a: 0}, // this new 0 comes from owner update, causing StaggeredMotion to re-render
+      {a: 400},
+      {a: 385.8333333333333},
+      {a: 364.3078703703703},
+      {a: 364.3078703703703},
+      {a: 353.79556970164606},
+      {a: 350.02047519790233},
     ]);
   });
 });
