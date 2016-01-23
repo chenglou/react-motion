@@ -4,7 +4,6 @@
 
 /coverage/
 /demos/
-/native/non-compiled.js
 /test/
 
 /karma.conf.js

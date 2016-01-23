@@ -42,7 +42,7 @@
     "start": "node server.js",
     "build-demos": "webpack",
     "lint": "eslint --ext .js,.jsx .",
-    "prerelease": "babel src --out-dir lib && babel native/non-compiled.js > native/index.js && webpack --config webpack.prod.config.js",
+    "prerelease": "rm lib/* && babel src --out-dir lib && webpack --config webpack.prod.config.js",
     "test": "karma start ./karma.conf.js --single-run",
     "test:travis": "karma start ./karma.conf.js --single-run",
     "test:dev": "karma start ./karma.conf.js --no-single-run --auto-watch",

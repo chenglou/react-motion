@@ -36,7 +36,6 @@
     "webpack.config.js",
     "webpack.prod.config.js",
     "karma.conf.js",
-    "package.json",
-    "native/non-compiled.js"
+    "package.json"
   ]
 }
