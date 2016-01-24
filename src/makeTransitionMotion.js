@@ -23,35 +23,31 @@ function fastClone(a) {
   return {...a, style: {...a.style}};
 }
 
-// TODO: optimize, manual loops
 function shouldStopAnimationAll(
   currentStyles: TransitionPlainStyles,
   destStyles: TransitionStyles,
   currentVelocities: TransitionVelocities,
 ): boolean {
-  // TODO: key search code
-  const keyInDestStyles = currentStyles.every(({key}) => {
-    return destStyles.some(destStyle => destStyle.key === key);
-  });
-  if (!keyInDestStyles) {
+  if (currentStyles.length !== destStyles.length) {
     return false;
   }
 
-  // TODO: key search code
-  const keyInCurrentStyles = destStyles.every(({key}) => {
-    return currentStyles.some(currentStyle => currentStyle.key === key);
-  });
-  if (!keyInCurrentStyles) {
-    return false;
+  for (let i = 0; i < currentStyles.length; i++) {
+    if (currentStyles[i].key !== destStyles[i].key) {
+      return false;
+    }
   }
 
-  return currentStyles.every((currentStyleCell, i) => {
-    return shouldStopAnimation(
-      currentStyleCell.style,
-      destStyles[i].style,
-      currentVelocities[i].style,
-    );
-  });
+  for (let i = 0; i < currentStyles.length; i++) {
+    if (!shouldStopAnimation(
+        currentStyles[i].style,
+        destStyles[i].style,
+        currentVelocities[i].style)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 // core key merging logic
