@@ -4,8 +4,9 @@ import stripStyle from './stripStyle';
 import stepper from './stepper';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
+import shouldStopAnimation from './shouldStopAnimation';
 
-import type {PlainStyle, Style, Velocity, StaggeredPlainStyles, StaggeredStyles, StaggeredVelocities} from './Types';
+import type {PlainStyle, Velocity, StaggeredPlainStyles, StaggeredStyles, StaggeredVelocities} from './Types';
 const msPerFrame = 1000 / 60;
 
 type StaggeredMotionState = {
@@ -15,44 +16,17 @@ type StaggeredMotionState = {
   lastIdealVelocities: StaggeredVelocities,
 };
 
-function myClone<A>(a: Array<A>): Array<A> {
-  return a.map(obj => ({...obj}));
-}
-
-// usage assumption: currentStyle values have already been rendered but it says
-// nothing of whether currentStyle is stale (see unreadPropStyle)
-function shouldStopAnimationEach(currentStyle: PlainStyle, destStyle: Style, currentVelocity: Velocity): boolean {
-  for (let key in destStyle) {
-    if (!destStyle.hasOwnProperty(key)) {
-      continue;
-    }
-    const destVal = typeof destStyle[key] === 'number'
-      ? destStyle[key]
-      : destStyle[key].val;
-
-    // stepper will have already taken care of rounding precision errors, so
-    // won't have such thing as 0.9999 !=== 1
-    if (currentStyle[key] !== destVal) {
-      return false;
-    }
-    if (currentVelocity[key] !== 0) {
+function shouldStopAnimationAll(
+  currentStyles: StaggeredPlainStyles,
+  styles: StaggeredStyles,
+  currentVelocities: StaggeredVelocities,
+): boolean {
+  for (let i = 0; i < currentStyles.length; i++) {
+    if (!shouldStopAnimation(currentStyles[i], styles[i], currentVelocities[i])) {
       return false;
     }
   }
-
   return true;
-}
-
-function shouldStopAnimation(
-  currentStyles: StaggeredPlainStyles,
-  destStyles: StaggeredStyles,
-  currentVelocities: StaggeredVelocities,
-): boolean {
-  return currentStyles.every((currentStyle, key) => {
-    const destStyle = destStyles[key];
-    const currentVelocity = currentVelocities[key];
-    return shouldStopAnimationEach(currentStyle, destStyle, currentVelocity);
-  });
 }
 
 export default function makeStaggeredMotion(React: Object): Object {
@@ -134,7 +108,7 @@ export default function makeStaggeredMotion(React: Object): Object {
         const destStyles: StaggeredStyles = this.props.styles(this.state.lastIdealStyles);
 
         // check if we need to animate in the first place
-        if (shouldStopAnimation(
+        if (shouldStopAnimationAll(
           this.state.currentStyles,
           destStyles,
           this.state.currentVelocities,

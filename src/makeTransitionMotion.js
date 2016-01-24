@@ -5,8 +5,9 @@ import stepper from './stepper';
 import mergeDiff from './mergeDiff';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
+import shouldStopAnimation from './shouldStopAnimation';
 
-import type {PlainStyle, Style, Velocity, TransitionPlainStyles, TransitionStyles, TransitionVelocities, WillEnter, WillLeave} from './Types';
+import type {PlainStyle, Velocity, TransitionPlainStyles, TransitionStyles, TransitionVelocities, WillEnter, WillLeave} from './Types';
 const msPerFrame = 1000 / 60;
 
 type TransitionMotionState = {
@@ -17,36 +18,13 @@ type TransitionMotionState = {
   mergedPropsStyles: TransitionStyles,
 };
 
-function clone(a) {
-  return JSON.parse(JSON.stringify(a));
-}
-
-// usage assumption: currentStyle values have already been rendered but it says
-// nothing of whether currentStyle is stale (see unreadpropstyle)
-function shouldStopAnimationEach(currentStyle: PlainStyle, destStyle: Style, currentVelocity: Velocity): boolean {
-  for (let key in destStyle) {
-    if (!destStyle.hasOwnProperty(key)) {
-      continue;
-    }
-    const destVal = typeof destStyle[key] === 'number'
-      ? destStyle[key]
-      : destStyle[key].val;
-
-    // stepper will have already taken care of rounding precision errors, so
-    // won't have such thing as 0.9999 !=== 1
-    if (currentStyle[key] !== destVal) {
-      return false;
-    }
-    if (currentVelocity[key] !== 0) {
-      return false;
-    }
-  }
-
-  return true;
+function fastClone(a) {
+  // $FlowFixMe
+  return {...a, style: {...a.style}};
 }
 
 // TODO: optimize, manual loops
-function shouldStopAnimation(
+function shouldStopAnimationAll(
   currentStyles: TransitionPlainStyles,
   destStyles: TransitionStyles,
   currentVelocities: TransitionVelocities,
@@ -68,7 +46,7 @@ function shouldStopAnimation(
   }
 
   return currentStyles.every((currentStyleCell, i) => {
-    return shouldStopAnimationEach(
+    return shouldStopAnimation(
       currentStyleCell.style,
       destStyles[i].style,
       currentVelocities[i].style,
@@ -110,7 +88,7 @@ function mergeAndSync(
       if (leavingStyle == null) {
         return null;
       }
-      if (shouldStopAnimationEach(
+      if (shouldStopAnimation(
           oldCurrentStyles[oldIndex].style,
           leavingStyle,
           oldCurrentVelocities[oldIndex].style)) {
@@ -321,13 +299,12 @@ export default function makeTransitionMotion(React: Object): Object {
           : propStyles;
 
         // check if we need to animate in the first place
-        if (shouldStopAnimation(
+        if (shouldStopAnimationAll(
           this.state.currentStyles,
           destStyles,
           this.state.currentVelocities,
         )) {
-          // TODO: no need to cancel animationID here; shouldn't have any in
-          // flight?
+          // no need to cancel animationID here; shouldn't have any in flight
           this.animationID = null;
           this.accumulatedTime = 0;
           return;

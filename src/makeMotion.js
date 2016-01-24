@@ -4,43 +4,20 @@ import stripStyle from './stripStyle';
 import stepper from './stepper';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
+import shouldStopAnimation from './shouldStopAnimation';
 
 import type {PlainStyle, Style, Velocity} from './Types';
 const msPerFrame = 1000 / 60;
 
-// usage assumption: currentStyle values have already been rendered but it says
-// nothing of whether currentStyle is stale (see unreadPropStyle)
-function shouldStopAnimation(currentStyle: PlainStyle, destStyle: Style, currentVelocity: Velocity): boolean {
-  for (let key in destStyle) {
-    if (!destStyle.hasOwnProperty(key)) {
-      continue;
-    }
-    const destVal = typeof destStyle[key] === 'number'
-      ? destStyle[key]
-      : destStyle[key].val;
-
-    // stepper will have already taken care of rounding precision errors, so
-    // won't have such thing as 0.9999 !=== 1
-    if (currentStyle[key] !== destVal) {
-      return false;
-    }
-    if (currentVelocity[key] !== 0) {
-      return false;
-    }
-  }
-
-  return true;
-}
+type MotionState = {
+  currentStyle: PlainStyle,
+  currentVelocity: Velocity,
+  lastIdealStyle: PlainStyle,
+  lastIdealVelocity: Velocity,
+};
 
 export default function makeMotion(React: Object): Object {
   const {PropTypes} = React;
-
-  type MotionState = {
-    currentStyle: PlainStyle,
-    currentVelocity: Velocity,
-    lastIdealStyle: PlainStyle,
-    lastIdealVelocity: Velocity,
-  };
 
   const Motion = React.createClass({
     propTypes: {
