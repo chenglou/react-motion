@@ -3,7 +3,7 @@ import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
 import TestUtils from 'react-addons-test-utils';
 
-const injector = require('inject!../src/makeTransitionMotion');
+const injector = require('inject!../src/TransitionMotion');
 
 describe('TransitionMotion', () => {
   let TransitionMotion;
@@ -14,7 +14,7 @@ describe('TransitionMotion', () => {
     TransitionMotion = injector({
       raf: mockRaf.raf,
       'performance-now': mockRaf.now,
-    })(React);
+    });
   });
 
   it('should allow returning null from children function', () => {

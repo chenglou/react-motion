@@ -3,7 +3,7 @@ import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
 import TestUtils from 'react-addons-test-utils';
 
-const injector = require('inject!../src/makeStaggeredMotion');
+const injector = require('inject!../src/StaggeredMotion');
 
 describe('StaggeredMotion', () => {
   let StaggeredMotion;
@@ -14,7 +14,7 @@ describe('StaggeredMotion', () => {
     StaggeredMotion = injector({
       raf: mockRaf.raf,
       'performance-now': mockRaf.now,
-    })(React);
+    });
   });
 
   it('should allow returning null from children function', () => {

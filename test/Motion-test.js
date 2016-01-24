@@ -3,7 +3,7 @@ import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
 import TestUtils from 'react-addons-test-utils';
 
-const injector = require('inject!../src/makeMotion');
+const injector = require('inject!../src/Motion');
 
 // temporarily putting the animation loop test here
 // TODO: put it in the correct file
@@ -16,7 +16,7 @@ describe('animation loop', () => {
     Motion = injector({
       raf: mockRaf.raf,
       'performance-now': mockRaf.now,
-    })(React);
+    });
   });
 
   it('should interpolate correctly when the timer is perfect', () => {
@@ -133,7 +133,7 @@ describe('Motion', () => {
     Motion = injector({
       raf: mockRaf.raf,
       'performance-now': mockRaf.now,
-    })(React);
+    });
   });
 
   it('should allow returning null from children function', () => {
