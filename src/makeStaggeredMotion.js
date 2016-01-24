@@ -60,38 +60,44 @@ export default function makeStaggeredMotion(React: Object): Object {
     // at 0 (didn't have time to tick and interpolate even once). If we naively
     // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
     // In reality currentStyle should be 400
-    unreadPropStyle: (null: ?StaggeredStyles),
-    // after checking for unreadPropStyle != null, we manually go set the
+    unreadPropStyles: (null: ?StaggeredStyles),
+    // after checking for unreadPropStyles != null, we manually go set the
     // non-interpolating values (those that are a number, without a spring
     // config)
-    clearUnreadPropStyle(unreadPropStyle: StaggeredStyles): void {
-      let newCurrentStyles = myClone(this.state.currentStyles);
-      let newCurrentVelocities = myClone(this.state.currentVelocities);
-      let lastIdealStyles = myClone(this.state.lastIdealStyles);
-      let lastIdealVelocities = myClone(this.state.lastIdealVelocities);
+    clearUnreadPropStyle(unreadPropStyles: StaggeredStyles): void {
+      let {currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities} = this.state;
 
-      unreadPropStyle.forEach((destStyle, i) => {
-        for (let key in destStyle) {
-          if (!destStyle.hasOwnProperty(key)) {
+      let someDirty = false;
+      for (let i = 0; i < unreadPropStyles.length; i++) {
+        const unreadPropStyle = unreadPropStyles[i];
+        let dirty = false;
+
+        for (let key in unreadPropStyle) {
+          if (!unreadPropStyle.hasOwnProperty(key)) {
             continue;
           }
 
-          const styleValue = destStyle[key];
+          const styleValue = unreadPropStyle[key];
           if (typeof styleValue === 'number') {
-            newCurrentStyles[i][key] = styleValue;
-            newCurrentVelocities[i][key] = 0;
+            if (!dirty) {
+              dirty = true;
+              someDirty = true;
+              currentStyles[i] = {...currentStyles[i]};
+              currentVelocities[i] = {...currentVelocities[i]};
+              lastIdealStyles[i] = {...lastIdealStyles[i]};
+              lastIdealVelocities[i] = {...lastIdealVelocities[i]};
+            }
+            currentStyles[i][key] = styleValue;
+            currentVelocities[i][key] = 0;
             lastIdealStyles[i][key] = styleValue;
             lastIdealVelocities[i][key] = 0;
           }
         }
-      });
+      }
 
-      this.setState({
-        currentStyles: newCurrentStyles,
-        currentVelocities: newCurrentVelocities,
-        lastIdealStyles,
-        lastIdealVelocities,
-      });
+      if (someDirty) {
+        this.setState({currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities});
+      }
     },
 
     startAnimationIfNecessary(): void {
@@ -143,17 +149,17 @@ export default function makeStaggeredMotion(React: Object): Object {
 
         // console.log(currentFrameCompletion, this.accumulatedTime, framesToCatchUp, '-------------111');
 
-        // TODO: no need to alloc so much. Optimize
-        let newLastIdealStyles = myClone(this.state.lastIdealStyles);
-        let newLastIdealVelocities = myClone(this.state.lastIdealVelocities);
-        let newCurrentStyles = myClone(this.state.currentStyles);
-        let newCurrentVelocities = myClone(this.state.currentVelocities);
+        let newLastIdealStyles = [];
+        let newLastIdealVelocities = [];
+        let newCurrentStyles = [];
+        let newCurrentVelocities = [];
 
-        destStyles.forEach((destStyle, i) => {
-          let newCurrentStyle = newCurrentStyles[i];
-          let newCurrentVelocity = newCurrentVelocities[i];
-          let newLastIdealStyle = newLastIdealStyles[i];
-          let newLastIdealVelocity = newLastIdealVelocities[i];
+        for (let i = 0; i < destStyles.length; i++) {
+          const destStyle = destStyles[i];
+          let newCurrentStyle: PlainStyle = {};
+          let newCurrentVelocity: Velocity = {};
+          let newLastIdealStyle: PlainStyle = {};
+          let newLastIdealVelocity: Velocity = {};
 
           for (let key in destStyle) {
             if (!destStyle.hasOwnProperty(key)) {
@@ -167,25 +173,23 @@ export default function makeStaggeredMotion(React: Object): Object {
               newLastIdealStyle[key] = styleValue;
               newLastIdealVelocity[key] = 0;
             } else {
+              let newLastIdealStyleValue = this.state.lastIdealStyles[i][key];
+              let newLastIdealVelocityValue = this.state.lastIdealVelocities[i][key];
               for (let j = 0; j < framesToCatchUp; j++) {
-                const interpolated = stepper(
+                [newLastIdealStyleValue, newLastIdealVelocityValue] = stepper(
                   msPerFrame / 1000,
-                  newLastIdealStyle[key],
-                  newLastIdealVelocity[key],
+                  newLastIdealStyleValue,
+                  newLastIdealVelocityValue,
                   styleValue.val,
                   styleValue.stiffness,
                   styleValue.damping,
                   styleValue.precision,
                 );
-
-                newLastIdealStyle[key] = interpolated[0];
-                newLastIdealVelocity[key] = interpolated[1];
-                // console.log(interpolated, '----------------222');
               }
-              const nextIdeal = stepper(
+              const [nextIdealX, nextIdealV] = stepper(
                 msPerFrame / 1000,
-                newLastIdealStyle[key],
-                newLastIdealVelocity[key],
+                newLastIdealStyleValue,
+                newLastIdealVelocityValue,
                 styleValue.val,
                 styleValue.stiffness,
                 styleValue.damping,
@@ -193,16 +197,23 @@ export default function makeStaggeredMotion(React: Object): Object {
               );
 
               newCurrentStyle[key] =
-                newLastIdealStyle[key] +
-                (nextIdeal[0] - newLastIdealStyle[key]) * currentFrameCompletion;
+                newLastIdealStyleValue +
+                (nextIdealX - newLastIdealStyleValue) * currentFrameCompletion;
               newCurrentVelocity[key] =
-                newLastIdealVelocity[key] +
-                (nextIdeal[1] - newLastIdealVelocity[key]) * currentFrameCompletion;
+                newLastIdealVelocityValue +
+                (nextIdealV - newLastIdealVelocityValue) * currentFrameCompletion;
+              newLastIdealStyle[key] = newLastIdealStyleValue;
+              newLastIdealVelocity[key] = newLastIdealVelocityValue;
             }
 
             // console.log(newCurrentStyle[key], newCurrentVelocity[key], '--------------------333');
           }
-        });
+
+          newCurrentStyles[i] = newCurrentStyle;
+          newCurrentVelocities[i] = newCurrentVelocity;
+          newLastIdealStyles[i] = newLastIdealStyle;
+          newLastIdealVelocities[i] = newLastIdealVelocity;
+        }
 
         this.animationID = null;
         // the amount we're looped over above
@@ -216,7 +227,7 @@ export default function makeStaggeredMotion(React: Object): Object {
           lastIdealVelocities: newLastIdealVelocities,
         });
 
-        this.unreadPropStyle = null;
+        this.unreadPropStyles = null;
 
         this.startAnimationIfNecessary();
       });
@@ -228,12 +239,12 @@ export default function makeStaggeredMotion(React: Object): Object {
     },
 
     componentWillReceiveProps(props) {
-      if (this.unreadPropStyle != null) {
+      if (this.unreadPropStyles != null) {
         // previous props haven't had the chance to be set yet; set them here
-        this.clearUnreadPropStyle(this.unreadPropStyle);
+        this.clearUnreadPropStyle(this.unreadPropStyles);
       }
 
-      this.unreadPropStyle = props.styles(this.state.lastIdealStyles);
+      this.unreadPropStyles = props.styles(this.state.lastIdealStyles);
       if (this.animationID == null) {
         this.prevTime = defaultNow();
         this.startAnimationIfNecessary();

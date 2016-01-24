@@ -55,10 +55,8 @@ export default function makeMotion(React: Object): Object {
     // non-interpolating values (those that are a number, without a spring
     // config)
     clearUnreadPropStyle(destStyle: Style): void {
-      let newCurrentStyle: PlainStyle = {...this.state.currentStyle};
-      let newCurrentVelocity: Velocity = {...this.state.currentVelocity};
-      let lastIdealStyle: PlainStyle = {...this.state.lastIdealStyle};
-      let lastIdealVelocity: Velocity = {...this.state.lastIdealVelocity};
+      let dirty = false;
+      let {currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity} = this.state;
 
       for (let key in destStyle) {
         if (!destStyle.hasOwnProperty(key)) {
@@ -67,19 +65,24 @@ export default function makeMotion(React: Object): Object {
 
         const styleValue = destStyle[key];
         if (typeof styleValue === 'number') {
-          newCurrentStyle[key] = styleValue;
-          newCurrentVelocity[key] = 0;
+          if (!dirty) {
+            dirty = true;
+            currentStyle = {...currentStyle};
+            currentVelocity = {...currentVelocity};
+            lastIdealStyle = {...lastIdealStyle};
+            lastIdealVelocity = {...lastIdealVelocity};
+          }
+
+          currentStyle[key] = styleValue;
+          currentVelocity[key] = 0;
           lastIdealStyle[key] = styleValue;
           lastIdealVelocity[key] = 0;
         }
       }
 
-      this.setState({
-        currentStyle: newCurrentStyle,
-        currentVelocity: newCurrentVelocity,
-        lastIdealStyle,
-        lastIdealVelocity,
-      });
+      if (dirty) {
+        this.setState({currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity});
+      }
     },
 
     startAnimationIfNecessary(): void {
@@ -130,9 +133,8 @@ export default function makeMotion(React: Object): Object {
 
         // console.log(currentFrameCompletion, this.accumulatedTime, framesToCatchUp, '-------------111');
 
-        // TODO: no need to alloc so much. Optimize
-        let newLastIdealStyle: PlainStyle = {...this.state.lastIdealStyle};
-        let newLastIdealVelocity: Velocity = {...this.state.lastIdealVelocity};
+        let newLastIdealStyle: PlainStyle = {};
+        let newLastIdealVelocity: Velocity = {};
         let newCurrentStyle: PlainStyle = {};
         let newCurrentVelocity: Velocity = {};
 
@@ -148,25 +150,23 @@ export default function makeMotion(React: Object): Object {
             newLastIdealStyle[key] = styleValue;
             newLastIdealVelocity[key] = 0;
           } else {
+            let newLastIdealStyleValue = this.state.lastIdealStyle[key];
+            let newLastIdealVelocityValue = this.state.lastIdealVelocity[key];
             for (let i = 0; i < framesToCatchUp; i++) {
-              const interpolated = stepper(
+              [newLastIdealStyleValue, newLastIdealVelocityValue] = stepper(
                 msPerFrame / 1000,
-                newLastIdealStyle[key],
-                newLastIdealVelocity[key],
+                newLastIdealStyleValue,
+                newLastIdealVelocityValue,
                 styleValue.val,
                 styleValue.stiffness,
                 styleValue.damping,
                 styleValue.precision,
               );
-
-              newLastIdealStyle[key] = interpolated[0];
-              newLastIdealVelocity[key] = interpolated[1];
-              // console.log(interpolated, '----------------222');
             }
-            const nextIdeal = stepper(
+            const [nextIdealX, nextIdealV] = stepper(
               msPerFrame / 1000,
-              newLastIdealStyle[key],
-              newLastIdealVelocity[key],
+              newLastIdealStyleValue,
+              newLastIdealVelocityValue,
               styleValue.val,
               styleValue.stiffness,
               styleValue.damping,
@@ -174,11 +174,13 @@ export default function makeMotion(React: Object): Object {
             );
 
             newCurrentStyle[key] =
-              newLastIdealStyle[key] +
-              (nextIdeal[0] - newLastIdealStyle[key]) * currentFrameCompletion;
+              newLastIdealStyleValue +
+              (nextIdealX - newLastIdealStyleValue) * currentFrameCompletion;
             newCurrentVelocity[key] =
-              newLastIdealVelocity[key] +
-              (nextIdeal[1] - newLastIdealVelocity[key]) * currentFrameCompletion;
+              newLastIdealVelocityValue +
+              (nextIdealV - newLastIdealVelocityValue) * currentFrameCompletion;
+            newLastIdealStyle[key] = newLastIdealStyleValue;
+            newLastIdealVelocity[key] = newLastIdealVelocityValue;
           }
 
           // console.log(newCurrentStyle[key], newCurrentVelocity[key], '--------------------333');

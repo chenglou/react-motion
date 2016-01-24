@@ -117,21 +117,21 @@ function mergeAndSync(
         ...newMergedPropsStyleCell,
         style: willEnter(newMergedPropsStyleCell),
       };
-      newCurrentStyles.push(stylesCell);
-      newLastIdealStyles.push(stylesCell);
+      newCurrentStyles[i] = stylesCell;
+      newLastIdealStyles[i] = stylesCell;
 
       const velocity = {
         ...newMergedPropsStyleCell,
         style: mapToZero(newMergedPropsStyleCell.style),
       };
-      newCurrentVelocities.push(velocity);
-      newLastIdealVelocities.push(velocity);
+      newCurrentVelocities[i] = velocity;
+      newLastIdealVelocities[i] = velocity;
     } else {
-      newCurrentStyles.push(oldCurrentStyles[found]);
-      newLastIdealStyles.push(oldLastIdealStyles[found]);
+      newCurrentStyles[i] = oldCurrentStyles[found];
+      newLastIdealStyles[i] = oldLastIdealStyles[found];
 
-      newCurrentVelocities.push(oldCurrentVelocities[found]);
-      newLastIdealVelocities.push(oldLastIdealVelocities[found]);
+      newCurrentVelocities[i] = oldCurrentVelocities[found];
+      newLastIdealVelocities[i] = oldLastIdealVelocities[found];
     }
   }
 
@@ -194,11 +194,9 @@ export default function makeTransitionMotion(React: Object): Object {
       }
       // TODO: optimize
       const oldCurrentStyles = defaultStyles == null
-        // $FlowFixMe
         ? destStyles.map(s => ({...s, style: stripStyle(s.style)}))
         : defaultStyles;
       const oldCurrentVelocities = defaultStyles == null
-        // $FlowFixMe
         ? destStyles.map(s => ({...s, style: mapToZero(s.style)}))
         : defaultStyles.map(s => ({...s, style: mapToZero(s.style)}));
       const [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
@@ -235,51 +233,59 @@ export default function makeTransitionMotion(React: Object): Object {
     // after checking for unreadpropstyle != null, we manually go set the
     // non-interpolating values (those that are a number, without a spring
     // config)
-    clearUnreadPropStyle(unreadPropStyle: TransitionStyles): void {
-      let [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities] = mergeAndSync(
+    clearUnreadPropStyle(unreadPropStyles: TransitionStyles): void {
+      let [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
         // $FlowFixMe
         this.props.willEnter,
         // $FlowFixMe
         this.props.willLeave,
         this.state.mergedPropsStyles,
-        unreadPropStyle,
+        unreadPropStyles,
         this.state.currentStyles,
         this.state.currentVelocities,
         this.state.lastIdealStyles,
         this.state.lastIdealVelocities,
       );
 
-      // TODO: optimize
-      newMergedPropsStyles = clone(newMergedPropsStyles);
-      newCurrentStyles = clone(newCurrentStyles);
-      newCurrentVelocities = clone(newCurrentVelocities);
-      newLastIdealStyles = clone(newLastIdealStyles);
-      newLastIdealVelocities = clone(newLastIdealVelocities);
+      let someDirty = false;
+      for (let i = 0; i < unreadPropStyles.length; i++) {
+        const unreadPropStyle = unreadPropStyles[i].style;
+        let dirty = false;
 
-      unreadPropStyle.forEach((destStyle, id) => {
-        for (let key in destStyle.style) {
-          if (!destStyle.style.hasOwnProperty(key)) {
+        for (let key in unreadPropStyle) {
+          if (!unreadPropStyle.hasOwnProperty(key)) {
             continue;
           }
 
-          const styleValue = destStyle.style[key];
+          const styleValue = unreadPropStyle[key];
           if (typeof styleValue === 'number') {
-            newCurrentStyles[id].style[key] = styleValue;
-            newMergedPropsStyles[id].style[key] = styleValue;
-            newCurrentVelocities[id].style[key] = 0;
-            newLastIdealStyles[id].style[key] = styleValue;
-            newLastIdealVelocities[id].style[key] = 0;
+            if (!dirty) {
+              dirty = true;
+              someDirty = true;
+              currentStyles[i] = fastClone(currentStyles[i]);
+              mergedPropsStyles[i] = fastClone(mergedPropsStyles[i]);
+              currentVelocities[i] = fastClone(currentVelocities[i]);
+              lastIdealStyles[i] = fastClone(lastIdealStyles[i]);
+              lastIdealVelocities[i] = fastClone(lastIdealVelocities[i]);
+            }
+            currentStyles[i].style[key] = styleValue;
+            mergedPropsStyles[i].style[key] = styleValue;
+            currentVelocities[i].style[key] = 0;
+            lastIdealStyles[i].style[key] = styleValue;
+            lastIdealVelocities[i].style[key] = 0;
           }
         }
-      });
+      }
 
-      this.setState({
-        currentStyles: newCurrentStyles,
-        currentVelocities: newCurrentVelocities,
-        mergedPropsStyles: newMergedPropsStyles,
-        lastIdealStyles: newLastIdealStyles,
-        lastIdealVelocities: newLastIdealVelocities,
-      });
+      if (someDirty) {
+        this.setState({
+          currentStyles,
+          currentVelocities,
+          mergedPropsStyles,
+          lastIdealStyles,
+          lastIdealVelocities,
+        });
+      }
     },
 
     startAnimationIfNecessary(): void {
@@ -346,18 +352,19 @@ export default function makeTransitionMotion(React: Object): Object {
           this.state.lastIdealStyles,
           this.state.lastIdealVelocities,
         );
-        newMergedPropsStyles.forEach((newMergedPropsStyle, i) => {
+        for (let i = 0; i < newMergedPropsStyles.length; i++) {
+          const newMergedPropsStyle = newMergedPropsStyles[i].style;
           let newCurrentStyle: PlainStyle = {};
           let newCurrentVelocity: Velocity = {};
           let newLastIdealStyle: PlainStyle = {};
           let newLastIdealVelocity: Velocity = {};
 
-          for (let key in newMergedPropsStyle.style) {
-            if (!newMergedPropsStyle.style.hasOwnProperty(key)) {
+          for (let key in newMergedPropsStyle) {
+            if (!newMergedPropsStyle.hasOwnProperty(key)) {
               continue;
             }
 
-            const styleValue = newMergedPropsStyle.style[key];
+            const styleValue = newMergedPropsStyle[key];
             if (typeof styleValue === 'number') {
               newCurrentStyle[key] = styleValue;
               newCurrentVelocity[key] = 0;
@@ -367,7 +374,7 @@ export default function makeTransitionMotion(React: Object): Object {
               let newLastIdealStyleValue = newLastIdealStyles[i].style[key];
               let newLastIdealVelocityValue = newLastIdealVelocities[i].style[key];
               for (let j = 0; j < framesToCatchUp; j++) {
-                const interpolated = stepper(
+                [newLastIdealStyleValue, newLastIdealVelocityValue] = stepper(
                   msPerFrame / 1000,
                   newLastIdealStyleValue,
                   newLastIdealVelocityValue,
@@ -376,12 +383,8 @@ export default function makeTransitionMotion(React: Object): Object {
                   styleValue.damping,
                   styleValue.precision,
                 );
-
-                newLastIdealStyleValue = interpolated[0];
-                newLastIdealVelocityValue = interpolated[1];
-                // console.log(interpolated, '----------------222');
               }
-              const nextIdeal = stepper(
+              const [nextIdealX, nextIdealV] = stepper(
                 msPerFrame / 1000,
                 newLastIdealStyleValue,
                 newLastIdealVelocityValue,
@@ -393,10 +396,10 @@ export default function makeTransitionMotion(React: Object): Object {
 
               newCurrentStyle[key] =
                 newLastIdealStyleValue +
-                (nextIdeal[0] - newLastIdealStyleValue) * currentFrameCompletion;
+                (nextIdealX - newLastIdealStyleValue) * currentFrameCompletion;
               newCurrentVelocity[key] =
                 newLastIdealVelocityValue +
-                (nextIdeal[1] - newLastIdealVelocityValue) * currentFrameCompletion;
+                (nextIdealV - newLastIdealVelocityValue) * currentFrameCompletion;
               newLastIdealStyle[key] = newLastIdealStyleValue;
               newLastIdealVelocity[key] = newLastIdealVelocityValue;
             }
@@ -408,7 +411,7 @@ export default function makeTransitionMotion(React: Object): Object {
           newLastIdealVelocities[i] = {...newLastIdealVelocities[i], style: newLastIdealVelocity};
           newCurrentStyles[i] = {...newCurrentStyles[i], style: newCurrentStyle};
           newCurrentVelocities[i] = {...newCurrentVelocities[i], style: newCurrentVelocity};
-        });
+        }
 
         this.animationID = null;
         // the amount we're looped over above

@@ -1,4 +1,10 @@
 /* @flow */
+
+// stepper is used a lot. Saves allocation to return the same array wrapper.
+// This is fine and danger-free against mutations because the callsite
+// immediately destructures it and gets the numbers inside without passing the
+// array reference around.
+let reusedTuple: [number, number] = [];
 export default function stepper(
   secondPerFrame: number,
   x: number,
@@ -25,8 +31,12 @@ export default function stepper(
   const newX = x + newV * secondPerFrame;
 
   if (Math.abs(newV) < precision && Math.abs(newX - destX) < precision) {
-    return [destX, 0];
+    reusedTuple[0] = destX;
+    reusedTuple[1] = 0;
+    return reusedTuple;
   }
 
-  return [newX, newV];
+  reusedTuple[0] = newX;
+  reusedTuple[1] = newV;
+  return reusedTuple;
 }
