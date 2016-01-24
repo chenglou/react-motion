@@ -69,7 +69,6 @@ function shouldStopAnimationAll(
 //    certainly add c, value of c is willEnter(c)
 // loop over merged and construct new current
 // dest doesn't change, that's owner's
-// TODO: optimize
 function mergeAndSync(
   willEnter: WillEnter,
   willLeave: WillLeave,
@@ -129,7 +128,6 @@ function mergeAndSync(
     } else {
       newCurrentStyles[i] = oldCurrentStyles[found];
       newLastIdealStyles[i] = oldLastIdealStyles[found];
-
       newCurrentVelocities[i] = oldCurrentVelocities[found];
       newLastIdealVelocities[i] = oldLastIdealVelocities[found];
     }
@@ -192,7 +190,6 @@ export default function makeTransitionMotion(React: Object): Object {
           return defaultStyleCell;
         });
       }
-      // TODO: optimize
       const oldCurrentStyles = defaultStyles == null
         ? destStyles.map(s => ({...s, style: stripStyle(s.style)}))
         : defaultStyles;
@@ -289,16 +286,9 @@ export default function makeTransitionMotion(React: Object): Object {
     },
 
     startAnimationIfNecessary(): void {
-      // console.log('started');
-      // TODO: remove
-      if (this.animationID != null) {
-        throw new Error('Testing. Something wrong. animationID not null.');
-      }
       // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
       // call cb? No, otherwise accidental parent rerender causes cb trigger
-
       this.animationID = defaultRaf(() => {
-        // console.log('one raf called');
         const propStyles = this.props.styles;
         let destStyles: TransitionStyles = typeof propStyles === 'function'
           ? propStyles(this.state.lastIdealStyles)
@@ -315,7 +305,6 @@ export default function makeTransitionMotion(React: Object): Object {
           this.accumulatedTime = 0;
           return;
         }
-        // console.log('dont stop, continue');
 
         const currentTime = defaultNow();
         const timeDelta = currentTime - this.prevTime;
@@ -327,7 +316,6 @@ export default function makeTransitionMotion(React: Object): Object {
         }
 
         if (this.accumulatedTime === 0) {
-          // console.log('bail, accumulatedTime = 0');
           // no need to cancel animationID here; shouldn't have any in flight
           this.animationID = null;
           this.startAnimationIfNecessary();
@@ -337,8 +325,6 @@ export default function makeTransitionMotion(React: Object): Object {
         let currentFrameCompletion =
           (this.accumulatedTime - Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
         const framesToCatchUp = Math.floor(this.accumulatedTime / msPerFrame);
-
-        // console.log(currentFrameCompletion, this.accumulatedTime, framesToCatchUp, '-------------111');
 
         let [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities] = mergeAndSync(
           // $FlowFixMe
@@ -403,8 +389,6 @@ export default function makeTransitionMotion(React: Object): Object {
               newLastIdealStyle[key] = newLastIdealStyleValue;
               newLastIdealVelocity[key] = newLastIdealVelocityValue;
             }
-
-            // console.log(newCurrentStyle[key], newCurrentVelocity[key], '--------------------333');
           }
 
           newLastIdealStyles[i] = {...newLastIdealStyles[i], style: newLastIdealStyle};
@@ -416,7 +400,6 @@ export default function makeTransitionMotion(React: Object): Object {
         this.animationID = null;
         // the amount we're looped over above
         this.accumulatedTime -= framesToCatchUp * msPerFrame;
-        // console.log(this.accumulatedTime, '---------------444');
 
         this.setState({
           currentStyles: newCurrentStyles,

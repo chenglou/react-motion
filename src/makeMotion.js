@@ -86,16 +86,9 @@ export default function makeMotion(React: Object): Object {
     },
 
     startAnimationIfNecessary(): void {
-      // console.log('started');
-      // TODO: remove
-      if (this.animationID != null) {
-        throw new Error('Testing. Something wrong. animationID not null.');
-      }
       // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
       // call cb? No, otherwise accidental parent rerender causes cb trigger
-
       this.animationID = defaultRaf(() => {
-        // console.log('one raf called');
         // check if we need to animate in the first place
         const propsStyle: Style = this.props.style;
         if (shouldStopAnimation(
@@ -108,7 +101,6 @@ export default function makeMotion(React: Object): Object {
           this.accumulatedTime = 0;
           return;
         }
-        // console.log('dont stop, continue');
 
         const currentTime = defaultNow();
         const timeDelta = currentTime - this.prevTime;
@@ -120,7 +112,6 @@ export default function makeMotion(React: Object): Object {
         }
 
         if (this.accumulatedTime === 0) {
-          // console.log('bail, accumulatedTime = 0');
           // no need to cancel animationID here; shouldn't have any in flight
           this.animationID = null;
           this.startAnimationIfNecessary();
@@ -130,8 +121,6 @@ export default function makeMotion(React: Object): Object {
         let currentFrameCompletion =
           (this.accumulatedTime - Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
         const framesToCatchUp = Math.floor(this.accumulatedTime / msPerFrame);
-
-        // console.log(currentFrameCompletion, this.accumulatedTime, framesToCatchUp, '-------------111');
 
         let newLastIdealStyle: PlainStyle = {};
         let newLastIdealVelocity: Velocity = {};
@@ -182,14 +171,11 @@ export default function makeMotion(React: Object): Object {
             newLastIdealStyle[key] = newLastIdealStyleValue;
             newLastIdealVelocity[key] = newLastIdealVelocityValue;
           }
-
-          // console.log(newCurrentStyle[key], newCurrentVelocity[key], '--------------------333');
         }
 
         this.animationID = null;
         // the amount we're looped over above
         this.accumulatedTime -= framesToCatchUp * msPerFrame;
-        // console.log(this.accumulatedTime, '---------------444');
 
         this.setState({
           currentStyle: newCurrentStyle,

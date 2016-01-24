@@ -101,16 +101,9 @@ export default function makeStaggeredMotion(React: Object): Object {
     },
 
     startAnimationIfNecessary(): void {
-      // console.log('started');
-      // TODO: remove
-      if (this.animationID != null) {
-        throw new Error('Testing. Something wrong. animationID not null.');
-      }
       // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
       // call cb? No, otherwise accidental parent rerender causes cb trigger
-
       this.animationID = defaultRaf(() => {
-        // console.log('one raf called');
         const destStyles: StaggeredStyles = this.props.styles(this.state.lastIdealStyles);
 
         // check if we need to animate in the first place
@@ -124,7 +117,6 @@ export default function makeStaggeredMotion(React: Object): Object {
           this.accumulatedTime = 0;
           return;
         }
-        // console.log('dont stop, continue');
 
         const currentTime = defaultNow();
         const timeDelta = currentTime - this.prevTime;
@@ -136,7 +128,6 @@ export default function makeStaggeredMotion(React: Object): Object {
         }
 
         if (this.accumulatedTime === 0) {
-          // console.log('bail, accumulatedTime = 0');
           // no need to cancel animationID here; shouldn't have any in flight
           this.animationID = null;
           this.startAnimationIfNecessary();
@@ -146,8 +137,6 @@ export default function makeStaggeredMotion(React: Object): Object {
         let currentFrameCompletion =
           (this.accumulatedTime - Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
         const framesToCatchUp = Math.floor(this.accumulatedTime / msPerFrame);
-
-        // console.log(currentFrameCompletion, this.accumulatedTime, framesToCatchUp, '-------------111');
 
         let newLastIdealStyles = [];
         let newLastIdealVelocities = [];
@@ -205,8 +194,6 @@ export default function makeStaggeredMotion(React: Object): Object {
               newLastIdealStyle[key] = newLastIdealStyleValue;
               newLastIdealVelocity[key] = newLastIdealVelocityValue;
             }
-
-            // console.log(newCurrentStyle[key], newCurrentVelocity[key], '--------------------333');
           }
 
           newCurrentStyles[i] = newCurrentStyle;
@@ -218,7 +205,6 @@ export default function makeStaggeredMotion(React: Object): Object {
         this.animationID = null;
         // the amount we're looped over above
         this.accumulatedTime -= framesToCatchUp * msPerFrame;
-        // console.log(this.accumulatedTime, '---------------444');
 
         this.setState({
           currentStyles: newCurrentStyles,
