@@ -9,7 +9,7 @@ const Demo = React.createClass({
         // key is creation date
         {key: 't1', text: 'Board the plane', isDone: false},
         {key: 't2', text: 'Sleep', isDone: false},
-        {key: 't3', text: 'Try to finish coneference slides', isDone: false},
+        {key: 't3', text: 'Try to finish conference slides', isDone: false},
         {key: 't4', text: 'Eat cheese and drink wine', isDone: false},
         {key: 't5', text: 'Go around in Uber', isDone: false},
         {key: 't6', text: 'Talk with conf attendees', isDone: false},
@@ -64,7 +64,7 @@ const Demo = React.createClass({
   },
 
   handleDestroy(date) {
-    this.setState({todos: this.state.todos.filter(({key}) => key === date)});
+    this.setState({todos: this.state.todos.filter(({key}) => key !== date)});
   },
 
   // actual animation-related logic
