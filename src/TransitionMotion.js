@@ -448,7 +448,20 @@ const TransitionMotion = React.createClass({
   },
 
   render(): ReactElement {
-    const renderedChildren = this.props.children(this.state.currentStyles);
+    const propsStyles = typeof this.props.styles === 'function'
+      ? this.props.styles(this.state.lastIdealStyles)
+      : this.props.styles;
+
+    const freshCurrentStyles = this.state.mergedPropsStyles.map((mergedPropsStyle, i) => {
+      for (let j = 0; j < propsStyles.length; j++) {
+        if (propsStyles[j].key === mergedPropsStyle.key) {
+          return {...propsStyles[j], style: this.state.currentStyles[i].style};
+        }
+      }
+      return {...mergedPropsStyle, style: this.state.currentStyles[i].style};
+    });
+
+    const renderedChildren = this.props.children(freshCurrentStyles);
     return renderedChildren && React.Children.only(renderedChildren);
   },
 });
