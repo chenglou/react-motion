@@ -100,8 +100,7 @@ export default function makeMotion(React: Object): Object {
           propsStyle,
           this.state.currentVelocity,
         )) {
-          // TODO: no need to cancel animationID here; shouldn't have any in
-          // flight?
+          // no need to cancel animationID here; shouldn't have any in flight
           this.animationID = null;
           this.accumulatedTime = 0;
           return;
@@ -119,7 +118,7 @@ export default function makeMotion(React: Object): Object {
 
         if (this.accumulatedTime === 0) {
           // console.log('bail, accumulatedTime = 0');
-          // assume no concurrent rAF here
+          // no need to cancel animationID here; shouldn't have any in flight
           this.animationID = null;
           this.startAnimationIfNecessary();
           return;
@@ -186,6 +185,7 @@ export default function makeMotion(React: Object): Object {
         }
 
         this.animationID = null;
+        // the amount we're looped over above
         this.accumulatedTime -= framesToCatchUp * msPerFrame;
         // console.log(this.accumulatedTime, '---------------444');
 
