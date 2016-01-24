@@ -425,5 +425,10 @@ describe('Motion', () => {
       {a: 353.79556970164606},
       {a: 350.02047519790233},
     ]);
+    mockRaf.step(999);
+    expect(count.length).toBe(85);
+    setState({a: spring(400)});
+    // make sure we're still updating children even if there's nothing to interp
+    expect(count.length).toBe(86);
   });
 });
