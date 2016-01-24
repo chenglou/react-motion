@@ -333,7 +333,7 @@ describe('Motion', () => {
       80.49479595336075,
       114.22887257563633,
     ]);
-    expect(count.length).toBe(106);
+    expect(count.length).toBe(91);
     expect(count[count.length - 1]).toEqual(400);
   });
 

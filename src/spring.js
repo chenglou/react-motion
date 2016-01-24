@@ -12,7 +12,7 @@ type SpringHelperConfig = {
 const defaultConfig = {
   ...presets.noWobble,
   onRest: null,
-  precision: 0.001,
+  precision: 0.01,
 };
 
 export default function spring(val: number, config?: SpringHelperConfig): SpringConfig {

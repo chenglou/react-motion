@@ -234,8 +234,8 @@ describe('StaggeredMotion', () => {
       [2.0123698988340193, 90.49479595336075, 0.09006472908093276, 13.602589163237312],
       [2.8557218143909084, 124.22887257563633, 0.18039409126848038, 17.215763650739216],
     ]);
-    expect(count.length).toBe(112);
-    expect(count[count.length - 1]).toEqual([10, 410, 10, 409.9989743401555]);
+    expect(count.length).toBe(111);
+    expect(count[count.length - 1]).toEqual([10, 410, 10, 410]);
   });
 
   it('should support jumping to value', () => {

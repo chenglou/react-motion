@@ -459,7 +459,7 @@ describe('TransitionMotion', () => {
       [{key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}}, {key: 2, style: {c: 17.62052469135803}}, {key: 3, style: {d: 1.1897376543209877}}],
     ]);
     mockRaf.step(999);
-    expect(count.length).toBe(106);
+    expect(count.length).toBe(91);
     expect(count[count.length - 1]).toEqual([{key: 1, style: {a: 10, b: 410}}, {key: 3, style: {d: 10}}]);
   });
 
