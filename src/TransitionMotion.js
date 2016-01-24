@@ -38,18 +38,22 @@ function shouldStopAnimationAll(
   currentStyles: TransitionPlainStyles,
   destStyles: TransitionStyles,
   currentVelocities: TransitionVelocities,
+  mergedPropsStyles: TransitionStyles,
 ): boolean {
-  if (currentStyles.length !== destStyles.length) {
+  if (mergedPropsStyles.length !== destStyles.length) {
     return false;
   }
 
-  for (let i = 0; i < currentStyles.length; i++) {
-    if (currentStyles[i].key !== destStyles[i].key) {
+  for (let i = 0; i < mergedPropsStyles.length; i++) {
+    if (mergedPropsStyles[i].key !== destStyles[i].key) {
       return false;
     }
   }
 
-  for (let i = 0; i < currentStyles.length; i++) {
+  // we have the invariant that mergedPropsStyles and
+  // currentStyles/currentVelocities/last* are synced in terms of cells, see
+  // mergeAndSync comment for more info
+  for (let i = 0; i < mergedPropsStyles.length; i++) {
     if (!shouldStopAnimation(
         currentStyles[i].style,
         destStyles[i].style,
@@ -64,8 +68,8 @@ function shouldStopAnimationAll(
 // core key merging logic
 
 // things to do: say previously merged style is {a, b}, dest style (prop) is {b,
-// c}, previous current (interpolating) style is {a, b} (invariant:
-// keys(current) = keys(merged)
+// c}, previous current (interpolating) style is {a, b}
+// **invariant**: current[i] corresponds to merged[i] in terms of key
 
 // steps:
 // turn merged style into {a?, b, c}
@@ -110,15 +114,15 @@ function mergeAndSync(
   let newLastIdealVelocities = [];
   for (let i = 0; i < newMergedPropsStyles.length; i++) {
     const newMergedPropsStyleCell = newMergedPropsStyles[i];
-    let found = null;
-    for (let j = 0; j < oldCurrentStyles.length; j++) {
-      if (oldCurrentStyles[j].key === newMergedPropsStyleCell.key) {
-        found = j;
+    let foundOldIndex = null;
+    for (let j = 0; j < oldMergedPropsStyles.length; j++) {
+      if (oldMergedPropsStyles[j].key === newMergedPropsStyleCell.key) {
+        foundOldIndex = j;
         break;
       }
     }
     // TODO: key search code
-    if (found == null) {
+    if (foundOldIndex == null) {
       const stylesCell = {
         ...newMergedPropsStyleCell,
         style: willEnter(newMergedPropsStyleCell),
@@ -133,10 +137,10 @@ function mergeAndSync(
       newCurrentVelocities[i] = velocity;
       newLastIdealVelocities[i] = velocity;
     } else {
-      newCurrentStyles[i] = oldCurrentStyles[found];
-      newLastIdealStyles[i] = oldLastIdealStyles[found];
-      newCurrentVelocities[i] = oldCurrentVelocities[found];
-      newLastIdealVelocities[i] = oldLastIdealVelocities[found];
+      newCurrentStyles[i] = oldCurrentStyles[foundOldIndex];
+      newLastIdealStyles[i] = oldLastIdealStyles[foundOldIndex];
+      newCurrentVelocities[i] = oldCurrentVelocities[foundOldIndex];
+      newLastIdealVelocities[i] = oldLastIdealVelocities[foundOldIndex];
     }
   }
 
@@ -303,6 +307,7 @@ const TransitionMotion = React.createClass({
         this.state.currentStyles,
         destStyles,
         this.state.currentVelocities,
+        this.state.mergedPropsStyles,
       )) {
         // no need to cancel animationID here; shouldn't have any in flight
         this.animationID = null;
