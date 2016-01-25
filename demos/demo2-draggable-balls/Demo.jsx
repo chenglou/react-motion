@@ -2,6 +2,8 @@ import React from 'react';
 import {Motion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 
+const springSetting1 = {stiffness: 180, damping: 10};
+const springSetting2 = {stiffness: 120, damping: 17};
 function reinsert(arr, from, to) {
   const _arr = arr.slice(0);
   const val = _arr[from];
@@ -92,16 +94,16 @@ const Demo = React.createClass({
             style = {
               translateX: x,
               translateY: y,
-              scale: spring(1.2, [180, 10]),
-              boxShadow: spring((x - (3 * width - 50) / 2) / 15, [180, 10]),
+              scale: spring(1.2, springSetting1),
+              boxShadow: spring((x - (3 * width - 50) / 2) / 15, springSetting1),
             };
           } else {
             [x, y] = layout[visualPosition];
             style = {
-              translateX: spring(x, [120, 17]),
-              translateY: spring(y, [120, 17]),
-              scale: spring(1, [180, 10]),
-              boxShadow: spring((x - (3 * width - 50) / 2) / 15, [180, 10]),
+              translateX: spring(x, springSetting2),
+              translateY: spring(y, springSetting2),
+              scale: spring(1, springSetting1),
+              boxShadow: spring((x - (3 * width - 50) / 2) / 15, springSetting1),
             };
           }
           return (
