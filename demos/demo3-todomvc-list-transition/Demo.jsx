@@ -7,17 +7,17 @@ const Demo = React.createClass({
     return {
       todos: [
         // key is creation date
-        {key: 't1', text: 'Board the plane', isDone: false},
-        {key: 't2', text: 'Sleep', isDone: false},
-        {key: 't3', text: 'Try to finish conference slides', isDone: false},
-        {key: 't4', text: 'Eat cheese and drink wine', isDone: false},
-        {key: 't5', text: 'Go around in Uber', isDone: false},
-        {key: 't6', text: 'Talk with conf attendees', isDone: false},
-        {key: 't7', text: 'Show Demo 1', isDone: false},
-        {key: 't8', text: 'Show Demo 2', isDone: false},
-        {key: 't9', text: 'Lament about the state of animation', isDone: false},
-        {key: 't10', text: 'Show Secret Demo', isDone: false},
-        {key: 't11', text: 'Go home', isDone: false},
+        {key: 't1', data: {text: 'Board the plane', isDone: false}},
+        {key: 't2', data: {text: 'Sleep', isDone: false}},
+        {key: 't3', data: {text: 'Try to finish conference slides', isDone: false}},
+        {key: 't4', data: {text: 'Eat cheese and drink wine', isDone: false}},
+        {key: 't5', data: {text: 'Go around in Uber', isDone: false}},
+        {key: 't6', data: {text: 'Talk with conf attendees', isDone: false}},
+        {key: 't7', data: {text: 'Show Demo 1', isDone: false}},
+        {key: 't8', data: {text: 'Show Demo 2', isDone: false}},
+        {key: 't9', data: {text: 'Lament about the state of animation', isDone: false}},
+        {key: 't10', data: {text: 'Show Secret Demo', isDone: false}},
+        {key: 't11', data: {text: 'Go home', isDone: false}},
       ],
       value: '',
       selected: 'all',
@@ -33,25 +33,29 @@ const Demo = React.createClass({
     e.preventDefault();
     const newItem = {
       key: 't' + Date.now(),
-      text: this.state.value,
-      isDone: false,
+      data: {text: this.state.value, isDone: false},
     };
     // append at head
     this.setState({todos: [newItem].concat(this.state.todos)});
   },
 
-  handleDone(key) {
+  handleDone(doneKey) {
     this.setState({
-      todos: this.state.todos.map(todo =>
-        todo.key === key ? {...todo, isDone: !todo.isDone} : todo
-      ),
+      todos: this.state.todos.map(todo => {
+        const {key, data: {text, isDone}} = todo;
+        return key === doneKey
+          ? {key: key, data: {text: text, isDone: !isDone}}
+          : todo;
+      }),
     });
   },
 
   handleToggleAll() {
-    const allDone = this.state.todos.every(({isDone}) => isDone);
+    const allDone = this.state.todos.some(({data}) => data.isDone);
     this.setState({
-      todos: this.state.todos.map(todo => ({...todo, isDone: allDone})),
+      todos: this.state.todos.map(({key, data: {text, isDone}}) => (
+        {key: key, data: {text: text, isDone: !allDone}}
+      )),
     });
   },
 
@@ -60,7 +64,7 @@ const Demo = React.createClass({
   },
 
   handleClearCompleted() {
-    this.setState({todos: this.state.todos.filter(({isDone}) => !isDone)});
+    this.setState({todos: this.state.todos.filter(({data}) => !data.isDone)});
   },
 
   handleDestroy(date) {
@@ -74,13 +78,13 @@ const Demo = React.createClass({
 
   getStyles() {
     const {todos, value, selected} = this.state;
-    return todos.filter(({isDone, text}) => {
+    return todos.filter(({data: {isDone, text}}) => {
       return text.toUpperCase().indexOf(value.toUpperCase()) >= 0 &&
         (selected === 'completed' && isDone ||
         selected === 'active' && !isDone ||
         selected === 'all');
     })
-    .map(todo => {
+    .map((todo, i) => {
       return {
         ...todo,
         style: {
@@ -130,7 +134,7 @@ const Demo = React.createClass({
             willEnter={this.willEnter}>
             {styles =>
               <ul className="todo-list">
-                {styles.map(({key, isDone, text, style}) =>
+                {styles.map(({key, style, data: {isDone, text}}) =>
                   <li key={key} style={style} className={isDone ? 'completed' : ''}>
                     <div className="view">
                       <input
@@ -154,7 +158,7 @@ const Demo = React.createClass({
         <footer className="footer">
           <span className="todo-count">
             <strong>
-              {todos.filter(({isDone}) => !isDone).length}
+              {todos.filter(({data: {isDone}}) => !isDone).length}
             </strong> item left
           </span>
           <ul className="filters">

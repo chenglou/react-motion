@@ -41,8 +41,7 @@ export type TransitionStyle = {
 export type TransitionPlainStyle = {
   key: any,
   data?: any,
-  // same as TransitionStyle, passed to you as argument to style/children
-  // function
+  // same as TransitionStyle, passed as argument to style/children function
   style: PlainStyle,
 };
 export type WillEnter = (style: TransitionStyle) => PlainStyle;
