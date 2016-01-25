@@ -29,18 +29,16 @@ export type StaggeredProps = {
   children: (interpolated: StaggeredPlainStyles) => ReactElement,
 };
 
-// TransitionMotion
-export type TransitionPlainStyles = Array<{key: any, style: PlainStyle}>;
+// === TransitionMotion ===
+export type TransitionPlainStyle = {key: any, style: PlainStyle};
 export type TransitionStyle = {key: any, style: Style};
-export type TransitionStyles = Array<TransitionStyle>;
-export type TransitionVelocities = Array<{key: any, style: Velocity}>;
 export type WillEnter = (style: TransitionStyle) => PlainStyle;
 export type WillLeave = (style: TransitionStyle) => ?Style;
 
 export type TransitionProps = {
-  defaultStyles?: TransitionPlainStyles,
-  styles: TransitionStyles | (previousInterpolatedStyles: ?TransitionPlainStyles) => TransitionStyles,
-  children: (interpolated: TransitionPlainStyles) => ReactElement,
+  defaultStyles?: Array<TransitionPlainStyle>,
+  styles: Array<TransitionStyle> | (previousInterpolatedStyles: ?Array<TransitionPlainStyle>) => Array<TransitionStyle>,
+  children: (interpolatedStyles: Array<TransitionPlainStyle>) => ReactElement,
   willEnter?: WillEnter,
   willLeave?: WillLeave,
 };

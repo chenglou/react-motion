@@ -1,8 +1,8 @@
 /* @flow */
-import type {TransitionStyles, TransitionStyle} from './Types';
+import type {TransitionStyle} from './Types';
 
 // babel transforms the tail calls into loops
-function mergeDiffArr(arrA, arrB, indexA, indexB, onRemove, accum): TransitionStyles {
+function mergeDiffArr(arrA, arrB, indexA, indexB, onRemove, accum): Array<TransitionStyle> {
   const endA = indexA === arrA.length;
   const endB = indexB === arrB.length;
   // const keyA = arrA[indexA].key;
@@ -50,9 +50,9 @@ function mergeDiffArr(arrA, arrB, indexA, indexB, onRemove, accum): TransitionSt
 }
 
 export default function mergeDiff(
-  prev: TransitionStyles,
-  next: TransitionStyles,
+  prev: Array<TransitionStyle>,
+  next: Array<TransitionStyle>,
   onRemove: (prevIndex: number, prevStyleCell: TransitionStyle) => ?TransitionStyle
-): TransitionStyles {
+): Array<TransitionStyle> {
   return mergeDiffArr(prev, next, 0, 0, onRemove, []);
 }

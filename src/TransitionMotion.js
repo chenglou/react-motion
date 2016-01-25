@@ -11,9 +11,7 @@ import React, {PropTypes} from 'react';
 import type {
   PlainStyle,
   Velocity,
-  TransitionPlainStyles,
-  TransitionStyles,
-  TransitionVelocities,
+  TransitionStyle,
   WillEnter,
   WillLeave,
   TransitionProps,
@@ -22,27 +20,23 @@ import type {
 const msPerFrame = 1000 / 60;
 
 type TransitionMotionState = {
-  currentStyles: TransitionPlainStyles,
-  currentVelocities: TransitionVelocities,
-  lastIdealStyles: TransitionPlainStyles,
-  lastIdealVelocities: TransitionVelocities,
-  mergedPropsStyles: TransitionStyles,
+  currentStyles: Array<PlainStyle>,
+  currentVelocities: Array<Velocity>,
+  lastIdealStyles: Array<PlainStyle>,
+  lastIdealVelocities: Array<Velocity>,
+  mergedPropsStyles: Array<TransitionStyle>,
 };
 
-function fastClone(a) {
-  // $FlowFixMe
-  return {...a, style: {...a.style}};
-}
-
 function rehydrateStyles(
-  mergedPropsStyles: TransitionStyles,
-  unreadPropStyles: ?TransitionStyles,
-  plainStyles: TransitionPlainStyles,
-): TransitionPlainStyles {
+  mergedPropsStyles: Array<TransitionStyle>,
+  unreadPropStyles: ?Array<TransitionStyle>,
+  plainStyles: Array<PlainStyle>,
+): Array<PlainStyle> {
   if (unreadPropStyles == null) {
     // no stale props styles value
+    // $FlowFixMe
     return mergedPropsStyles.map((mergedPropsStyle, i) => {
-      return {...mergedPropsStyle, style: plainStyles[i].style};
+      return {...mergedPropsStyle, style: plainStyles[i]};
     });
   }
   return mergedPropsStyles.map((mergedPropsStyle, i) => {
@@ -50,18 +44,18 @@ function rehydrateStyles(
     for (let j = 0; j < unreadPropStyles.length; j++) {
       // $FlowFixMe
       if (unreadPropStyles[j].key === mergedPropsStyle.key) {
-        return {...unreadPropStyles[j], style: plainStyles[i].style};
+        return {...unreadPropStyles[j], style: plainStyles[i]};
       }
     }
-    return {...mergedPropsStyle, style: plainStyles[i].style};
+    return {...mergedPropsStyle, style: plainStyles[i]};
   });
 }
 
 function shouldStopAnimationAll(
-  currentStyles: TransitionPlainStyles,
-  destStyles: TransitionStyles,
-  currentVelocities: TransitionVelocities,
-  mergedPropsStyles: TransitionStyles,
+  currentStyles: Array<PlainStyle>,
+  destStyles: Array<TransitionStyle>,
+  currentVelocities: Array<Velocity>,
+  mergedPropsStyles: Array<TransitionStyle>,
 ): boolean {
   if (mergedPropsStyles.length !== destStyles.length) {
     return false;
@@ -78,9 +72,9 @@ function shouldStopAnimationAll(
   // mergeAndSync comment for more info
   for (let i = 0; i < mergedPropsStyles.length; i++) {
     if (!shouldStopAnimation(
-        currentStyles[i].style,
+        currentStyles[i],
         destStyles[i].style,
-        currentVelocities[i].style)) {
+        currentVelocities[i])) {
       return false;
     }
   }
@@ -106,13 +100,13 @@ function shouldStopAnimationAll(
 function mergeAndSync(
   willEnter: WillEnter,
   willLeave: WillLeave,
-  oldMergedPropsStyles: TransitionStyles,
-  destStyles: TransitionStyles,
-  oldCurrentStyles: TransitionPlainStyles,
-  oldCurrentVelocities: TransitionVelocities,
-  oldLastIdealStyles: TransitionPlainStyles,
-  oldLastIdealVelocities: TransitionVelocities,
-): [TransitionStyles, TransitionPlainStyles, TransitionVelocities, TransitionPlainStyles, TransitionVelocities] {
+  oldMergedPropsStyles: Array<TransitionStyle>,
+  destStyles: Array<TransitionStyle>,
+  oldCurrentStyles: Array<PlainStyle>,
+  oldCurrentVelocities: Array<Velocity>,
+  oldLastIdealStyles: Array<PlainStyle>,
+  oldLastIdealVelocities: Array<Velocity>,
+): [Array<TransitionStyle>, Array<PlainStyle>, Array<Velocity>, Array<PlainStyle>, Array<Velocity>] {
   const newMergedPropsStyles = mergeDiff(
     oldMergedPropsStyles,
     destStyles,
@@ -122,9 +116,9 @@ function mergeAndSync(
         return null;
       }
       if (shouldStopAnimation(
-          oldCurrentStyles[oldIndex].style,
+          oldCurrentStyles[oldIndex],
           leavingStyle,
-          oldCurrentVelocities[oldIndex].style)) {
+          oldCurrentVelocities[oldIndex])) {
         return null;
       }
       return {...oldMergedPropsStyle, style: leavingStyle};
@@ -146,17 +140,11 @@ function mergeAndSync(
     }
     // TODO: key search code
     if (foundOldIndex == null) {
-      const stylesCell = {
-        ...newMergedPropsStyleCell,
-        style: willEnter(newMergedPropsStyleCell),
-      };
-      newCurrentStyles[i] = stylesCell;
-      newLastIdealStyles[i] = stylesCell;
+      const plainStyle = willEnter(newMergedPropsStyleCell);
+      newCurrentStyles[i] = plainStyle;
+      newLastIdealStyles[i] = plainStyle;
 
-      const velocity = {
-        ...newMergedPropsStyleCell,
-        style: mapToZero(newMergedPropsStyleCell.style),
-      };
+      const velocity = mapToZero(newMergedPropsStyleCell.style);
       newCurrentVelocities[i] = velocity;
       newLastIdealVelocities[i] = velocity;
     } else {
@@ -200,13 +188,13 @@ const TransitionMotion = React.createClass({
 
   getInitialState(): TransitionMotionState {
     const {defaultStyles, styles, willEnter, willLeave} = this.props;
-    const destStyles: TransitionStyles = typeof styles === 'function' ? styles() : styles;
+    const destStyles: Array<TransitionStyle> = typeof styles === 'function' ? styles() : styles;
 
     // this is special. for the first time around, we don't have a comparison
     // between last (no last) and current merged props. we'll compute last so:
     // say default is {a, b} and styles (dest style) is {b, c}, we'll
     // fabricate last as {a, b}
-    let oldMergedPropsStyles: TransitionStyles;
+    let oldMergedPropsStyles: Array<TransitionStyle>;
     if (defaultStyles == null) {
       oldMergedPropsStyles = destStyles;
     } else {
@@ -222,11 +210,11 @@ const TransitionMotion = React.createClass({
       });
     }
     const oldCurrentStyles = defaultStyles == null
-      ? destStyles.map(s => ({...s, style: stripStyle(s.style)}))
-      : defaultStyles;
+      ? destStyles.map(s => stripStyle(s.style))
+      : defaultStyles.map(s => stripStyle(s.style));
     const oldCurrentVelocities = defaultStyles == null
-      ? destStyles.map(s => ({...s, style: mapToZero(s.style)}))
-      : defaultStyles.map(s => ({...s, style: mapToZero(s.style)}));
+      ? destStyles.map(s => mapToZero(s.style))
+      : defaultStyles.map(s => mapToZero(s.style));
     const [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
       // $FlowFixMe
       willEnter,
@@ -257,11 +245,11 @@ const TransitionMotion = React.createClass({
   // at 0 (didn't have time to tick and interpolate even once). If we naively
   // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
   // In reality currentStyle should be 400
-  unreadPropStyles: (null: ?TransitionStyles),
+  unreadPropStyles: (null: ?Array<TransitionStyle>),
   // after checking for unreadPropStyles != null, we manually go set the
   // non-interpolating values (those that are a number, without a spring
   // config)
-  clearUnreadPropStyle(unreadPropStyles: TransitionStyles): void {
+  clearUnreadPropStyle(unreadPropStyles: Array<TransitionStyle>): void {
     let [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
       // $FlowFixMe
       this.props.willEnter,
@@ -290,17 +278,20 @@ const TransitionMotion = React.createClass({
           if (!dirty) {
             dirty = true;
             someDirty = true;
-            currentStyles[i] = fastClone(currentStyles[i]);
-            mergedPropsStyles[i] = fastClone(mergedPropsStyles[i]);
-            currentVelocities[i] = fastClone(currentVelocities[i]);
-            lastIdealStyles[i] = fastClone(lastIdealStyles[i]);
-            lastIdealVelocities[i] = fastClone(lastIdealVelocities[i]);
+            currentStyles[i] = {...currentStyles[i]};
+            currentVelocities[i] = {...currentVelocities[i]};
+            lastIdealStyles[i] = {...lastIdealStyles[i]};
+            lastIdealVelocities[i] = {...lastIdealVelocities[i]};
+            mergedPropsStyles[i] = {
+              ...mergedPropsStyles[i],
+              style: {...mergedPropsStyles[i].style},
+            };
           }
-          currentStyles[i].style[key] = styleValue;
+          currentStyles[i][key] = styleValue;
+          currentVelocities[i][key] = 0;
+          lastIdealStyles[i][key] = styleValue;
+          lastIdealVelocities[i][key] = 0;
           mergedPropsStyles[i].style[key] = styleValue;
-          currentVelocities[i].style[key] = 0;
-          lastIdealStyles[i].style[key] = styleValue;
-          lastIdealVelocities[i].style[key] = 0;
         }
       }
     }
@@ -321,7 +312,7 @@ const TransitionMotion = React.createClass({
     // call cb? No, otherwise accidental parent rerender causes cb trigger
     this.animationID = defaultRaf(() => {
       const propStyles = this.props.styles;
-      let destStyles: TransitionStyles = typeof propStyles === 'function'
+      let destStyles: Array<TransitionStyle> = typeof propStyles === 'function'
         ? propStyles(rehydrateStyles(
           this.state.mergedPropsStyles,
           this.unreadPropStyles,
@@ -393,8 +384,8 @@ const TransitionMotion = React.createClass({
             newLastIdealStyle[key] = styleValue;
             newLastIdealVelocity[key] = 0;
           } else {
-            let newLastIdealStyleValue = newLastIdealStyles[i].style[key];
-            let newLastIdealVelocityValue = newLastIdealVelocities[i].style[key];
+            let newLastIdealStyleValue = newLastIdealStyles[i][key];
+            let newLastIdealVelocityValue = newLastIdealVelocities[i][key];
             for (let j = 0; j < framesToCatchUp; j++) {
               [newLastIdealStyleValue, newLastIdealVelocityValue] = stepper(
                 msPerFrame / 1000,
@@ -427,10 +418,10 @@ const TransitionMotion = React.createClass({
           }
         }
 
-        newLastIdealStyles[i] = {...newLastIdealStyles[i], style: newLastIdealStyle};
-        newLastIdealVelocities[i] = {...newLastIdealVelocities[i], style: newLastIdealVelocity};
-        newCurrentStyles[i] = {...newCurrentStyles[i], style: newCurrentStyle};
-        newCurrentVelocities[i] = {...newCurrentVelocities[i], style: newCurrentVelocity};
+        newLastIdealStyles[i] = newLastIdealStyle;
+        newLastIdealVelocities[i] = newLastIdealVelocity;
+        newCurrentStyles[i] = newCurrentStyle;
+        newCurrentVelocities[i] = newCurrentVelocity;
       }
 
       this.animationID = null;
