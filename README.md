@@ -5,9 +5,6 @@
 [![Bower version](https://badge.fury.io/bo/react-motion.svg)](http://badge.fury.io/bo/react-motion)
 [![react-motion channel on discord](https://img.shields.io/badge/discord-react--motion%40reactiflux-738bd7.svg?style=flat)](https://discordapp.com/invite/0ZcbPKXt5bYzmcI0)
 
-#### Note: this is the master branch README, which differs from the stable build README that's located [here](https://github.com/chenglou/react-motion/blob/cc852fe787bb15a8b4a9e51538e03c57d5543d2e/README.md)
-
-
 ```jsx
 import {Motion, spring} from 'react-motion';
 // In your render...
@@ -59,9 +56,9 @@ npm install
 npm run prerelease
 ```
 
-**For React-native**, instead of `require('react-motion')`, do `require('react-motion/native')`.
+To try the demos locally with hot reloading, run `npm start`. **Don't forget to compile for production when you test your animation's performance!**
 
-_(P.S. Don't forget to compile for production when you test your animation's performance!)_
+**For React-native**: previous react-motion v0.3.* supported a dedicated build for RN, which has now been made obsolete since RN v0.18. This library should Just Work under the new React-Native 0.18+.
 
 ## Demos
 - [Simple Transition](http://chenglou.github.io/react-motion/demos/demo0-simple-transition)
@@ -84,158 +81,133 @@ For 95% of use-cases of animating components, we don't have to resort to using h
 This library also provides an alternative, more powerful API for React's `TransitionGroup`.
 
 ## API
-The library exports `Motion`, `StaggeredMotion`, `TransitionMotion`, `presets`, `spring` and `utils`.
 
-#### `spring: number -> ?[stiffness, damping] -> ConfigurationObject`
-(**Note**: not the `Spring` component in version <0.3.0.)
-The pervasive helper used to specify the how to animate to the destination value, e.g. `spring(10, [120, 17])` returns a configuration object with private properties (don't mutate this object because its representation is still evolving) that describes "an animation to the value 10, with a physics spring's [stiffness](https://en.wikipedia.org/wiki/Stiffness) of 120 and [damping](https://en.wikipedia.org/wiki/Damping) of 17". `spring(10)` without the spring configuration array defaults to `[170, 26]`. See below for more usage and see [here](#presets) for a list of convenient configurations the library exports.
+TODO: wiki link for upgrading to 0.4.0.
+
+The library exports `Motion`, `StaggeredMotion`, `TransitionMotion`, `presets`, and `spring`.
+
+Here's the concise public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
+
+##### `spring: (val: number, config?: SpringHelperConfig) => OpaqueConfig`
+Specifies the how to animate to the destination value, e.g. `spring(10, {stiffness: 120, damping: 17})` means "animate to value 10, with a spring of stiffness 120 and damping 17".
+
+- `val`: the value.
+- `config`: optional, for further adjustments. Possible fields:
+  - `stiffness`: optional, defaults to `170`.
+  - `damping`: optional, defaults to `26`.
+  - `precision`: optional, defaults to `0.01`. Specifies both the rounding of the interpolated value and the speed (internal).
+
+  It's normal not to feel how stiffness and damping affect your spring; use (TODO: link to spring params chooser) to get a feeling. **Usually**, you'd just use the list of tasteful stiffness/damping presets [here](#presets).
+
+Used in conjunction with the components below.
 
 ### &lt;Motion />
-Props:
-
-#### `defaultStyle: ?Object`
-Optional. The value when the component first renders (ignored in subsequent renders). Accepts an object of arbitrary keys, mapping to initial values you want to animate, e.g. `{x: 0, y: 10}`.
-
-#### `style: Object`
-Required. Must have the same keys throughout component's existence. Must have the same keys as `defaultStyle` (if provided). Similar to `defaultStyle`, but asks for a `spring` configuration as the destination value: `{x: spring(10), y: spring(20, [120, 17])}`.
-
-**If a plain number is provided rather than a `spring` config**, instead of giving an interpolated value in the children function param below, we'll jump straight to that number value.
-
-#### `children: Object -> ?ReactElement`
-Required **function**, which is passed an interpolated style object, e.g. `{x: 5.2, y: 12.1}`. Must returns a React element to render.
-
+#### Usage
 ```jsx
-<Motion defaultStyle={{x: 0}} style={{x: spring(10, [120, 17])}}>
-  {interpolatedStyle => <div>{interpolatedStyle.x}</div>}
+<Motion defaultStyle={{x: 0}} style={{x: spring(10)}}>
+  {interpolatingStyle => <div style={interpolatingStyle} />}
 </Motion>
 ```
 
+#### Props
+
+##### `style: Style`
+Required. The `Style` type is an object that maps to either a `number` or an `OpaqueConfig` returned by `spring()` above. Must keep the same keys throughout component's existence. The meaning of the values:
+
+- an `OpaqueConfig` returned from `spring(x)`: interpolate to `x`.
+- a `number` `x`: jump to `x`, do not interpolate.
+
+##### `defaultStyle?: PlainStyle`
+Optional. The `PlainStyle` type maps to `number`s. Defaults to an object with the same keys as `style` above, whose values are the initial numbers you're interpolating on. **Note that during subsequent renders, this prop is ignored. The values will interpolate from the current ones to the destination ones (specified by `style`)**.
+
+##### `children: (interpolatedStyle: PlainStyle) => ReactElement`
+Required **function**.
+
+- `interpolatedStyle`: the interpolated style object passed back to you. E.g. if you gave `style={{x: spring(10), y: spring(20)}}`, you'll receive as `interpolatedStyle`, at a certain time, `{x: 5.2, y: 12.1}`, which you can then apply on your `div` or something else.
+
+- Return: must return **one** React element to render.
+
 ### &lt;StaggeredMotion />
-When you want to animate a list of items, you can certainly create an array of `Motion`s and animate each. However, you often want to "stagger" them, i.e. animate items in one after another with a delay. Hard-coding this duration goes against the very purpose of spring physics. Instead, here's a natural, physics-based alternative, where "the destination position of an item depends on the current position of another".
+Animates a collection of items whose values depend on each other, creating a natural, springy, "staggering" effect [like so](TODO link to chat heads demo). This is preferred over hard-coding a delay for an array of `Motions` to achieve a similar (but less natural-looking) effect.
 
-#### `defaultStyles: ?Array<Object>`
-Optional. Similar to `Motion`'s `defaultStyle`, except an array of styles.
-
-#### `styles: ?Array<Object> -> Array<Object>`
-Required **function**. Takes as argument the previous array of styles (which is `undefined` at first render, unless `defaultStyles` is provided!). Return the array of styles containing the destination values.
-
-#### `children: Array<Object> -> ?ReactElement`
-A required **function**. Similar to `Motion`'s `children`, but accepts the array of interpolated styles instead, e.g. `[{x: 5}, {x: 6.4}, {x: 8.1}]`
-
+#### Usage
 ```jsx
 <StaggeredMotion
-  defaultStyles={[{x: 0}, {x: 10}, {x: 20}]}
-  styles={prevStyles => prevStyles.map((_, i) => {
+  defaultStyles={[{h: 0}, {h: 0}, {h: 0}]}
+  styles={prevInterpolatedStyles => prevInterpolatedStyles.map((_, i) => {
     return i === 0
-      ? {x: spring(this.state.mouseX)} // first item follows mouse's x position
-      : prevStyles[i - 1]; // item i follow the position of the item before it, creating a natural staggering spring
+      ? {h: spring(100)}
+      : {h: spring(prevInterpolatedStyles[i - 1].h)}
   })}>
-  {interpolatedStyles =>
+  {interpolatingStyles =>
     <div>
-      {interpolatedStyles.map((style, i) =>
-        <div key={i} style={{left: style.x}} />
-      )}
+      {interpolatingStyles.map((style, i) =>
+        <div key={i} style={{border: '1px solid', height: style.h}} />)
+      }
     </div>
   }
 </StaggeredMotion>
 ```
 
+Aka "the current spring's destination value is the interpolating value of the previous spring". Imagine a spring dragging another. Physics, it works!
+
+#### Props
+
+##### `styles: (previousInterpolatedStyles: ?Array<PlainStyle>) => Array<Style>`
+Required **function**. **Don't forget the "s"**!
+
+- `previousInterpolatedStyles`: the previously interpolating (array of) styles (`undefined` at first render, unless `defaultStyles` is provided).
+
+- Return: must return an array of `Style`s containing the destination values, e.g. `[{x: spring(10)}, {x: spring(20)}]`.
+
+##### `defaultStyles?: Array<PlainStyle>`
+Optional. Similar to `Motion`'s `defaultStyle`, but an array of them.
+
+##### `children: (interpolatedStyles: Array<PlainStyle>) => ReactElement`
+Required **function**. Similar to `Motion`'s `children`, but accepts the array of interpolated styles instead, e.g. `[{x: 5}, {x: 6.4}, {x: 8.1}]`
+
 ### &lt;TransitionMotion />
-**The magic component that helps you to do mounting and unmounting animation.** Unlike React's `TransitionGroup`, instead of retaining a few items in a list when they disappear, `TransitionMotion` diffs on the shape of its `styles` object prop.
+**Helps you to do mounting and unmounting animation**.
 
-**The general idea**
+#### Usage
 
-Let `TransitionMotion`'s `styles` be `{myKey1: {x: spring(30)}, myKey2: {x: spring(20)}}`. The interpolated styles passed to the `children` function, after a moment, would be `{myKey1: {x: 15.1}, myKey2: {x: 8.2}}`.
+You have items `a`, `b`, `c`, with their respective style configuration, given to `TransitionMotion`'s `styles`. In its `children` function, you're passed the three interpolated styles as params; you map over them and produce three components. All is good.
 
-A few renders later, you kill `myKey1` and its style config, i.e. pass the new `styles` as `{myKey2: {x: spring(20)}}`. TransitionMotion detects a missing key, but **retains** the key in the interpolated values as `{myKey1: ..., myKey2: ...}`.
+During next render, you give only `a` and `b`, indicating that you want `c` gone, but that you'd like to animate it reaching value `0`, before killing it for good.
 
-This is when `TransitionMotion` calls the prop `willLeave` that you provide, passing `myKey1` as argument. You're asked to return a final style config (for example, `{x: spring(50)}`) for `myKey1`, representing the style values that, when `interpolatedStyles.myKey1` reaches them, allows `TransitionMotion` to truly kill `myKey1` and its style config from the interpolated styles.
+Fortunately, `TransitionMotion` has kept `c` around and still passes it into the `children` function param. So when you're mapping over these three interpolated styles, you're still producing three components. It'll keep interpolating, while checking `c`'s current value at every frame. Once `c` reaches the specified `0`, `TransitionMotion` will remove it for good (from the interpolated styles passed to your `children` function).
 
-In summary: `styles` is `{k1: {x: spring(30)}, k2: {x: spring(20)}}`. Next render, `styles` is `{k2: {x: spring(20)}}`. The interpolated styles passed to children aren't affected, but remember that the `k1: configReturnedFromWillLeave` (say, `{x: spring(50)}`) part doesn't exist in the actual `styles` anymore. Moments later, interpolated styles reach `{k1: {x: 50}, k2: {x: 19.2}}`; it then re-renders, kills `k1` and become `{k2: {x: 19.2}}`. All this time, you're mapping over the interpolate styles and rendering two items, until the last render.
-
-Similar but simpler logic for `willEnter`.
-
-#### `defaultStyles: ?Object<string, Object>`
-Optional. Accepts an object of the format `{myKey1: styleObject, myKey2: styleObject}` where each `styleObject` is similar to `Motion`'s `defaultStyle`. The keys must be unique **non-number** IDs (number keys in JS object screws with keys enumeration order, which is important when you map over it in `children` function).
-
-#### `styles: Object | (?Object -> Object)`
-Required. Accepts an object similar to `defaultStyles`, but where `styleObject` has `spring` configurations: `{myKey1: {x: spring(10)}, myKey2: {y: spring(20)}}`. Alternatively, also accepts a function which takes a `prevStyles` parameter (just like `StaggeredMotion`; you can do staggered unmounting animation!), and returns the destination styles.
-
-#### `willEnter: (string, Object, Object, Object, Object) -> Object`
-__Not a very helpful type definition...__
-Optional. Pass a function that takes the arguments `(keyFromStylesThatJustEntered, correspondingStyleOfKey, styles, currentInterpolatedStyle, currentSpeed)`, and that returns a style object similar to a `defaultStyle`.
-
-Defaults to a function that returns `correspondingStyleOfKey`, in this case `{x: spring(20)}`.
-
-#### `willLeave: (string, Object, Object, Object, Object) -> Object`
-Optional. Pass a function that takes the arguments `keyThatJustLeft, correspondingStyleOfKey, styles, currentInterpolatedStyle, currentSpeed)` and that return a style object containing some `spring(...)` as the destination configuration.
-
-Optional, defaults to `correspondingStyleOfKey`, i.e. immediately killing the key from the interpolated values.
-
-#### `children: Object -> ?ReactElement`
-A required **function**. Similar to `Motion`'s `children`, but accepts the object of interpolated styles instead.
+This time, when mapping through the two remaining interpolated styles, you'll produce only two components. `c` is gone for real.
 
 ```jsx
 const Demo = React.createClass({
   getInitialState() {
     return {
-      blocks: {
-        a: 'I am a',
-        b: 'I am b',
-        c: 'I am c',
-      },
+      items: [{key: 'a', size: 10}, {key: 'b', size: 20}, {key: 'c', size: 30}],
     };
   },
-
-  getStyles() {
-    let configs = {};
-    Object.keys(this.state.blocks).forEach(key => {
-      configs[key] = {
-        opacity: spring(1),
-        text: this.state.blocks[key], // not interpolated
-      };
+  componentDidMount() {
+    this.setState({
+      items: [{key: 'a', size: 10}, {key: 'b', size: 20}], // remove c.
     });
-    return configs;
   },
-
-  // not used here! We don't add any new item
-  willEnter(key) {
-    return {
-      opacity: spring(0), // start at 0, gradually expand
-      text: this.state.blocks[key], // this is really just carried around so
-      // that interpolated values can still access the text when the key is gone
-      // from actual `styles`
-    };
+  willLeave() {
+    // triggered when c's gone. Keeping c until its width/height reach 0.
+    return {width: spring(0), height: spring(0)};
   },
-
-  willLeave(key, style) {
-    return {
-      opacity: spring(0), // make opacity reach 0, after which we can kill the key
-      text: style.text,
-    };
-  },
-
-  handleClick(key) {
-    const {...newBlocks} = this.state.blocks;
-    delete newBlocks[key];
-    this.setState({blocks: newBlocks});
-  },
-
   render() {
     return (
       <TransitionMotion
-        styles={this.getStyles()}
-        willEnter={this.willEnter}
-        willLeave={this.willLeave}>
+        willLeave={this.willLeave}
+        styles={this.state.items.map(item => ({
+          key: item.key,
+          style: {width: item.size, height: item.size},
+        }))}>
         {interpolatedStyles =>
+          // first render: a, b, c. Second: still a, b, c! Only last one's a, b.
           <div>
-            {Object.keys(interpolatedStyles).map(key => {
-              const {text, ...style} = interpolatedStyles[key];
-              return (
-                <div onClick={this.handleClick.bind(null, key)} style={style}>
-                  {text}
-                </div>
-              );
+            {interpolatedStyles.map(config => {
+              return <div key={config.key} style={{...config.style, border: '1px solid'}} />
             })}
           </div>
         }
@@ -245,28 +217,55 @@ const Demo = React.createClass({
 });
 ```
 
+#### Props
+
+First, two type definitions to ease the comprehension.
+
+- `TransitionStyle`: an object of the format `{key: any, data?: any, style: Style}`.
+
+  - `key`: required. The ID that `TransitionMotion` uses to track which configuration is which across renders, even when things are reordered. Typically reused as the component `key` when you map over the interpolated styles.
+
+  - `data`: optional. Anything you'd like to carry along. This is so that when the previous section example's `c` disappears, you still get to access `c`'s related data, such as the text to display along with it.
+
+  - `style`: required. The actual starting style configuration, similar to what you provide for `Motion`'s `style`. Maps keys to either a number or an `OpaqueConfig` returned by `spring()`.
+
+- `TransitionPlainStyle`: similar to above, except the `style` field's value is of type `PlainStyle`, aka an object that maps to numbers.
+
+##### `styles: Array<TransitionStyle> | (previousInterpolatedStyles: ?Array<TransitionPlainStyle>) => Array<TransitionStyle>`
+Required. Accepts either:
+
+  - an array of `TransitionStyle` configs, e.g. `[{key: 1, style: {x: spring(0)}}, {key: 2, style: {x: spring(10)}}]`.
+
+  - a function similar to `StaggeredMotion`, taking the previously interpolating styles (`undefined` at first call, unless `defaultStyles` is provided), and returning the previously mentioned array of configs. __You can do staggered mounting animation with this__.
+
+##### `defaultStyles?: Array<TransitionPlainStyle>`
+Optional. Similar to the other components' `defaultStyle`/`defaultStyles`.
+
+##### `children: (interpolatedStyles: Array<TransitionPlainStyle>) => ReactElement`
+Required **function**. Similar to other two components' `children`. Receive back an array similar to what you provided for `defaultStyles`, only that each `style` object's number value represent the currently interpolating value.
+
+##### `willLeave?: (styleThatLeft: TransitionStyle) => ?Style`
+Optional. Defaults to `() => null`. **The magic sauce property**.
+
+- `styleThatLeft`: the e.g. `{key: ..., data: ..., value: ...}` object from the `styles` array, identified by `key`, that was present during a previous render, and that is now absent, thus triggering the call to `willLeave`.
+
+- Return: `null` to indicate you want the `TransitionStyle` gone immediately. A `Style` object to indicate you want to reach transition to the specified value(s) before killing the `TransitionStyle`.
+
+##### `willEnter?: (styleThatEntered: TransitionStyle) => PlainStyle`
+Optional. Defaults to `styleThatEntered => stripStyle(styleThatEntered.style)`. Where `stripStyle` turns `{a: spring(10), b: spring(20)}` into `{a: 10, b: 20}`.
+
+- `styleThatEntered`: similar to `willLeave`'s, except the `TransitionStyle` represents the object whose `key` value was absent during the last `render`, and that is now present.
+
+- Return: a `defaultStyle`-like `PlainStyle` configuration, e.g. `{a: 0, b: 0}`, that serves as the starting values of the animation. Under this light, the default provided means "a style config that has the same starting values as the destination values "
+
 ### `presets`
-Some tasteful, commonly used spring presets you can plug into your `style` like so: `spring(10, presets.wobbly)`. [See here](https://github.com/chenglou/react-motion/blob/043231a84e420ba1cc7f5b0ceb1753a6406d38f1/src/presets.js).
-
-### `utils`
-Since `TransitionMotion` dictates `styles` to be an object, manipulating keys could be a little more tedious than manipulating arrays. Here are the common scenarios' solutions:
-
-- Insert item at the beginning: `{newKey: myConfigForThisKey, ...oldConfigs}`.
-- Insert item at the end: `{...oldConfigs, newKey: myConfigForThisKey}`.
-- Slice/splice/reverse/sort: this library exposes a `utils.reorderKeys` function.
-
-**Note**: object keys creation order is now guaranteed by the specs, except for integer keys, which follow ascending order and should not be used with `TransitionMotion`. Fortunately, you can just add a letter to your key to turn them into "true" strings.
-
-#### `reorderKeys: (Object, Function) -> Object`
-`utils.reorderKeys({a: 1, b: 2}, (keysArray) => ['b', 'a']) // gives {b: 2, a: 1}`
-
-`Function` will receive, as arguments, the array of keys in `Object` and should return a new array of keys (with e.g. order changed and/or keys removed). `reorderKeys` will then return a new object of the same shape as `object`, but with the keys in the order `Function` dictated.
+Some tasteful, commonly used spring presets you can plug into your `style` like so: `spring(10, presets.wobbly)` or `spring(20, {...presets.gentle, precision: 0.1})`. [See here](TODO new link).
 
 ## FAQ
 
 - How do I set the duration of my animation?
 
-[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](http://chenglou.github.io/react-motion/demos/demo5-spring-parameters-chooser/) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
+[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](TODO new link) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
 
 - How do I unmount the `TransitionMotion` container itself?
 
