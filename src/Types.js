@@ -33,8 +33,18 @@ export type StaggeredProps = {
 };
 
 // === TransitionMotion ===
-export type TransitionPlainStyle = {key: any, style: PlainStyle};
-export type TransitionStyle = {key: any, style: Style};
+export type TransitionStyle = {
+  key: any, // unique ID to identify component across render animations
+  data?: any, // optional data you want to carry along the style, e.g. itemText
+  style: Style, // actual style you're passing
+};
+export type TransitionPlainStyle = {
+  key: any,
+  data?: any,
+  // same as TransitionStyle, passed to you as argument to style/children
+  // function
+  style: PlainStyle,
+};
 export type WillEnter = (style: TransitionStyle) => PlainStyle;
 export type WillLeave = (style: TransitionStyle) => ?Style;
 

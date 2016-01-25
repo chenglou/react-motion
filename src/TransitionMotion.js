@@ -35,19 +35,25 @@ function rehydrateStyles(
   if (unreadPropStyles == null) {
     // no stale props styles value
     // $FlowFixMe
-    return mergedPropsStyles.map((mergedPropsStyle, i) => {
-      return {...mergedPropsStyle, style: plainStyles[i]};
-    });
+    return mergedPropsStyles.map((mergedPropsStyle, i) => ({
+      key: mergedPropsStyle.key,
+      data: mergedPropsStyle.data,
+      style: plainStyles[i],
+    }));
   }
   return mergedPropsStyles.map((mergedPropsStyle, i) => {
     // $FlowFixMe
     for (let j = 0; j < unreadPropStyles.length; j++) {
       // $FlowFixMe
       if (unreadPropStyles[j].key === mergedPropsStyle.key) {
-        return {...unreadPropStyles[j], style: plainStyles[i]};
+        return {
+          key: unreadPropStyles[j].key,
+          data: unreadPropStyles[j].data,
+          style: plainStyles[i],
+        };
       }
     }
-    return {...mergedPropsStyle, style: plainStyles[i]};
+    return {key: mergedPropsStyle.key, data: mergedPropsStyle.data, style: plainStyles[i]};
   });
 }
 
@@ -121,7 +127,7 @@ function mergeAndSync(
           oldCurrentVelocities[oldIndex])) {
         return null;
       }
-      return {...oldMergedPropsStyle, style: leavingStyle};
+      return {key: oldMergedPropsStyle.key, data: oldMergedPropsStyle.data, style: leavingStyle};
     },
   );
 
@@ -144,6 +150,7 @@ function mergeAndSync(
       newCurrentStyles[i] = plainStyle;
       newLastIdealStyles[i] = plainStyle;
 
+      // $FlowFixMe
       const velocity = mapToZero(newMergedPropsStyleCell.style);
       newCurrentVelocities[i] = velocity;
       newLastIdealVelocities[i] = velocity;
@@ -162,12 +169,14 @@ const TransitionMotion = React.createClass({
   propTypes: {
     defaultStyles: PropTypes.arrayOf(PropTypes.shape({
       key: PropTypes.any.isRequired,
+      data: PropTypes.any,
       style: PropTypes.objectOf(PropTypes.number).isRequired,
     })),
     styles: PropTypes.oneOfType([
       PropTypes.func,
       PropTypes.arrayOf(PropTypes.shape({
         key: PropTypes.any.isRequired,
+        data: PropTypes.any,
         style: PropTypes.objectOf(PropTypes.oneOfType([
           PropTypes.number,
           PropTypes.object,
@@ -283,7 +292,8 @@ const TransitionMotion = React.createClass({
             lastIdealStyles[i] = {...lastIdealStyles[i]};
             lastIdealVelocities[i] = {...lastIdealVelocities[i]};
             mergedPropsStyles[i] = {
-              ...mergedPropsStyles[i],
+              key: mergedPropsStyles[i].key,
+              data: mergedPropsStyles[i].data,
               style: {...mergedPropsStyles[i].style},
             };
           }

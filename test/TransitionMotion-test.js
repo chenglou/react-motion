@@ -119,7 +119,9 @@ describe('TransitionMotion', () => {
         return (
           <TransitionMotion
             defaultStyles={[{key: 1, style: {a: 0}}]}
-            styles={[{key: 1, style: {a: spring(10, {stiffness: 100, damping: 50, precision: 16})}}]}>
+            styles={[
+              {key: 1, style: {a: spring(10, {stiffness: 100, damping: 50, precision: 16})}},
+            ]}>
             {([{style: {a}}]) => {
               count.push(a);
               return null;
@@ -170,16 +172,31 @@ describe('TransitionMotion', () => {
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([[
-      {key: 1, style: {a: 0, b: 10}},
-      {key: 2, style: {c: 20}},
+      {key: 1, style: {a: 0, b: 10}, data: undefined},
+      {key: 2, style: {c: 20}, data: undefined},
     ]]);
     mockRaf.step(4);
     expect(count).toEqual([
-      [{key: 1, style: {a: 0, b: 10}}, {key: 2, style: {c: 20}}],
-      [{key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}}, {key: 2, style: {c: 38.888888888888886}}],
-      [{key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}}, {key: 2, style: {c: 67.589506172839506}}],
-      [{key: 1, style: {a: 2.0123698988340193, b: 90.49479595336075}}, {key: 2, style: {c: 100.49479595336075}}],
-      [{key: 1, style: {a: 2.8557218143909084, b: 124.22887257563633}}, {key: 2, style: {c: 134.22887257563632}}],
+      [
+        {key: 1, style: {a: 0, b: 10}, data: undefined},
+        {key: 2, style: {c: 20}, data: undefined},
+      ],
+      [
+        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, data: undefined},
+        {key: 2, style: {c: 38.888888888888886}, data: undefined},
+      ],
+      [
+        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, data: undefined},
+        {key: 2, style: {c: 67.589506172839506}, data: undefined},
+      ],
+      [
+        {key: 1, style: {a: 2.0123698988340193, b: 90.49479595336075}, data: undefined},
+        {key: 2, style: {c: 100.49479595336075}, data: undefined},
+      ],
+      [
+        {key: 1, style: {a: 2.8557218143909084, b: 124.22887257563633}, data: undefined},
+        {key: 2, style: {c: 134.22887257563632}, data: undefined},
+      ],
     ]);
   });
 
@@ -349,7 +366,7 @@ describe('TransitionMotion', () => {
     });
     TestUtils.renderIntoDocument(<App />);
 
-    expect(count).toEqual([[{key: 1, style: {x: 0}}]]);
+    expect(count).toEqual([[{key: 1, style: {x: 0}, data: undefined}]]);
     setState({
       val: [{key: 1, style: {x: 400}}, {key: 2, style: {y: 10}}],
     });
@@ -362,14 +379,34 @@ describe('TransitionMotion', () => {
     });
     mockRaf.step(2);
     expect(count).toEqual([
-      [{key: 1, style: {x: 0}}],
-      [{key: 1, style: {x: 0}}], // this new 0 comes from owner update, causing TransitionMotion to re-render
-      [{key: 1, style: {x: 400}}, {key: 2, style: {y: 10}}],
-      [{key: 1, style: {x: 385.8333333333333}}, {key: 2, style: {y: 9.527777777777779}}],
-      [{key: 1, style: {x: 364.3078703703703}}, {key: 2, style: {y: 8.810262345679014}}],
-      [{key: 1, style: {x: 364.3078703703703}}, {key: 2, style: {y: 8.810262345679014}}],
-      [{key: 1, style: {x: 353.79556970164606}}, {key: 2, style: {y: 7.9876301011659825}}],
-      [{key: 1, style: {x: 350.02047519790233}}, {key: 2, style: {y: 7.144278185609093}}],
+      [{key: 1, style: {x: 0}, data: undefined}],
+      // this new 0 comes from owner update, causing TransitionMotion to
+      // re-render
+      [{key: 1, style: {x: 0}, data: undefined}],
+      [
+        {key: 1, style: {x: 400}, data: undefined},
+        {key: 2, style: {y: 10}, data: undefined},
+      ],
+      [
+        {key: 1, style: {x: 385.8333333333333}, data: undefined},
+        {key: 2, style: {y: 9.527777777777779}, data: undefined},
+      ],
+      [
+        {key: 1, style: {x: 364.3078703703703}, data: undefined},
+        {key: 2, style: {y: 8.810262345679014}, data: undefined},
+      ],
+      [
+        {key: 1, style: {x: 364.3078703703703}, data: undefined},
+        {key: 2, style: {y: 8.810262345679014}, data: undefined},
+      ],
+      [
+        {key: 1, style: {x: 353.79556970164606}, data: undefined},
+        {key: 2, style: {y: 7.9876301011659825}, data: undefined},
+      ],
+      [
+        {key: 1, style: {x: 350.02047519790233}, data: undefined},
+        {key: 2, style: {y: 7.144278185609093}, data: undefined},
+      ],
     ]);
     mockRaf.step(999);
     expect(count.length).toBe(85);
@@ -406,7 +443,7 @@ describe('TransitionMotion', () => {
     });
     TestUtils.renderIntoDocument(<App />);
 
-    expect(count).toEqual([[{key: 1, style: {x: 0}}]]);
+    expect(count).toEqual([[{key: 1, style: {x: 0}, data: undefined}]]);
     setState({
       val: [{key: 1, style: {x: 400}}, {key: 2, style: {y: 10}}],
     });
@@ -419,14 +456,34 @@ describe('TransitionMotion', () => {
     });
     mockRaf.step(2);
     expect(count).toEqual([
-      [{key: 1, style: {x: 0}}],
-      [{key: 1, style: {x: 0}}], // this new 0 comes from owner update, causing TransitionMotion to re-render
-      [{key: 1, style: {x: 400}}, {key: 2, style: {y: 10}}],
-      [{key: 1, style: {x: 385.8333333333333}}, {key: 2, style: {y: 9.527777777777779}}],
-      [{key: 1, style: {x: 364.3078703703703}}, {key: 2, style: {y: 8.810262345679014}}],
-      [{key: 1, style: {x: 364.3078703703703}}, {key: 2, style: {y: 8.810262345679014}}],
-      [{key: 1, style: {x: 353.79556970164606}}, {key: 2, style: {y: 7.9876301011659825}}],
-      [{key: 1, style: {x: 350.02047519790233}}, {key: 2, style: {y: 7.144278185609093}}],
+      [{key: 1, style: {x: 0}, data: undefined}],
+      // this new 0 comes from owner update, causing TransitionMotion to
+      // re-render
+      [{key: 1, style: {x: 0}, data: undefined}],
+      [
+        {key: 1, style: {x: 400}, data: undefined},
+        {key: 2, style: {y: 10}, data: undefined},
+      ],
+      [
+        {key: 1, style: {x: 385.8333333333333}, data: undefined},
+        {key: 2, style: {y: 9.527777777777779}, data: undefined},
+      ],
+      [
+        {key: 1, style: {x: 364.3078703703703}, data: undefined},
+        {key: 2, style: {y: 8.810262345679014}, data: undefined},
+      ],
+      [
+        {key: 1, style: {x: 364.3078703703703}, data: undefined},
+        {key: 2, style: {y: 8.810262345679014}, data: undefined},
+      ],
+      [
+        {key: 1, style: {x: 353.79556970164606}, data: undefined},
+        {key: 2, style: {y: 7.9876301011659825}, data: undefined},
+      ],
+      [
+        {key: 1, style: {x: 350.02047519790233}, data: undefined},
+        {key: 2, style: {y: 7.144278185609093}, data: undefined},
+      ],
     ]);
     mockRaf.step(999);
     expect(count.length).toBe(85);
@@ -460,17 +517,36 @@ describe('TransitionMotion', () => {
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([
-      [{key: 1, style: {a: 0, b: 10}}, {key: 2, style: {c: 20}}, {key: 3, style: {d: 0}}],
+      [
+        {key: 1, style: {a: 0, b: 10}, data: undefined},
+        {key: 2, style: {c: 20}, data: undefined},
+        {key: 3, style: {d: 0}, data: undefined},
+      ],
     ]);
     mockRaf.step(2);
     expect(count).toEqual([
-      [{key: 1, style: {a: 0, b: 10}}, {key: 2, style: {c: 20}}, {key: 3, style: {d: 0}}],
-      [{key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}}, {key: 2, style: {c: 19.055555555555557}}, {key: 3, style: {d: 0.4722222222222222}}],
-      [{key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}}, {key: 2, style: {c: 17.62052469135803}}, {key: 3, style: {d: 1.1897376543209877}}],
+      [
+        {key: 1, style: {a: 0, b: 10}, data: undefined},
+        {key: 2, style: {c: 20}, data: undefined},
+        {key: 3, style: {d: 0}, data: undefined},
+      ],
+      [
+        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, data: undefined},
+        {key: 2, style: {c: 19.055555555555557}, data: undefined},
+        {key: 3, style: {d: 0.4722222222222222}, data: undefined},
+      ],
+      [
+        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, data: undefined},
+        {key: 2, style: {c: 17.62052469135803}, data: undefined},
+        {key: 3, style: {d: 1.1897376543209877}, data: undefined},
+      ],
     ]);
     mockRaf.step(999);
     expect(count.length).toBe(91);
-    expect(count[count.length - 1]).toEqual([{key: 1, style: {a: 10, b: 410}}, {key: 3, style: {d: 10}}]);
+    expect(count[count.length - 1]).toEqual([
+      {key: 1, style: {a: 10, b: 410}, data: undefined},
+      {key: 3, style: {d: 10}, data: undefined},
+    ]);
   });
 
   it('should eliminate things in/out at the beginning', () => {
@@ -481,7 +557,10 @@ describe('TransitionMotion', () => {
         return (
           <TransitionMotion
             defaultStyles={[{key: 1, style: {a: 0, b: 10}}, {key: 2, style: {c: 20}}]}
-            styles={[{key: 1, style: {a: spring(10), b: spring(410)}}, {key: 3, style: {d: spring(10)}}]}>
+            styles={[
+              {key: 1, style: {a: spring(10), b: spring(410)}},
+              {key: 3, style: {d: spring(10)}},
+            ]}>
             {a => {
               count.push(a);
               return null;
@@ -493,12 +572,24 @@ describe('TransitionMotion', () => {
 
     TestUtils.renderIntoDocument(<App />);
 
-    expect(count).toEqual([[{key: 1, style: {a: 0, b: 10}}, {key: 3, style: {d: 10}}]]);
+    expect(count).toEqual([[
+      {key: 1, style: {a: 0, b: 10}, data: undefined},
+      {key: 3, style: {d: 10}, data: undefined},
+    ]]);
     mockRaf.step(2);
     expect(count).toEqual([
-      [{key: 1, style: {a: 0, b: 10}}, {key: 3, style: {d: 10}}],
-      [{key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}}, {key: 3, style: {d: 10}}],
-      [{key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}}, {key: 3, style: {d: 10}}],
+      [
+        {key: 1, style: {a: 0, b: 10}, data: undefined},
+        {key: 3, style: {d: 10}, data: undefined},
+      ],
+      [
+        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, data: undefined},
+        {key: 3, style: {d: 10}, data: undefined},
+      ],
+      [
+        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, data: undefined},
+        {key: 3, style: {d: 10}, data: undefined},
+      ],
     ]);
   });
 
@@ -509,8 +600,8 @@ describe('TransitionMotion', () => {
       getInitialState() {
         return {
           val: [
-            {key: 1, style: {a: spring(10), b: spring(410)}, bla1: 3},
-            {key: 3, style: {d: spring(10)}, bla3: 4},
+            {key: 1, style: {a: spring(10), b: spring(410)}, data: [3]},
+            {key: 3, style: {d: spring(10)}, data: [4]},
           ],
         };
       },
@@ -522,7 +613,10 @@ describe('TransitionMotion', () => {
           <TransitionMotion
             willLeave={() => ({c: spring(0)})}
             willEnter={() => ({d: 0})}
-            defaultStyles={[{key: 1, style: {a: 0, b: 10}, bla1: 1}, {key: 2, style: {c: 20}, bla2: 2}]}
+            defaultStyles={[
+              {key: 1, style: {a: 0, b: 10}, data: [1]},
+              {key: 2, style: {c: 20}, data: [2]},
+            ]}
             styles={this.state.val}>
             {a => {
               count.push(a);
@@ -535,70 +629,70 @@ describe('TransitionMotion', () => {
 
     TestUtils.renderIntoDocument(<App />);
 
-    // somewhat defined behavior: notice that bla1 is 3, not 1. For simplicity
-    // of current implementation we've decided not to render bla1: 1 from
+    // somewhat defined behavior: notice that data is 3, not 1. For simplicity
+    // of current implementation we've decided not to render data: [1] from
     // defaultStyles (this is a problem unique to TransitionMotion, since no
     // other component carries unrelated data)
     expect(count).toEqual([[
-      {key: 1, style: {a: 0, b: 10}, bla1: 3},
-      {key: 2, style: {c: 20}, bla2: 2},
-      {key: 3, style: {d: 0}, bla3: 4},
+      {key: 1, style: {a: 0, b: 10}, data: [3]},
+      {key: 2, style: {c: 20}, data: [2]},
+      {key: 3, style: {d: 0}, data: [4]},
     ]]);
     mockRaf.step(2);
     setState({
       val: [
-        {key: 1, style: {a: spring(10), b: spring(410)}, bla1: 5},
-        {key: 3, style: {d: spring(10)}, bla3: 6},
+        {key: 1, style: {a: spring(10), b: spring(410)}, data: [5]},
+        {key: 3, style: {d: spring(10)}, data: [6]},
       ],
     });
     mockRaf.step(1);
     expect(count).toEqual([
       [
-        {key: 1, style: {a: 0, b: 10}, bla1: 3},
-        {key: 2, style: {c: 20}, bla2: 2},
-        {key: 3, style: {d: 0}, bla3: 4},
+        {key: 1, style: {a: 0, b: 10}, data: [3]},
+        {key: 2, style: {c: 20}, data: [2]},
+        {key: 3, style: {d: 0}, data: [4]},
       ],
       [
-        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, bla1: 3},
-        {key: 2, style: {c: 19.055555555555557}, bla2: 2},
-        {key: 3, style: {d: 0.4722222222222222}, bla3: 4},
+        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, data: [3]},
+        {key: 2, style: {c: 19.055555555555557}, data: [2]},
+        {key: 3, style: {d: 0.4722222222222222}, data: [4]},
       ],
       [
-        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, bla1: 3},
-        {key: 2, style: {c: 17.62052469135803}, bla2: 2},
-        {key: 3, style: {d: 1.1897376543209877}, bla3: 4},
+        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, data: [3]},
+        {key: 2, style: {c: 17.62052469135803}, data: [2]},
+        {key: 3, style: {d: 1.1897376543209877}, data: [4]},
       ],
-      // notice the bla1 and bla3 change!
+      // notice the `data` change!
       [
         // from the setState
-        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, bla1: 5},
-        {key: 2, style: {c: 17.62052469135803}, bla2: 2},
-        {key: 3, style: {d: 1.1897376543209877}, bla3: 6},
+        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, data: [5]},
+        {key: 2, style: {c: 17.62052469135803}, data: [2]},
+        {key: 3, style: {d: 1.1897376543209877}, data: [6]},
       ],
       [
-        {key: 1, style: {a: 2.0123698988340193, b: 90.49479595336075}, bla1: 5},
-        {key: 2, style: {c: 15.975260202331965}, bla2: 2},
-        {key: 3, style: {d: 2.0123698988340193}, bla3: 6},
+        {key: 1, style: {a: 2.0123698988340193, b: 90.49479595336075}, data: [5]},
+        {key: 2, style: {c: 15.975260202331965}, data: [2]},
+        {key: 3, style: {d: 2.0123698988340193}, data: [6]},
       ],
     ]);
     mockRaf.step(999);
     expect(count.length).toBe(92);
     expect(count[count.length - 1]).toEqual([
-      {key: 1, style: {a: 10, b: 410}, bla1: 5},
-      {key: 3, style: {d: 10}, bla3: 6},
+      {key: 1, style: {a: 10, b: 410}, data: [5]},
+      {key: 3, style: {d: 10}, data: [6]},
     ]);
     setState({
       val: [
-        // bla1 and bla3 change again
-        {key: 1, style: {a: spring(10), b: spring(410)}, bla1: 7},
-        {key: 3, style: {d: spring(10)}, bla3: 8},
+        // `data` changes again
+        {key: 1, style: {a: spring(10), b: spring(410)}, data: [7]},
+        {key: 3, style: {d: spring(10)}, data: [8]},
       ],
     });
     mockRaf.step(10); // no effect, stopped
     expect(count.length).toBe(93); // rendered once from setState
     expect(count[count.length - 1]).toEqual([
-      {key: 1, style: {a: 10, b: 410}, bla1: 7},
-      {key: 3, style: {d: 10}, bla3: 8},
+      {key: 1, style: {a: 10, b: 410}, data: [7]},
+      {key: 3, style: {d: 10}, data: [8]},
     ]);
   });
 
@@ -610,8 +704,8 @@ describe('TransitionMotion', () => {
       getInitialState() {
         return {
           val: [
-            {key: 1, style: {a: spring(10), b: spring(410)}, bla1: 3},
-            {key: 3, style: {d: spring(10)}, bla3: 4},
+            {key: 1, style: {a: spring(10), b: spring(410)}, data: [3]},
+            {key: 3, style: {d: spring(10)}, data: [4]},
           ],
         };
       },
@@ -623,7 +717,10 @@ describe('TransitionMotion', () => {
           <TransitionMotion
             willLeave={() => ({c: spring(0)})}
             willEnter={() => ({d: 0})}
-            defaultStyles={[{key: 1, style: {a: 0, b: 10}, bla1: 1}, {key: 2, style: {c: 20}, bla2: 2}]}
+            defaultStyles={[
+              {key: 1, style: {a: 0, b: 10}, data: [1]},
+              {key: 2, style: {c: 20}, data: [2]},
+            ]}
             styles={a => {
               prevValues.push(a);
               return this.state.val;
@@ -639,88 +736,88 @@ describe('TransitionMotion', () => {
 
     TestUtils.renderIntoDocument(<App />);
 
-    // somewhat defined behavior: notice that bla1 is 3, not 1. For simplicity
-    // of current implementation we've decided not to render bla1: 1 from
+    // somewhat defined behavior: notice that data is 3, not 1. For simplicity
+    // of current implementation we've decided not to render data: [1] from
     // defaultStyles (this is a problem unique to TransitionMotion, since no
     // other component carries unrelated data)
     expect(count).toEqual([[
-      {key: 1, style: {a: 0, b: 10}, bla1: 3},
-      {key: 2, style: {c: 20}, bla2: 2},
-      {key: 3, style: {d: 0}, bla3: 4},
+      {key: 1, style: {a: 0, b: 10}, data: [3]},
+      {key: 2, style: {c: 20}, data: [2]},
+      {key: 3, style: {d: 0}, data: [4]},
     ]]);
     mockRaf.step(2);
     setState({
       val: [
-        {key: 1, style: {a: spring(10), b: spring(410)}, bla1: 5},
-        {key: 3, style: {d: spring(10)}, bla3: 6},
+        {key: 1, style: {a: spring(10), b: spring(410)}, data: [5]},
+        {key: 3, style: {d: spring(10)}, data: [6]},
       ],
     });
     mockRaf.step(1);
     expect(count).toEqual([
       [
-        {key: 1, style: {a: 0, b: 10}, bla1: 3},
-        {key: 2, style: {c: 20}, bla2: 2},
-        {key: 3, style: {d: 0}, bla3: 4},
+        {key: 1, style: {a: 0, b: 10}, data: [3]},
+        {key: 2, style: {c: 20}, data: [2]},
+        {key: 3, style: {d: 0}, data: [4]},
       ],
       [
-        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, bla1: 3},
-        {key: 2, style: {c: 19.055555555555557}, bla2: 2},
-        {key: 3, style: {d: 0.4722222222222222}, bla3: 4},
+        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, data: [3]},
+        {key: 2, style: {c: 19.055555555555557}, data: [2]},
+        {key: 3, style: {d: 0.4722222222222222}, data: [4]},
       ],
       [
-        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, bla1: 3},
-        {key: 2, style: {c: 17.62052469135803}, bla2: 2},
-        {key: 3, style: {d: 1.1897376543209877}, bla3: 4},
+        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, data: [3]},
+        {key: 2, style: {c: 17.62052469135803}, data: [2]},
+        {key: 3, style: {d: 1.1897376543209877}, data: [4]},
       ],
-      // notice the bla1 and bla3 change!
+      // notice the data change!
       [
         // from the setState
-        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, bla1: 5},
-        {key: 2, style: {c: 17.62052469135803}, bla2: 2},
-        {key: 3, style: {d: 1.1897376543209877}, bla3: 6},
+        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, data: [5]},
+        {key: 2, style: {c: 17.62052469135803}, data: [2]},
+        {key: 3, style: {d: 1.1897376543209877}, data: [6]},
       ],
       [
-        {key: 1, style: {a: 2.0123698988340193, b: 90.49479595336075}, bla1: 5},
-        {key: 2, style: {c: 15.975260202331965}, bla2: 2},
-        {key: 3, style: {d: 2.0123698988340193}, bla3: 6},
+        {key: 1, style: {a: 2.0123698988340193, b: 90.49479595336075}, data: [5]},
+        {key: 2, style: {c: 15.975260202331965}, data: [2]},
+        {key: 3, style: {d: 2.0123698988340193}, data: [6]},
       ],
     ]);
     mockRaf.step(999);
     expect(count.length).toBe(92);
     expect(count[count.length - 1]).toEqual([
-      {key: 1, style: {a: 10, b: 410}, bla1: 5},
-      {key: 3, style: {d: 10}, bla3: 6},
+      {key: 1, style: {a: 10, b: 410}, data: [5]},
+      {key: 3, style: {d: 10}, data: [6]},
     ]);
     setState({
       val: [
-        // bla1 and bla3 change again
-        {key: 1, style: {a: spring(10), b: spring(410)}, bla1: 7},
-        {key: 3, style: {d: spring(10)}, bla3: 8},
+        // `data` changes again
+        {key: 1, style: {a: spring(10), b: spring(410)}, data: [7]},
+        {key: 3, style: {d: spring(10)}, data: [8]},
       ],
     });
     mockRaf.step(10); // no effect, stopped
     expect(count.length).toBe(93); // rendered once from setState
     expect(count[count.length - 1]).toEqual([
-      {key: 1, style: {a: 10, b: 410}, bla1: 7},
-      {key: 3, style: {d: 10}, bla3: 8},
+      {key: 1, style: {a: 10, b: 410}, data: [7]},
+      {key: 3, style: {d: 10}, data: [8]},
     ]);
 
     expect(prevValues.slice(0, 3)).toEqual([
       undefined,
       [
-        {key: 1, style: {a: 0, b: 10}, bla1: 3},
-        {key: 2, style: {c: 20}, bla2: 2},
-        {key: 3, style: {d: 0}, bla3: 4},
+        {key: 1, style: {a: 0, b: 10}, data: [3]},
+        {key: 2, style: {c: 20}, data: [2]},
+        {key: 3, style: {d: 0}, data: [4]},
       ],
       [
-        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, bla1: 3},
-        {key: 2, style: {c: 19.055555555555557}, bla2: 2},
-        {key: 3, style: {d: 0.4722222222222222}, bla3: 4},
+        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, data: [3]},
+        {key: 2, style: {c: 19.055555555555557}, data: [2]},
+        {key: 3, style: {d: 0.4722222222222222}, data: [4]},
       ],
     ]);
     expect(prevValues[prevValues.length - 1]).toEqual([
-      {key: 1, style: {a: 10, b: 410}, bla1: 7},
-      {key: 3, style: {d: 10}, bla3: 8},
+      {key: 1, style: {a: 10, b: 410}, data: [7]},
+      {key: 3, style: {d: 10}, data: [8]},
     ]);
   });
 });
