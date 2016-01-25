@@ -190,7 +190,7 @@ const TransitionMotion = React.createClass({
 
   getDefaultProps(): {willEnter: WillEnter, willLeave: WillLeave} {
     return {
-      willEnter: TransitionStylesWrap => stripStyle(TransitionStylesWrap.style),
+      willEnter: styleThatEntered => stripStyle(styleThatEntered.style),
       willLeave: () => null,
     };
   },

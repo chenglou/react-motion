@@ -49,8 +49,8 @@ export type TransitionPlainStyle = {
   // same as TransitionStyle, passed as argument to style/children function
   style: PlainStyle,
 };
-export type WillEnter = (style: TransitionStyle) => PlainStyle;
-export type WillLeave = (style: TransitionStyle) => ?Style;
+export type WillEnter = (styleThatEntered: TransitionStyle) => PlainStyle;
+export type WillLeave = (styleThatLeft: TransitionStyle) => ?Style;
 
 export type TransitionProps = {
   defaultStyles?: Array<TransitionPlainStyle>,
