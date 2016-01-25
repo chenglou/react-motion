@@ -601,4 +601,126 @@ describe('TransitionMotion', () => {
       {key: 3, style: {d: 10}, bla3: 8},
     ]);
   });
+
+  it('should carry around the ignored values in styles function', () => {
+    let count = [];
+    let prevValues = [];
+    let setState = () => {};
+    const App = React.createClass({
+      getInitialState() {
+        return {
+          val: [
+            {key: 1, style: {a: spring(10), b: spring(410)}, bla1: 3},
+            {key: 3, style: {d: spring(10)}, bla3: 4},
+          ],
+        };
+      },
+      componentWillMount() {
+        setState = this.setState.bind(this);
+      },
+      render() {
+        return (
+          <TransitionMotion
+            willLeave={() => ({c: spring(0)})}
+            willEnter={() => ({d: 0})}
+            defaultStyles={[{key: 1, style: {a: 0, b: 10}, bla1: 1}, {key: 2, style: {c: 20}, bla2: 2}]}
+            styles={a => {
+              prevValues.push(a);
+              return this.state.val;
+            }}>
+            {a => {
+              count.push(a);
+              return null;
+            }}
+          </TransitionMotion>
+        );
+      },
+    });
+
+    TestUtils.renderIntoDocument(<App />);
+
+    // somewhat defined behavior: notice that bla1 is 3, not 1. For simplicity
+    // of current implementation we've decided not to render bla1: 1 from
+    // defaultStyles (this is a problem unique to TransitionMotion, since no
+    // other component carries unrelated data)
+    expect(count).toEqual([[
+      {key: 1, style: {a: 0, b: 10}, bla1: 3},
+      {key: 2, style: {c: 20}, bla2: 2},
+      {key: 3, style: {d: 0}, bla3: 4},
+    ]]);
+    mockRaf.step(2);
+    setState({
+      val: [
+        {key: 1, style: {a: spring(10), b: spring(410)}, bla1: 5},
+        {key: 3, style: {d: spring(10)}, bla3: 6},
+      ],
+    });
+    mockRaf.step(1);
+    expect(count).toEqual([
+      [
+        {key: 1, style: {a: 0, b: 10}, bla1: 3},
+        {key: 2, style: {c: 20}, bla2: 2},
+        {key: 3, style: {d: 0}, bla3: 4},
+      ],
+      [
+        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, bla1: 3},
+        {key: 2, style: {c: 19.055555555555557}, bla2: 2},
+        {key: 3, style: {d: 0.4722222222222222}, bla3: 4},
+      ],
+      [
+        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, bla1: 3},
+        {key: 2, style: {c: 17.62052469135803}, bla2: 2},
+        {key: 3, style: {d: 1.1897376543209877}, bla3: 4},
+      ],
+      // notice the bla1 and bla3 change!
+      [
+        // from the setState
+        {key: 1, style: {a: 1.1897376543209877, b: 57.589506172839506}, bla1: 5},
+        {key: 2, style: {c: 17.62052469135803}, bla2: 2},
+        {key: 3, style: {d: 1.1897376543209877}, bla3: 6},
+      ],
+      [
+        {key: 1, style: {a: 2.0123698988340193, b: 90.49479595336075}, bla1: 5},
+        {key: 2, style: {c: 15.975260202331965}, bla2: 2},
+        {key: 3, style: {d: 2.0123698988340193}, bla3: 6},
+      ],
+    ]);
+    mockRaf.step(999);
+    expect(count.length).toBe(92);
+    expect(count[count.length - 1]).toEqual([
+      {key: 1, style: {a: 10, b: 410}, bla1: 5},
+      {key: 3, style: {d: 10}, bla3: 6},
+    ]);
+    setState({
+      val: [
+        // bla1 and bla3 change again
+        {key: 1, style: {a: spring(10), b: spring(410)}, bla1: 7},
+        {key: 3, style: {d: spring(10)}, bla3: 8},
+      ],
+    });
+    mockRaf.step(10); // no effect, stopped
+    expect(count.length).toBe(93); // rendered once from setState
+    expect(count[count.length - 1]).toEqual([
+      {key: 1, style: {a: 10, b: 410}, bla1: 7},
+      {key: 3, style: {d: 10}, bla3: 8},
+    ]);
+
+    expect(prevValues.slice(0, 3)).toEqual([
+      undefined,
+      [
+        {key: 1, style: {a: 0, b: 10}, bla1: 3},
+        {key: 2, style: {c: 20}, bla2: 2},
+        {key: 3, style: {d: 0}, bla3: 4},
+      ],
+      [
+        {key: 1, style: {a: 0.4722222222222222, b: 28.888888888888886}, bla1: 3},
+        {key: 2, style: {c: 19.055555555555557}, bla2: 2},
+        {key: 3, style: {d: 0.4722222222222222}, bla3: 4},
+      ],
+    ]);
+    expect(prevValues[prevValues.length - 1]).toEqual([
+      {key: 1, style: {a: 10, b: 410}, bla1: 7},
+      {key: 3, style: {d: 10}, bla3: 8},
+    ]);
+  });
 });
