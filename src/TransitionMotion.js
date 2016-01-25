@@ -34,6 +34,29 @@ function fastClone(a) {
   return {...a, style: {...a.style}};
 }
 
+function rehydrateStyles(
+  mergedPropsStyles: TransitionStyles,
+  unreadPropStyles: ?TransitionStyles,
+  plainStyles: TransitionPlainStyles,
+): TransitionPlainStyles {
+  if (unreadPropStyles == null) {
+    // no stale props styles value
+    return mergedPropsStyles.map((mergedPropsStyle, i) => {
+      return {...mergedPropsStyle, style: plainStyles[i].style};
+    });
+  }
+  return mergedPropsStyles.map((mergedPropsStyle, i) => {
+    // $FlowFixMe
+    for (let j = 0; j < unreadPropStyles.length; j++) {
+      // $FlowFixMe
+      if (unreadPropStyles[j].key === mergedPropsStyle.key) {
+        return {...unreadPropStyles[j], style: plainStyles[i].style};
+      }
+    }
+    return {...mergedPropsStyle, style: plainStyles[i].style};
+  });
+}
+
 function shouldStopAnimationAll(
   currentStyles: TransitionPlainStyles,
   destStyles: TransitionStyles,
@@ -234,8 +257,8 @@ const TransitionMotion = React.createClass({
   // at 0 (didn't have time to tick and interpolate even once). If we naively
   // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
   // In reality currentStyle should be 400
-  unreadpropstyle: (null: ?TransitionStyles),
-  // after checking for unreadpropstyle != null, we manually go set the
+  unreadPropStyles: (null: ?TransitionStyles),
+  // after checking for unreadPropStyles != null, we manually go set the
   // non-interpolating values (those that are a number, without a spring
   // config)
   clearUnreadPropStyle(unreadPropStyles: TransitionStyles): void {
@@ -299,7 +322,11 @@ const TransitionMotion = React.createClass({
     this.animationID = defaultRaf(() => {
       const propStyles = this.props.styles;
       let destStyles: TransitionStyles = typeof propStyles === 'function'
-        ? propStyles(this.state.lastIdealStyles)
+        ? propStyles(rehydrateStyles(
+          this.state.mergedPropsStyles,
+          this.unreadPropStyles,
+          this.state.lastIdealStyles,
+        ))
         : propStyles;
 
       // check if we need to animate in the first place
@@ -418,7 +445,7 @@ const TransitionMotion = React.createClass({
         mergedPropsStyles: newMergedPropsStyles,
       });
 
-      this.unreadpropstyle = null;
+      this.unreadPropStyles = null;
 
       this.startAnimationIfNecessary();
     });
@@ -430,14 +457,23 @@ const TransitionMotion = React.createClass({
   },
 
   componentWillReceiveProps(props: TransitionProps) {
-    if (this.unreadpropstyle) {
+    if (this.unreadPropStyles) {
       // previous props haven't had the chance to be set yet; set them here
-      this.clearUnreadPropStyle(this.unreadpropstyle);
+      this.clearUnreadPropStyle(this.unreadPropStyles);
     }
 
-    this.unreadpropstyle = typeof props.styles === 'function'
-      ? props.styles(this.state.lastIdealStyles)
-      : props.styles;
+    if (typeof props.styles === 'function') {
+      // $FlowFixMe
+      this.unreadPropStyles = props.styles(
+        rehydrateStyles(
+          this.state.mergedPropsStyles,
+          this.unreadPropStyles,
+          this.state.lastIdealStyles,
+        )
+      );
+    } else {
+      this.unreadPropStyles = props.styles;
+    }
 
     if (this.animationID == null) {
       this.prevTime = defaultNow();
@@ -453,20 +489,12 @@ const TransitionMotion = React.createClass({
   },
 
   render(): ReactElement {
-    const propsStyles = typeof this.props.styles === 'function'
-      ? this.props.styles(this.state.lastIdealStyles)
-      : this.props.styles;
-
-    const freshCurrentStyles = this.state.mergedPropsStyles.map((mergedPropsStyle, i) => {
-      for (let j = 0; j < propsStyles.length; j++) {
-        if (propsStyles[j].key === mergedPropsStyle.key) {
-          return {...propsStyles[j], style: this.state.currentStyles[i].style};
-        }
-      }
-      return {...mergedPropsStyle, style: this.state.currentStyles[i].style};
-    });
-
-    const renderedChildren = this.props.children(freshCurrentStyles);
+    const hydratedStyles = rehydrateStyles(
+      this.state.mergedPropsStyles,
+      this.unreadPropStyles,
+      this.state.currentStyles,
+    );
+    const renderedChildren = this.props.children(hydratedStyles);
     return renderedChildren && React.Children.only(renderedChildren);
   },
 });
