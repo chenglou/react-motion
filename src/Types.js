@@ -1,16 +1,21 @@
 /* @flow */
 
 // === basic reused types ===
-// the opaque object returned by `spring(value, yourConfig)`
-export type SpringConfig = {
+// type of the second parameter of `spring(val, config)` all fields are optional
+export type SpringHelperConfig = {
+  stiffness?: number,
+  damping?: number,
+  precision?: number,
+};
+// the object returned by `spring(value, yourConfig)`. Used internally only!
+export type OpaqueConfig = {
   val: number,
   stiffness: number,
   damping: number,
   precision: number,
-  onRest: ?(() => void),
 };
 // your typical style object given in props. Maps to a number or a spring config
-export type Style = {[key: string]: number | SpringConfig};
+export type Style = {[key: string]: number | OpaqueConfig};
 // the interpolating style object, with the same keys as the above Style object,
 // with the values mapped to numbers, naturally
 export type PlainStyle = {[key: string]: number};
