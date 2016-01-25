@@ -1,4 +1,7 @@
 /* @flow */
+
+// === basic reused types ===
+// the opaque object returned by `spring(value, yourConfig)`
 export type SpringConfig = {
   val: number,
   stiffness: number,
@@ -6,27 +9,27 @@ export type SpringConfig = {
   precision: number,
   onRest: ?(() => void),
 };
-
-// Motion
+// your typical style object given in props. Maps to a number or a spring config
 export type Style = {[key: string]: number | SpringConfig};
+// the interpolating style object, with the same keys as the above Style object,
+// with the values mapped to numbers, naturally
 export type PlainStyle = {[key: string]: number};
+// internal velocity object. Similar to PlainStyle, but whose numbers represent
+// speed. Might be exposed one day.
 export type Velocity = {[key: string]: number};
 
+// === Motion ===
 export type MotionProps = {
   defaultStyle?: PlainStyle,
   style: Style,
-  children: (interpolated: PlainStyle) => ReactElement,
+  children: (interpolatedStyle: PlainStyle) => ReactElement,
 };
 
-// StaggeredMotion
-export type StaggeredPlainStyles = Array<PlainStyle>;
-export type StaggeredStyles = Array<Style>;
-export type StaggeredVelocities = Array<Velocity>;
-
+// === StaggeredMotion ===
 export type StaggeredProps = {
-  defaultStyles?: StaggeredPlainStyles,
-  styles: (previousInterpolatedStyles: ?StaggeredPlainStyles) => StaggeredStyles,
-  children: (interpolated: StaggeredPlainStyles) => ReactElement,
+  defaultStyles?: Array<PlainStyle>,
+  styles: (previousInterpolatedStyles: ?Array<PlainStyle>) => Array<Style>,
+  children: (interpolatedStyles: Array<PlainStyle>) => ReactElement,
 };
 
 // === TransitionMotion ===

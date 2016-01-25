@@ -7,28 +7,21 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React, {PropTypes} from 'react';
 
-import type {
-  PlainStyle,
-  Velocity,
-  StaggeredPlainStyles,
-  StaggeredStyles,
-  StaggeredVelocities,
-  StaggeredProps,
-} from './Types';
+import type {PlainStyle, Style, Velocity, StaggeredProps} from './Types';
 
 const msPerFrame = 1000 / 60;
 
 type StaggeredMotionState = {
-  currentStyles: StaggeredPlainStyles,
-  currentVelocities: StaggeredVelocities,
-  lastIdealStyles: StaggeredPlainStyles,
-  lastIdealVelocities: StaggeredVelocities,
+  currentStyles: Array<PlainStyle>,
+  currentVelocities: Array<Velocity>,
+  lastIdealStyles: Array<PlainStyle>,
+  lastIdealVelocities: Array<Velocity>,
 };
 
 function shouldStopAnimationAll(
-  currentStyles: StaggeredPlainStyles,
-  styles: StaggeredStyles,
-  currentVelocities: StaggeredVelocities,
+  currentStyles: Array<PlainStyle>,
+  styles: Array<Style>,
+  currentVelocities: Array<Velocity>,
 ): boolean {
   for (let i = 0; i < currentStyles.length; i++) {
     if (!shouldStopAnimation(currentStyles[i], styles[i], currentVelocities[i])) {
@@ -48,7 +41,7 @@ const StaggeredMotion = React.createClass({
 
   getInitialState(): StaggeredMotionState {
     const {defaultStyles, styles} = this.props;
-    const currentStyles: StaggeredPlainStyles = defaultStyles || styles().map(stripStyle);
+    const currentStyles: Array<PlainStyle> = defaultStyles || styles().map(stripStyle);
     const currentVelocities = currentStyles.map(currentStyle => mapToZero(currentStyle));
     return {
       currentStyles: currentStyles,
@@ -66,11 +59,11 @@ const StaggeredMotion = React.createClass({
   // at 0 (didn't have time to tick and interpolate even once). If we naively
   // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
   // In reality currentStyle should be 400
-  unreadPropStyles: (null: ?StaggeredStyles),
+  unreadPropStyles: (null: ?Array<Style>),
   // after checking for unreadPropStyles != null, we manually go set the
   // non-interpolating values (those that are a number, without a spring
   // config)
-  clearUnreadPropStyle(unreadPropStyles: StaggeredStyles): void {
+  clearUnreadPropStyle(unreadPropStyles: Array<Style>): void {
     let {currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities} = this.state;
 
     let someDirty = false;
@@ -110,7 +103,7 @@ const StaggeredMotion = React.createClass({
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
     this.animationID = defaultRaf(() => {
-      const destStyles: StaggeredStyles = this.props.styles(this.state.lastIdealStyles);
+      const destStyles: Array<Style> = this.props.styles(this.state.lastIdealStyles);
 
       // check if we need to animate in the first place
       if (shouldStopAnimationAll(
