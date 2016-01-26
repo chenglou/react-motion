@@ -4,6 +4,9 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### 0.4.1 (January 26th 2016)
+- [F] Made a mistake while publishing the bower package; fixed.
+
 ### 0.4.0 (January 26th 2016)
 - [B] `spring` helper's format has changed from `spring(10, [120, 12])` to `spring(10, {stiffness: 120, damping: 12})`.
 - [B] `style`, `styles` and `styles` of the three respective components now only accept either a number to interpolate, or a `spring` configuration to interpolate. Previously, it accepted (and ignored) random key/value pairs mixed in, such as `{x: spring(0), y: 'helloWorld'}`. `y` Doesn't belong there and should be placed elsewhere, e.g. directly on the (actual react) style of the component you're assigning the interpolating values on.
