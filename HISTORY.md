@@ -10,13 +10,13 @@ Legend:
 ### 0.4.0 (January 26th 2016)
 - [B] `spring` helper's format has changed from `spring(10, [120, 12])` to `spring(10, {stiffness: 120, damping: 12})`.
 - [B] `style`, `styles` and `styles` of the three respective components now only accept either a number to interpolate, or a `spring` configuration to interpolate. Previously, it accepted (and ignored) random key/value pairs mixed in, such as `{x: spring(0), y: 'helloWorld'}`. `y` Doesn't belong there and should be placed elsewhere, e.g. directly on the (actual react) style of the component you're assigning the interpolating values on.
-- [B] `TransitionMotion` got an all-around clearer API. See the [upgrade guide](https://github.com/chenglou/react-motion/wiki) and [README section](https://github.com/chenglou/react-motion/blob/05d76f5ec7e9722dbca0237a97c41267e297eb2c/README.md#transitionmotion-) for more.
+- [B] `TransitionMotion` got an all-around clearer API. See the [upgrade guide](https://github.com/chenglou/react-motion/wiki) and [README section](https://github.com/chenglou/react-motion/blob/9877c311cc4a22099eb56fe7c76bad9753519ddb/README.md#transitionmotion-) for more.
 - [B] `Motion`'s' `defaultStyle`, informally accepted the format `{x: spring(0)}`. This is now officially unsupported. The correct format has always been `{x: 0}`. Setting a default style of `{x: spring(whatever)}` did not make sense; the configuration only applies for a `style`, aka destination value. Same modification applies to `StaggeredMotion` and `TransitionMotion`'s `defaultStyles` & `willEnter`.
 - [B] `TransitionMotion`'s `willEnter`/`willLeave`'s signature has changed.
 - [B] The `reorderKeys` helper is no longer needed thanks to the changes to `TransitionMotion`. It's now removed.
 - [B] React-Native specific build gone. RN 0.18+ uses the vanilla Npm React package, so there's no more need for us to export a wrapper.
 - [F] Bunch of bugs gone: #225, #212, #179, #157, #90, #88.
-- [I] `spring` has acquired a new field as part of the new signature: [precision tuning](https://github.com/chenglou/react-motion/blob/05d76f5ec7e9722dbca0237a97c41267e297eb2c/README.md#--spring-val-number-config-springhelperconfig--opaqueconfig)!
+- [I] `spring` has acquired a new field as part of the new signature: [precision tuning](https://github.com/chenglou/react-motion/blob/9877c311cc4a22099eb56fe7c76bad9753519ddb/README.md#--spring-val-number-config-springhelperconfig--opaqueconfig)!
 - [I] [Fully typed](https://github.com/chenglou/react-motion/blob/05d76f5ec7e9722dbca0237a97c41267e297eb2c/src/Types.js) via [Flow types](http://flowtype.org).
 - [I] Performance improvements.
 
