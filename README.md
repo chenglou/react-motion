@@ -82,11 +82,11 @@ This library also provides an alternative, more powerful API for React's `Transi
 
 ## API
 
-TODO: wiki link for upgrading to 0.4.0.
+**Coming from 0.3.* to 0.4.0? [Here](https://github.com/chenglou/react-motion/wiki)'s the upgrade guide.**
 
 The library exports `Motion`, `StaggeredMotion`, `TransitionMotion`, `presets`, and `spring`.
 
-Here's the concise public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
+[Here](https://github.com/chenglou/react-motion/blob/783c52ad777fb4558a7561bd10d917ada9b8c58d/src/Types.js)'s the well-annotated public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
 
 ##### `spring: (val: number, config?: SpringHelperConfig) => OpaqueConfig`
 Specifies the how to animate to the destination value, e.g. `spring(10, {stiffness: 120, damping: 17})` means "animate to value 10, with a spring of stiffness 120 and damping 17".
@@ -97,7 +97,7 @@ Specifies the how to animate to the destination value, e.g. `spring(10, {stiffne
   - `damping`: optional, defaults to `26`.
   - `precision`: optional, defaults to `0.01`. Specifies both the rounding of the interpolated value and the speed (internal).
 
-  It's normal not to feel how stiffness and damping affect your spring; use (TODO: link to spring params chooser) to get a feeling. **Usually**, you'd just use the list of tasteful stiffness/damping presets [here](#presets).
+  It's normal not to feel how stiffness and damping affect your spring; use [Spring Parameters Chooser](http://chenglou.github.io/react-motion/demos/demo5-spring-parameters-chooser) to get a feeling. **Usually**, you'd just use the list of tasteful stiffness/damping presets [here](#presets).
 
 Used in conjunction with the components below.
 
@@ -128,7 +128,7 @@ Required **function**.
 - Return: must return **one** React element to render.
 
 ### &lt;StaggeredMotion />
-Animates a collection of items whose values depend on each other, creating a natural, springy, "staggering" effect [like so](TODO link to chat heads demo). This is preferred over hard-coding a delay for an array of `Motions` to achieve a similar (but less natural-looking) effect.
+Animates a collection of items whose values depend on each other, creating a natural, springy, "staggering" effect [like so](http://chenglou.github.io/react-motion/demos/demo1-chat-heads). This is preferred over hard-coding a delay for an array of `Motions` to achieve a similar (but less natural-looking) effect.
 
 #### Usage
 ```jsx
@@ -256,16 +256,18 @@ Optional. Defaults to `styleThatEntered => stripStyle(styleThatEntered.style)`. 
 
 - `styleThatEntered`: similar to `willLeave`'s, except the `TransitionStyle` represents the object whose `key` value was absent during the last `render`, and that is now present.
 
-- Return: a `defaultStyle`-like `PlainStyle` configuration, e.g. `{a: 0, b: 0}`, that serves as the starting values of the animation. Under this light, the default provided means "a style config that has the same starting values as the destination values "
+- Return: a `defaultStyle`-like `PlainStyle` configuration, e.g. `{a: 0, b: 0}`, that serves as the starting values of the animation. Under this light, the default provided means "a style config that has the same starting values as the destination values".
+
+**Note** that `willEnter` and `defaultStyles` serve different purposes. `willEnter` only triggers when a previously inexistent `TransitionStyle` inside `styles` comes into the new render.
 
 ### `presets`
-Some tasteful, commonly used spring presets you can plug into your `style` like so: `spring(10, presets.wobbly)` or `spring(20, {...presets.gentle, precision: 0.1})`. [See here](TODO new link).
+Some tasteful, commonly used spring presets you can plug into your `style` like so: `spring(10, presets.wobbly)` or `spring(20, {...presets.gentle, precision: 0.1})`. [See here](https://github.com/chenglou/react-motion/blob/1cf9ef4a95000ef8b173fdb5a74e9e54597b8e33/src/presets.js).
 
 ## FAQ
 
 - How do I set the duration of my animation?
 
-[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](TODO new link) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
+[Hard-coded duration goes against fluid interfaces](https://twitter.com/andy_matuschak/status/566736015188963328). If your animation is interrupted mid-way, you'd get a weird completion animation if you hard-coded the time. That being said, in the demo section there's a great [Spring Parameters Chooser](http://chenglou.github.io/react-motion/demos/demo5-spring-parameters-chooser) for you to have a feel of what spring is appropriate, rather than guessing a duration in the dark.
 
 - How do I unmount the `TransitionMotion` container itself?
 
