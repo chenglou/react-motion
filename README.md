@@ -15,20 +15,11 @@ import {Motion, spring} from 'react-motion';
 
 Animate a counter from `0` to `10`. For more advanced usage, see below.
 
-## Install
+### Install
 
-#### Npm:
-```sh
-npm install --save react-motion
-```
+- Npm: `npm install --save react-motion`
 
-#### Bower:
-```sh
-bower install --save https://npmcdn.com/react-motion/bower.zip
-```
-
-or in `bower.json`
-
+- Bower: `bower install --save https://npmcdn.com/react-motion/bower.zip`. Or in `bower.json`:
 ```json
 {
   "dependencies": {
@@ -36,19 +27,18 @@ or in `bower.json`
   }
 }
 ```
-
 then include as
 ```html
 <script src="bower_components/react-motion/build/react-motion.js"></script>
 ```
 
-#### 1998 Script Tag:
+- 1998 Script Tag:
 ```html
 <script src="https://npmcdn.com/react-motion/build/react-motion.js"></script>
 (Module exposed as `ReactMotion`)
 ```
 
-#### Or build it yourself from the repo:
+- Build it yourself from the repo:
 ```sh
 git clone https://github.com/chenglou/react-motion.git
 cd react-motion
@@ -60,7 +50,7 @@ To try the demos locally with hot reloading, run `npm start`. **Don't forget to 
 
 **For React-native**: previous react-motion v0.3.* supported a dedicated build for RN, which has now been made obsolete since RN v0.18. This library should Just Work under the new React-Native 0.18+.
 
-## Demos
+### Demos
 - [Simple Transition](http://chenglou.github.io/react-motion/demos/demo0-simple-transition)
 - [Chat Heads](http://chenglou.github.io/react-motion/demos/demo1-chat-heads)
 - [Draggable Balls](http://chenglou.github.io/react-motion/demos/demo2-draggable-balls)
@@ -84,12 +74,21 @@ This library also provides an alternative, more powerful API for React's `Transi
 
 **Coming from 0.3.* to 0.4.0? [Here](https://github.com/chenglou/react-motion/wiki)'s the upgrade guide.**
 
-The library exports `Motion`, `StaggeredMotion`, `TransitionMotion`, `presets`, and `spring`.
+Exports:
+- `spring`.
+- `Motion`
+- `StaggeredMotion`
+- `TransitionMotion`
+- `presets`
 
 [Here](https://github.com/chenglou/react-motion/blob/783c52ad777fb4558a7561bd10d917ada9b8c58d/src/Types.js)'s the well-annotated public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
 
-##### `spring: (val: number, config?: SpringHelperConfig) => OpaqueConfig`
-Specifies the how to animate to the destination value, e.g. `spring(10, {stiffness: 120, damping: 17})` means "animate to value 10, with a spring of stiffness 120 and damping 17".
+---
+
+### Helpers
+
+##### - spring: (val: number, config?: SpringHelperConfig) => OpaqueConfig
+Used in conjunction with the components below. Specifies the how to animate to the destination value, e.g. `spring(10, {stiffness: 120, damping: 17})` means "animate to value 10, with a spring of stiffness 120 and damping 17".
 
 - `val`: the value.
 - `config`: optional, for further adjustments. Possible fields:
@@ -97,9 +96,12 @@ Specifies the how to animate to the destination value, e.g. `spring(10, {stiffne
   - `damping`: optional, defaults to `26`.
   - `precision`: optional, defaults to `0.01`. Specifies both the rounding of the interpolated value and the speed (internal).
 
-  It's normal not to feel how stiffness and damping affect your spring; use [Spring Parameters Chooser](http://chenglou.github.io/react-motion/demos/demo5-spring-parameters-chooser) to get a feeling. **Usually**, you'd just use the list of tasteful stiffness/damping presets [here](#presets).
+  It's normal not to feel how stiffness and damping affect your spring; use [Spring Parameters Chooser](http://chenglou.github.io/react-motion/demos/demo5-spring-parameters-chooser) to get a feeling. **Usually**, you'd just use the list of tasteful stiffness/damping presets below.
 
-Used in conjunction with the components below.
+##### - Presets for `{stiffness, damping}`
+Commonly used spring configurations used like so: `spring(10, presets.wobbly)` or `spring(20, {...presets.gentle, precision: 0.1})`. [See here](https://github.com/chenglou/react-motion/blob/1cf9ef4a95000ef8b173fdb5a74e9e54597b8e33/src/presets.js).
+
+---
 
 ### &lt;Motion />
 #### Usage
@@ -111,21 +113,24 @@ Used in conjunction with the components below.
 
 #### Props
 
-##### `style: Style`
+##### - style: Style
+
 Required. The `Style` type is an object that maps to either a `number` or an `OpaqueConfig` returned by `spring()` above. Must keep the same keys throughout component's existence. The meaning of the values:
 
 - an `OpaqueConfig` returned from `spring(x)`: interpolate to `x`.
 - a `number` `x`: jump to `x`, do not interpolate.
 
-##### `defaultStyle?: PlainStyle`
+##### - defaultStyle?: PlainStyle
 Optional. The `PlainStyle` type maps to `number`s. Defaults to an object with the same keys as `style` above, whose values are the initial numbers you're interpolating on. **Note that during subsequent renders, this prop is ignored. The values will interpolate from the current ones to the destination ones (specified by `style`)**.
 
-##### `children: (interpolatedStyle: PlainStyle) => ReactElement`
+##### - children: (interpolatedStyle: PlainStyle) => ReactElement
 Required **function**.
 
 - `interpolatedStyle`: the interpolated style object passed back to you. E.g. if you gave `style={{x: spring(10), y: spring(20)}}`, you'll receive as `interpolatedStyle`, at a certain time, `{x: 5.2, y: 12.1}`, which you can then apply on your `div` or something else.
 
 - Return: must return **one** React element to render.
+
+---
 
 ### &lt;StaggeredMotion />
 Animates a collection of items whose values depend on each other, creating a natural, springy, "staggering" effect [like so](http://chenglou.github.io/react-motion/demos/demo1-chat-heads). This is preferred over hard-coding a delay for an array of `Motions` to achieve a similar (but less natural-looking) effect.
@@ -153,18 +158,20 @@ Aka "the current spring's destination value is the interpolating value of the pr
 
 #### Props
 
-##### `styles: (previousInterpolatedStyles: ?Array<PlainStyle>) => Array<Style>`
+##### - styles: (previousInterpolatedStyles: ?Array&lt;PlainStyle>) => Array&lt;Style>
 Required **function**. **Don't forget the "s"**!
 
 - `previousInterpolatedStyles`: the previously interpolating (array of) styles (`undefined` at first render, unless `defaultStyles` is provided).
 
 - Return: must return an array of `Style`s containing the destination values, e.g. `[{x: spring(10)}, {x: spring(20)}]`.
 
-##### `defaultStyles?: Array<PlainStyle>`
+##### - defaultStyles?: Array&lt;PlainStyle>
 Optional. Similar to `Motion`'s `defaultStyle`, but an array of them.
 
-##### `children: (interpolatedStyles: Array<PlainStyle>) => ReactElement`
+##### - children: (interpolatedStyles: Array&lt;PlainStyle>) => ReactElement
 Required **function**. Similar to `Motion`'s `children`, but accepts the array of interpolated styles instead, e.g. `[{x: 5}, {x: 6.4}, {x: 8.1}]`
+
+---
 
 ### &lt;TransitionMotion />
 **Helps you to do mounting and unmounting animation**.
@@ -231,27 +238,27 @@ First, two type definitions to ease the comprehension.
 
 - `TransitionPlainStyle`: similar to above, except the `style` field's value is of type `PlainStyle`, aka an object that maps to numbers.
 
-##### `styles: Array<TransitionStyle> | (previousInterpolatedStyles: ?Array<TransitionPlainStyle>) => Array<TransitionStyle>`
+##### - styles: Array&lt;TransitionStyle> | (previousInterpolatedStyles: ?Array&lt;TransitionPlainStyle>) => Array&lt;TransitionStyle>
 Required. Accepts either:
 
   - an array of `TransitionStyle` configs, e.g. `[{key: 1, style: {x: spring(0)}}, {key: 2, style: {x: spring(10)}}]`.
 
   - a function similar to `StaggeredMotion`, taking the previously interpolating styles (`undefined` at first call, unless `defaultStyles` is provided), and returning the previously mentioned array of configs. __You can do staggered mounting animation with this__.
 
-##### `defaultStyles?: Array<TransitionPlainStyle>`
+##### - defaultStyles?: Array&lt;TransitionPlainStyle>
 Optional. Similar to the other components' `defaultStyle`/`defaultStyles`.
 
-##### `children: (interpolatedStyles: Array<TransitionPlainStyle>) => ReactElement`
+##### - children: (interpolatedStyles: Array&lt;TransitionPlainStyle>) => ReactElement
 Required **function**. Similar to other two components' `children`. Receive back an array similar to what you provided for `defaultStyles`, only that each `style` object's number value represent the currently interpolating value.
 
-##### `willLeave?: (styleThatLeft: TransitionStyle) => ?Style`
+##### - willLeave?: (styleThatLeft: TransitionStyle) => ?Style
 Optional. Defaults to `() => null`. **The magic sauce property**.
 
 - `styleThatLeft`: the e.g. `{key: ..., data: ..., value: ...}` object from the `styles` array, identified by `key`, that was present during a previous render, and that is now absent, thus triggering the call to `willLeave`.
 
 - Return: `null` to indicate you want the `TransitionStyle` gone immediately. A `Style` object to indicate you want to reach transition to the specified value(s) before killing the `TransitionStyle`.
 
-##### `willEnter?: (styleThatEntered: TransitionStyle) => PlainStyle`
+##### - willEnter?: (styleThatEntered: TransitionStyle) => PlainStyle
 Optional. Defaults to `styleThatEntered => stripStyle(styleThatEntered.style)`. Where `stripStyle` turns `{a: spring(10), b: spring(20)}` into `{a: 10, b: 20}`.
 
 - `styleThatEntered`: similar to `willLeave`'s, except the `TransitionStyle` represents the object whose `key` value was absent during the last `render`, and that is now present.
@@ -260,8 +267,7 @@ Optional. Defaults to `styleThatEntered => stripStyle(styleThatEntered.style)`. 
 
 **Note** that `willEnter` and `defaultStyles` serve different purposes. `willEnter` only triggers when a previously inexistent `TransitionStyle` inside `styles` comes into the new render.
 
-### `presets`
-Some tasteful, commonly used spring presets you can plug into your `style` like so: `spring(10, presets.wobbly)` or `spring(20, {...presets.gentle, precision: 0.1})`. [See here](https://github.com/chenglou/react-motion/blob/1cf9ef4a95000ef8b173fdb5a74e9e54597b8e33/src/presets.js).
+---
 
 ## FAQ
 
