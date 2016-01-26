@@ -1,0 +1,19 @@
+{
+  "name": "integration",
+  "version": "0.4.1",
+  "homepage": "https://github.com/chenglou/react-motion",
+  "authors": [
+    "Cheng Lou <chenglou92@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react-motion": "https://npmcdn.com/react-motion/bower.zip"
+  }
+}

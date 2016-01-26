@@ -9,5 +9,7 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {}
+  "dependencies": {
+    "react-motion": "^0.4.1"
+  }
 }

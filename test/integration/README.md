@@ -4,11 +4,11 @@ Please run this:
 ```
 rm -rf bower_components
 rm -rf node_modules
-bower install react-motion
-npm install react-motion
+bower install
+npm install
 node -e 'console.log(require("react-motion"))'
 ```
 
 Check that the output of that looks normal.
 
-For Bower, please also open up bower.html and see that
+For Bower, please also open up bower.html
