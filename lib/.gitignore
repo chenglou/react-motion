@@ -1,0 +1,5 @@
+# Ignore everything in this directory
+*.js
+*.map
+# Except this file
+!.gitignore
