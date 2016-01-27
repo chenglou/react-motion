@@ -38,17 +38,21 @@ then include as
 (Module exposed as `ReactMotion`)
 ```
 
-- Build it yourself from the repo:
+**For React-native**: previous react-motion v0.3.* supported a dedicated build for RN, which has now been made obsolete since RN v0.18. This library should Just Work under the new React-Native 0.18+.
+
+### Try things yourself
 ```sh
 git clone https://github.com/chenglou/react-motion.git
 cd react-motion
 npm install
-npm run prerelease
 ```
 
-To try the demos locally with hot reloading, run `npm start`. **Don't forget to compile for production when you test your animation's performance!**
+To try the demos locally:
 
-**For React-native**: previous react-motion v0.3.* supported a dedicated build for RN, which has now been made obsolete since RN v0.18. This library should Just Work under the new React-Native 0.18+.
+- with hot reloading (**slow, development version**): run `npm start`.
+- Without hot reloading (**faster, production version**): run `npm run build-demos` and open the static `demos/demo_name/index.html` file directly. **Don't forget to use production mode when testing your animation's performance**!
+
+To build the repo yourself: `npm run prerelease`.
 
 ### Demos
 - [Simple Transition](http://chenglou.github.io/react-motion/demos/demo0-simple-transition)
