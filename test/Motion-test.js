@@ -3,6 +3,8 @@ import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
 import TestUtils from 'react-addons-test-utils';
 
+const {createSpy} = global.jasmine;
+
 const injector = require('inject!../src/Motion');
 
 // temporarily putting the animation loop test here
@@ -384,6 +386,111 @@ describe('Motion', () => {
       352.4104938271605,
       319.5052040466392,
     ]);
+  });
+
+  it('should call onRest at the end of an animation', () => {
+    const onRest = createSpy('onRest');
+    let result = 0;
+
+    const App = React.createClass({
+      render() {
+        return (
+          <Motion
+            defaultStyle={{a: 0}}
+            style={{a: spring(5, {stiffness: 380, damping: 18, precision: 1})}}
+            onRest={onRest}
+          >
+            {
+              ({a}) => {
+                result = a;
+                return null;
+              }
+            }
+          </Motion>
+        );
+      },
+    });
+
+    TestUtils.renderIntoDocument(<App />);
+
+    mockRaf.step(22);
+
+    expect(result).toEqual(5);
+    expect(onRest.calls.count()).toEqual(1);
+  });
+
+
+  it('should not call onRest if an animation is still in progress', () => {
+    const onRest = createSpy('onRest');
+    let resultA = 0;
+    let resultB = 0;
+
+    const App = React.createClass({
+      render() {
+        return (
+          <Motion
+            defaultStyle={{a: 0, b: 0}}
+            style={
+              {
+                a: spring(5, {stiffness: 380, damping: 18, precision: 1}),
+                b: spring(500, {stiffness: 380, damping: 18, precision: 1}),
+              }
+            }
+            onRest={onRest}
+          >
+            {
+              ({a, b}) => {
+                resultA = a;
+                resultB = b;
+                return null;
+              }
+            }
+          </Motion>
+        );
+      },
+    });
+
+    TestUtils.renderIntoDocument(<App />);
+
+    mockRaf.step(22);
+
+    expect(resultA).toEqual(5);
+    expect(resultB).not.toEqual(500);
+    expect(onRest).not.toHaveBeenCalled();
+  });
+
+
+  it('should not call onRest unless an animation occurred', () => {
+    const onRest = createSpy('onRest');
+
+    let setState;
+
+    const App = React.createClass({
+      getInitialState() {
+        return {a: spring(0)};
+      },
+      componentWillMount() {
+        setState = this.setState.bind(this);
+      },
+      render() {
+        return (
+          <Motion
+            defaultStyle={{a: 0}}
+            style={{a: this.state.a}}
+            onRest={onRest}
+          >
+            {() => null}
+          </Motion>
+        );
+      },
+    });
+
+    TestUtils.renderIntoDocument(<App />);
+    mockRaf.step();
+    setState({a: 50});
+    mockRaf.step();
+
+    expect(onRest).not.toHaveBeenCalled();
   });
 
   it('should behave well when many owner updates come in-between rAFs', () => {
