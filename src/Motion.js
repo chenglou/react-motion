@@ -26,6 +26,7 @@ const Motion = React.createClass({
       PropTypes.object,
     ])).isRequired,
     children: PropTypes.func.isRequired,
+    onRest: PropTypes.func,
   },
 
   getInitialState(): MotionState {
@@ -40,6 +41,7 @@ const Motion = React.createClass({
     };
   },
 
+  wasAnimating: false,
   animationID: (null: ?number),
   prevTime: 0,
   accumulatedTime: 0,
@@ -94,11 +96,18 @@ const Motion = React.createClass({
         propsStyle,
         this.state.currentVelocity,
       )) {
+        if (this.wasAnimating && this.props.onRest) {
+          this.props.onRest();
+        }
+
         // no need to cancel animationID here; shouldn't have any in flight
         this.animationID = null;
+        this.wasAnimating = false;
         this.accumulatedTime = 0;
         return;
       }
+
+      this.wasAnimating = true;
 
       const currentTime = defaultNow();
       const timeDelta = currentTime - this.prevTime;
