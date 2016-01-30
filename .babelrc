@@ -1,4 +1,12 @@
 {
   "stage": 0,
-  "loose": "all"
+  "loose": "all",
+  "env": {
+    "production": {
+      "optional": [
+        "optimisation.react.inlineElements",
+        "optimisation.react.constantElements"
+      ]
+    }
+  }
 }
