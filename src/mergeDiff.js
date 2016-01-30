@@ -1,58 +1,105 @@
 /* @flow */
 import type {TransitionStyle} from './Types';
 
-// babel transforms the tail calls into loops
-function mergeDiffArr(arrA, arrB, indexA, indexB, onRemove, accum): Array<TransitionStyle> {
-  const endA = indexA === arrA.length;
-  const endB = indexB === arrB.length;
-  // const keyA = arrA[indexA].key;
-  // const keyB = arrB[indexB].key;
-  if (endA && endB) {
-    return accum;
-  }
+// core keys merging algorithm. If previous render's keys are [a, b], and the
+// next render's [c, b, d], what's the final merged keys and ordering?
 
-  if (endA) {
-    accum.push(arrB[indexB]);
-    return mergeDiffArr(arrA, arrB, indexA, indexB + 1, onRemove, accum);
-  }
+// - c and a must both be before b
+// - b before d
+// - ordering between a and c ambiguous
 
-  if (endB) {
-    const fill = onRemove(indexA, arrA[indexA]);
-    if (fill != null) {
-      accum.push(fill);
-    }
-    return mergeDiffArr(arrA, arrB, indexA + 1, indexB, onRemove, accum);
-  }
+// this reduces to merging two partially ordered lists (e.g. lists where not
+// every item has a definite ordering, like comparing a and c above). For the
+// ambiguous ordering we deterministically choose to place the next render's
+// item after the previous'; so c after a
 
-  if (arrA[indexA].key === arrB[indexB].key) {
-    accum.push(arrB[indexB]);
-    return mergeDiffArr(arrA, arrB, indexA + 1, indexB + 1, onRemove, accum);
-  }
-
-  // TODO: key search code
-  let found = false;
-  for (let i = indexB; i < arrB.length; i++) {
-    if (arrB[i].key === arrA[indexA].key) {
-      found = true;
-      break;
-    }
-  }
-  if (!found) {
-    const fill = onRemove(indexA, arrA[indexA]);
-    if (fill != null) {
-      accum.push(fill);
-    }
-    return mergeDiffArr(arrA, arrB, indexA + 1, indexB, onRemove, accum);
-  }
-
-  // key a != key b, key a (old) not found in new arr (arr b)
-  return mergeDiffArr(arrA, arrB, indexA + 1, indexB, onRemove, accum);
-}
-
+// this is called a topological sorting. Except the existing algorithms don't
+// work well with js bc of the amount of allocation, and isn't optimized for our
+// current use-case bc the runtime is linear in terms of edges (see wiki for
+// meaning), which is huge when two lists have many common elements
 export default function mergeDiff(
   prev: Array<TransitionStyle>,
   next: Array<TransitionStyle>,
   onRemove: (prevIndex: number, prevStyleCell: TransitionStyle) => ?TransitionStyle
 ): Array<TransitionStyle> {
-  return mergeDiffArr(prev, next, 0, 0, onRemove, []);
+  // bookkeeping for easier access of a key's index below. This is 2 allocations +
+  // potentially triggering chrome hash map mode for objs (so it might be faster
+  // to loop through and find a key's index each time), but I no longer care
+  let prevKeyIndex: {[key: string]: number} = {};
+  for (let i = 0; i < prev.length; i++) {
+    prevKeyIndex[prev[i].key] = i;
+  }
+  let nextKeyIndex: {[key: string]: number} = {};
+  for (let i = 0; i < next.length; i++) {
+    nextKeyIndex[next[i].key] = i;
+  }
+
+  // first, an overly elaborate way of merging prev and next, eliminating
+  // duplicates (in terms of keys). If there's dupe, keep the item in next).
+  // This way of writing it saves allocations
+  let ret = [];
+  for (let i = 0; i < next.length; i++) {
+    ret[i] = next[i];
+  }
+  for (let i = 0; i < prev.length; i++) {
+    if (!nextKeyIndex.hasOwnProperty(prev[i].key)) {
+      // this is called my TM's `mergeAndSync`, which calls willLeave. We don't
+      // merge in keys that the user desires to kill
+      const fill = onRemove(i, prev[i]);
+      if (fill != null) {
+        ret.push(fill);
+      }
+    }
+  }
+
+  // now all the items all present. Core sorting logic to have the right order
+  return ret.sort((a, b) => {
+    const nextOrderA = nextKeyIndex[a.key];
+    const nextOrderB = nextKeyIndex[b.key];
+    const prevOrderA = prevKeyIndex[a.key];
+    const prevOrderB = prevKeyIndex[b.key];
+
+    if (nextOrderA != null && nextOrderB != null) {
+      // both keys in next
+      return nextKeyIndex[a.key] - nextKeyIndex[b.key];
+    } else if (prevOrderA != null && prevOrderB != null) {
+      // both keys in prev
+      return prevKeyIndex[a.key] - prevKeyIndex[b.key];
+    } else if (nextOrderA != null) {
+      // key a in next, key b in prev
+
+      // how to determine the order between a and b? We find a "pivot" (term
+      // abuse), a key present in both prev and next, that is sandwiched between
+      // a and b. In the context of our above example, if we're comparing a and
+      // d, b's (the only) pivot
+      for (let i = 0; i < next.length; i++) {
+        const pivot = next[i].key;
+        if (!prevKeyIndex.hasOwnProperty(pivot)) {
+          continue;
+        }
+
+        if (nextOrderA < nextKeyIndex[pivot] && prevOrderB > prevKeyIndex[pivot]) {
+          return -1;
+        } else if (nextOrderA > nextKeyIndex[pivot] && prevOrderB < prevKeyIndex[pivot]) {
+          return 1;
+        }
+      }
+      // pluggable. default to: next bigger than prev
+      return 1;
+    }
+    // prevOrderA, nextOrderB
+    for (let i = 0; i < next.length; i++) {
+      const pivot = next[i].key;
+      if (!prevKeyIndex.hasOwnProperty(pivot)) {
+        continue;
+      }
+      if (nextOrderB < nextKeyIndex[pivot] && prevOrderA > prevKeyIndex[pivot]) {
+        return 1;
+      } else if (nextOrderB > nextKeyIndex[pivot] && prevOrderA < prevKeyIndex[pivot]) {
+        return -1;
+      }
+    }
+    // pluggable. default to: next bigger than prev
+    return -1;
+  });
 }
