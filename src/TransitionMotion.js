@@ -19,21 +19,19 @@ import type {
 
 const msPerFrame = 1000 / 60;
 
-type TransitionMotionState = {
-  currentStyles: Array<PlainStyle>,
-  currentVelocities: Array<Velocity>,
-  lastIdealStyles: Array<PlainStyle>,
-  lastIdealVelocities: Array<Velocity>,
-  mergedPropsStyles: Array<TransitionStyle>,
-};
-
+// the children function & (potential) styles function asks as param an
+// Array<TransitionPlainStyle>, where each TransitionPlainStyle is of the format
+// {key: string, data?: any, style: PlainStyle}. However, the way we keep
+// internal states doesn't contain such a data structure (check the state and
+// TransitionMotionState). So when children function and others ask for such
+// data we need to generate them on the fly by combining mergedPropsStyles and
+// currentStyles/lastIdealStyles
 function rehydrateStyles(
   mergedPropsStyles: Array<TransitionStyle>,
   unreadPropStyles: ?Array<TransitionStyle>,
   plainStyles: Array<PlainStyle>,
 ): Array<PlainStyle> {
   if (unreadPropStyles == null) {
-    // no stale props styles value
     // $FlowFixMe
     return mergedPropsStyles.map((mergedPropsStyle, i) => ({
       key: mergedPropsStyle.key,
@@ -47,12 +45,14 @@ function rehydrateStyles(
       // $FlowFixMe
       if (unreadPropStyles[j].key === mergedPropsStyle.key) {
         return {
+          // $FlowFixMe
           key: unreadPropStyles[j].key,
           data: unreadPropStyles[j].data,
           style: plainStyles[i],
         };
       }
     }
+    // $FlowFixMe
     return {key: mergedPropsStyle.key, data: mergedPropsStyle.data, style: plainStyles[i]};
   });
 }
@@ -165,6 +165,23 @@ function mergeAndSync(
   return [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities];
 }
 
+type TransitionMotionState = {
+  // list of styles, each containing interpolating values. Part of what's passed
+  // to children function. Notice that this is
+  // Array<ActualInterpolatingStyleObject>, without the wrapper that is {key: ...,
+  // data: ... style: ActualInterpolatingStyleObject}. Only mergedPropsStyles
+  // contains the key & data info (so that we only have a single source of truth
+  // for these, and to save space). Check the comment for `rehydrateStyles` to
+  // see how we regenerate the entirety of what's passed to children function
+  currentStyles: Array<PlainStyle>,
+  currentVelocities: Array<Velocity>,
+  lastIdealStyles: Array<PlainStyle>,
+  lastIdealVelocities: Array<Velocity>,
+  // the array that keeps track of currently rendered stuff! Including stuff
+  // that you've unmounted but that's still animating. This is where it lives
+  mergedPropsStyles: Array<TransitionStyle>,
+};
+
 const TransitionMotion = React.createClass({
   propTypes: {
     defaultStyles: PropTypes.arrayOf(PropTypes.shape({
@@ -191,6 +208,8 @@ const TransitionMotion = React.createClass({
   getDefaultProps(): {willEnter: WillEnter, willLeave: WillLeave} {
     return {
       willEnter: styleThatEntered => stripStyle(styleThatEntered.style),
+      // recall: returning null makes the current unmounting TransitionStyle
+      // disappear immediately
       willLeave: () => null,
     };
   },
@@ -272,7 +291,6 @@ const TransitionMotion = React.createClass({
       this.state.lastIdealVelocities,
     );
 
-    let someDirty = false;
     for (let i = 0; i < unreadPropStyles.length; i++) {
       const unreadPropStyle = unreadPropStyles[i].style;
       let dirty = false;
@@ -286,7 +304,6 @@ const TransitionMotion = React.createClass({
         if (typeof styleValue === 'number') {
           if (!dirty) {
             dirty = true;
-            someDirty = true;
             currentStyles[i] = {...currentStyles[i]};
             currentVelocities[i] = {...currentVelocities[i]};
             lastIdealStyles[i] = {...lastIdealStyles[i]};
@@ -306,15 +323,16 @@ const TransitionMotion = React.createClass({
       }
     }
 
-    if (someDirty) {
-      this.setState({
-        currentStyles,
-        currentVelocities,
-        mergedPropsStyles,
-        lastIdealStyles,
-        lastIdealVelocities,
-      });
-    }
+    // unlike the other 2 components, we can't detect staleness and optionally
+    // opt out of setState here. each style object's data might contain new
+    // stuff we're not/cannot compare
+    this.setState({
+      currentStyles,
+      currentVelocities,
+      mergedPropsStyles,
+      lastIdealStyles,
+      lastIdealVelocities,
+    });
   },
 
   startAnimationIfNecessary(): void {
