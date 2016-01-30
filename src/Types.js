@@ -6,6 +6,7 @@ export type SpringHelperConfig = {
   stiffness?: number,
   damping?: number,
   precision?: number,
+  // TODO: add onRest. Not public yet
 };
 // the object returned by `spring(value, yourConfig)`. Used internally only!
 export type OpaqueConfig = {
@@ -13,6 +14,7 @@ export type OpaqueConfig = {
   stiffness: number,
   damping: number,
   precision: number,
+  // TODO: add onRest. Not public yet
 };
 // your typical style object given in props. Maps to a number or a spring config
 export type Style = {[key: string]: number | OpaqueConfig};
@@ -39,12 +41,12 @@ export type StaggeredProps = {
 
 // === TransitionMotion ===
 export type TransitionStyle = {
-  key: any, // unique ID to identify component across render animations
+  key: string, // unique ID to identify component across render animations
   data?: any, // optional data you want to carry along the style, e.g. itemText
   style: Style, // actual style you're passing
 };
 export type TransitionPlainStyle = {
-  key: any,
+  key: string,
   data?: any,
   // same as TransitionStyle, passed as argument to style/children function
   style: PlainStyle,
