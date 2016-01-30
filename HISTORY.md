@@ -1,8 +1,11 @@
 Legend:
-
 - [B]: Breaking
 - [F]: Fix
 - [I]: Improvement
+
+### 0.4.2 (in development)
+- [F] `TransitionMotion` keys merging bug. #264
+- [F] `TransitionMotion` rare stale read bug. [https://github.com/chenglou/react-motion/commit/f20dc1b9c8de7b387927b24afdb73e0a5ea0d0a6](https://github.com/chenglou/react-motion/commit/f20dc1b9c8de7b387927b24afdb73e0a5ea0d0a6)
 
 ### 0.4.1 (January 26th 2016)
 - [F] Made a mistake while publishing the bower package; fixed.
@@ -26,7 +29,7 @@ Legend:
 - [I] Related to above, the `src/` folder is now exposed on npm so that you can take advantage of Flow by using: `import {Motion} from 'react-motion/src/react-motion'` directly, instead of the old, prebuilt `import {Motion} from 'react-motion'`. **This is experimental** and intentionally undocumented. You'll have to adjust your webpack/browserify configurations to require these original source files correctly. No harm trying of course. It's just some type annotations =).
 
 ### 0.3.0 (September 30th 2015)
-- [B] API revamp! See https://github.com/chenglou/react-motion/wiki for more details. Thanks!
+- [B] API revamp! See [https://github.com/chenglou/react-motion/wiki](https://github.com/chenglou/react-motion/wiki) for more details. Thanks!
 
 ### 0.2.7 (August 6th 2015)
 - [F] Small bug where nested springs don't animate. #123
