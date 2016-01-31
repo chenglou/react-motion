@@ -85,7 +85,7 @@ Exports:
 - `TransitionMotion`
 - `presets`
 
-[Here](https://github.com/chenglou/react-motion/blob/783c52ad777fb4558a7561bd10d917ada9b8c58d/src/Types.js)'s the well-annotated public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
+[Here](https://github.com/chenglou/react-motion/blob/026f4d18d3246e14abbf17bef0a9eda536934193/src/Types.js)'s the well-annotated public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
 
 ---
 
@@ -103,7 +103,7 @@ Used in conjunction with the components below. Specifies the how to animate to t
   It's normal not to feel how stiffness and damping affect your spring; use [Spring Parameters Chooser](http://chenglou.github.io/react-motion/demos/demo5-spring-parameters-chooser) to get a feeling. **Usually**, you'd just use the list of tasteful stiffness/damping presets below.
 
 ##### - Presets for `{stiffness, damping}`
-Commonly used spring configurations used like so: `spring(10, presets.wobbly)` or `spring(20, {...presets.gentle, precision: 0.1})`. [See here](https://github.com/chenglou/react-motion/blob/1cf9ef4a95000ef8b173fdb5a74e9e54597b8e33/src/presets.js).
+Commonly used spring configurations used like so: `spring(10, presets.wobbly)` or `spring(20, {...presets.gentle, precision: 0.1})`. [See here](https://github.com/chenglou/react-motion/blob/026f4d18d3246e14abbf17bef0a9eda536934193/src/presets.js).
 
 ---
 
@@ -232,7 +232,7 @@ const Demo = React.createClass({
 
 First, two type definitions to ease the comprehension.
 
-- `TransitionStyle`: an object of the format `{key: any, data?: any, style: Style}`.
+- `TransitionStyle`: an object of the format `{key: string, data?: any, style: Style}`.
 
   - `key`: required. The ID that `TransitionMotion` uses to track which configuration is which across renders, even when things are reordered. Typically reused as the component `key` when you map over the interpolated styles.
 
@@ -245,7 +245,7 @@ First, two type definitions to ease the comprehension.
 ##### - styles: Array&lt;TransitionStyle> | (previousInterpolatedStyles: ?Array&lt;TransitionPlainStyle>) => Array&lt;TransitionStyle>
 Required. Accepts either:
 
-  - an array of `TransitionStyle` configs, e.g. `[{key: 1, style: {x: spring(0)}}, {key: 2, style: {x: spring(10)}}]`.
+  - an array of `TransitionStyle` configs, e.g. `[{key: 'a', style: {x: spring(0)}}, {key: 'b', style: {x: spring(10)}}]`.
 
   - a function similar to `StaggeredMotion`, taking the previously interpolating styles (`undefined` at first call, unless `defaultStyles` is provided), and returning the previously mentioned array of configs. __You can do staggered mounting animation with this__.
 
@@ -263,11 +263,11 @@ Optional. Defaults to `() => null`. **The magic sauce property**.
 - Return: `null` to indicate you want the `TransitionStyle` gone immediately. A `Style` object to indicate you want to reach transition to the specified value(s) before killing the `TransitionStyle`.
 
 ##### - willEnter?: (styleThatEntered: TransitionStyle) => PlainStyle
-Optional. Defaults to `styleThatEntered => stripStyle(styleThatEntered.style)`. Where `stripStyle` turns `{a: spring(10), b: spring(20)}` into `{a: 10, b: 20}`.
+Optional. Defaults to `styleThatEntered => stripStyle(styleThatEntered.style)`. Where `stripStyle` turns `{x: spring(10), y: spring(20)}` into `{x: 10, y: 20}`.
 
 - `styleThatEntered`: similar to `willLeave`'s, except the `TransitionStyle` represents the object whose `key` value was absent during the last `render`, and that is now present.
 
-- Return: a `defaultStyle`-like `PlainStyle` configuration, e.g. `{a: 0, b: 0}`, that serves as the starting values of the animation. Under this light, the default provided means "a style config that has the same starting values as the destination values".
+- Return: a `defaultStyle`-like `PlainStyle` configuration, e.g. `{x: 0, y: 0}`, that serves as the starting values of the animation. Under this light, the default provided means "a style config that has the same starting values as the destination values".
 
 **Note** that `willEnter` and `defaultStyles` serve different purposes. `willEnter` only triggers when a previously inexistent `TransitionStyle` inside `styles` comes into the new render.
 
