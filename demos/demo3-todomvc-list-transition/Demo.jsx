@@ -51,10 +51,10 @@ const Demo = React.createClass({
   },
 
   handleToggleAll() {
-    const allDone = this.state.todos.some(({data}) => data.isDone);
+    const allNotDone = this.state.todos.every(({data}) => data.isDone);
     this.setState({
       todos: this.state.todos.map(({key, data: {text, isDone}}) => (
-        {key: key, data: {text: text, isDone: !allDone}}
+        {key: key, data: {text: text, isDone: !allNotDone}}
       )),
     });
   },
@@ -111,6 +111,7 @@ const Demo = React.createClass({
 
   render() {
     const {todos, value, selected} = this.state;
+    const itemsLeft = todos.filter(({data: {isDone}}) => !isDone).length;
     return (
       <section className="todoapp">
         <header className="header">
@@ -126,7 +127,11 @@ const Demo = React.createClass({
           </form>
         </header>
         <section className="main">
-          <input className="toggle-all" type="checkbox" onChange={this.handleToggleAll} />
+          <input
+            className="toggle-all"
+            type="checkbox"
+            checked={itemsLeft === 0} style={{display: todos.length === 0 ? 'none' : 'inline'}}
+            onChange={this.handleToggleAll} />
           <TransitionMotion
             defaultStyles={this.getDefaultStyles()}
             styles={this.getStyles()}
@@ -158,8 +163,8 @@ const Demo = React.createClass({
         <footer className="footer">
           <span className="todo-count">
             <strong>
-              {todos.filter(({data: {isDone}}) => !isDone).length}
-            </strong> item left
+              {itemsLeft}
+            </strong> {itemsLeft === 1 ? 'item' : 'items'} left
           </span>
           <ul className="filters">
             <li>
