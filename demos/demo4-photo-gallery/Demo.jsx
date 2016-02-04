@@ -14,6 +14,18 @@ const Demo = React.createClass({
     this.setState({currPhoto: value});
   },
 
+  clickHandler(e){
+    var btnType = e.target.id === 'nbtn' ? 1 : 0;
+    var photoIndex = btnType ? this.state.currPhoto+1 : this.state.currPhoto-1;
+
+    photoIndex = photoIndex >= 0 ? photoIndex : this.state.photos.length - 1;
+    photoIndex = photoIndex >= this.state.photos.length ? 0 : photoIndex;
+
+    this.setState({
+      currPhoto: photoIndex
+    })
+  },
+
   render() {
     const {photos, currPhoto} = this.state;
     const [currWidth, currHeight] = photos[currPhoto];
@@ -37,12 +49,14 @@ const Demo = React.createClass({
     return (
       <div>
         <div>Scroll Me</div>
+        <button id="pbtn" onClick={this.clickHandler}>Previous</button>
         <input
           type="range"
           min={0}
           max={photos.length - 1}
           value={currPhoto}
           onChange={this.handleChange} />
+        <button id="nbtn" onClick={this.clickHandler}>Next</button>
         <div className="demo4">
           <Motion style={{height: spring(currHeight), width: spring(currWidth)}}>
             {container =>
