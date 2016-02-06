@@ -2,6 +2,8 @@ import React from 'react';
 import {Motion, spring} from '../../src/react-motion';
 
 const springSettings = {stiffness: 170, damping: 26};
+const NEXT = 'show-next';
+
 const Demo = React.createClass({
   getInitialState() {
     return {
@@ -14,9 +16,8 @@ const Demo = React.createClass({
     this.setState({currPhoto: value});
   },
 
-  clickHandler(e){
-    var btnType = e.target.id === 'nbtn' ? 1 : 0;
-    var photoIndex = btnType ? this.state.currPhoto+1 : this.state.currPhoto-1;
+  clickHandler(btn){
+    var photoIndex = btn === NEXT ? this.state.currPhoto+1 : this.state.currPhoto-1;
 
     photoIndex = photoIndex >= 0 ? photoIndex : this.state.photos.length - 1;
     photoIndex = photoIndex >= this.state.photos.length ? 0 : photoIndex;
@@ -49,14 +50,14 @@ const Demo = React.createClass({
     return (
       <div>
         <div>Scroll Me</div>
-        <button id="pbtn" onClick={this.clickHandler}>Previous</button>
+        <button onClick={this.clickHandler.bind(null, '')}>Previous</button>
         <input
           type="range"
           min={0}
           max={photos.length - 1}
           value={currPhoto}
           onChange={this.handleChange} />
-        <button id="nbtn" onClick={this.clickHandler}>Next</button>
+        <button onClick={this.clickHandler.bind(null, NEXT)}>Next</button>
         <div className="demo4">
           <Motion style={{height: spring(currHeight), width: spring(currWidth)}}>
             {container =>
