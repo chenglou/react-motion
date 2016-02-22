@@ -137,7 +137,7 @@ Required **function**.
 ---
 
 ### &lt;StaggeredMotion />
-Animates a collection of items whose values depend on each other, creating a natural, springy, "staggering" effect [like so](http://chenglou.github.io/react-motion/demos/demo1-chat-heads). This is preferred over hard-coding a delay for an array of `Motions` to achieve a similar (but less natural-looking) effect.
+Animates a collection of (**fixed length**) items whose values depend on each other, creating a natural, springy, "staggering" effect [like so](http://chenglou.github.io/react-motion/demos/demo1-chat-heads). This is preferred over hard-coding a delay for an array of `Motions` to achieve a similar (but less natural-looking) effect.
 
 #### Usage
 ```jsx
