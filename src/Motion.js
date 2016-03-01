@@ -7,6 +7,7 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React, {PropTypes} from 'react';
 
+import type { Element as ReactElement } from 'react';
 import type {PlainStyle, Style, Velocity, MotionProps} from './Types';
 const msPerFrame = 1000 / 60;
 
