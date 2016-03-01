@@ -1,6 +1,7 @@
 [ignore]
 .*/node_modules/fbjs/lib/PromiseMap.js
 .*/node_modules/fbjs/lib/fetchWithRetries.js
+.*/test/.*
 
 [include]
 
