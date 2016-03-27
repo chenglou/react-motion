@@ -69,8 +69,8 @@ describe('TransitionMotion', () => {
         return this.state.kill
           ? null
           : <TransitionMotion
-              defaultStyles={[{key: '1', style: {x: 0}}]}
-              styles={() => [{key: '1', style: {x: spring(10)}}]}>
+              defaultStyles={[{key: 1, style: {x: 0}}]}
+              styles={() => [{key: 1, style: {x: spring(10)}}]}>
               {() => null}
             </TransitionMotion>;
       },

@@ -185,14 +185,20 @@ type TransitionMotionState = {
 const TransitionMotion = React.createClass({
   propTypes: {
     defaultStyles: PropTypes.arrayOf(PropTypes.shape({
-      key: PropTypes.string.isRequired,
+      key: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+      ]).isRequired,
       data: PropTypes.any,
       style: PropTypes.objectOf(PropTypes.number).isRequired,
     })),
     styles: PropTypes.oneOfType([
       PropTypes.func,
       PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.string.isRequired,
+        key: PropTypes.oneOfType([
+          PropTypes.string,
+          PropTypes.number
+        ]).isRequired,
         data: PropTypes.any,
         style: PropTypes.objectOf(PropTypes.oneOfType([
           PropTypes.number,
