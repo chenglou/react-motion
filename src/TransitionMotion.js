@@ -187,7 +187,7 @@ const TransitionMotion = React.createClass({
     defaultStyles: PropTypes.arrayOf(PropTypes.shape({
       key: PropTypes.oneOfType([
         PropTypes.string,
-        PropTypes.number
+        PropTypes.number,
       ]).isRequired,
       data: PropTypes.any,
       style: PropTypes.objectOf(PropTypes.number).isRequired,
@@ -197,7 +197,7 @@ const TransitionMotion = React.createClass({
       PropTypes.arrayOf(PropTypes.shape({
         key: PropTypes.oneOfType([
           PropTypes.string,
-          PropTypes.number
+          PropTypes.number,
         ]).isRequired,
         data: PropTypes.any,
         style: PropTypes.objectOf(PropTypes.oneOfType([
