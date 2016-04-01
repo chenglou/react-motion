@@ -79,7 +79,7 @@ This library also provides an alternative, more powerful API for React's `Transi
 **Coming from 0.3.* to 0.4.0? [Here](https://github.com/chenglou/react-motion/wiki)'s the upgrade guide.**
 
 Exports:
-- `spring`.
+- `spring`
 - `Motion`
 - `StaggeredMotion`
 - `TransitionMotion`
