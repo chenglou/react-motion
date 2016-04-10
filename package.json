@@ -4,7 +4,7 @@
   "description": "A spring that solves your animation problems.",
   "main": "lib/react-motion.js",
   "peerDependencies": {
-    "react": ">=0.13.2 || ^0.14"
+    "react": ">=0.13.2 || ^0.14 || ^15.0.0"
   },
   "devDependencies": {
     "babel": "^5.8.23",
