@@ -4,7 +4,7 @@
   "description": "A spring that solves your animation problems.",
   "main": "lib/react-motion.js",
   "peerDependencies": {
-    "react": ">=0.13.2 || ^0.14"
+    "react": ">=0.13.2 || ^0.14 || ^15.0.0"
   },
   "devDependencies": {
     "babel": "^5.8.23",
@@ -29,10 +29,10 @@
     "karma-webpack": "^1.7.0",
     "lodash.range": "^3.0.1",
     "phantomjs": "^1.9.17",
-    "react": ">=0.14.3",
-    "react-addons-test-utils": "^0.14.6",
+    "react": ">=15.0.1",
+    "react-addons-test-utils": "^15.0.1",
     "react-codemirror": ">=0.1.2",
-    "react-dom": ">=0.14.3",
+    "react-dom": ">=15.0.1",
     "react-hot-loader": "^1.2.8",
     "style-loader": "^0.12.4",
     "webpack": "^1.10.1",
