@@ -137,7 +137,7 @@ Required **function**.
 ---
 
 ### &lt;StaggeredMotion />
-Animates a collection of items whose values depend on each other, creating a natural, springy, "staggering" effect [like so](http://chenglou.github.io/react-motion/demos/demo1-chat-heads). This is preferred over hard-coding a delay for an array of `Motions` to achieve a similar (but less natural-looking) effect.
+Animates a collection of (**fixed length**) items whose values depend on each other, creating a natural, springy, "staggering" effect [like so](http://chenglou.github.io/react-motion/demos/demo1-chat-heads). This is preferred over hard-coding a delay for an array of `Motions` to achieve a similar (but less natural-looking) effect.
 
 #### Usage
 ```jsx
@@ -258,7 +258,7 @@ Required **function**. Similar to other two components' `children`. Receive back
 ##### - willLeave?: (styleThatLeft: TransitionStyle) => ?Style
 Optional. Defaults to `() => null`. **The magic sauce property**.
 
-- `styleThatLeft`: the e.g. `{key: ..., data: ..., value: ...}` object from the `styles` array, identified by `key`, that was present during a previous render, and that is now absent, thus triggering the call to `willLeave`.
+- `styleThatLeft`: the e.g. `{key: ..., data: ..., style: ...}` object from the `styles` array, identified by `key`, that was present during a previous render, and that is now absent, thus triggering the call to `willLeave`. Note that the style property is exactly what you passed in `styles`, and is not interpolated. For example, if you passed a spring for `x` you will receive an object like `{x: {stiffness, damping, val, precision}}`.
 
 - Return: `null` to indicate you want the `TransitionStyle` gone immediately. A `Style` object to indicate you want to reach transition to the specified value(s) before killing the `TransitionStyle`.
 

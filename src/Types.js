@@ -1,5 +1,6 @@
 /* @flow */
 
+import type {Element as ReactElement} from 'react';
 // === basic reused types ===
 // type of the second parameter of `spring(val, config)` all fields are optional
 export type SpringHelperConfig = {

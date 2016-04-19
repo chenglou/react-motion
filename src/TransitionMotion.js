@@ -8,6 +8,7 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React, {PropTypes} from 'react';
 
+import type {Element as ReactElement} from 'react';
 import type {
   PlainStyle,
   Velocity,
