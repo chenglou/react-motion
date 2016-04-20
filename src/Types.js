@@ -7,15 +7,13 @@ export type SpringHelperConfig = {
   stiffness?: number,
   damping?: number,
   precision?: number,
-  // TODO: add onRest. Not public yet
 };
-// the object returned by `spring(value, yourConfig)`. Used internally only!
+// the object returned by `spring(value, yourConfig)`. For internal usage only!
 export type OpaqueConfig = {
   val: number,
   stiffness: number,
   damping: number,
   precision: number,
-  // TODO: add onRest. Not public yet
 };
 // your typical style object given in props. Maps to a number or a spring config
 export type Style = {[key: string]: number | OpaqueConfig};
@@ -31,6 +29,7 @@ export type MotionProps = {
   defaultStyle?: PlainStyle,
   style: Style,
   children: (interpolatedStyle: PlainStyle) => ReactElement,
+  onRest?: () => void,
 };
 
 // === StaggeredMotion ===

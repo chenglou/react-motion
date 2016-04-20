@@ -136,6 +136,9 @@ Required **function**.
 
 - Return: must return **one** React element to render.
 
+##### - onRest?: () => void
+Optional. The callback that fires when the animation comes to a rest.
+
 ---
 
 ### &lt;StaggeredMotion />
@@ -176,6 +179,8 @@ Optional. Similar to `Motion`'s `defaultStyle`, but an array of them.
 
 ##### - children: (interpolatedStyles: Array&lt;PlainStyle>) => ReactElement
 Required **function**. Similar to `Motion`'s `children`, but accepts the array of interpolated styles instead, e.g. `[{x: 5}, {x: 6.4}, {x: 8.1}]`
+
+(No `onRest` for StaggeredMotion because we haven't found a good semantics for it yet. Voice your support in the issues section.)
 
 ---
 
@@ -272,6 +277,8 @@ Optional. Defaults to `styleThatEntered => stripStyle(styleThatEntered.style)`. 
 - Return: a `defaultStyle`-like `PlainStyle` configuration, e.g. `{x: 0, y: 0}`, that serves as the starting values of the animation. Under this light, the default provided means "a style config that has the same starting values as the destination values".
 
 **Note** that `willEnter` and `defaultStyles` serve different purposes. `willEnter` only triggers when a previously inexistent `TransitionStyle` inside `styles` comes into the new render.
+
+(No `onRest` for TransitionMotion because we haven't found a good semantics for it yet. Voice your support in the issues section.)
 
 ---
 
