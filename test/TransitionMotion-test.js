@@ -803,7 +803,10 @@ describe('TransitionMotion', () => {
     ]);
 
     expect(prevValues.slice(0, 3)).toEqual([
-      undefined,
+      [
+        {key: '1', style: {a: 0, b: 10}, data: [1]},
+        {key: '2', style: {c: 20}, data: [2]},
+      ],
       [
         {key: '1', style: {a: 0, b: 10}, data: [3]},
         {key: '2', style: {c: 20}, data: [2]},

@@ -217,7 +217,7 @@ const TransitionMotion = React.createClass({
 
   getInitialState(): TransitionMotionState {
     const {defaultStyles, styles, willEnter, willLeave} = this.props;
-    const destStyles: Array<TransitionStyle> = typeof styles === 'function' ? styles() : styles;
+    const destStyles: Array<TransitionStyle> = typeof styles === 'function' ? styles(defaultStyles) : styles;
 
     // this is special. for the first time around, we don't have a comparison
     // between last (no last) and current merged props. we'll compute last so:
