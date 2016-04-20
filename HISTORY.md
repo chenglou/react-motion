@@ -3,6 +3,10 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### 0.4.3 (April 19th 2016)
+- [F] `TransitionMotion` `styles` function not being passed `defaultStyles` value upon first call. #296
+- [I] `onRest` callback for `Motion`!
+
 ### 0.4.2 (January 30th 2016)
 - [F] `TransitionMotion` keys merging bug. #264
 - [F] `TransitionMotion` rare stale read bug. [https://github.com/chenglou/react-motion/commit/f20dc1b9c8de7b387927b24afdb73e0a5ea0d0a6](https://github.com/chenglou/react-motion/commit/f20dc1b9c8de7b387927b24afdb73e0a5ea0d0a6)

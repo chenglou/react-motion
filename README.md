@@ -38,21 +38,7 @@ then include as
 (Module exposed as `ReactMotion`)
 ```
 
-**For React-native**: previous react-motion v0.3.* supported a dedicated build for RN, which has now been made obsolete since RN v0.18. This library should Just Work under the new React-Native 0.18+.
-
-### Try things yourself
-```sh
-git clone https://github.com/chenglou/react-motion.git
-cd react-motion
-npm install
-```
-
-To try the demos locally:
-
-- with hot reloading (**slow, development version**): run `npm start`.
-- Without hot reloading (**faster, production version**): run `npm run build-demos` and open the static `demos/demo_name/index.html` file directly. **Don't forget to use production mode when testing your animation's performance**!
-
-To build the repo yourself: `npm run prerelease`.
+**Works with React-Native v0.18+**.
 
 ### Demos
 - [Simple Transition](http://chenglou.github.io/react-motion/demos/demo0-simple-transition)
@@ -66,6 +52,18 @@ To build the repo yourself: `npm run prerelease`.
 
 [Check the wiki for more!](https://github.com/chenglou/react-motion/wiki/Gallery-of-third-party-React-Motion-demos)
 
+### Try the Demos Locally
+```sh
+git clone https://github.com/chenglou/react-motion.git
+cd react-motion
+npm install
+```
+
+- With hot reloading (**slow, development version**): run `npm start`.
+- Without hot reloading (**faster, production version**): run `npm run build-demos` and open the static `demos/demo_name/index.html` file directly. **Don't forget to use production mode when testing your animation's performance**!
+
+To build the repo yourself: `npm run prerelease`.
+
 ## What does this library try to solve?
 
 [My React-Europe talk](https://www.youtube.com/watch?v=1tavDv5hXpo)
@@ -76,8 +74,6 @@ This library also provides an alternative, more powerful API for React's `Transi
 
 ## API
 
-**Coming from 0.3.* to 0.4.0? [Here](https://github.com/chenglou/react-motion/wiki)'s the upgrade guide.**
-
 Exports:
 - `spring`
 - `Motion`
@@ -85,7 +81,7 @@ Exports:
 - `TransitionMotion`
 - `presets`
 
-[Here](https://github.com/chenglou/react-motion/blob/026f4d18d3246e14abbf17bef0a9eda536934193/src/Types.js)'s the well-annotated public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
+[Here](https://github.com/chenglou/react-motion/blob/9cb90eca20ecf56e77feb816d101a4a9110c7d70/src/Types.js)'s the well-annotated public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
 
 P.S. using TypeScript? [Here](https://github.com/chenglou/react-motion/issues/300#issuecomment-207262071) are the React-motion TypeScript definitions!
 
@@ -105,7 +101,7 @@ Used in conjunction with the components below. Specifies the how to animate to t
   It's normal not to feel how stiffness and damping affect your spring; use [Spring Parameters Chooser](http://chenglou.github.io/react-motion/demos/demo5-spring-parameters-chooser) to get a feeling. **Usually**, you'd just use the list of tasteful stiffness/damping presets below.
 
 ##### - Presets for `{stiffness, damping}`
-Commonly used spring configurations used like so: `spring(10, presets.wobbly)` or `spring(20, {...presets.gentle, precision: 0.1})`. [See here](https://github.com/chenglou/react-motion/blob/026f4d18d3246e14abbf17bef0a9eda536934193/src/presets.js).
+Commonly used spring configurations used like so: `spring(10, presets.wobbly)` or `spring(20, {...presets.gentle, precision: 0.1})`. [See here](https://github.com/chenglou/react-motion/blob/9cb90eca20ecf56e77feb816d101a4a9110c7d70/src/presets.js).
 
 ---
 
