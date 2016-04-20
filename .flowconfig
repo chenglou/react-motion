@@ -1,6 +1,13 @@
 [ignore]
 .*/node_modules/fbjs/lib/PromiseMap.js
 .*/node_modules/fbjs/lib/fetchWithRetries.js
+.*/node_modules/fbjs/lib/Deferred.js.flow
+.*/node_modules/fbjs/lib/equalsSet.js.flow
+.*/node_modules/fbjs/lib/shallowEqual.js.flow
+.*/node_modules/fbjs/lib/someSet.js.flow
+.*/node_modules/fbjs/lib/everySet.js.flow
+.*/node_modules/fbjs/lib/UnicodeBidi.js.flow
+.*/node_modules/fbjs/lib/UnicodeBidiService.js.flow
 .*/test/.*
 
 [include]
