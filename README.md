@@ -87,6 +87,8 @@ Exports:
 
 [Here](https://github.com/chenglou/react-motion/blob/026f4d18d3246e14abbf17bef0a9eda536934193/src/Types.js)'s the well-annotated public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
 
+P.S. using TypeScript? [Here](https://github.com/chenglou/react-motion/issues/300#issuecomment-207262071) are the React-motion TypeScript definitions!
+
 ---
 
 ### Helpers
