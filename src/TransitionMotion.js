@@ -337,6 +337,9 @@ const TransitionMotion = React.createClass({
   },
 
   startAnimationIfNecessary(): void {
+    if (this.unmounting) {
+      return;
+    }
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
     this.animationID = defaultRaf(() => {
@@ -502,6 +505,7 @@ const TransitionMotion = React.createClass({
   },
 
   componentWillUnmount() {
+    this.unmounting = true;
     if (this.animationID != null) {
       defaultRaf.cancel(this.animationID);
       this.animationID = null;
