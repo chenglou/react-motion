@@ -3,6 +3,9 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### 0.4.4 (June 4th 2016)
+- [F] Small fix to component unmounting bug (https://github.com/chenglou/react-motion/commit/49ea396041b0031b95f4941cc7efce200fcca454). It's not clear why this is erroring, but people want the temp fix.
+
 ### 0.4.3 (April 19th 2016)
 - [F] `TransitionMotion` `styles` function not being passed `defaultStyles` value upon first call. #296
 - [I] `onRest` callback for `Motion`!
