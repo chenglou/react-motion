@@ -342,7 +342,7 @@ const TransitionMotion = React.createClass({
     }
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
-    this.animationID = defaultRaf(() => {
+    this.animationID = defaultRaf((timestamp) => {
       const propStyles = this.props.styles;
       let destStyles: Array<TransitionStyle> = typeof propStyles === 'function'
         ? propStyles(rehydrateStyles(
@@ -365,7 +365,7 @@ const TransitionMotion = React.createClass({
         return;
       }
 
-      const currentTime = defaultNow();
+      const currentTime = timestamp || defaultNow();
       const timeDelta = currentTime - this.prevTime;
       this.prevTime = currentTime;
       this.accumulatedTime = this.accumulatedTime + timeDelta;
