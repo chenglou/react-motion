@@ -89,7 +89,7 @@ const Motion = React.createClass({
   startAnimationIfNecessary(): void {
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
-    this.animationID = defaultRaf(() => {
+    this.animationID = defaultRaf((timestamp) => {
       // check if we need to animate in the first place
       const propsStyle: Style = this.props.style;
       if (shouldStopAnimation(
@@ -110,7 +110,7 @@ const Motion = React.createClass({
 
       this.wasAnimating = true;
 
-      const currentTime = defaultNow();
+      const currentTime = timestamp || defaultNow();
       const timeDelta = currentTime - this.prevTime;
       this.prevTime = currentTime;
       this.accumulatedTime = this.accumulatedTime + timeDelta;
