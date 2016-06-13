@@ -266,6 +266,7 @@ const TransitionMotion = React.createClass({
     };
   },
 
+  unmounting: (false: boolean),
   animationID: (null: ?number),
   prevTime: 0,
   accumulatedTime: 0,
