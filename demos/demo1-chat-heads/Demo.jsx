@@ -1,7 +1,6 @@
 import React from 'react';
-import {StaggeredMotion, spring} from '../../src/react-motion';
+import {StaggeredMotion, spring, presets} from '../../src/react-motion';
 import range from 'lodash.range';
-import presets from '../../src/presets';
 
 const Demo = React.createClass({
   getInitialState() {
