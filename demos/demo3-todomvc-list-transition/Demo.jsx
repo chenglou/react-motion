@@ -1,6 +1,5 @@
 import React from 'react';
-import {TransitionMotion, spring} from '../../src/react-motion';
-import presets from '../../src/presets';
+import {TransitionMotion, spring, presets} from '../../src/react-motion';
 
 const Demo = React.createClass({
   getInitialState() {
