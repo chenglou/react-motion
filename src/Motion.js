@@ -223,7 +223,7 @@ const Motion = React.createClass({
     }
   },
 
-  render(): ReactElement {
+  render(): React$Element<*> {
     const renderedChildren = this.props.children(this.state.currentStyle);
     return renderedChildren && React.Children.only(renderedChildren);
   },
