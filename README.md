@@ -5,7 +5,7 @@
 [![Bower version](https://badge.fury.io/bo/react-motion.svg)](http://badge.fury.io/bo/react-motion)
 [![react-motion channel on discord](https://img.shields.io/badge/discord-react--motion%40reactiflux-738bd7.svg?style=flat)](https://discordapp.com/invite/0ZcbPKXt5bYzmcI0)
 
-```jsx
+```js
 import {Motion, spring} from 'react-motion';
 // In your render...
 <Motion defaultStyle={{x: 0}} style={{x: spring(10)}}>
