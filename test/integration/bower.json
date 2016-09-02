@@ -14,6 +14,6 @@
     "tests"
   ],
   "dependencies": {
-    "react-motion": "https://npmcdn.com/react-motion/bower.zip"
+    "react-motion": "https://unpkg.com/react-motion/bower.zip"
   }
 }

@@ -19,11 +19,11 @@ Animate a counter from `0` to `10`. For more advanced usage, see below.
 
 - Npm: `npm install --save react-motion`
 
-- Bower: **do not install with `bower install react-motion`, it won't work**. Use `bower install --save https://npmcdn.com/react-motion/bower.zip`. Or in `bower.json`:
+- Bower: **do not install with `bower install react-motion`, it won't work**. Use `bower install --save https://unpkg.com/react-motion/bower.zip`. Or in `bower.json`:
 ```json
 {
   "dependencies": {
-    "react-motion": "https://npmcdn.com/react-motion/bower.zip"
+    "react-motion": "https://unpkg.com/react-motion/bower.zip"
   }
 }
 ```
@@ -34,7 +34,7 @@ then include as
 
 - 1998 Script Tag:
 ```html
-<script src="https://npmcdn.com/react-motion/build/react-motion.js"></script>
+<script src="https://unpkg.com/react-motion/build/react-motion.js"></script>
 (Module exposed as `ReactMotion`)
 ```
 
