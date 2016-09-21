@@ -9,4 +9,4 @@ cache:
 node_js:
   - 4
 
-script: npm run lint && npm run test:travis
+script: npm run lint && npm run flow_check && npm run test:travis
