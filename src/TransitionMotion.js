@@ -8,7 +8,6 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React, {PropTypes} from 'react';
 
-import type {Element as ReactElement} from 'react';
 import type {
   PlainStyle,
   Velocity,
@@ -258,11 +257,11 @@ const TransitionMotion = React.createClass({
     );
 
     return {
-      currentStyles: currentStyles,
-      currentVelocities: currentVelocities,
-      lastIdealStyles: lastIdealStyles,
-      lastIdealVelocities: lastIdealVelocities,
-      mergedPropsStyles: mergedPropsStyles,
+      currentStyles,
+      currentVelocities,
+      lastIdealStyles,
+      lastIdealVelocities,
+      mergedPropsStyles,
     };
   },
 
@@ -298,7 +297,7 @@ const TransitionMotion = React.createClass({
       let dirty = false;
 
       for (let key in unreadPropStyle) {
-        if (!unreadPropStyle.hasOwnProperty(key)) {
+        if (!Object.prototype.hasOwnProperty.call(unreadPropStyle, key)) {
           continue;
         }
 
@@ -406,7 +405,7 @@ const TransitionMotion = React.createClass({
         let newLastIdealVelocity: Velocity = {};
 
         for (let key in newMergedPropsStyle) {
-          if (!newMergedPropsStyle.hasOwnProperty(key)) {
+          if (!Object.prototype.hasOwnProperty.call(newMergedPropsStyle, key)) {
             continue;
           }
 
@@ -513,7 +512,7 @@ const TransitionMotion = React.createClass({
     }
   },
 
-  render(): React$Element<*> {
+  render(): React.Element<*> {
     const hydratedStyles = rehydrateStyles(
       this.state.mergedPropsStyles,
       this.unreadPropStyles,

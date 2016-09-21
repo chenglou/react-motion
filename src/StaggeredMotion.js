@@ -7,7 +7,6 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React, {PropTypes} from 'react';
 
-import type {Element as ReactElement} from 'react';
 import type {PlainStyle, Style, Velocity, StaggeredProps} from './Types';
 
 const msPerFrame = 1000 / 60;
@@ -45,8 +44,8 @@ const StaggeredMotion = React.createClass({
     const currentStyles: Array<PlainStyle> = defaultStyles || styles().map(stripStyle);
     const currentVelocities = currentStyles.map(currentStyle => mapToZero(currentStyle));
     return {
-      currentStyles: currentStyles,
-      currentVelocities: currentVelocities,
+      currentStyles,
+      currentVelocities,
       lastIdealStyles: currentStyles,
       lastIdealVelocities: currentVelocities,
     };
@@ -73,7 +72,7 @@ const StaggeredMotion = React.createClass({
       let dirty = false;
 
       for (let key in unreadPropStyle) {
-        if (!unreadPropStyle.hasOwnProperty(key)) {
+        if (!Object.prototype.hasOwnProperty.call(unreadPropStyle, key)) {
           continue;
         }
 
@@ -151,7 +150,7 @@ const StaggeredMotion = React.createClass({
         let newLastIdealVelocity: Velocity = {};
 
         for (let key in destStyle) {
-          if (!destStyle.hasOwnProperty(key)) {
+          if (!Object.prototype.hasOwnProperty.call(destStyle, key)) {
             continue;
           }
 
@@ -244,7 +243,7 @@ const StaggeredMotion = React.createClass({
     }
   },
 
-  render(): React$Element<*> {
+  render(): React.Element<*> {
     const renderedChildren = this.props.children(this.state.currentStyles);
     return renderedChildren && React.Children.only(renderedChildren);
   },

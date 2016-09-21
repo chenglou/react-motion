@@ -5,7 +5,7 @@ import type {PlainStyle, Style} from './Types';
 export default function mapToZero(obj: Style | PlainStyle): PlainStyle {
   let ret = {};
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       ret[key] = 0;
     }
   }

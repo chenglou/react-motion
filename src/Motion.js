@@ -7,8 +7,8 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React, {PropTypes} from 'react';
 
-import type {Element as ReactElement} from 'react';
 import type {PlainStyle, Style, Velocity, MotionProps} from './Types';
+
 const msPerFrame = 1000 / 60;
 
 type MotionState = {
@@ -35,8 +35,8 @@ const Motion = React.createClass({
     const currentStyle = defaultStyle || stripStyle(style);
     const currentVelocity = mapToZero(currentStyle);
     return {
-      currentStyle: currentStyle,
-      currentVelocity: currentVelocity,
+      currentStyle,
+      currentVelocity,
       lastIdealStyle: currentStyle,
       lastIdealVelocity: currentVelocity,
     };
@@ -60,7 +60,7 @@ const Motion = React.createClass({
     let {currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity} = this.state;
 
     for (let key in destStyle) {
-      if (!destStyle.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(destStyle, key)) {
         continue;
       }
 
@@ -136,7 +136,7 @@ const Motion = React.createClass({
       let newCurrentVelocity: Velocity = {};
 
       for (let key in propsStyle) {
-        if (!propsStyle.hasOwnProperty(key)) {
+        if (!Object.prototype.hasOwnProperty.call(propsStyle, key)) {
           continue;
         }
 
@@ -223,7 +223,7 @@ const Motion = React.createClass({
     }
   },
 
-  render(): React$Element<*> {
+  render(): React.Element<*> {
     const renderedChildren = this.props.children(this.state.currentStyle);
     return renderedChildren && React.Children.only(renderedChildren);
   },
