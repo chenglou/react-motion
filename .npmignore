@@ -5,6 +5,7 @@
 /coverage/
 /demos/
 /test/
+/src/
 
 /karma.conf.js
 /webpack.*
