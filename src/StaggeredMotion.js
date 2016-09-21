@@ -7,7 +7,7 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React, {PropTypes} from 'react';
 
-import type {PlainStyle, Style, Velocity, StaggeredProps} from './Types';
+import type {ReactElement, PlainStyle, Style, Velocity, StaggeredProps} from './Types';
 
 const msPerFrame = 1000 / 60;
 
@@ -243,7 +243,7 @@ const StaggeredMotion = React.createClass({
     }
   },
 
-  render(): React.Element<*> {
+  render(): ReactElement {
     const renderedChildren = this.props.children(this.state.currentStyles);
     return renderedChildren && React.Children.only(renderedChildren);
   },

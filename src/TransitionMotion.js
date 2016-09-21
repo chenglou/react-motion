@@ -9,6 +9,7 @@ import shouldStopAnimation from './shouldStopAnimation';
 import React, {PropTypes} from 'react';
 
 import type {
+  ReactElement,
   PlainStyle,
   Velocity,
   TransitionStyle,
@@ -506,7 +507,7 @@ const TransitionMotion = React.createClass({
     }
   },
 
-  render(): React.Element<*> {
+  render(): ReactElement {
     const hydratedStyles = rehydrateStyles(
       this.state.mergedPropsStyles,
       this.unreadPropStyles,

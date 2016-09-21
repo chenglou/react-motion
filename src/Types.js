@@ -1,6 +1,12 @@
 /* @flow */
 
+// Babel 5.x doesn't support type parameters, so we make this alias here out of
+// Babel's sight.
+/* eslint-disable spaced-comment, no-undef */
+/*::
 import type React from 'react';
+export type ReactElement = React.Element<*>;
+*/
 
 // === basic reused types ===
 // type of the second parameter of `spring(val, config)` all fields are optional
@@ -29,7 +35,7 @@ export type Velocity = {[key: string]: number};
 export type MotionProps = {
   defaultStyle?: PlainStyle,
   style: Style,
-  children: (interpolatedStyle: PlainStyle) => React.Element<*>,
+  children: (interpolatedStyle: PlainStyle) => ReactElement,
   onRest?: () => void,
 };
 
@@ -37,7 +43,7 @@ export type MotionProps = {
 export type StaggeredProps = {
   defaultStyles?: Array<PlainStyle>,
   styles: (previousInterpolatedStyles: ?Array<PlainStyle>) => Array<Style>,
-  children: (interpolatedStyles: Array<PlainStyle>) => React.Element<*>,
+  children: (interpolatedStyles: Array<PlainStyle>) => ReactElement,
 };
 
 // === TransitionMotion ===
@@ -58,7 +64,7 @@ export type WillLeave = (styleThatLeft: TransitionStyle) => ?Style;
 export type TransitionProps = {
   defaultStyles?: Array<TransitionPlainStyle>,
   styles: Array<TransitionStyle> | (previousInterpolatedStyles: ?Array<TransitionPlainStyle>) => Array<TransitionStyle>,
-  children: (interpolatedStyles: Array<TransitionPlainStyle>) => React.Element<*>,
+  children: (interpolatedStyles: Array<TransitionPlainStyle>) => ReactElement,
   willEnter?: WillEnter,
   willLeave?: WillLeave,
 };

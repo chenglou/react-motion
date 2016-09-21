@@ -7,7 +7,7 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React, {PropTypes} from 'react';
 
-import type {PlainStyle, Style, Velocity, MotionProps} from './Types';
+import type {ReactElement, PlainStyle, Style, Velocity, MotionProps} from './Types';
 
 const msPerFrame = 1000 / 60;
 
@@ -223,7 +223,7 @@ const Motion = React.createClass({
     }
   },
 
-  render(): React.Element<*> {
+  render(): ReactElement {
     const renderedChildren = this.props.children(this.state.currentStyle);
     return renderedChildren && React.Children.only(renderedChildren);
   },
