@@ -13,21 +13,21 @@ function test(prevRaw, nextRaw, expectedRaw, customOnRemove) {
   prevRaw.forEach(num => {
     const styleVal = Math.random();
     // key needs to be a string; cast it
-    prev.push({key: num + '', style: {a: styleVal}});
+    prev.push({key: String(num), style: {a: styleVal}});
     prevKeyStyleValMap[num] = styleVal;
   });
   let next = [];
   let nextKeyStyleValMap = {};
   nextRaw.forEach(num => {
     const styleVal = Math.random();
-    next.push({key: num + '', style: {a: styleVal}});
+    next.push({key: String(num), style: {a: styleVal}});
     nextKeyStyleValMap[num] = styleVal;
   });
 
   const expected = expectedRaw.map(num => {
     return {
-      key: num + '',
-      style: {a: nextKeyStyleValMap.hasOwnProperty(num) ? nextKeyStyleValMap[num] : prevKeyStyleValMap[num]},
+      key: String(num),
+      style: {a: Object.prototype.hasOwnProperty.call(nextKeyStyleValMap, num) ? nextKeyStyleValMap[num] : prevKeyStyleValMap[num]},
     };
   });
 

@@ -7,7 +7,7 @@ import type {Style, PlainStyle} from './Types';
 export default function stripStyle(style: Style): PlainStyle {
   let ret = {};
   for (const key in style) {
-    if (!style.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(style, key)) {
       continue;
     }
     ret[key] = typeof style[key] === 'number' ? style[key] : style[key].val;

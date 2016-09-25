@@ -430,12 +430,10 @@ describe('Motion', () => {
         return (
           <Motion
             defaultStyle={{a: 0, b: 0}}
-            style={
-              {
-                a: spring(5, {stiffness: 380, damping: 18, precision: 1}),
-                b: spring(500, {stiffness: 380, damping: 18, precision: 1}),
-              }
-            }
+            style={{
+              a: spring(5, {stiffness: 380, damping: 18, precision: 1}),
+              b: spring(500, {stiffness: 380, damping: 18, precision: 1}),
+            }}
             onRest={onRest}
           >
             {

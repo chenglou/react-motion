@@ -1,6 +1,13 @@
 /* @flow */
 
-import type {Element as ReactElement} from 'react';
+// Babel 5.x doesn't support type parameters, so we make this alias here out of
+// Babel's sight.
+/* eslint-disable spaced-comment, no-undef */
+/*::
+import type React from 'react';
+export type ReactElement = React.Element<*>;
+*/
+
 // === basic reused types ===
 // type of the second parameter of `spring(val, config)` all fields are optional
 export type SpringHelperConfig = {

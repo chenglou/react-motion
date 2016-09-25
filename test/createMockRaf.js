@@ -2,7 +2,7 @@
 
 type Callback = (now: number) => void;
 
-export default function(): Object {
+export default function (): Object {
   let allCallbacks = [];
   let prevTime = 0;
   let id = 0;
@@ -20,7 +20,7 @@ export default function(): Object {
   };
 
   const defaultTimeInterval = 1000 / 60;
-  const _step = ms => {
+  const singleStep = ms => {
     const allCallbacksBefore = allCallbacks;
     allCallbacks = [];
 
@@ -30,7 +30,7 @@ export default function(): Object {
 
   const step = (howMany = 1, ms = defaultTimeInterval) => {
     for (let i = 0; i < howMany; i++) {
-      _step(ms);
+      singleStep(ms);
     }
   };
 

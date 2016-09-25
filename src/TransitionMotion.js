@@ -8,11 +8,12 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React, {PropTypes} from 'react';
 
-import type {Element as ReactElement} from 'react';
 import type {
+  ReactElement,
   PlainStyle,
   Velocity,
   TransitionStyle,
+  TransitionPlainStyle,
   WillEnter,
   WillLeave,
   TransitionProps,
@@ -31,9 +32,11 @@ function rehydrateStyles(
   mergedPropsStyles: Array<TransitionStyle>,
   unreadPropStyles: ?Array<TransitionStyle>,
   plainStyles: Array<PlainStyle>,
-): Array<PlainStyle> {
-  if (unreadPropStyles == null) {
-    // $FlowFixMe
+): Array<TransitionPlainStyle> {
+  // Copy the value to a `const` so that Flow understands that the const won't
+  // change and will be non-nullable in the callback below.
+  const cUnreadPropStyles = unreadPropStyles;
+  if (cUnreadPropStyles == null) {
     return mergedPropsStyles.map((mergedPropsStyle, i) => ({
       key: mergedPropsStyle.key,
       data: mergedPropsStyle.data,
@@ -41,19 +44,15 @@ function rehydrateStyles(
     }));
   }
   return mergedPropsStyles.map((mergedPropsStyle, i) => {
-    // $FlowFixMe
-    for (let j = 0; j < unreadPropStyles.length; j++) {
-      // $FlowFixMe
-      if (unreadPropStyles[j].key === mergedPropsStyle.key) {
+    for (let j = 0; j < cUnreadPropStyles.length; j++) {
+      if (cUnreadPropStyles[j].key === mergedPropsStyle.key) {
         return {
-          // $FlowFixMe
-          key: unreadPropStyles[j].key,
-          data: unreadPropStyles[j].data,
+          key: cUnreadPropStyles[j].key,
+          data: cUnreadPropStyles[j].data,
           style: plainStyles[i],
         };
       }
     }
-    // $FlowFixMe
     return {key: mergedPropsStyle.key, data: mergedPropsStyle.data, style: plainStyles[i]};
   });
 }
@@ -151,7 +150,6 @@ function mergeAndSync(
       newCurrentStyles[i] = plainStyle;
       newLastIdealStyles[i] = plainStyle;
 
-      // $FlowFixMe
       const velocity = mapToZero(newMergedPropsStyleCell.style);
       newCurrentVelocities[i] = velocity;
       newLastIdealVelocities[i] = velocity;
@@ -227,8 +225,7 @@ const TransitionMotion = React.createClass({
     if (defaultStyles == null) {
       oldMergedPropsStyles = destStyles;
     } else {
-      // $FlowFixMe
-      oldMergedPropsStyles = defaultStyles.map(defaultStyleCell => {
+      oldMergedPropsStyles = (defaultStyles: any).map(defaultStyleCell => {
         // TODO: key search code
         for (let i = 0; i < destStyles.length; i++) {
           if (destStyles[i].key === defaultStyleCell.key) {
@@ -240,15 +237,16 @@ const TransitionMotion = React.createClass({
     }
     const oldCurrentStyles = defaultStyles == null
       ? destStyles.map(s => stripStyle(s.style))
-      : defaultStyles.map(s => stripStyle(s.style));
+      : (defaultStyles: any).map(s => stripStyle(s.style));
     const oldCurrentVelocities = defaultStyles == null
       ? destStyles.map(s => mapToZero(s.style))
       : defaultStyles.map(s => mapToZero(s.style));
     const [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
-      // $FlowFixMe
-      willEnter,
-      // $FlowFixMe
-      willLeave,
+      // Because this is an old-style React.createClass component, Flow doesn't
+      // understand that the willEnter and willLeave props have default values
+      // and will always be present.
+      (willEnter: any),
+      (willLeave: any),
       oldMergedPropsStyles,
       destStyles,
       oldCurrentStyles,
@@ -258,11 +256,11 @@ const TransitionMotion = React.createClass({
     );
 
     return {
-      currentStyles: currentStyles,
-      currentVelocities: currentVelocities,
-      lastIdealStyles: lastIdealStyles,
-      lastIdealVelocities: lastIdealVelocities,
-      mergedPropsStyles: mergedPropsStyles,
+      currentStyles,
+      currentVelocities,
+      lastIdealStyles,
+      lastIdealVelocities,
+      mergedPropsStyles,
     };
   },
 
@@ -281,10 +279,8 @@ const TransitionMotion = React.createClass({
   // config)
   clearUnreadPropStyle(unreadPropStyles: Array<TransitionStyle>): void {
     let [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
-      // $FlowFixMe
-      this.props.willEnter,
-      // $FlowFixMe
-      this.props.willLeave,
+      (this.props.willEnter: any),
+      (this.props.willLeave: any),
       this.state.mergedPropsStyles,
       unreadPropStyles,
       this.state.currentStyles,
@@ -298,7 +294,7 @@ const TransitionMotion = React.createClass({
       let dirty = false;
 
       for (let key in unreadPropStyle) {
-        if (!unreadPropStyle.hasOwnProperty(key)) {
+        if (!Object.prototype.hasOwnProperty.call(unreadPropStyle, key)) {
           continue;
         }
 
@@ -387,10 +383,8 @@ const TransitionMotion = React.createClass({
       const framesToCatchUp = Math.floor(this.accumulatedTime / msPerFrame);
 
       let [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities] = mergeAndSync(
-        // $FlowFixMe
-        this.props.willEnter,
-        // $FlowFixMe
-        this.props.willLeave,
+        (this.props.willEnter: any),
+        (this.props.willLeave: any),
         this.state.mergedPropsStyles,
         destStyles,
         this.state.currentStyles,
@@ -406,7 +400,7 @@ const TransitionMotion = React.createClass({
         let newLastIdealVelocity: Velocity = {};
 
         for (let key in newMergedPropsStyle) {
-          if (!newMergedPropsStyle.hasOwnProperty(key)) {
+          if (!Object.prototype.hasOwnProperty.call(newMergedPropsStyle, key)) {
             continue;
           }
 
@@ -486,9 +480,9 @@ const TransitionMotion = React.createClass({
       this.clearUnreadPropStyle(this.unreadPropStyles);
     }
 
-    if (typeof props.styles === 'function') {
-      // $FlowFixMe
-      this.unreadPropStyles = props.styles(
+    const styles = props.styles;
+    if (typeof styles === 'function') {
+      this.unreadPropStyles = styles(
         rehydrateStyles(
           this.state.mergedPropsStyles,
           this.unreadPropStyles,
@@ -496,7 +490,7 @@ const TransitionMotion = React.createClass({
         )
       );
     } else {
-      this.unreadPropStyles = props.styles;
+      this.unreadPropStyles = styles;
     }
 
     if (this.animationID == null) {

@@ -42,7 +42,7 @@ export default function mergeDiff(
     ret[i] = next[i];
   }
   for (let i = 0; i < prev.length; i++) {
-    if (!nextKeyIndex.hasOwnProperty(prev[i].key)) {
+    if (!Object.prototype.hasOwnProperty.call(nextKeyIndex, prev[i].key)) {
       // this is called my TM's `mergeAndSync`, which calls willLeave. We don't
       // merge in keys that the user desires to kill
       const fill = onRemove(i, prev[i]);
@@ -74,7 +74,7 @@ export default function mergeDiff(
       // d, b's (the only) pivot
       for (let i = 0; i < next.length; i++) {
         const pivot = next[i].key;
-        if (!prevKeyIndex.hasOwnProperty(pivot)) {
+        if (!Object.prototype.hasOwnProperty.call(prevKeyIndex, pivot)) {
           continue;
         }
 
@@ -90,7 +90,7 @@ export default function mergeDiff(
     // prevOrderA, nextOrderB
     for (let i = 0; i < next.length; i++) {
       const pivot = next[i].key;
-      if (!prevKeyIndex.hasOwnProperty(pivot)) {
+      if (!Object.prototype.hasOwnProperty.call(prevKeyIndex, pivot)) {
         continue;
       }
       if (nextOrderB < nextKeyIndex[pivot] && prevOrderA > prevKeyIndex[pivot]) {

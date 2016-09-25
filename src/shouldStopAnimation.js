@@ -9,7 +9,7 @@ export default function shouldStopAnimation(
   currentVelocity: Velocity,
 ): boolean {
   for (let key in style) {
-    if (!style.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(style, key)) {
       continue;
     }
 
