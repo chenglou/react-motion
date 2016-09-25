@@ -28,7 +28,7 @@ export type Velocity = {[key: string]: number};
 export type MotionProps = {
   defaultStyle?: PlainStyle,
   style: Style,
-  children: (interpolatedStyle: PlainStyle) => ReactElement,
+  children: (interpolatedStyle: PlainStyle) => React$Element<*>,
   onRest?: () => void,
 };
 
@@ -36,7 +36,7 @@ export type MotionProps = {
 export type StaggeredProps = {
   defaultStyles?: Array<PlainStyle>,
   styles: (previousInterpolatedStyles: ?Array<PlainStyle>) => Array<Style>,
-  children: (interpolatedStyles: Array<PlainStyle>) => ReactElement,
+  children: (interpolatedStyles: Array<PlainStyle>) => React$Element<*>,
 };
 
 // === TransitionMotion ===
@@ -57,7 +57,7 @@ export type WillLeave = (styleThatLeft: TransitionStyle) => ?Style;
 export type TransitionProps = {
   defaultStyles?: Array<TransitionPlainStyle>,
   styles: Array<TransitionStyle> | (previousInterpolatedStyles: ?Array<TransitionPlainStyle>) => Array<TransitionStyle>,
-  children: (interpolatedStyles: Array<TransitionPlainStyle>) => ReactElement,
+  children: (interpolatedStyles: Array<TransitionPlainStyle>) => React$Element<*>,
   willEnter?: WillEnter,
   willLeave?: WillLeave,
 };

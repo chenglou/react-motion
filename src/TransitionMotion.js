@@ -513,7 +513,7 @@ const TransitionMotion = React.createClass({
     }
   },
 
-  render(): ReactElement {
+  render(): React$Element<*> {
     const hydratedStyles = rehydrateStyles(
       this.state.mergedPropsStyles,
       this.unreadPropStyles,
