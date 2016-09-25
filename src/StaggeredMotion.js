@@ -243,7 +243,7 @@ const StaggeredMotion = React.createClass({
     }
   },
 
-  render(): React$Element<*> {
+  render(): ReactElement {
     const renderedChildren = this.props.children(this.state.currentStyles);
     return renderedChildren && React.Children.only(renderedChildren);
   },
