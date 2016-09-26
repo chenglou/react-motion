@@ -1,6 +1,6 @@
 {
   "name": "react-motion",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "homepage": "https://github.com/chenglou/react-motion",
   "authors": [
     "chenglou"
@@ -11,7 +11,7 @@
     "build/react-motion.map"
   ],
   "dependencies": {
-    "react": ">=0.13.2 || ^0.14"
+    "react": ">=0.13.2 || ^0.14 || ^15.0.0"
   },
   "keywords": [
     "react",
