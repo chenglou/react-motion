@@ -55,12 +55,13 @@ then include as
 ### Try the Demos Locally
 ```sh
 git clone https://github.com/chenglou/react-motion.git
-cd react-motion
+cd react-motion/demos/demo0-simple-transition # Same as others
 npm install
+npm start
 ```
 
 - With hot reloading (**slow, development version**): run `npm start`.
-- Without hot reloading (**faster, production version**): run `npm run build-demos` and open the static `demos/demo_name/index.html` file directly. **Don't forget to use production mode when testing your animation's performance**!
+- Without hot reloading (**faster, production version**): run `npm run build` **Don't forget to use production mode when testing your animation's performance**!
 
 To build the repo yourself: `npm run prerelease`.
 

@@ -1,0 +1,18 @@
+.demo4 {
+  display: flex;
+  display: -webkit-flex;
+  align-items: center;
+  height: 700px;
+  position: relative;
+}
+
+.demo4-inner {
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+}
+
+.demo4-photo {
+  position: absolute;
+  background-color: lightgray;
+}
