@@ -9,7 +9,6 @@
 
 /karma.conf.js
 /webpack.*
-/server.js
 
 # sublime
 /*.sublime-project

@@ -44,7 +44,6 @@
   },
   "scripts": {
     "start": "node server.js",
-    "build-demos": "webpack",
     "lint": "eslint --ext .js,.jsx .",
     "flow_check": "flow check",
     "prerelease": "rm -rf lib && babel src --out-dir lib && flow-copy-source -v src lib && webpack --config webpack.prod.config.js",
@@ -52,7 +51,7 @@
     "test:travis": "karma start ./karma.conf.js --single-run",
     "test:dev": "karma start ./karma.conf.js --no-single-run --auto-watch",
     "test:cov": "karma start ./karma.conf.js --single-run --reporters coverage",
-    "gh-pages": "git fetch origin && git checkout gh-pages && git reset --hard origin/gh-pages && git rebase origin/master --force-rebase && npm run build-demos && git add . && git commit --amend --no-edit && git push origin gh-pages --force && git checkout master"
+    "gh-pages": "git fetch origin && git checkout gh-pages && git reset --hard origin/gh-pages && git rebase origin/master --force-rebase && git add . && git commit --amend --no-edit && git push origin gh-pages --force && git checkout master"
   },
   "repository": {
     "type": "git",
