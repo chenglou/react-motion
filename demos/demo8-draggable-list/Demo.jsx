@@ -21,7 +21,7 @@ const Demo = React.createClass({
   getInitialState() {
     return {
       delta: 0,
-      mouse: 0,
+      mouseY: 0,
       isPressed: false,
       lastPressed: 0,
       order: range(itemsCount),
@@ -47,7 +47,7 @@ const Demo = React.createClass({
   handleMouseDown(pos, pressY, {pageY}) {
     this.setState({
       delta: pageY - pressY,
-      mouse: pressY,
+      mouseY: pressY,
       isPressed: true,
       lastPressed: pos,
     });
@@ -56,10 +56,10 @@ const Demo = React.createClass({
   handleMouseMove({pageY}) {
     const {isPressed, delta, order, lastPressed} = this.state;
     if (isPressed) {
-      const mouse = pageY - delta;
-      const row = clamp(Math.round(mouse / 100), 0, itemsCount - 1);
+      const mouseY = pageY - delta;
+      const row = clamp(Math.round(mouseY / 100), 0, itemsCount - 1);
       const newOrder = reinsert(order, order.indexOf(lastPressed), row);
-      this.setState({mouse: mouse, order: newOrder});
+      this.setState({mouseY: mouseY, order: newOrder});
     }
   },
 
@@ -68,7 +68,7 @@ const Demo = React.createClass({
   },
 
   render() {
-    const {mouse, isPressed, lastPressed, order} = this.state;
+    const {mouseY, isPressed, lastPressed, order} = this.state;
 
     return (
       <div className="demo8">
@@ -77,7 +77,7 @@ const Demo = React.createClass({
             ? {
                 scale: spring(1.1, springConfig),
                 shadow: spring(16, springConfig),
-                y: mouse,
+                y: mouseY,
               }
             : {
                 scale: spring(1, springConfig),
