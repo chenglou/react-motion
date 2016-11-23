@@ -20,7 +20,7 @@ const itemsCount = 4;
 const Demo = React.createClass({
   getInitialState() {
     return {
-      delta: 0,
+      topDeltaY: 0,
       mouse: 0,
       isPressed: false,
       lastPressed: 0,
@@ -46,7 +46,7 @@ const Demo = React.createClass({
 
   handleMouseDown(pos, pressY, {pageY}) {
     this.setState({
-      delta: pageY - pressY,
+      topDeltaY: pageY - pressY,
       mouse: pressY,
       isPressed: true,
       lastPressed: pos,
@@ -54,9 +54,9 @@ const Demo = React.createClass({
   },
 
   handleMouseMove({pageY}) {
-    const {isPressed, delta, order, lastPressed} = this.state;
+    const {isPressed, topDeltaY, order, lastPressed} = this.state;
     if (isPressed) {
-      const mouse = pageY - delta;
+      const mouse = pageY - topDeltaY;
       const row = clamp(Math.round(mouse / 100), 0, itemsCount - 1);
       const newOrder = reinsert(order, order.indexOf(lastPressed), row);
       this.setState({mouse: mouse, order: newOrder});
@@ -64,7 +64,7 @@ const Demo = React.createClass({
   },
 
   handleMouseUp() {
-    this.setState({isPressed: false, delta: 0});
+    this.setState({isPressed: false, topDeltaY: 0});
   },
 
   render() {
