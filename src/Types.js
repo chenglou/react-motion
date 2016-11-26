@@ -60,6 +60,7 @@ export type TransitionPlainStyle = {
 };
 export type WillEnter = (styleThatEntered: TransitionStyle) => PlainStyle;
 export type WillLeave = (styleThatLeft: TransitionStyle) => ?Style;
+export type DidLeave = (styleThatLeft: { key: string, data?: any }) => void;
 
 export type TransitionProps = {
   defaultStyles?: Array<TransitionPlainStyle>,
