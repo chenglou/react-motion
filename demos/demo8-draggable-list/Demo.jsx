@@ -57,8 +57,8 @@ const Demo = React.createClass({
     const {isPressed, topDeltaY, order, originalPosOfLastPressed} = this.state;
     if (isPressed) {
       const mouseY = pageY - topDeltaY;
-      const row = clamp(Math.round(mouseY / 100), 0, itemsCount - 1);
-      const newOrder = reinsert(order, order.indexOf(originalPosOfLastPressed), row);
+      const currentRow = clamp(Math.round(mouseY / 100), 0, itemsCount - 1);
+      const newOrder = reinsert(order, order.indexOf(originalPosOfLastPressed), currentRow);
       this.setState({mouseY: mouseY, order: newOrder});
     }
   },
