@@ -13,6 +13,7 @@
     "no-nested-ternary": 0,
     "prefer-const": 0,
     "no-multiple-empty-lines": 0,
+    "no-useless-escape": 0,
 
     "react/no-did-mount-set-state": 2,
     "react/no-multi-comp": 0,
