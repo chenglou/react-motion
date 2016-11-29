@@ -20,10 +20,10 @@ const itemsCount = 4;
 const Demo = React.createClass({
   getInitialState() {
     return {
-      delta: 0,
-      mouse: 0,
+      topDeltaY: 0,
+      mouseY: 0,
       isPressed: false,
-      lastPressed: 0,
+      originalPosOfLastPressed: 0,
       order: range(itemsCount),
     };
   },
@@ -46,44 +46,44 @@ const Demo = React.createClass({
 
   handleMouseDown(pos, pressY, {pageY}) {
     this.setState({
-      delta: pageY - pressY,
-      mouse: pressY,
+      topDeltaY: pageY - pressY,
+      mouseY: pressY,
       isPressed: true,
-      lastPressed: pos,
+      originalPosOfLastPressed: pos,
     });
   },
 
   handleMouseMove({pageY}) {
-    const {isPressed, delta, order, lastPressed} = this.state;
+    const {isPressed, topDeltaY, order, originalPosOfLastPressed} = this.state;
 
     if (isPressed) {
-      const mouse = pageY - delta;
-      const row = clamp(Math.round(mouse / 100), 0, itemsCount - 1);
+      const mouseY = pageY - topDeltaY;
+      const currentRow = clamp(Math.round(mouseY / 100), 0, itemsCount - 1);
       let newOrder = order;
 
-      if (row !== order.indexOf(lastPressed)){
-        newOrder = reinsert(order, order.indexOf(lastPressed), row);
+      if (currentRow !== order.indexOf(originalPosOfLastPressed)){
+        newOrder = reinsert(order, order.indexOf(originalPosOfLastPressed), currentRow);
       }
 
-      this.setState({mouse: mouse, order: newOrder});
+      this.setState({mouseY: mouseY, order: newOrder});
     }
   },
 
   handleMouseUp() {
-    this.setState({isPressed: false, delta: 0});
+    this.setState({isPressed: false, topDeltaY: 0});
   },
 
   render() {
-    const {mouse, isPressed, lastPressed, order} = this.state;
+    const {mouseY, isPressed, originalPosOfLastPressed, order} = this.state;
 
     return (
       <div className="demo8">
         {range(itemsCount).map(i => {
-          const style = lastPressed === i && isPressed
+          const style = originalPosOfLastPressed === i && isPressed
             ? {
                 scale: spring(1.1, springConfig),
                 shadow: spring(16, springConfig),
-                y: mouse,
+                y: mouseY,
               }
             : {
                 scale: spring(1, springConfig),
@@ -101,7 +101,7 @@ const Demo = React.createClass({
                     boxShadow: `rgba(0, 0, 0, 0.2) 0px ${shadow}px ${2 * shadow}px 0px`,
                     transform: `translate3d(0, ${y}px, 0) scale(${scale})`,
                     WebkitTransform: `translate3d(0, ${y}px, 0) scale(${scale})`,
-                    zIndex: i === lastPressed ? 99 : i,
+                    zIndex: i === originalPosOfLastPressed ? 99 : i,
                   }}>
                   {order.indexOf(i) + 1}
                 </div>
