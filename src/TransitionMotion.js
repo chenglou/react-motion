@@ -16,6 +16,7 @@ import type {
   TransitionPlainStyle,
   WillEnter,
   WillLeave,
+  DidLeave,
   TransitionProps,
 } from './Types';
 
@@ -106,6 +107,7 @@ function shouldStopAnimationAll(
 function mergeAndSync(
   willEnter: WillEnter,
   willLeave: WillLeave,
+  didLeave: DidLeave,
   oldMergedPropsStyles: Array<TransitionStyle>,
   destStyles: Array<TransitionStyle>,
   oldCurrentStyles: Array<PlainStyle>,
@@ -119,12 +121,14 @@ function mergeAndSync(
     (oldIndex, oldMergedPropsStyle) => {
       const leavingStyle = willLeave(oldMergedPropsStyle);
       if (leavingStyle == null) {
+        didLeave({ key: oldMergedPropsStyle.key, data: oldMergedPropsStyle.data });
         return null;
       }
       if (shouldStopAnimation(
           oldCurrentStyles[oldIndex],
           leavingStyle,
           oldCurrentVelocities[oldIndex])) {
+        didLeave({ key: oldMergedPropsStyle.key, data: oldMergedPropsStyle.data });
         return null;
       }
       return {key: oldMergedPropsStyle.key, data: oldMergedPropsStyle.data, style: leavingStyle};
@@ -200,21 +204,23 @@ const TransitionMotion = React.createClass({
       }),
     )]).isRequired,
     children: PropTypes.func.isRequired,
-    willLeave: PropTypes.func,
     willEnter: PropTypes.func,
+    willLeave: PropTypes.func,
+    didLeave: PropTypes.func,
   },
 
-  getDefaultProps(): {willEnter: WillEnter, willLeave: WillLeave} {
+  getDefaultProps(): {willEnter: WillEnter, willLeave: WillLeave, didLeave: DidLeave} {
     return {
       willEnter: styleThatEntered => stripStyle(styleThatEntered.style),
       // recall: returning null makes the current unmounting TransitionStyle
       // disappear immediately
       willLeave: () => null,
+      didLeave: () => {},
     };
   },
 
   getInitialState(): TransitionMotionState {
-    const {defaultStyles, styles, willEnter, willLeave} = this.props;
+    const {defaultStyles, styles, willEnter, willLeave, didLeave} = this.props;
     const destStyles: Array<TransitionStyle> = typeof styles === 'function' ? styles(defaultStyles) : styles;
 
     // this is special. for the first time around, we don't have a comparison
@@ -247,6 +253,7 @@ const TransitionMotion = React.createClass({
       // and will always be present.
       (willEnter: any),
       (willLeave: any),
+      (didLeave: any),
       oldMergedPropsStyles,
       destStyles,
       oldCurrentStyles,
@@ -281,6 +288,7 @@ const TransitionMotion = React.createClass({
     let [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
       (this.props.willEnter: any),
       (this.props.willLeave: any),
+      (this.props.didLeave: any),
       this.state.mergedPropsStyles,
       unreadPropStyles,
       this.state.currentStyles,
@@ -385,6 +393,7 @@ const TransitionMotion = React.createClass({
       let [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities] = mergeAndSync(
         (this.props.willEnter: any),
         (this.props.willLeave: any),
+        (this.props.didLeave: any),
         this.state.mergedPropsStyles,
         destStyles,
         this.state.currentStyles,

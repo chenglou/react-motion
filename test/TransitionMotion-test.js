@@ -200,6 +200,44 @@ describe('TransitionMotion', () => {
     ]);
   });
 
+  it('should invoke didLeave in last frame', () => {
+    let count = [];
+    let setState = () => {};
+    const App = React.createClass({
+      getInitialState() {
+        return {
+          val: [{key: '1', style: {x: spring(10)}}],
+        };
+      },
+      componentWillMount() {
+        setState = this.setState.bind(this);
+      },
+      render() {
+        return (
+          <TransitionMotion
+            styles={this.state.val}
+            willEnter={() => ({x: 0})}
+            willLeave={() => ({x: spring(0)})}
+            didLeave={(a) => { count.push(a); }}>
+            {() => {
+              return null;
+            }}
+          </TransitionMotion>
+        );
+      },
+    });
+    TestUtils.renderIntoDocument(<App />);
+
+    expect(count).toEqual([]);
+    setState({
+      val: [{key: '2', style: {x: 10}}],
+    });
+    mockRaf.step(999);
+    expect(count).toEqual([
+      {key: '1', data: undefined},
+    ]);
+  });
+
   it('should work with nested TransitionMotions', () => {
     let count = [];
     const App = React.createClass({
