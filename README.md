@@ -265,6 +265,11 @@ Optional. Defaults to `() => null`. **The magic sauce property**.
 
 - Return: `null` to indicate you want the `TransitionStyle` gone immediately. A `Style` object to indicate you want to reach transition to the specified value(s) before killing the `TransitionStyle`.
 
+##### - didLeave?: (styleThatLeft: `{key: string, data?: any}`) => void
+Optional. Defaults to `() => {}`.
+
+- `styleThatLeft`: the `{key:..., data:...}` that was removed after the finished transition.
+
 ##### - willEnter?: (styleThatEntered: TransitionStyle) => PlainStyle
 Optional. Defaults to `styleThatEntered => stripStyle(styleThatEntered.style)`. Where `stripStyle` turns `{x: spring(10), y: spring(20)}` into `{x: 10, y: 20}`.
 
