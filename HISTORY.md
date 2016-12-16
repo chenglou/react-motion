@@ -3,6 +3,9 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### 0.4.7 (December 15th 2016)
+- [I] `didLeave` for `TransitionMotion`! Please check the README for more.
+
 ### 0.4.4 (June 4th 2016)
 - [F] Small fix to component unmounting bug (https://github.com/chenglou/react-motion/commit/49ea396041b0031b95f4941cc7efce200fcca454). It's not clear why this is erroring, but people want the temp fix.
 
