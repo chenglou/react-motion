@@ -31,8 +31,8 @@ const layout = range(count).map(n => {
 const Demo = React.createClass({
   getInitialState() {
     return {
-      mouse: [0, 0],
-      delta: [0, 0], // difference between mouse and circle pos, for dragging
+      mouseXY: [0, 0],
+      MouseCircleDelta: [0, 0], // difference between mouse and circle pos for x + y coords, for dragging
       lastPress: null, // key of the last pressed component
       isPressed: false,
       order: range(count), // index: visual position. value: component key/id
@@ -56,14 +56,14 @@ const Demo = React.createClass({
   },
 
   handleMouseMove({pageX, pageY}) {
-    const {order, lastPress, isPressed, delta: [dx, dy]} = this.state;
+    const {order, lastPress, isPressed, MouseCircleDelta: [dx, dy]} = this.state;
     if (isPressed) {
-      const mouse = [pageX - dx, pageY - dy];
-      const col = clamp(Math.floor(mouse[0] / width), 0, 2);
-      const row = clamp(Math.floor(mouse[1] / height), 0, Math.floor(count / 3));
+      const mouseXY = [pageX - dx, pageY - dy];
+      const col = clamp(Math.floor(mouseXY[0] / width), 0, 2);
+      const row = clamp(Math.floor(mouseXY[1] / height), 0, Math.floor(count / 3));
       const index = row * 3 + col;
       const newOrder = reinsert(order, order.indexOf(lastPress), index);
-      this.setState({mouse: mouse, order: newOrder});
+      this.setState({mouseXY, order: newOrder});
     }
   },
 
@@ -71,17 +71,17 @@ const Demo = React.createClass({
     this.setState({
       lastPress: key,
       isPressed: true,
-      delta: [pageX - pressX, pageY - pressY],
-      mouse: [pressX, pressY],
+      MouseCircleDelta: [pageX - pressX, pageY - pressY],
+      mouseXY: [pressX, pressY],
     });
   },
 
   handleMouseUp() {
-    this.setState({isPressed: false, delta: [0, 0]});
+    this.setState({isPressed: false, MouseCircleDelta: [0, 0]});
   },
 
   render() {
-    const {order, lastPress, isPressed, mouse} = this.state;
+    const {order, lastPress, isPressed, mouseXY} = this.state;
     return (
       <div className="demo2">
         {order.map((_, key) => {
@@ -90,7 +90,7 @@ const Demo = React.createClass({
           let y;
           const visualPosition = order.indexOf(key);
           if (key === lastPress && isPressed) {
-            [x, y] = mouse;
+            [x, y] = mouseXY;
             style = {
               translateX: x,
               translateY: y,
