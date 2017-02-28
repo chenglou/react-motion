@@ -32,7 +32,7 @@ const Demo = React.createClass({
   getInitialState() {
     return {
       mouseXY: [0, 0],
-      MouseCircleDelta: [0, 0], // difference between mouse and circle pos for x + y coords, for dragging
+      mouseCircleDelta: [0, 0], // difference between mouse and circle pos for x + y coords, for dragging
       lastPress: null, // key of the last pressed component
       isPressed: false,
       order: range(count), // index: visual position. value: component key/id
@@ -56,7 +56,8 @@ const Demo = React.createClass({
   },
 
   handleMouseMove({pageX, pageY}) {
-    const {order, lastPress, isPressed, MouseCircleDelta: [dx, dy]} = this.state;
+    const {order, lastPress, isPressed, 
+           cleDelta: [dx, dy]} = this.state;
     if (isPressed) {
       const mouseXY = [pageX - dx, pageY - dy];
       const col = clamp(Math.floor(mouseXY[0] / width), 0, 2);
@@ -71,13 +72,13 @@ const Demo = React.createClass({
     this.setState({
       lastPress: key,
       isPressed: true,
-      MouseCircleDelta: [pageX - pressX, pageY - pressY],
+      mouseCircleDelta: [pageX - pressX, pageY - pressY],
       mouseXY: [pressX, pressY],
     });
   },
 
   handleMouseUp() {
-    this.setState({isPressed: false, MouseCircleDelta: [0, 0]});
+    this.setState({isPressed: false, mouseCircleDelta: [0, 0]});
   },
 
   render() {
