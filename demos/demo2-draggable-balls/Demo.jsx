@@ -56,8 +56,7 @@ const Demo = React.createClass({
   },
 
   handleMouseMove({pageX, pageY}) {
-    const {order, lastPress, isPressed, 
-           cleDelta: [dx, dy]} = this.state;
+    const {order, lastPress, isPressed, mouseCircleDelta: [dx, dy]} = this.state;
     if (isPressed) {
       const mouseXY = [pageX - dx, pageY - dy];
       const col = clamp(Math.floor(mouseXY[0] / width), 0, 2);
