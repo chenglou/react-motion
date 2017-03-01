@@ -345,9 +345,14 @@ const TransitionMotion = React.createClass({
     if (this.unmounting) {
       return;
     }
+
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
     this.animationID = defaultRaf((timestamp) => {
+      if (this.unmounting) {
+        return;
+      }
+
       const propStyles = this.props.styles;
       let destStyles: Array<TransitionStyle> = typeof propStyles === 'function'
         ? propStyles(rehydrateStyles(
