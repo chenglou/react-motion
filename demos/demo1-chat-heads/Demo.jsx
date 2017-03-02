@@ -1,5 +1,5 @@
 import React from 'react';
-import {StaggeredMotion, spring, presets} from '../../src/react-motion';
+import {StaggeredMotion, spring, Motion, presets} from '../../src/react-motion';
 import range from 'lodash.range';
 
 
@@ -14,7 +14,7 @@ const Demo = React.createClass({
   },
 
   handleMouseMove({pageX: x, pageY: y}) {
-    if(x > 20 && y > 20){ // chat heads dont go into slider region
+    if(x > 20 && y > 20){ // chat heads avoid slider region
       this.setState({x, y});
     }
   },
@@ -42,9 +42,17 @@ const Demo = React.createClass({
   },
 
   render() {
+    const stiffnessSpringParams = { stiffness: this.state.stiffness * 4, damping: this.state.stiffness * 4 }
+   
     return (
       <div>
-        <input type="range" value={this.state.stiffness} onChange={this.handleStiffnessChange} />
+        <div class="container">
+          <div class="slider">
+            <Motion style={{x: spring(this.state.stiffness, stiffnessSpringParams)}}>
+              {interpolatingStyle =>  <input type= "range" min="0" max="200" value={interpolatingStyle} onChange={this.handleStiffnessChange} />}
+            </Motion>
+            {this.state.stiffness}    
+          </div>
       <StaggeredMotion
         defaultStyles={range(6).map(() => ({x: 0, y: 0}))}
         styles={this.getStyles}>
@@ -64,8 +72,12 @@ const Demo = React.createClass({
         }
       </StaggeredMotion>
       </div>
+      </div>
     );
   },
 });
+
+// to do - need a perf optimisation whereby input range value is only wrapped in motion and 
+// interpolated when mouse is hovered over the slider
 
 export default Demo;
