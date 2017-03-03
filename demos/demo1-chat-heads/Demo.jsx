@@ -42,12 +42,12 @@ const Demo = React.createClass({
   },
 
   render() {
-    const stiffnessSpringParams = { stiffness: this.state.stiffness * 4, damping: this.state.stiffness * 4 }
+    const stiffnessSpringParams = { stiffness: this.state.stiffness * 10, damping: this.state.stiffness * 4 }
    
     return (
       <div>
-        <div class="container">
-          <div class="slider">
+        <div className="container">
+          <div className="slider">
             <Motion style={{x: spring(this.state.stiffness, stiffnessSpringParams)}}>
               {interpolatingStyle =>  <input type= "range" min="0" max="200" value={interpolatingStyle} onChange={this.handleStiffnessChange} />}
             </Motion>
