@@ -6,13 +6,11 @@ body {
   width: 20%;
   height: 5%;
   padding: 1%;
-  margin: auto;
   text-align: center;
 }
 
 .slider {
   width: 100%;
-  margin: 50% auto;
 }
 
 /* Slider styles */ 
@@ -48,6 +46,21 @@ input[type="range"]::-webkit-slider-thumb:hover {
 input[type="range"]::-webkit-slider-thumb:active {
   box-shadow: 0px 0px 1px #3c6d59;
 }
+
+input[type='range'], 
+input[type='range']:focus, 
+input[type='range']:active, 
+input[type='range']::-moz-focus-inner, 
+input[type='range']:-moz-focusring
+input[type='range']:-webkit-focusring  {
+    border: 0;
+    outline: none;
+}
+
+input[type='range']:focus:-webkit-focus-ring-color { 
+  outline: none; 
+}
+
 
 #rangevalue {
   text-align: center;
