@@ -3,13 +3,15 @@ import React from 'react'
 const Slider = React.createClass({
   propTypes: {
 	    value: React.PropTypes.string,
-	    onChange: React.PropTypes.function
+	    onChange: React.PropTypes.function,
+	    max: React.PropTypes.number,
+   	    min: React.PropTypes.number
   },
   render () {
     return (
       <div className='container'>
         <div className='slider'>
-          <input type='range' min='1' max='250' value={this.props.value}
+          <input type='range' min={this.props.min} max={this.props.max} value={this.props.value}
             onChange={this.props.onChange} />
             {this.props.value}
         </div>
