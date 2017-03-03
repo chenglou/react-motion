@@ -1,7 +1,7 @@
 import React from 'react';
 import {StaggeredMotion, spring, Motion, presets} from '../../src/react-motion';
 import range from 'lodash.range';
-
+import Slider from './Slider'
 
 const Demo = React.createClass({
   getInitialState() {
@@ -41,18 +41,10 @@ const Demo = React.createClass({
     return endValue;
   },
 
-  render() {
-    const stiffnessSpringParams = { stiffness: this.state.stiffness * 10, damping: this.state.stiffness * 4 }
-   
+  render() {   
     return (
       <div>
-        <div className="container">
-          <div className="slider">
-            <Motion style={{x: spring(this.state.stiffness, stiffnessSpringParams)}}>
-              {interpolatingStyle =>  <input type= "range" min="0" max="200" value={interpolatingStyle} onChange={this.handleStiffnessChange} />}
-            </Motion>
-            {this.state.stiffness}    
-          </div>
+      <Slider value={this.state.stiffness} onChange={this.handleStiffnessChange} />
       <StaggeredMotion
         defaultStyles={range(6).map(() => ({x: 0, y: 0}))}
         styles={this.getStyles}>
@@ -71,7 +63,6 @@ const Demo = React.createClass({
           </div>
         }
       </StaggeredMotion>
-      </div>
       </div>
     );
   },
