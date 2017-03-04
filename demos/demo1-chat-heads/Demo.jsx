@@ -11,8 +11,8 @@ const Demo = React.createClass({
       y: 300, 
       stiffness: 100, 
       damping: 17,
-      stiffnessBehaviour: null,
-      dampingBehaviour: null,
+      stiffnessBehaviour: 'constant',
+      dampingBehaviour: 'constant',
     };
   },
 
@@ -46,9 +46,9 @@ const Demo = React.createClass({
   handleDampingParamChange(event) {
     this.setState({dampingBehaviour: event.newValue});
   },
-
+  
   getStyles(prevStyles) {
-    // `prevStyles` is the interpolated value of the last tick
+  // `prevStyles` is the interpolated value of the last tick
     let stiffness = this.state.stiffness
     let damping = this.state.damping
 
@@ -76,14 +76,6 @@ const Demo = React.createClass({
   },
 
   render() {   
-
-     var dropDownOnChange = function(change) {
-        alert('onChangeForSelect:\noldValue: ' + 
-                change.oldValue + 
-                '\nnewValue: ' 
-                + change.newValue);
-    };
-
     const options = [
         {
             description: 'Constant',
@@ -101,33 +93,44 @@ const Demo = React.createClass({
 
     return (
       <div>
-      <Dropdown id='myDropdown' 
-                  options={options} 
-                  value='b'
-                  labelField='description'
-                  valueField='code'
-                  onChange={dropDownOnChange}/>
-
-      <Slider value={this.state.stiffness} min={1} max={350} onChange={this.handleStiffnessChange} />
-      <Slider value={this.state.damping} min={0} max={100} onChange={this.handleDampingChange} />
+        <div className="dropdown-container">
+         Stiffness Behaviour <Dropdown className='Dropdown' 
+                      options={options} 
+                      value={this.state.stiffnessBehaviour}
+                      labelField='description'
+                      valueField='code'
+                      onChange={this.handleStiffnessParamChange}
+                      />
+        </div>
+        <div className="dropdown-container">
+          Damping Behaviour <Dropdown className='Dropdown' 
+                      options={options} 
+                      value={this.state.dampingBehaviour}
+                      labelField='description'
+                      valueField='code'
+                      onChange={this.handleDampingParamChange}
+                      />
+        </div>
+        <Slider value={this.state.stiffness} min={1} max={350} onChange={this.handleStiffnessChange} />
+        <Slider value={this.state.damping} min={0} max={100} onChange={this.handleDampingChange} />
         <StaggeredMotion
           defaultStyles={range(6).map(() => ({x: 0, y: 0}))}
           styles={this.getStyles}>
-         {balls =>
-           <div className="demo1">
-             {balls.map(({x, y}, i) =>
-               <div
-                 key={i}
-                 className={`demo1-ball ball-${i}`}
-                 style={{
-                   WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                   transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                   zIndex: balls.length - i,
-                 }} />
-             )}
-           </div>
-         }
-       </StaggeredMotion>
+          {balls =>
+            <div className="demo1">
+              {balls.map(({x, y}, i) =>
+                <div
+                  key={i}
+                  className={`demo1-ball ball-${i}`}
+                  style={{
+                    WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
+                    transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
+                    zIndex: balls.length - i,
+                  }} />
+              )}
+            </div>
+          }
+        </StaggeredMotion>
       </div>
     );
   },
