@@ -1,3 +1,10 @@
+   @font-face {
+      font-family: "Roboto-Medium";
+      src: url("Roboto-Medium.ttf");
+    }
+    
+    body { font-family: "Roboto-Medium", sans-serif }
+
 body {
   background-color: white;
 }

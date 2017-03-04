@@ -94,7 +94,8 @@ const Demo = React.createClass({
     return (
       <div>
         <div className="dropdown-container">
-         Stiffness Behaviour <Dropdown className='Dropdown' 
+         Stiffness Behaviour 
+         <Dropdown className='Dropdown' 
                       options={options} 
                       value={this.state.stiffnessBehaviour}
                       labelField='description'
@@ -103,7 +104,8 @@ const Demo = React.createClass({
                       />
         </div>
         <div className="dropdown-container">
-          Damping Behaviour <Dropdown className='Dropdown' 
+          Damping Behaviour
+           <Dropdown className='Dropdown' 
                       options={options} 
                       value={this.state.dampingBehaviour}
                       labelField='description'
