@@ -11,10 +11,8 @@ const Demo = React.createClass({
       y: 300, 
       stiffness: 100, 
       damping: 17,
-      staggeredStiffness: false,
-      inverseStaggeredStiffness: false,
-      staggeredDamping: false,
-      inverseStaggeredDamping: false
+      stiffnessBehaviour: null,
+      dampingBehaviour: null,
     };
   },
 
@@ -41,39 +39,35 @@ const Demo = React.createClass({
     this.setState({damping: event.target.value});
   },
 
-  toggleLinearStiffness(){
-    this.setState({linearStiffness: !this.state.linearStiffness})
+  handleStiffnessParamChange(event) {
+    this.setState({stiffnessBehaviour: event.newValue});
   },
 
-  toggleInverseLinearStiffness(){
-    this.setState({inverseLinearStiffness: !this.state.inverseLinearStiffness})
-  },
-
-  resetEffects(){
-    this.setState({
-          inverseLinearStiffness: false,
-          linearStiffness: false,
-          linearDamping: false,
-          inverseLinearDamping: false
-        })
+  handleDampingParamChange(event) {
+    this.setState({dampingBehaviour: event.newValue});
   },
 
   getStyles(prevStyles) {
     // `prevStyles` is the interpolated value of the last tick
     let stiffness = this.state.stiffness
     let damping = this.state.damping
-    const endValue = prevStyles.map((_, i) => {
-       if (this.state.inverseLinearStiffness === true){
-        stiffness = this.state.stiffness / i
-                damping = this.state.damping / i
 
+    const endValue = prevStyles.map((_, i) => {
+      if (this.state.stiffnessBehaviour === 'linear'){
+        stiffness = this.state.stiffness * i
       }
-      if (this.state.linearStiffness === true){
+      if (this.state.stiffnessBehaviour === 'inverseLinear'){
+        stiffness = this.state.stiffness / i
+      }
+      if (this.state.dampingBehaviour === 'linear'){
+        damping = this.state.damping * i
+      }
+      if (this.state.dampingBehaviour === 'inverseLinear'){
         damping = this.state.damping / i
       }
       return i === 0
         ? this.state
-        : {  // do stiffness * i for coel effect then add slider for this and slider for how many chat heads
+        : {  
             x: spring(prevStyles[i - 1].x, {stiffness, damping}),
             y: spring(prevStyles[i - 1].y, {stiffness, damping}),
           };
@@ -82,34 +76,58 @@ const Demo = React.createClass({
   },
 
   render() {   
+
+     var dropDownOnChange = function(change) {
+        alert('onChangeForSelect:\noldValue: ' + 
+                change.oldValue + 
+                '\nnewValue: ' 
+                + change.newValue);
+    };
+
+    const options = [
+        {
+            description: 'Constant',
+            code: 'constant'
+        },
+        {
+            description: 'Linear',
+            code: 'linear'
+        },
+        {
+            description: 'Inverse Linear',
+            code: 'invertedLinear'
+        },
+    ];
+
     return (
       <div>
-        <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
-
-      <button onClick={this.toggleLinearStiffness} > Linear Spring Stiffness </button>
-      <button onClick={this.toggleInverseLinearStiffness} > Inverse Linear Spring Stiffness </button>
-      <button onClick={this.resetEffects} > Reset </ button>
+      <Dropdown id='myDropdown' 
+                  options={options} 
+                  value='b'
+                  labelField='description'
+                  valueField='code'
+                  onChange={dropDownOnChange}/>
 
       <Slider value={this.state.stiffness} min={1} max={350} onChange={this.handleStiffnessChange} />
       <Slider value={this.state.damping} min={0} max={100} onChange={this.handleDampingChange} />
-      <StaggeredMotion
-        defaultStyles={range(6).map(() => ({x: 0, y: 0}))}
-        styles={this.getStyles}>
-        {balls =>
-          <div className="demo1">
-            {balls.map(({x, y}, i) =>
-              <div
-                key={i}
-                className={`demo1-ball ball-${i}`}
-                style={{
-                  WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                  transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                  zIndex: balls.length - i,
-                }} />
-            )}
-          </div>
-        }
-      </StaggeredMotion>
+        <StaggeredMotion
+          defaultStyles={range(6).map(() => ({x: 0, y: 0}))}
+          styles={this.getStyles}>
+         {balls =>
+           <div className="demo1">
+             {balls.map(({x, y}, i) =>
+               <div
+                 key={i}
+                 className={`demo1-ball ball-${i}`}
+                 style={{
+                   WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
+                   transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
+                   zIndex: balls.length - i,
+                 }} />
+             )}
+           </div>
+         }
+       </StaggeredMotion>
       </div>
     );
   },

@@ -3,7 +3,7 @@ body {
 }
 
 .container {
-  width: 20%;
+  width: 100%;
   height: 5%;
   padding-top: 1%;
   text-align: center;
@@ -17,7 +17,7 @@ body {
 input[type="range"] {
   -webkit-appearance: none !important;
   width: 100%;
-  height: 10px;
+  height: 6px;
   background-color: #984FC9;
   border: 1px solid #97c68b;
   border-radius: 10px;
