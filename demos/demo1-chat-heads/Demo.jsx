@@ -2,14 +2,19 @@ import React from 'react';
 import {StaggeredMotion, spring, Motion, presets} from '../../src/react-motion';
 import range from 'lodash.range';
 import Slider from './Slider'
+import Dropdown from './Dropdown'
 
 const Demo = React.createClass({
   getInitialState() {
     return {
       x: 250,
       y: 300, 
-      stiffness: 80, 
-      damping: 50
+      stiffness: 100, 
+      damping: 17,
+      staggeredStiffness: false,
+      inverseStaggeredStiffness: false,
+      staggeredDamping: false,
+      inverseStaggeredDamping: false
     };
   },
 
@@ -36,14 +41,39 @@ const Demo = React.createClass({
     this.setState({damping: event.target.value});
   },
 
+  toggleLinearStiffness(){
+    this.setState({linearStiffness: !this.state.linearStiffness})
+  },
+
+  toggleInverseLinearStiffness(){
+    this.setState({inverseLinearStiffness: !this.state.inverseLinearStiffness})
+  },
+
+  resetEffects(){
+    this.setState({
+          inverseLinearStiffness: false,
+          linearStiffness: false,
+          linearDamping: false,
+          inverseLinearDamping: false
+        })
+  },
+
   getStyles(prevStyles) {
     // `prevStyles` is the interpolated value of the last tick
-    const stiffness = this.state.stiffness
-    const damping = this.state.damping
+    let stiffness = this.state.stiffness
+    let damping = this.state.damping
     const endValue = prevStyles.map((_, i) => {
+       if (this.state.inverseLinearStiffness === true){
+        stiffness = this.state.stiffness / i
+                damping = this.state.damping / i
+
+      }
+      if (this.state.linearStiffness === true){
+        damping = this.state.damping / i
+      }
       return i === 0
         ? this.state
-        : {
+        : {  // do stiffness * i for coel effect then add slider for this and slider for how many chat heads
             x: spring(prevStyles[i - 1].x, {stiffness, damping}),
             y: spring(prevStyles[i - 1].y, {stiffness, damping}),
           };
@@ -54,6 +84,12 @@ const Demo = React.createClass({
   render() {   
     return (
       <div>
+        <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+
+      <button onClick={this.toggleLinearStiffness} > Linear Spring Stiffness </button>
+      <button onClick={this.toggleInverseLinearStiffness} > Inverse Linear Spring Stiffness </button>
+      <button onClick={this.resetEffects} > Reset </ button>
+
       <Slider value={this.state.stiffness} min={1} max={350} onChange={this.handleStiffnessChange} />
       <Slider value={this.state.damping} min={0} max={100} onChange={this.handleDampingChange} />
       <StaggeredMotion
