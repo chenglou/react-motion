@@ -1,7 +1,6 @@
 import React from 'react';
 
 const Dropdown = React.createClass({
-
     propTypes: {
         id: React.PropTypes.string.isRequired,
         options: React.PropTypes.array.isRequired,
@@ -26,14 +25,14 @@ const Dropdown = React.createClass({
     },
 
     getInitialState: function() {
-        var selected = this.getSelectedFromProps(this.props);
+        const selected = this.getSelectedFromProps(this.props);
         return {
             selected: selected
         }
     },
     
     componentWillReceiveProps: function(nextProps) {
-        var selected = this.getSelectedFromProps(nextProps);
+        const selected = this.getSelectedFromProps(nextProps);
         this.setState({
            selected: selected
         });
@@ -50,8 +49,8 @@ const Dropdown = React.createClass({
     },
 
     render: function() {
-        var self = this;
-        var options = self.props.options.map(function(option) {
+        const self = this;
+        const options = self.props.options.map(function(option) {
             return (
                 <option key={option[self.props.valueField]} value={option[self.props.valueField]}>
                     {option[self.props.labelField]}
@@ -70,7 +69,7 @@ const Dropdown = React.createClass({
 
     handleChange: function(e) {
         if (this.props.onChange) {
-            var change = {
+            const change = {
               oldValue: this.state.selected,
               newValue: e.target.value
             }
