@@ -39,7 +39,7 @@ const Dropdown = React.createClass({
     },
     
     getSelectedFromProps(props) {
-        var selected;
+        let selected;
         if (props.value === null && props.options.length !== 0) {
             selected = props.options[0][props.valueField];
         } else {
