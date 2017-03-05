@@ -13,7 +13,7 @@ const Slider = React.createClass({
         <div className='slider'>
           <input type='range' min={this.props.min} max={this.props.max} value={this.props.value}
             onChange={this.props.onChange} />
-            {this.props.value}
+            {this.props.label + ': '}{this.props.value}
         </div>
       </div>)
   }

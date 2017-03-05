@@ -126,12 +126,11 @@ const Demo = React.createClass({
         <span class="bar"></span>
         </div>
         <div className="container">
-        <label>Stiffness</label>
-        <Slider value={this.state.stiffness} min={1} max={350} onChange={this.handleStiffnessChange} />
+        <Slider value={this.state.stiffness} label={'Stiffness'} min={1} max={350} onChange={this.handleStiffnessChange} />
         </div>
         <div className="container">
-        <label>Damping</label>
-        <Slider value={this.state.damping} min={0} max={100} onChange={this.handleDampingChange} />
+
+        <Slider value={this.state.damping} label={'Damping'} min={0} max={100} onChange={this.handleDampingChange} />
         </div>
 
         <StaggeredMotion
