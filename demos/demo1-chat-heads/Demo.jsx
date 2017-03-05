@@ -21,10 +21,7 @@ const Demo = React.createClass({
   componentDidMount() {
     window.addEventListener('mousemove', this.handleMouseMove);
     window.addEventListener('touchmove', this.handleTouchMove);
-  // const height = document.getElementById('header').clientHeight;
-  //  this.setState({ height });
     this.setState({ headerHeight: this.divRef.clientHeight });
-
   },
 
   handleMouseMove({pageX: x, pageY: y}) {
@@ -95,86 +92,97 @@ const Demo = React.createClass({
     const options = [
         {
             description: 'Constant',
-            code: 'constant'
+            value: 'constant'
         },
         {
             description: 'Linear',
-            code: 'linear'
+            value: 'linear'
         },
         {
             description: 'Inverse Linear',
-            code: 'invertedLinear'
+            value: 'invertedLinear'
         },
     ];
 
     return (
       <div>
-      <div className="header"  ref={element => this.divRef = element}>
-      <div className="parent-container">
-        <div className="dropdown-container">
+        <div className="header"  ref={element => this.divRef = element}>
+          <div className="parent-container">
+            <div className="dropdown-container">
               <div className=".mdl-selectfield">
-
-         <label>Stiffness Behaviour</label>
-         <Dropdown className='Dropdown' 
-                      options={options} 
-                      value={this.state.stiffnessBehaviour}
-                      labelField='description'
-                      valueField='code'
-                      onChange={this.handleStiffnessParamChange}
-                      />
-        </div>
-        </div>
-        <div className="dropdown-container">
-              <div className=".mdl-selectfield">
-
-         <label>Damping Behaviour</label>
-           <Dropdown className='Dropdown' 
-                      options={options} 
-                      value={this.state.dampingBehaviour}
-                      labelField='description'
-                      valueField='code'
-                      onChange={this.handleDampingParamChange}
-                      />
-        </div>
-        </div>
-        <div className="input-container">
-          <label>Precision</label>
-        <input type="text" value={this.state.precision} size={4} onChange={this.handlePrecisionChange} />
-        <span class="highlight"></span>
-        <span class="bar"></span>
-        </div>
-      </div>   
-        
-      
-
-        <div className="slider-container">
-        <Slider value={this.state.stiffness} label={'Stiffness'} min={1} max={350} onChange={this.handleStiffnessChange} />
-        </div>
-        <div className="slider-container">
-
-        <Slider value={this.state.damping} label={'Damping'} min={0} max={100} onChange={this.handleDampingChange} />
-        </div>
-        </div>
-
-        <StaggeredMotion
-          defaultStyles={range(6).map(() => ({x: 0, y: 0}))}
-          styles={this.getStyles}>
-          {balls =>
-            <div className="demo1">
-              {balls.map(({x, y}, i) =>
-                <div
-                  key={i}
-                  className={`demo1-ball ball-${i}`}
-                  style={{
-                    WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                    transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
-                    zIndex: balls.length - i,
-                  }} />
-              )}
+                <label>Stiffness Behaviour</label>
+                <Dropdown className='Dropdown' 
+                  options={options} 
+                  value={this.state.stiffnessBehaviour}
+                  labelField='description'
+                  valueField='code'
+                  onChange={this.handleStiffnessParamChange}
+                />
+              </div>
             </div>
-          }
-        </StaggeredMotion>
+            <div className="dropdown-container">
+              <div className=".mdl-selectfield">
+                <label>Damping Behaviour</label>
+                  <Dropdown
+                    className='Dropdown' 
+                    options={options} 
+                    value={this.state.dampingBehaviour}
+                    labelField='description'
+                    valueField='code'
+                    onChange={this.handleDampingParamChange}
+                  />
+              </div>
+            </div>
+            <div className="input-container">
+              <label>Precision</label>
+              <input
+                type="text"
+                value={this.state.precision}
+                size={4}
+                onChange={this.handlePrecisionChange}
+              />
+              <span class="highlight"></span>
+              <span class="bar"></span>
+            </div>
+          </div>   
+        <div className="slider-container">
+          <Slider
+            value={this.state.stiffness}
+            label={'Stiffness'}
+            min={1}
+            max={350}
+            onChange={this.handleStiffnessChange} 
+          />
+        </div>
+        <div className="slider-container">
+          <Slider
+            value={this.state.damping}
+            label={'Damping'}
+            min={0}
+            max={100}
+            onChange={this.handleDampingChange}
+          />
+        </div>
       </div>
+      <StaggeredMotion
+        defaultStyles={range(6).map(() => ({x: 0, y: 0}))}
+        styles={this.getStyles}>
+        {balls =>
+          <div className="demo1">
+            {balls.map(({x, y}, i) =>
+              <div
+                key={i}
+                className={`demo1-ball ball-${i}`}
+                style={{
+                  WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
+                  transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
+                  zIndex: balls.length - i,
+                }} />
+            )}
+          </div>
+        }
+      </StaggeredMotion>
+    </div>
     );
   },
 });
