@@ -1,12 +1,20 @@
-   @font-face {
-      font-family: "Roboto-Medium";
-      src: url("Roboto-Medium.ttf");
-    }
-    
-    body { font-family: "Roboto-Medium", sans-serif }
+@font-face {
+  font-family: "Roboto-Medium";
+  src: url("Roboto-Medium.ttf");
+}
+
+* { 
+  box-sizing: border-box;
+}
+
+label {
+  color:#999; 
+  font-size: 0.85rem;
+}
 
 body {
   background-color: white;
+  font-family: "Roboto-Medium", sans-serif; 
 }
 
 .container {
@@ -18,6 +26,11 @@ body {
 
 .slider {
   width: 100%;
+}
+
+input[type="text"] {
+    color: rgba(0,0,0, 0.66);
+    text-align: center;
 }
 
 /* Slider styles */ 
@@ -78,10 +91,6 @@ input[type=range]:focus {
   color: #931FE0;
 }
 
-* {
-margin: 0;
-}
-
 /* Chat heads */ 
 .demo1 {
 width: 100%;
@@ -122,4 +131,68 @@ background-image: url(4.jpg);
 
 .ball-5 {
 background-image: url(5.jpg);
+}
+
+/* Control positions */ 
+
+.input-container {
+
+}
+
+.dropdown-container {
+  width:125px;
+}
+.container { 
+  font-family:'Roboto-Medium';
+  font-size:1rem;
+  display:block; 
+  background:#FFF;
+}
+
+/* Style Select Field */
+select {
+  font-family: inherit;
+  background-color: transparent;
+  width: 100%;
+  padding: 4px 0;
+  font-size: 0.8rem;
+  color: rgba(0,0,0, 0.66);
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0, 0.12);
+}
+
+/* Remove focus */
+select:focus {
+  outline: none;
+}
+
+/* Hide label */
+.mdl-selectfield label {
+  display: none;
+}
+
+/* Use custom arrow */
+.mdl-selectfield select {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+
+.mdl-selectfield {
+  font-family: 'Roboto','Helvetica','Arial',sans-serif;
+  position: relative;
+}
+.mdl-selectfield:after {
+  position: absolute;
+  top: 0.75em;
+  right: 0.5em;
+  /* Styling the down arrow */
+  width: 0;
+  height: 0;
+  padding: 0;
+  content: '';
+  border-left: .25em solid transparent;
+  border-right: .25em solid transparent;
+  border-top: 0.375em solid rgba(0,0,0, 0.12);
+  pointer-events: none;
 }

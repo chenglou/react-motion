@@ -102,7 +102,9 @@ const Demo = React.createClass({
     return (
       <div>
         <div className="dropdown-container">
-         Stiffness Behaviour 
+              <div className=".mdl-selectfield">
+
+         <label>Stiffness Behaviour</label>
          <Dropdown className='Dropdown' 
                       options={options} 
                       value={this.state.stiffnessBehaviour}
@@ -111,8 +113,11 @@ const Demo = React.createClass({
                       onChange={this.handleStiffnessParamChange}
                       />
         </div>
+        </div>
         <div className="dropdown-container">
-          Damping Behaviour
+              <div className=".mdl-selectfield">
+
+         <label>Damping Behaviour</label>
            <Dropdown className='Dropdown' 
                       options={options} 
                       value={this.state.dampingBehaviour}
@@ -120,15 +125,21 @@ const Demo = React.createClass({
                       valueField='code'
                       onChange={this.handleDampingParamChange}
                       />
+                        </div>
+        </div>
+         
+        <div className="input-container">
           <label>Precision</label>
         <input type="text" value={this.state.precision} size={4} onChange={this.handlePrecisionChange} />
         <span class="highlight"></span>
         <span class="bar"></span>
         </div>
-        <div className="container">
+      
+
+        <div className="slider-container">
         <Slider value={this.state.stiffness} label={'Stiffness'} min={1} max={350} onChange={this.handleStiffnessChange} />
         </div>
-        <div className="container">
+        <div className="slider-container">
 
         <Slider value={this.state.damping} label={'Damping'} min={0} max={100} onChange={this.handleDampingChange} />
         </div>
