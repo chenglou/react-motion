@@ -11,6 +11,7 @@ const Demo = React.createClass({
       y: 300, 
       stiffness: 100, 
       damping: 17,
+      precision: 0.01,
       stiffnessBehaviour: 'constant',
       dampingBehaviour: 'constant',
     };
@@ -35,6 +36,12 @@ const Demo = React.createClass({
     this.setState({stiffness: event.target.value});
   },
 
+  handlePrecisionChange(event) {
+    if(!isNaN(event.target.value)){
+      this.setState({precision: event.target.value});
+    }
+  },
+
   handleDampingChange(event) {
     this.setState({damping: event.target.value});
   },
@@ -51,6 +58,7 @@ const Demo = React.createClass({
   // `prevStyles` is the interpolated value of the last tick
     let stiffness = this.state.stiffness
     let damping = this.state.damping
+    let precision = this.state.precision
 
     const endValue = prevStyles.map((_, i) => {
       if (this.state.stiffnessBehaviour === 'linear'){
@@ -68,8 +76,8 @@ const Demo = React.createClass({
       return i === 0
         ? this.state
         : {  
-            x: spring(prevStyles[i - 1].x, {stiffness, damping}),
-            y: spring(prevStyles[i - 1].y, {stiffness, damping}),
+            x: spring(prevStyles[i - 1].x, {stiffness, damping, precision}),
+            y: spring(prevStyles[i - 1].y, {stiffness, damping, precision}),
           };
     });
     return endValue;
@@ -112,9 +120,20 @@ const Demo = React.createClass({
                       valueField='code'
                       onChange={this.handleDampingParamChange}
                       />
+          <label>Precision</label>
+        <input type="text" value={this.state.precision} size={4} onChange={this.handlePrecisionChange} />
+        <span class="highlight"></span>
+        <span class="bar"></span>
         </div>
+        <div className="container">
+        <label>Stiffness</label>
         <Slider value={this.state.stiffness} min={1} max={350} onChange={this.handleStiffnessChange} />
+        </div>
+        <div className="container">
+        <label>Damping</label>
         <Slider value={this.state.damping} min={0} max={100} onChange={this.handleDampingChange} />
+        </div>
+
         <StaggeredMotion
           defaultStyles={range(6).map(() => ({x: 0, y: 0}))}
           styles={this.getStyles}>
