@@ -101,6 +101,7 @@ const Demo = React.createClass({
 
     return (
       <div>
+      <div className="parent-container">
         <div className="dropdown-container">
               <div className=".mdl-selectfield">
 
@@ -125,15 +126,16 @@ const Demo = React.createClass({
                       valueField='code'
                       onChange={this.handleDampingParamChange}
                       />
-                        </div>
         </div>
-         
+        </div>
         <div className="input-container">
           <label>Precision</label>
         <input type="text" value={this.state.precision} size={4} onChange={this.handlePrecisionChange} />
         <span class="highlight"></span>
         <span class="bar"></span>
         </div>
+      </div>   
+        
       
 
         <div className="slider-container">
