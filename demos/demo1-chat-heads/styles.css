@@ -160,7 +160,7 @@ background-image: url(5.jpg);
 }
 .container { 
   font-family:'Roboto-Medium';
-  font-size:1 rem;
+  font-size:1rem;
   display: block; 
   background: #FFF;
 }

@@ -14,17 +14,25 @@ const Demo = React.createClass({
       precision: 0.01,
       stiffnessBehaviour: 'constant',
       dampingBehaviour: 'constant',
+      headerHeight: 0
     };
   },
 
   componentDidMount() {
     window.addEventListener('mousemove', this.handleMouseMove);
     window.addEventListener('touchmove', this.handleTouchMove);
+  // const height = document.getElementById('header').clientHeight;
+  //  this.setState({ height });
+    this.setState({ headerHeight: this.divRef.clientHeight });
+
   },
 
   handleMouseMove({pageX: x, pageY: y}) {
-    if(x > 20 && y > 20){ // chat heads avoid slider region
-      this.setState({x, y});
+    const height = this.state.headerHeight
+    const chatHeadRadiusPx = 20
+    // chat heads avoid header area
+    if(y > height + chatHeadRadiusPx){
+      this.setState({x, y: y - height});
     }
   },
 
@@ -101,6 +109,7 @@ const Demo = React.createClass({
 
     return (
       <div>
+      <div className="header"  ref={element => this.divRef = element}>
       <div className="parent-container">
         <div className="dropdown-container">
               <div className=".mdl-selectfield">
@@ -144,6 +153,7 @@ const Demo = React.createClass({
         <div className="slider-container">
 
         <Slider value={this.state.damping} label={'Damping'} min={0} max={100} onChange={this.handleDampingChange} />
+        </div>
         </div>
 
         <StaggeredMotion
