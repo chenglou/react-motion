@@ -77,7 +77,6 @@ const Demo = React.createClass({
   },
 
   handleMouseUp() {
-    this.setState({isPressed: false, MouseCircleDelta: [0, 0]});
     this.setState({isPressed: false, mouseCircleDelta: [0, 0]});
   },
 
