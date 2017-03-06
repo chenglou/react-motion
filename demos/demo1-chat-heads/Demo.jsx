@@ -208,7 +208,4 @@ const Demo = React.createClass({
   },
 });
 
-// to do - need a perf optimisation whereby input range value is only wrapped in motion and 
-// interpolated when mouse is hovered over the slider
-
 export default Demo;
