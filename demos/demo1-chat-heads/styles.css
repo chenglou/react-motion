@@ -26,6 +26,10 @@ input[type="text"] {
   text-align: center;
 }
 
+input[type="text"]:hover{
+  color: rgba(0,0,0, 0.78);
+}
+
 /* Slider styles */ 
 input[type="range"] {
   -webkit-appearance: none !important;
@@ -199,6 +203,11 @@ select:focus {
   outline: none;
 }
 
+select:hover {
+  outline: none;
+  color: rgba(0,0,0, 0.78);
+}
+
 /* Hide label */
 .mdl-selectfield label {
   display: none;
@@ -215,6 +224,7 @@ select:focus {
   font-family: 'Roboto','Helvetica','Arial',sans-serif;
   position: relative;
 }
+
 .mdl-selectfield:after {
   position: absolute;
   top: 0.75em;
