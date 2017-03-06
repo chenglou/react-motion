@@ -24,6 +24,16 @@ const Demo = React.createClass({
     this.setState({ headerHeight: this.divRef.clientHeight });
   },
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.x !== nextState.x) {
+      return true;
+    }
+    if (this.props.y !== nextProps.y) {
+      return true;
+    }
+    return false;
+  },
+
   handleMouseMove({pageX: x, pageY: y}) {
     const height = this.state.headerHeight
     const chatHeadRadiusPx = 20
