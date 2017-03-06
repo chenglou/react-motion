@@ -31,6 +31,16 @@ const Demo = React.createClass({
     if (this.props.y !== nextProps.y) {
       return true;
     }
+    if (this.state.stiffness !== nextState.stiffness) {
+      return true;
+    }
+    if (this.state.damping !== nextState.damping) {
+      return true;
+    }
+    if (this.state.precision !== nextState.damping) {
+      return true;
+    }
+  
     return false;
   },
 
@@ -70,7 +80,7 @@ const Demo = React.createClass({
   },
   
   getStyles(prevStyles) {
-  // `prevStyles` is the interpolated value of the last tick
+    // `prevStyles` is the interpolated value of the last tick
     let stiffness = this.state.stiffness
     let damping = this.state.damping
     let precision = this.state.precision
@@ -187,7 +197,8 @@ const Demo = React.createClass({
                   WebkitTransform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
                   transform: `translate3d(${x - 25}px, ${y - 25}px, 0)`,
                   zIndex: balls.length - i,
-                }} />
+                }} 
+              />
             )}
           </div>
         }
