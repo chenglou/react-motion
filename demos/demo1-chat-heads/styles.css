@@ -8,7 +8,7 @@
 }
 
 label {
-  color: #999; 
+  color: #606060; 
   font-size: 0.85rem;
 }
 
@@ -193,9 +193,9 @@ select {
   width: 100%;
   padding: 4px 0;
   font-size: 0.8rem;
-  color: rgba(0,0,0, 0.66);
+  color: rgba(0,0,0, 0.56);
   border: none;
-  border-bottom: 1px solid rgba(0,0,0, 0.12);
+  border-bottom: 1px solid rgba(0,0,0, 0.22);
 }
 
 /* Remove focus */
