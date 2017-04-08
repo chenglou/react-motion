@@ -1,8 +1,9 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {StaggeredMotion, spring, presets} from '../../src/react-motion';
 import range from 'lodash.range';
 
-const Demo = React.createClass({
+const Demo = createReactClass({
   getInitialState() {
     return {x: 250, y: 300};
   },

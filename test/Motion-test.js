@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
 import TestUtils from 'react-addons-test-utils';
@@ -23,7 +24,7 @@ describe('animation loop', () => {
 
   it('should interpolate correctly when the timer is perfect', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <Motion defaultStyle={{a: 0}} style={{a: spring(10)}}>
@@ -51,7 +52,7 @@ describe('animation loop', () => {
 
   it('should work with negative numbers', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <Motion defaultStyle={{a: -10}} style={{a: spring(-100)}}>
@@ -78,7 +79,7 @@ describe('animation loop', () => {
 
   it('should interpolate correctly when the timer is imperfect', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <Motion defaultStyle={{a: 0}} style={{a: spring(10)}}>
@@ -139,7 +140,7 @@ describe('Motion', () => {
   });
 
   it('should allow returning null from children function', () => {
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         // shouldn't throw here
         return <Motion style={{a: 0}}>{() => null}</Motion>;
@@ -151,7 +152,7 @@ describe('Motion', () => {
   it('should not throw on unmount', () => {
     spyOn(console, 'error');
     let kill = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {kill: false};
       },
@@ -173,7 +174,7 @@ describe('Motion', () => {
 
   it('should allow a defaultStyle', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <Motion defaultStyle={{a: 0}} style={{a: spring(10)}}>
@@ -200,7 +201,7 @@ describe('Motion', () => {
 
   it('should accept different spring configs', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <Motion
@@ -232,7 +233,7 @@ describe('Motion', () => {
 
   it('should interpolate many values', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <Motion
@@ -262,7 +263,7 @@ describe('Motion', () => {
 
   it('should work with nested Motions', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <Motion defaultStyle={{owner: 0}} style={{owner: spring(10)}}>
@@ -312,7 +313,7 @@ describe('Motion', () => {
 
   it('should reach destination value', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <Motion defaultStyle={{a: 0}} style={{a: spring(400)}}>
@@ -342,7 +343,7 @@ describe('Motion', () => {
   it('should support jumping to value', () => {
     let count = [];
     let setState = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {p: false};
       },
@@ -392,7 +393,7 @@ describe('Motion', () => {
     const onRest = createSpy('onRest');
     let result = 0;
 
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <Motion
@@ -425,7 +426,7 @@ describe('Motion', () => {
     let resultA = 0;
     let resultB = 0;
 
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <Motion
@@ -463,7 +464,7 @@ describe('Motion', () => {
 
     let setState;
 
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {a: spring(0)};
       },
@@ -494,7 +495,7 @@ describe('Motion', () => {
   it('should behave well when many owner updates come in-between rAFs', () => {
     let count = [];
     let setState = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {a: spring(0)};
       },

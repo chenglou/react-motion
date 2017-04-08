@@ -6,7 +6,9 @@ import mergeDiff from './mergeDiff';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
-import React, {PropTypes} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import createReactClass from 'create-react-class';
 
 import type {
   ReactElement,
@@ -185,7 +187,7 @@ type TransitionMotionState = {
   mergedPropsStyles: Array<TransitionStyle>,
 };
 
-const TransitionMotion = React.createClass({
+const TransitionMotion = createReactClass({
   propTypes: {
     defaultStyles: PropTypes.arrayOf(PropTypes.shape({
       key: PropTypes.string.isRequired,
@@ -248,7 +250,7 @@ const TransitionMotion = React.createClass({
       ? destStyles.map(s => mapToZero(s.style))
       : defaultStyles.map(s => mapToZero(s.style));
     const [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
-      // Because this is an old-style React.createClass component, Flow doesn't
+      // Because this is an old-style createReactClass component, Flow doesn't
       // understand that the willEnter and willLeave props have default values
       // and will always be present.
       (willEnter: any),

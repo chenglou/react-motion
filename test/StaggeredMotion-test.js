@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
 import TestUtils from 'react-addons-test-utils';
@@ -18,7 +19,7 @@ describe('StaggeredMotion', () => {
   });
 
   it('should allow returning null from children function', () => {
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         // shouldn't throw here
         return (
@@ -34,7 +35,7 @@ describe('StaggeredMotion', () => {
   it('should not throw on unmount', () => {
     spyOn(console, 'error');
     let kill = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {kill: false};
       },
@@ -58,7 +59,7 @@ describe('StaggeredMotion', () => {
 
   it('should allow a defaultStyles', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <StaggeredMotion
@@ -87,7 +88,7 @@ describe('StaggeredMotion', () => {
 
   it('should accept different spring configs', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <StaggeredMotion
@@ -119,7 +120,7 @@ describe('StaggeredMotion', () => {
 
   it('should interpolate many values while staggering', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <StaggeredMotion
@@ -153,7 +154,7 @@ describe('StaggeredMotion', () => {
 
   it('should work with nested Motions', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <StaggeredMotion defaultStyles={[{owner: 0}]} styles={() => [{owner: spring(10)}]}>
@@ -205,7 +206,7 @@ describe('StaggeredMotion', () => {
   // maybe shouldStopAnimation logic has a flaw
   it('should reach destination value', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <StaggeredMotion
@@ -241,7 +242,7 @@ describe('StaggeredMotion', () => {
   it('should support jumping to value', () => {
     let count = [];
     let setState = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {p: false};
       },
@@ -290,7 +291,7 @@ describe('StaggeredMotion', () => {
   it('should behave well when many owner updates come in-between rAFs', () => {
     let count = [];
     let setState = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {a: spring(0)};
       },
