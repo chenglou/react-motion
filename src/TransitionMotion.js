@@ -8,7 +8,6 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React from 'react';
 import PropTypes from 'prop-types';
-import createReactClass from 'create-react-class';
 
 import type {
   ReactElement,
@@ -170,6 +169,12 @@ function mergeAndSync(
   return [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities];
 }
 
+type TransitionMotionDefaultProps = {
+  willEnter: WillEnter,
+  willLeave: WillLeave,
+  didLeave: DidLeave
+}
+
 type TransitionMotionState = {
   // list of styles, each containing interpolating values. Part of what's passed
   // to children function. Notice that this is
@@ -187,8 +192,8 @@ type TransitionMotionState = {
   mergedPropsStyles: Array<TransitionStyle>,
 };
 
-const TransitionMotion = createReactClass({
-  propTypes: {
+export default class TransitionMotion extends React.Component {
+  static propTypes = {
     defaultStyles: PropTypes.arrayOf(PropTypes.shape({
       key: PropTypes.string.isRequired,
       data: PropTypes.any,
@@ -204,24 +209,41 @@ const TransitionMotion = createReactClass({
           PropTypes.object,
         ])).isRequired,
       }),
-    )]).isRequired,
+      )]).isRequired,
     children: PropTypes.func.isRequired,
     willEnter: PropTypes.func,
     willLeave: PropTypes.func,
     didLeave: PropTypes.func,
-  },
+  };
 
-  getDefaultProps(): {willEnter: WillEnter, willLeave: WillLeave, didLeave: DidLeave} {
-    return {
-      willEnter: styleThatEntered => stripStyle(styleThatEntered.style),
-      // recall: returning null makes the current unmounting TransitionStyle
-      // disappear immediately
-      willLeave: () => null,
-      didLeave: () => {},
-    };
-  },
+  static defaultProps: TransitionMotionDefaultProps = {
+    willEnter: styleThatEntered => stripStyle(styleThatEntered.style),
+    // recall: returning null makes the current unmounting TransitionStyle
+    // disappear immediately
+    willLeave: () => null,
+    didLeave: () => {},
+  };
 
-  getInitialState(): TransitionMotionState {
+  state: TransitionMotionState;
+  props: TransitionProps;
+
+  unmounting: boolean = false;
+  animationID: ?number = null;
+  prevTime = 0;
+  accumulatedTime = 0;
+  // it's possible that currentStyle's value is stale: if props is immediately
+  // changed from 0 to 400 to spring(0) again, the async currentStyle is still
+  // at 0 (didn't have time to tick and interpolate even once). If we naively
+  // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
+  // In reality currentStyle should be 400
+  unreadPropStyles: ?Array<TransitionStyle> = null;
+
+  constructor(props: TransitionProps) {
+    super(props);
+    this.state = this.defaultState();
+  }
+
+  defaultState(): TransitionMotionState {
     const {defaultStyles, styles, willEnter, willLeave, didLeave} = this.props;
     const destStyles: Array<TransitionStyle> = typeof styles === 'function' ? styles(defaultStyles) : styles;
 
@@ -271,22 +293,12 @@ const TransitionMotion = createReactClass({
       lastIdealVelocities,
       mergedPropsStyles,
     };
-  },
+  }
 
-  unmounting: (false: boolean),
-  animationID: (null: ?number),
-  prevTime: 0,
-  accumulatedTime: 0,
-  // it's possible that currentStyle's value is stale: if props is immediately
-  // changed from 0 to 400 to spring(0) again, the async currentStyle is still
-  // at 0 (didn't have time to tick and interpolate even once). If we naively
-  // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
-  // In reality currentStyle should be 400
-  unreadPropStyles: (null: ?Array<TransitionStyle>),
   // after checking for unreadPropStyles != null, we manually go set the
   // non-interpolating values (those that are a number, without a spring
   // config)
-  clearUnreadPropStyle(unreadPropStyles: Array<TransitionStyle>): void {
+  clearUnreadPropStyle = (unreadPropStyles: Array<TransitionStyle>): void => {
     let [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
       (this.props.willEnter: any),
       (this.props.willLeave: any),
@@ -341,9 +353,9 @@ const TransitionMotion = createReactClass({
       lastIdealStyles,
       lastIdealVelocities,
     });
-  },
+  }
 
-  startAnimationIfNecessary(): void {
+  startAnimationIfNecessary = (): void => {
     if (this.unmounting) {
       return;
     }
@@ -371,11 +383,11 @@ const TransitionMotion = createReactClass({
 
       // check if we need to animate in the first place
       if (shouldStopAnimationAll(
-        this.state.currentStyles,
-        destStyles,
-        this.state.currentVelocities,
-        this.state.mergedPropsStyles,
-      )) {
+          this.state.currentStyles,
+          destStyles,
+          this.state.currentVelocities,
+          this.state.mergedPropsStyles,
+        )) {
         // no need to cancel animationID here; shouldn't have any in flight
         this.animationID = null;
         this.accumulatedTime = 0;
@@ -488,12 +500,12 @@ const TransitionMotion = createReactClass({
 
       this.startAnimationIfNecessary();
     });
-  },
+  }
 
   componentDidMount() {
     this.prevTime = defaultNow();
     this.startAnimationIfNecessary();
-  },
+  }
 
   componentWillReceiveProps(props: TransitionProps) {
     if (this.unreadPropStyles) {
@@ -518,7 +530,7 @@ const TransitionMotion = createReactClass({
       this.prevTime = defaultNow();
       this.startAnimationIfNecessary();
     }
-  },
+  }
 
   componentWillUnmount() {
     this.unmounting = true;
@@ -526,7 +538,7 @@ const TransitionMotion = createReactClass({
       defaultRaf.cancel(this.animationID);
       this.animationID = null;
     }
-  },
+  }
 
   render(): ReactElement {
     const hydratedStyles = rehydrateStyles(
@@ -536,7 +548,6 @@ const TransitionMotion = createReactClass({
     );
     const renderedChildren = this.props.children(hydratedStyles);
     return renderedChildren && React.Children.only(renderedChildren);
-  },
-});
+  }
+}
 
-export default TransitionMotion;
