@@ -1,8 +1,9 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {TransitionMotion, spring} from '../../src/react-motion';
 
 const leavingSpringConfig = {stiffness: 60, damping: 15};
-const Demo = React.createClass({
+const Demo = createReactClass({
   getInitialState() {
     return {mouse: [], now: 't' + 0};
   },

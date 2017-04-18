@@ -5,7 +5,9 @@ import stepper from './stepper';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
-import React, {PropTypes} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import createReactClass from 'create-react-class';
 
 import type {ReactElement, PlainStyle, Style, Velocity, MotionProps} from './Types';
 
@@ -18,7 +20,7 @@ type MotionState = {
   lastIdealVelocity: Velocity,
 };
 
-const Motion = React.createClass({
+const Motion = createReactClass({
   propTypes: {
     // TOOD: warn against putting a config in here
     defaultStyle: PropTypes.objectOf(PropTypes.number),

@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {Motion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 
@@ -6,7 +7,7 @@ const gridWidth = 150;
 const gridHeight = 150;
 const grid = range(4).map(() => range(6));
 
-const Demo = React.createClass({
+const Demo = createReactClass({
   getInitialState() {
     return {
       delta: [0, 0],

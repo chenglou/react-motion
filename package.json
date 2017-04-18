@@ -73,7 +73,9 @@
   "author": "chenglou",
   "license": "MIT",
   "dependencies": {
+    "create-react-class": "^15.5.2",
     "performance-now": "^0.2.0",
+    "prop-types": "^15.5.8",
     "raf": "^3.1.0"
   }
 }

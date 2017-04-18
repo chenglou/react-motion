@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {Motion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 
@@ -17,7 +18,7 @@ function clamp(n, min, max) {
 const springConfig = {stiffness: 300, damping: 50};
 const itemsCount = 4;
 
-const Demo = React.createClass({
+const Demo = createReactClass({
   getInitialState() {
     return {
       topDeltaY: 0,

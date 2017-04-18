@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {Motion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 
@@ -28,7 +29,7 @@ const layout = range(count).map(n => {
   return [width * col, height * row];
 });
 
-const Demo = React.createClass({
+const Demo = createReactClass({
   getInitialState() {
     return {
       mouseXY: [0, 0],

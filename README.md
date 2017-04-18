@@ -194,7 +194,9 @@ Fortunately, `TransitionMotion` has kept `c` around and still passes it into the
 This time, when mapping through the two remaining interpolated styles, you'll produce only two components. `c` is gone for real.
 
 ```jsx
-const Demo = React.createClass({
+import createReactClass from 'create-react-class';
+
+const Demo = createReactClass({
   getInitialState() {
     return {
       items: [{key: 'a', size: 10}, {key: 'b', size: 20}, {key: 'c', size: 30}],

@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
 import TestUtils from 'react-addons-test-utils';
@@ -18,7 +19,7 @@ describe('TransitionMotion', () => {
   });
 
   it('should allow returning null from children function', () => {
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         // shouldn't throw here
         return <TransitionMotion styles={[{key: '1', style: {}}]}>{() => null}</TransitionMotion>;
@@ -30,7 +31,7 @@ describe('TransitionMotion', () => {
   it('should not throw on unmount', () => {
     spyOn(console, 'error');
     let kill = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {kill: false};
       },
@@ -58,7 +59,7 @@ describe('TransitionMotion', () => {
     // similar as above test
     spyOn(console, 'error');
     let kill = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {kill: false};
       },
@@ -84,7 +85,7 @@ describe('TransitionMotion', () => {
 
   it('should allow a defaultStyles', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <TransitionMotion
@@ -114,7 +115,7 @@ describe('TransitionMotion', () => {
 
   it('should accept different spring configs', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <TransitionMotion
@@ -148,7 +149,7 @@ describe('TransitionMotion', () => {
 
   it('should interpolate many values', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <TransitionMotion
@@ -203,7 +204,7 @@ describe('TransitionMotion', () => {
   it('should invoke didLeave in last frame', () => {
     let count = [];
     let setState = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {
           val: [{key: '1', style: {x: spring(10)}}],
@@ -240,7 +241,7 @@ describe('TransitionMotion', () => {
 
   it('should work with nested TransitionMotions', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <TransitionMotion
@@ -297,7 +298,7 @@ describe('TransitionMotion', () => {
 
   it('should reach destination value', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <TransitionMotion
@@ -329,7 +330,7 @@ describe('TransitionMotion', () => {
   it('should support jumping to value', () => {
     let count = [];
     let setState = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {p: false};
       },
@@ -379,7 +380,7 @@ describe('TransitionMotion', () => {
   it('should behave well when many owner updates come in-between rAFs', () => {
     let count = [];
     let setState = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {
           val: [{key: '1', style: {x: spring(0)}}],
@@ -456,7 +457,7 @@ describe('TransitionMotion', () => {
   it('should behave well when many owner styles function updates come in-between rAFs', () => {
     let count = [];
     let setState = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {
           val: [{key: '1', style: {x: spring(0)}}],
@@ -532,7 +533,7 @@ describe('TransitionMotion', () => {
 
   it('should transition things in/out at the beginning', () => {
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <TransitionMotion
@@ -590,7 +591,7 @@ describe('TransitionMotion', () => {
   it('should eliminate things in/out at the beginning', () => {
     // similar to previous test, but without willEnter/leave
     let count = [];
-    const App = React.createClass({
+    const App = createReactClass({
       render() {
         return (
           <TransitionMotion
@@ -634,7 +635,7 @@ describe('TransitionMotion', () => {
   it('should carry around the ignored values', () => {
     let count = [];
     let setState = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {
           val: [
@@ -738,7 +739,7 @@ describe('TransitionMotion', () => {
     let count = [];
     let prevValues = [];
     let setState = () => {};
-    const App = React.createClass({
+    const App = createReactClass({
       getInitialState() {
         return {
           val: [
