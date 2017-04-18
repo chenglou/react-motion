@@ -1,5 +1,4 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import {Motion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 
@@ -7,9 +6,10 @@ const gridWidth = 150;
 const gridHeight = 150;
 const grid = range(4).map(() => range(6));
 
-const Demo = createReactClass({
-  getInitialState() {
-    return {
+export default class Demo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       delta: [0, 0],
       mouse: [0, 0],
       isPressed: false,
@@ -17,51 +17,51 @@ const Demo = createReactClass({
       slider: {dragged: null, num: 0},
       lastPressed: [0, 0],
     };
-  },
+  };
 
   componentDidMount() {
     window.addEventListener('mousemove', this.handleMouseMove);
     window.addEventListener('touchmove', this.handleTouchMove);
     window.addEventListener('mouseup', this.handleMouseUp);
     window.addEventListener('touchend', this.handleMouseUp);
-  },
+  };
 
-  handleTouchStart(pos, press, e) {
+  handleTouchStart = (pos, press, e) => {
     this.handleMouseDown(pos, press, e.touches[0]);
-  },
+  };
 
-  handleMouseDown(pos, [pressX, pressY], {pageX, pageY}) {
+  handleMouseDown = (pos, [pressX, pressY], {pageX, pageY}) => {
     this.setState({
       delta: [pageX - pressX, pageY - pressY],
       mouse: [pressX, pressY],
       isPressed: true,
       lastPressed: pos,
     });
-  },
+  };
 
-  handleTouchMove(e) {
+  handleTouchMove = (e) => {
     if (this.state.isPressed) {
       e.preventDefault();
     }
     this.handleMouseMove(e.touches[0]);
-  },
+  };
 
-  handleMouseMove({pageX, pageY}) {
+  handleMouseMove = ({pageX, pageY}) => {
     const {isPressed, delta: [dx, dy]} = this.state;
     if (isPressed) {
       this.setState({mouse: [pageX - dx, pageY - dy]});
     }
-  },
+  };
 
-  handleMouseUp() {
+  handleMouseUp = () => {
     this.setState({
       isPressed: false,
       delta: [0, 0],
       slider: {dragged: null, num: 0},
     });
-  },
+  };
 
-  handleChange(constant, num, {target}) {
+  handleChange = (constant, num, {target}) => {
     const {firstConfig: [s, d]} = this.state;
     if (constant === 'stiffness') {
       this.setState({
@@ -72,13 +72,13 @@ const Demo = createReactClass({
         firstConfig: [s, target.value - num * 2],
       });
     }
-  },
+  };
 
-  handleMouseDownInput(constant, num) {
+  handleMouseDownInput = (constant, num) => {
     this.setState({
       slider: {dragged: constant, num: num},
     });
-  },
+  };
 
   render() {
     const {
@@ -159,8 +159,5 @@ const Demo = createReactClass({
         })}
       </div>
     );
-  },
-});
-
-
-export default Demo;
+  };
+}
