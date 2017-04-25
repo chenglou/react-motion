@@ -37,6 +37,7 @@ export default class Motion extends React.Component {
   constructor(props: MotionProps) {
     super(props);
     this.state = this.defaultState();
+    this.wasAnimating = false;
   }
 
   defaultState(): MotionState {
@@ -51,7 +52,6 @@ export default class Motion extends React.Component {
     };
   }
 
-  wasAnimating: false;
   animationID: ?number = null;
   prevTime = 0;
   accumulatedTime = 0;

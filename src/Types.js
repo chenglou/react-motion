@@ -37,6 +37,7 @@ export type MotionProps = {
   style: Style,
   children: (interpolatedStyle: PlainStyle) => ReactElement,
   onRest?: () => void,
+  wasAnimating?: boolean,
 };
 
 // === StaggeredMotion ===
