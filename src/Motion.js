@@ -117,7 +117,7 @@ export default class Motion extends Component {
         return;
       }
 
-      this.wasAnimating = true;
+      this.wasAnimating = false;
 
       const currentTime = timestamp || defaultNow();
       const timeDelta = currentTime - this.prevTime;
