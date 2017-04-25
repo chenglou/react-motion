@@ -11,7 +11,7 @@
     "build/react-motion.map"
   ],
   "dependencies": {
-    "react": "^15.5.0"
+    "react": "^0.14.9 || ^15.3.0"
   },
   "keywords": [
     "react",
