@@ -2,7 +2,7 @@
 import React from 'react';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
-import TestUtils from 'react-addons-test-utils';
+import TestUtils from 'react-dom/test-utils';
 
 const injector = require('inject!../src/StaggeredMotion');
 
