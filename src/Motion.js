@@ -54,7 +54,7 @@ export default class Motion extends Component {
   wasAnimating: false;
   animationID: ?number = null;
   prevTime = 0;
-  accumulatedTime= 0;
+  accumulatedTime = 0;
   // it's possible that currentStyle's value is stale: if props is immediately
   // changed from 0 to 400 to spring(0) again, the async currentStyle is still
   // at 0 (didn't have time to tick and interpolate even once). If we naively
@@ -213,20 +213,20 @@ export default class Motion extends Component {
   }
 
   componentWillReceiveProps(props: MotionProps) {
-    if (this.unreadPropStyle !== null) {
+    if (this.unreadPropStyle != null) {
       // previous props haven't had the chance to be set yet; set them here
       this.clearUnreadPropStyle(this.unreadPropStyle);
     }
 
     this.unreadPropStyle = props.style;
-    if (this.animationID === null) {
+    if (this.animationID == null) {
       this.prevTime = defaultNow();
       this.startAnimationIfNecessary();
     }
   }
 
   componentWillUnmount() {
-    if (this.animationID !== null) {
+    if (this.animationID != null) {
       defaultRaf.cancel(this.animationID);
       this.animationID = null;
     }
