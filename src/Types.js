@@ -38,6 +38,9 @@ export type MotionProps = {
   children: (interpolatedStyle: PlainStyle) => ReactElement,
   onRest?: () => void,
   wasAnimating?: boolean,
+  animationID?: number,
+  prevTime: number,
+  accumulatedTime: number,
 };
 
 // === StaggeredMotion ===

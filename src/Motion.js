@@ -38,6 +38,9 @@ export default class Motion extends React.Component {
     super(props);
     this.state = this.defaultState();
     this.wasAnimating = false;
+    this.animationID = null;
+    this.prevTime = 0;
+    this.accumulatedTime = 0;
   }
 
   defaultState(): MotionState {
@@ -52,9 +55,6 @@ export default class Motion extends React.Component {
     };
   }
 
-  animationID: ?number = null;
-  prevTime = 0;
-  accumulatedTime = 0;
   // it's possible that currentStyle's value is stale: if props is immediately
   // changed from 0 to 400 to spring(0) again, the async currentStyle is still
   // at 0 (didn't have time to tick and interpolate even once). If we naively
