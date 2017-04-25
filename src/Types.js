@@ -68,4 +68,5 @@ export type TransitionProps = {
   children: (interpolatedStyles: Array<TransitionPlainStyle>) => ReactElement,
   willEnter?: WillEnter,
   willLeave?: WillLeave,
+  didLeave?: DidLeave
 };

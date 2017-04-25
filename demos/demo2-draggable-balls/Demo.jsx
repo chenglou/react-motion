@@ -1,5 +1,4 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import {Motion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 
@@ -29,34 +28,35 @@ const layout = range(count).map(n => {
   return [width * col, height * row];
 });
 
-const Demo = createReactClass({
-  getInitialState() {
-    return {
+export default class Demo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       mouseXY: [0, 0],
       mouseCircleDelta: [0, 0], // difference between mouse and circle pos for x + y coords, for dragging
       lastPress: null, // key of the last pressed component
       isPressed: false,
       order: range(count), // index: visual position. value: component key/id
     };
-  },
+  };
 
   componentDidMount() {
     window.addEventListener('touchmove', this.handleTouchMove);
     window.addEventListener('touchend', this.handleMouseUp);
     window.addEventListener('mousemove', this.handleMouseMove);
     window.addEventListener('mouseup', this.handleMouseUp);
-  },
+  };
 
-  handleTouchStart(key, pressLocation, e) {
+  handleTouchStart = (key, pressLocation, e) => {
     this.handleMouseDown(key, pressLocation, e.touches[0]);
-  },
+  };
 
-  handleTouchMove(e) {
+  handleTouchMove = (e) => {
     e.preventDefault();
     this.handleMouseMove(e.touches[0]);
-  },
+  };
 
-  handleMouseMove({pageX, pageY}) {
+  handleMouseMove = ({pageX, pageY}) => {
     const {order, lastPress, isPressed, mouseCircleDelta: [dx, dy]} = this.state;
     if (isPressed) {
       const mouseXY = [pageX - dx, pageY - dy];
@@ -66,20 +66,20 @@ const Demo = createReactClass({
       const newOrder = reinsert(order, order.indexOf(lastPress), index);
       this.setState({mouseXY, order: newOrder});
     }
-  },
+  };
 
-  handleMouseDown(key, [pressX, pressY], {pageX, pageY}) {
+  handleMouseDown = (key, [pressX, pressY], {pageX, pageY}) => {
     this.setState({
       lastPress: key,
       isPressed: true,
       mouseCircleDelta: [pageX - pressX, pageY - pressY],
       mouseXY: [pressX, pressY],
     });
-  },
+  };
 
-  handleMouseUp() {
+  handleMouseUp = () => {
     this.setState({isPressed: false, mouseCircleDelta: [0, 0]});
-  },
+  };
 
   render() {
     const {order, lastPress, isPressed, mouseXY} = this.state;
@@ -128,7 +128,5 @@ const Demo = createReactClass({
         })}
       </div>
     );
-  },
-});
-
-export default Demo;
+  };
+}

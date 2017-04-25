@@ -1,38 +1,38 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import {StaggeredMotion, spring, presets} from '../../src/react-motion';
 import range from 'lodash.range';
 
-const Demo = createReactClass({
-  getInitialState() {
-    return {x: 250, y: 300};
-  },
+export default class Demo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {x: 250, y: 300};
+  };
 
   componentDidMount() {
     window.addEventListener('mousemove', this.handleMouseMove);
     window.addEventListener('touchmove', this.handleTouchMove);
-  },
+  };
 
-  handleMouseMove({pageX: x, pageY: y}) {
+  handleMouseMove = ({pageX: x, pageY: y}) => {
     this.setState({x, y});
-  },
+  };
 
-  handleTouchMove({touches}) {
+  handleTouchMove = ({touches}) => {
     this.handleMouseMove(touches[0]);
-  },
+  };
 
-  getStyles(prevStyles) {
+  getStyles = (prevStyles) => {
     // `prevStyles` is the interpolated value of the last tick
     const endValue = prevStyles.map((_, i) => {
       return i === 0
         ? this.state
         : {
-            x: spring(prevStyles[i - 1].x, presets.gentle),
-            y: spring(prevStyles[i - 1].y, presets.gentle),
-          };
+          x: spring(prevStyles[i - 1].x, presets.gentle),
+          y: spring(prevStyles[i - 1].y, presets.gentle),
+        };
     });
     return endValue;
-  },
+  };
 
   render() {
     return (
@@ -55,7 +55,5 @@ const Demo = createReactClass({
         }
       </StaggeredMotion>
     );
-  },
-});
-
-export default Demo;
+  };
+}

@@ -1,5 +1,4 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import {Motion, spring} from '../../src/react-motion';
 import range from 'lodash.range';
 
@@ -18,43 +17,44 @@ function clamp(n, min, max) {
 const springConfig = {stiffness: 300, damping: 50};
 const itemsCount = 4;
 
-const Demo = createReactClass({
-  getInitialState() {
-    return {
+export default class Demo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       topDeltaY: 0,
       mouseY: 0,
       isPressed: false,
       originalPosOfLastPressed: 0,
       order: range(itemsCount),
     };
-  },
+  };
 
   componentDidMount() {
     window.addEventListener('touchmove', this.handleTouchMove);
     window.addEventListener('touchend', this.handleMouseUp);
     window.addEventListener('mousemove', this.handleMouseMove);
     window.addEventListener('mouseup', this.handleMouseUp);
-  },
+  };
 
-  handleTouchStart(key, pressLocation, e) {
+  handleTouchStart = (key, pressLocation, e) => {
     this.handleMouseDown(key, pressLocation, e.touches[0]);
-  },
+  };
 
-  handleTouchMove(e) {
+  handleTouchMove = (e) => {
     e.preventDefault();
     this.handleMouseMove(e.touches[0]);
-  },
+  };
 
-  handleMouseDown(pos, pressY, {pageY}) {
+  handleMouseDown = (pos, pressY, {pageY}) => {
     this.setState({
       topDeltaY: pageY - pressY,
       mouseY: pressY,
       isPressed: true,
       originalPosOfLastPressed: pos,
     });
-  },
+  };
 
-  handleMouseMove({pageY}) {
+  handleMouseMove = ({pageY}) => {
     const {isPressed, topDeltaY, order, originalPosOfLastPressed} = this.state;
 
     if (isPressed) {
@@ -68,11 +68,11 @@ const Demo = createReactClass({
 
       this.setState({mouseY: mouseY, order: newOrder});
     }
-  },
+  };
 
-  handleMouseUp() {
+  handleMouseUp = () => {
     this.setState({isPressed: false, topDeltaY: 0});
-  },
+  };
 
   render() {
     const {mouseY, isPressed, originalPosOfLastPressed, order} = this.state;
@@ -112,7 +112,5 @@ const Demo = createReactClass({
         })}
       </div>
     );
-  },
-});
-
-export default Demo;
+  };
+}
