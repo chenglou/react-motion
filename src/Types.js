@@ -37,10 +37,6 @@ export type MotionProps = {
   style: Style,
   children: (interpolatedStyle: PlainStyle) => ReactElement,
   onRest?: () => void,
-  wasAnimating?: boolean,
-  animationID?: number,
-  prevTime: number,
-  accumulatedTime: number,
 };
 
 // === StaggeredMotion ===

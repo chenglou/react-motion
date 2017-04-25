@@ -37,11 +37,12 @@ export default class Motion extends React.Component {
   constructor(props: MotionProps) {
     super(props);
     this.state = this.defaultState();
-    this.wasAnimating = false;
-    this.animationID = null;
-    this.prevTime = 0;
-    this.accumulatedTime = 0;
   }
+
+  wasAnimating: boolean = false;
+  animationID: number = 0;
+  prevTime: number = 0;
+  accumulatedTime: number = 0;
 
   defaultState(): MotionState {
     const {defaultStyle, style} = this.props;
