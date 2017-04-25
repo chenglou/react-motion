@@ -1,5 +1,4 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
 import TestUtils from 'react-addons-test-utils';
@@ -19,25 +18,29 @@ describe('TransitionMotion', () => {
   });
 
   it('should allow returning null from children function', () => {
-    const App = createReactClass({
+    class App extends React.Component {
       render() {
         // shouldn't throw here
         return <TransitionMotion styles={[{key: '1', style: {}}]}>{() => null}</TransitionMotion>;
-      },
-    });
+      }
+    }
     TestUtils.renderIntoDocument(<App />);
   });
 
   it('should not throw on unmount', () => {
     spyOn(console, 'error');
     let kill = () => {};
-    const App = createReactClass({
-      getInitialState() {
-        return {kill: false};
-      },
+    class App extends React.Component {
+      constructor() {
+        super();
+
+        this.state = {
+          kill: false,
+        };
+      }
       componentWillMount() {
         kill = () => this.setState({kill: true});
-      },
+      }
       render() {
         return this.state.kill
           ? null
@@ -46,8 +49,8 @@ describe('TransitionMotion', () => {
               styles={[{key: '1', style: {x: spring(10)}}]}>
               {() => null}
             </TransitionMotion>;
-      },
-    });
+      }
+    }
     TestUtils.renderIntoDocument(<App />);
     mockRaf.step(2);
     kill();
@@ -59,13 +62,16 @@ describe('TransitionMotion', () => {
     // similar as above test
     spyOn(console, 'error');
     let kill = () => {};
-    const App = createReactClass({
-      getInitialState() {
-        return {kill: false};
-      },
+    class App extends React.Component {
+      constructor() {
+        super();
+        this.state = {
+            kill: false,
+        };
+      }
       componentWillMount() {
         kill = () => this.setState({kill: true});
-      },
+      }
       render() {
         return this.state.kill
           ? null
@@ -74,8 +80,8 @@ describe('TransitionMotion', () => {
               styles={() => [{key: '1', style: {x: spring(10)}}]}>
               {() => null}
             </TransitionMotion>;
-      },
-    });
+      }
+    }
     TestUtils.renderIntoDocument(<App />);
     mockRaf.step(2);
     kill();
@@ -85,7 +91,7 @@ describe('TransitionMotion', () => {
 
   it('should allow a defaultStyles', () => {
     let count = [];
-    const App = createReactClass({
+    class App extends React.Component {
       render() {
         return (
           <TransitionMotion
@@ -97,8 +103,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
 
     TestUtils.renderIntoDocument(<App />);
 
@@ -115,7 +121,7 @@ describe('TransitionMotion', () => {
 
   it('should accept different spring configs', () => {
     let count = [];
-    const App = createReactClass({
+    class App extends React.Component {
       render() {
         return (
           <TransitionMotion
@@ -129,8 +135,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
     TestUtils.renderIntoDocument(<App />);
 
     mockRaf.step(99);
@@ -149,7 +155,7 @@ describe('TransitionMotion', () => {
 
   it('should interpolate many values', () => {
     let count = [];
-    const App = createReactClass({
+    class App extends React.Component {
       render() {
         return (
           <TransitionMotion
@@ -167,8 +173,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
 
     TestUtils.renderIntoDocument(<App />);
 
@@ -204,15 +210,17 @@ describe('TransitionMotion', () => {
   it('should invoke didLeave in last frame', () => {
     let count = [];
     let setState = () => {};
-    const App = createReactClass({
-      getInitialState() {
-        return {
+    class App extends React.Component {
+      constructor() {
+        super();
+
+        this.state = {
           val: [{key: '1', style: {x: spring(10)}}],
         };
-      },
+      }
       componentWillMount() {
         setState = this.setState.bind(this);
-      },
+      }
       render() {
         return (
           <TransitionMotion
@@ -225,8 +233,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([]);
@@ -241,7 +249,7 @@ describe('TransitionMotion', () => {
 
   it('should work with nested TransitionMotions', () => {
     let count = [];
-    const App = createReactClass({
+    class App extends React.Component {
       render() {
         return (
           <TransitionMotion
@@ -262,8 +270,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([
@@ -298,7 +306,7 @@ describe('TransitionMotion', () => {
 
   it('should reach destination value', () => {
     let count = [];
-    const App = createReactClass({
+    class App extends React.Component {
       render() {
         return (
           <TransitionMotion
@@ -310,8 +318,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([0]);
@@ -330,13 +338,17 @@ describe('TransitionMotion', () => {
   it('should support jumping to value', () => {
     let count = [];
     let setState = () => {};
-    const App = createReactClass({
-      getInitialState() {
-        return {p: false};
-      },
+    class App extends React.Component {
+      constructor() {
+        super();
+
+        this.state = {
+          p: false,
+        };
+      }
       componentWillMount() {
         setState = this.setState.bind(this);
-      },
+      }
       render() {
         return (
           <TransitionMotion
@@ -347,8 +359,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([{x: 0}]);
@@ -380,15 +392,17 @@ describe('TransitionMotion', () => {
   it('should behave well when many owner updates come in-between rAFs', () => {
     let count = [];
     let setState = () => {};
-    const App = createReactClass({
-      getInitialState() {
-        return {
+    class App extends React.Component {
+      constructor() {
+        super();
+
+        this.state = {
           val: [{key: '1', style: {x: spring(0)}}],
         };
-      },
+      }
       componentWillMount() {
         setState = this.setState.bind(this);
-      },
+      }
       render() {
         return (
           <TransitionMotion
@@ -401,8 +415,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([[{key: '1', style: {x: 0}, data: undefined}]]);
@@ -457,15 +471,17 @@ describe('TransitionMotion', () => {
   it('should behave well when many owner styles function updates come in-between rAFs', () => {
     let count = [];
     let setState = () => {};
-    const App = createReactClass({
-      getInitialState() {
-        return {
+    class App extends React.Component {
+      constructor() {
+        super();
+
+        this.state = {
           val: [{key: '1', style: {x: spring(0)}}],
         };
-      },
+      }
       componentWillMount() {
         setState = this.setState.bind(this);
-      },
+      }
       render() {
         return (
           <TransitionMotion
@@ -478,8 +494,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
     TestUtils.renderIntoDocument(<App />);
 
     expect(count).toEqual([[{key: '1', style: {x: 0}, data: undefined}]]);
@@ -533,7 +549,7 @@ describe('TransitionMotion', () => {
 
   it('should transition things in/out at the beginning', () => {
     let count = [];
-    const App = createReactClass({
+    class App extends React.Component {
       render() {
         return (
           <TransitionMotion
@@ -550,8 +566,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
 
     TestUtils.renderIntoDocument(<App />);
 
@@ -591,7 +607,7 @@ describe('TransitionMotion', () => {
   it('should eliminate things in/out at the beginning', () => {
     // similar to previous test, but without willEnter/leave
     let count = [];
-    const App = createReactClass({
+    class App extends React.Component {
       render() {
         return (
           <TransitionMotion
@@ -606,8 +622,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
 
     TestUtils.renderIntoDocument(<App />);
 
@@ -635,18 +651,20 @@ describe('TransitionMotion', () => {
   it('should carry around the ignored values', () => {
     let count = [];
     let setState = () => {};
-    const App = createReactClass({
-      getInitialState() {
-        return {
+    class App extends React.Component {
+      constructor() {
+        super();
+
+        this.state = {
           val: [
             {key: '1', style: {a: spring(10), b: spring(410)}, data: [3]},
             {key: '3', style: {d: spring(10)}, data: [4]},
           ],
         };
-      },
+      }
       componentWillMount() {
         setState = this.setState.bind(this);
-      },
+      }
       render() {
         return (
           <TransitionMotion
@@ -663,8 +681,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
 
     TestUtils.renderIntoDocument(<App />);
 
@@ -739,18 +757,20 @@ describe('TransitionMotion', () => {
     let count = [];
     let prevValues = [];
     let setState = () => {};
-    const App = createReactClass({
-      getInitialState() {
-        return {
+    class App extends React.Component {
+      constructor() {
+        super();
+
+        this.state = {
           val: [
             {key: '1', style: {a: spring(10), b: spring(410)}, data: [3]},
             {key: '3', style: {d: spring(10)}, data: [4]},
           ],
         };
-      },
+      }
       componentWillMount() {
         setState = this.setState.bind(this);
-      },
+      }
       render() {
         return (
           <TransitionMotion
@@ -770,8 +790,8 @@ describe('TransitionMotion', () => {
             }}
           </TransitionMotion>
         );
-      },
-    });
+      }
+    }
 
     TestUtils.renderIntoDocument(<App />);
 
