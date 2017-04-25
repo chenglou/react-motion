@@ -40,7 +40,7 @@ export default class Motion extends React.Component {
   }
 
   wasAnimating: boolean = false;
-  animationID: ?number = 0;
+  animationID: ?number = null;
   prevTime: number = 0;
   accumulatedTime: number = 0;
 
