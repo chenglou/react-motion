@@ -7,7 +7,6 @@ import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
 import React from 'react';
 import PropTypes from 'prop-types';
-import createReactClass from 'create-react-class';
 
 import type {ReactElement, PlainStyle, Style, Velocity, MotionProps} from './Types';
 
@@ -20,8 +19,8 @@ type MotionState = {
   lastIdealVelocity: Velocity,
 };
 
-const Motion = createReactClass({
-  propTypes: {
+export default class Motion extends React.Component {
+  static propTypes = {
     // TOOD: warn against putting a config in here
     defaultStyle: PropTypes.objectOf(PropTypes.number),
     style: PropTypes.objectOf(PropTypes.oneOfType([
@@ -30,9 +29,22 @@ const Motion = createReactClass({
     ])).isRequired,
     children: PropTypes.func.isRequired,
     onRest: PropTypes.func,
-  },
+  };
 
-  getInitialState(): MotionState {
+  state: MotionState;
+  props: MotionProps;
+
+  constructor(props: MotionProps) {
+    super(props);
+    this.state = this.defaultState();
+  }
+
+  wasAnimating: boolean = false;
+  animationID: ?number = null;
+  prevTime: number = 0;
+  accumulatedTime: number = 0;
+
+  defaultState(): MotionState {
     const {defaultStyle, style} = this.props;
     const currentStyle = defaultStyle || stripStyle(style);
     const currentVelocity = mapToZero(currentStyle);
@@ -42,22 +54,18 @@ const Motion = createReactClass({
       lastIdealStyle: currentStyle,
       lastIdealVelocity: currentVelocity,
     };
-  },
+  }
 
-  wasAnimating: false,
-  animationID: (null: ?number),
-  prevTime: 0,
-  accumulatedTime: 0,
   // it's possible that currentStyle's value is stale: if props is immediately
   // changed from 0 to 400 to spring(0) again, the async currentStyle is still
   // at 0 (didn't have time to tick and interpolate even once). If we naively
   // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
   // In reality currentStyle should be 400
-  unreadPropStyle: (null: ?Style),
+  unreadPropStyle: ?Style = null;
   // after checking for unreadPropStyle != null, we manually go set the
   // non-interpolating values (those that are a number, without a spring
   // config)
-  clearUnreadPropStyle(destStyle: Style): void {
+  clearUnreadPropStyle = (destStyle: Style): void => {
     let dirty = false;
     let {currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity} = this.state;
 
@@ -86,9 +94,9 @@ const Motion = createReactClass({
     if (dirty) {
       this.setState({currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity});
     }
-  },
+  };
 
-  startAnimationIfNecessary(): void {
+  startAnimationIfNecessary = (): void => {
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
     this.animationID = defaultRaf((timestamp) => {
@@ -198,12 +206,12 @@ const Motion = createReactClass({
 
       this.startAnimationIfNecessary();
     });
-  },
+  };
 
   componentDidMount() {
     this.prevTime = defaultNow();
     this.startAnimationIfNecessary();
-  },
+  }
 
   componentWillReceiveProps(props: MotionProps) {
     if (this.unreadPropStyle != null) {
@@ -216,19 +224,17 @@ const Motion = createReactClass({
       this.prevTime = defaultNow();
       this.startAnimationIfNecessary();
     }
-  },
+  }
 
   componentWillUnmount() {
     if (this.animationID != null) {
       defaultRaf.cancel(this.animationID);
       this.animationID = null;
     }
-  },
+  }
 
   render(): ReactElement {
     const renderedChildren = this.props.children(this.state.currentStyle);
     return renderedChildren && React.Children.only(renderedChildren);
-  },
-});
-
-export default Motion;
+  }
+}
