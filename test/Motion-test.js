@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import React from 'react';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';

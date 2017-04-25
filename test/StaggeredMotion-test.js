@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import React from 'react';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
@@ -299,7 +300,7 @@ describe('StaggeredMotion', () => {
     let count = [];
     let setState = () => {};
     class App extends React.Component {
-      constructor(){
+      constructor() {
         super();
 
         this.state = {
