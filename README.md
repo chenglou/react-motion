@@ -80,6 +80,7 @@ Exports:
 - `StaggeredMotion`
 - `TransitionMotion`
 - `presets`
+- `stripStyle`
 
 [Here](https://github.com/chenglou/react-motion/blob/9cb90eca20ecf56e77feb816d101a4a9110c7d70/src/Types.js)'s the well-annotated public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
 
