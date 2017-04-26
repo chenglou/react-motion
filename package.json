@@ -1,6 +1,6 @@
 {
   "name": "react-motion",
-  "version": "0.4.8",
+  "version": "0.5.0",
   "description": "A spring that solves your animation problems.",
   "main": "lib/react-motion.js",
   "peerDependencies": {
