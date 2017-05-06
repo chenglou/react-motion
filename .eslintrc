@@ -14,7 +14,7 @@
     "prefer-const": 0,
     "no-multiple-empty-lines": 0,
     "no-useless-escape": 0,
-
+    "linebreak-style": 0,
     "react/no-did-mount-set-state": 2,
     "react/no-multi-comp": 0,
     "react/jsx-boolean-value": [2, "always"],
