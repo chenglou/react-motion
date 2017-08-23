@@ -4,8 +4,7 @@
 // Babel's sight.
 /* eslint-disable spaced-comment, no-undef */
 /*::
-import type {Element} from 'react';
-export type ReactElement = Element<*>;
+import * as React from 'react';
 */
 
 // === basic reused types ===
@@ -35,7 +34,7 @@ export type Velocity = {[key: string]: number};
 export type MotionProps = {
   defaultStyle?: PlainStyle,
   style: Style,
-  children: (interpolatedStyle: PlainStyle) => ReactElement,
+  children: (interpolatedStyle: PlainStyle) => React.Node,
   onRest?: () => void,
 };
 
@@ -43,7 +42,7 @@ export type MotionProps = {
 export type StaggeredProps = {
   defaultStyles?: Array<PlainStyle>,
   styles: (previousInterpolatedStyles: ?Array<PlainStyle>) => Array<Style>,
-  children: (interpolatedStyles: Array<PlainStyle>) => ReactElement,
+  children: (interpolatedStyles: Array<PlainStyle>) => React.Node,
 };
 
 // === TransitionMotion ===
@@ -65,7 +64,7 @@ export type DidLeave = (styleThatLeft: { key: string, data?: any }) => void;
 export type TransitionProps = {
   defaultStyles?: Array<TransitionPlainStyle>,
   styles: Array<TransitionStyle> | (previousInterpolatedStyles: ?Array<TransitionPlainStyle>) => Array<TransitionStyle>,
-  children: (interpolatedStyles: Array<TransitionPlainStyle>) => ReactElement,
+  children: (interpolatedStyles: Array<TransitionPlainStyle>) => React.Node,
   willEnter?: WillEnter,
   willLeave?: WillLeave,
   didLeave?: DidLeave
