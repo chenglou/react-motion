@@ -5,7 +5,8 @@ import stepper from './stepper';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
-import React, {PropTypes} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import type {ReactElement, PlainStyle, Style, Velocity, StaggeredProps} from './Types';
 
@@ -31,15 +32,20 @@ function shouldStopAnimationAll(
   return true;
 }
 
-const StaggeredMotion = React.createClass({
-  propTypes: {
+export default class StaggeredMotion extends React.Component<StaggeredProps, StaggeredMotionState> {
+  static propTypes = {
     // TOOD: warn against putting a config in here
     defaultStyles: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.number)),
     styles: PropTypes.func.isRequired,
     children: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialState(): StaggeredMotionState {
+  constructor(props: StaggeredProps) {
+    super(props);
+    this.state = this.defaultState();
+  }
+
+  defaultState(): StaggeredMotionState {
     const {defaultStyles, styles} = this.props;
     const currentStyles: Array<PlainStyle> = defaultStyles || styles().map(stripStyle);
     const currentVelocities = currentStyles.map(currentStyle => mapToZero(currentStyle));
@@ -49,21 +55,22 @@ const StaggeredMotion = React.createClass({
       lastIdealStyles: currentStyles,
       lastIdealVelocities: currentVelocities,
     };
-  },
+  }
 
-  animationID: (null: ?number),
-  prevTime: 0,
-  accumulatedTime: 0,
+  animationID: ?number = null;
+  prevTime = 0;
+  accumulatedTime = 0;
   // it's possible that currentStyle's value is stale: if props is immediately
   // changed from 0 to 400 to spring(0) again, the async currentStyle is still
   // at 0 (didn't have time to tick and interpolate even once). If we naively
   // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
   // In reality currentStyle should be 400
-  unreadPropStyles: (null: ?Array<Style>),
+  unreadPropStyles: ?Array<Style> = null;
+
   // after checking for unreadPropStyles != null, we manually go set the
   // non-interpolating values (those that are a number, without a spring
   // config)
-  clearUnreadPropStyle(unreadPropStyles: Array<Style>): void {
+  clearUnreadPropStyle = (unreadPropStyles: Array<Style>): void => {
     let {currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities} = this.state;
 
     let someDirty = false;
@@ -97,9 +104,9 @@ const StaggeredMotion = React.createClass({
     if (someDirty) {
       this.setState({currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities});
     }
-  },
+  }
 
-  startAnimationIfNecessary(): void {
+  startAnimationIfNecessary = (): void => {
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
     this.animationID = defaultRaf((timestamp) => {
@@ -107,10 +114,10 @@ const StaggeredMotion = React.createClass({
 
       // check if we need to animate in the first place
       if (shouldStopAnimationAll(
-        this.state.currentStyles,
-        destStyles,
-        this.state.currentVelocities,
-      )) {
+          this.state.currentStyles,
+          destStyles,
+          this.state.currentVelocities,
+        )) {
         // no need to cancel animationID here; shouldn't have any in flight
         this.animationID = null;
         this.accumulatedTime = 0;
@@ -216,12 +223,12 @@ const StaggeredMotion = React.createClass({
 
       this.startAnimationIfNecessary();
     });
-  },
+  }
 
   componentDidMount() {
     this.prevTime = defaultNow();
     this.startAnimationIfNecessary();
-  },
+  }
 
   componentWillReceiveProps(props: StaggeredProps) {
     if (this.unreadPropStyles != null) {
@@ -234,19 +241,17 @@ const StaggeredMotion = React.createClass({
       this.prevTime = defaultNow();
       this.startAnimationIfNecessary();
     }
-  },
+  }
 
   componentWillUnmount() {
     if (this.animationID != null) {
       defaultRaf.cancel(this.animationID);
       this.animationID = null;
     }
-  },
+  }
 
   render(): ReactElement {
     const renderedChildren = this.props.children(this.state.currentStyles);
     return renderedChildren && React.Children.only(renderedChildren);
-  },
-});
-
-export default StaggeredMotion;
+  }
+}

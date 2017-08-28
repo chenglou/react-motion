@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "react-motion": "^0.4.1"
+    "react-motion": "^0.5.1"
   }
 }

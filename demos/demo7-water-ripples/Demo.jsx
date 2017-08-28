@@ -2,12 +2,14 @@ import React from 'react';
 import {TransitionMotion, spring} from '../../src/react-motion';
 
 const leavingSpringConfig = {stiffness: 60, damping: 15};
-const Demo = React.createClass({
-  getInitialState() {
-    return {mouse: [], now: 't' + 0};
-  },
 
-  handleMouseMove({pageX, pageY}) {
+export default class Demo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {mouse: [], now: 't' + 0};
+  };
+
+  handleMouseMove = ({pageX, pageY}) => {
     // Make sure the state is queued and not batched.
     this.setState(() => {
       return {
@@ -15,20 +17,20 @@ const Demo = React.createClass({
         now: 't' + Date.now(),
       };
     });
-  },
+  };
 
-  handleTouchMove(e) {
+  handleTouchMove = (e) => {
     e.preventDefault();
     this.handleMouseMove(e.touches[0]);
-  },
+  };
 
-  willLeave(styleCell) {
+  willLeave = (styleCell) => {
     return {
       ...styleCell.style,
       opacity: spring(0, leavingSpringConfig),
       scale: spring(2, leavingSpringConfig),
     };
-  },
+  };
 
   render() {
     const {mouse: [mouseX, mouseY], now} = this.state;
@@ -63,7 +65,5 @@ const Demo = React.createClass({
         }
       </TransitionMotion>
     );
-  },
-});
-
-export default Demo;
+  };
+}

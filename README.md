@@ -83,7 +83,7 @@ Exports:
 
 [Here](https://github.com/chenglou/react-motion/blob/9cb90eca20ecf56e77feb816d101a4a9110c7d70/src/Types.js)'s the well-annotated public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
 
-P.S. using TypeScript? [Here](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/react-motion/index.d.ts) are the React-motion TypeScript definitions!
+P.S. using TypeScript? [Here](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-motion/index.d.ts) are the React-motion TypeScript definitions!
 
 ---
 
@@ -194,7 +194,9 @@ Fortunately, `TransitionMotion` has kept `c` around and still passes it into the
 This time, when mapping through the two remaining interpolated styles, you'll produce only two components. `c` is gone for real.
 
 ```jsx
-const Demo = React.createClass({
+import createReactClass from 'create-react-class';
+
+const Demo = createReactClass({
   getInitialState() {
     return {
       items: [{key: 'a', size: 10}, {key: 'b', size: 20}, {key: 'c', size: 30}],
