@@ -74,7 +74,7 @@ const Demo = React.createClass({
 
   handleTouchMove({ touches }) {
     this.handleMouseMove(touches[0]);
-  };
+  },
 
   handleStiffnessChange(event) {
     this.setState({ stiffness: event.target.value });
@@ -125,7 +125,7 @@ const Demo = React.createClass({
           };
     });
     return endValue;
-  };
+  },
 
   render() {
     const selectOptions = options.map(({ value, description }) =>
