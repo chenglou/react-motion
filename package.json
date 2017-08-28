@@ -20,7 +20,7 @@
     "eslint-plugin-import": "^1.15.0",
     "eslint-plugin-jsx-a11y": "^2.2.2",
     "eslint-plugin-react": "^6.3.0",
-    "flow-bin": "^0.32.0",
+    "flow-bin": "^0.53.1",
     "flow-copy-source": "^1.1.0",
     "inject-loader": "^2.0.1",
     "isparta-loader": "^0.2.0",

@@ -8,7 +8,13 @@ import shouldStopAnimation from './shouldStopAnimation';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import type {ReactElement, PlainStyle, Style, Velocity, MotionProps} from './Types';
+import type {
+  ReactElement,
+  PlainStyle,
+  Style,
+  Velocity,
+  MotionProps,
+} from './Types';
 
 const msPerFrame = 1000 / 60;
 
@@ -16,23 +22,19 @@ type MotionState = {
   currentStyle: PlainStyle,
   currentVelocity: Velocity,
   lastIdealStyle: PlainStyle,
-  lastIdealVelocity: Velocity,
+  lastIdealVelocity: Velocity
 };
 
-export default class Motion extends React.Component {
+export default class Motion extends React.Component<MotionProps, MotionState> {
   static propTypes = {
     // TOOD: warn against putting a config in here
     defaultStyle: PropTypes.objectOf(PropTypes.number),
-    style: PropTypes.objectOf(PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.object,
-    ])).isRequired,
+    style: PropTypes.objectOf(
+      PropTypes.oneOfType([PropTypes.number, PropTypes.object])
+    ).isRequired,
     children: PropTypes.func.isRequired,
     onRest: PropTypes.func,
   };
-
-  state: MotionState;
-  props: MotionProps;
 
   constructor(props: MotionProps) {
     super(props);
@@ -45,7 +47,7 @@ export default class Motion extends React.Component {
   accumulatedTime: number = 0;
 
   defaultState(): MotionState {
-    const {defaultStyle, style} = this.props;
+    const { defaultStyle, style } = this.props;
     const currentStyle = defaultStyle || stripStyle(style);
     const currentVelocity = mapToZero(currentStyle);
     return {
@@ -67,7 +69,12 @@ export default class Motion extends React.Component {
   // config)
   clearUnreadPropStyle = (destStyle: Style): void => {
     let dirty = false;
-    let {currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity} = this.state;
+    let {
+      currentStyle,
+      currentVelocity,
+      lastIdealStyle,
+      lastIdealVelocity,
+    } = this.state;
 
     for (let key in destStyle) {
       if (!Object.prototype.hasOwnProperty.call(destStyle, key)) {
@@ -78,10 +85,10 @@ export default class Motion extends React.Component {
       if (typeof styleValue === 'number') {
         if (!dirty) {
           dirty = true;
-          currentStyle = {...currentStyle};
-          currentVelocity = {...currentVelocity};
-          lastIdealStyle = {...lastIdealStyle};
-          lastIdealVelocity = {...lastIdealVelocity};
+          currentStyle = { ...currentStyle };
+          currentVelocity = { ...currentVelocity };
+          lastIdealStyle = { ...lastIdealStyle };
+          lastIdealVelocity = { ...lastIdealVelocity };
         }
 
         currentStyle[key] = styleValue;
@@ -92,21 +99,28 @@ export default class Motion extends React.Component {
     }
 
     if (dirty) {
-      this.setState({currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity});
+      this.setState({
+        currentStyle,
+        currentVelocity,
+        lastIdealStyle,
+        lastIdealVelocity,
+      });
     }
   };
 
   startAnimationIfNecessary = (): void => {
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
-    this.animationID = defaultRaf((timestamp) => {
+    this.animationID = defaultRaf(timestamp => {
       // check if we need to animate in the first place
       const propsStyle: Style = this.props.style;
-      if (shouldStopAnimation(
-        this.state.currentStyle,
-        propsStyle,
-        this.state.currentVelocity,
-      )) {
+      if (
+        shouldStopAnimation(
+          this.state.currentStyle,
+          propsStyle,
+          this.state.currentVelocity
+        )
+      ) {
         if (this.wasAnimating && this.props.onRest) {
           this.props.onRest();
         }
@@ -137,7 +151,9 @@ export default class Motion extends React.Component {
       }
 
       let currentFrameCompletion =
-        (this.accumulatedTime - Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
+        (this.accumulatedTime -
+          Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) /
+        msPerFrame;
       const framesToCatchUp = Math.floor(this.accumulatedTime / msPerFrame);
 
       let newLastIdealStyle: PlainStyle = {};
@@ -167,7 +183,7 @@ export default class Motion extends React.Component {
               styleValue.val,
               styleValue.stiffness,
               styleValue.damping,
-              styleValue.precision,
+              styleValue.precision
             );
           }
           const [nextIdealX, nextIdealV] = stepper(
@@ -177,7 +193,7 @@ export default class Motion extends React.Component {
             styleValue.val,
             styleValue.stiffness,
             styleValue.damping,
-            styleValue.precision,
+            styleValue.precision
           );
 
           newCurrentStyle[key] =
