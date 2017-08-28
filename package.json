@@ -69,7 +69,10 @@
     "transition",
     "ui"
   ],
-  "author": "chenglou",
+  "author": [
+    "nkbt",
+    "chenglou"
+  ],
   "license": "MIT",
   "dependencies": {
     "performance-now": "^0.2.0",

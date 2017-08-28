@@ -3,6 +3,23 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### 0.5.1 (August 28th 2017)
+- [F] New flow definitions, fixes children typing.
+
+### 0.5.0 (April 26th 2017)
+- [B] Dropping support for older React. Currently supported versions are `^0.14.9` || `^15.3.0`
+- [I] Upgraded all React components to use ES6 classes
+- [I] Replace React.PropTypes with prop-types package
+
+### 0.4.8 (April 17th 2017)
+
+- [I] Externalize stripStyle #452 by @bearcott
+- [I] Migrated deprecated React.PropTypes and React.createClass #446 by @Andarist
+- [F] Fix link to TypeScript types #443 by @pshrmn
+- [F] Refactored demo and fixed flow check errors #435 by @therewillbecode
+- [F] Fix broken link #430 by @codler
+- [F] Unmounted component setState fix #420 by @alleycat-at-git
+
 ### 0.4.7 (December 15th 2016)
 - [I] `didLeave` for `TransitionMotion`! Please check the README for more.
 
