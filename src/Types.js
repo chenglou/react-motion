@@ -4,8 +4,8 @@
 // Babel's sight.
 /* eslint-disable spaced-comment, no-undef */
 /*::
-import type React from 'react';
-export type ReactElement = React.Element<*>;
+import type {Element} from 'react';
+export type ReactElement = Element<*>;
 */
 
 // === basic reused types ===

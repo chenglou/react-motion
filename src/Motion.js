@@ -19,7 +19,7 @@ type MotionState = {
   lastIdealVelocity: Velocity,
 };
 
-export default class Motion extends React.Component {
+export default class Motion extends React.Component<MotionProps, MotionState> {
   static propTypes = {
     // TOOD: warn against putting a config in here
     defaultStyle: PropTypes.objectOf(PropTypes.number),
@@ -30,9 +30,6 @@ export default class Motion extends React.Component {
     children: PropTypes.func.isRequired,
     onRest: PropTypes.func,
   };
-
-  state: MotionState;
-  props: MotionProps;
 
   constructor(props: MotionProps) {
     super(props);

@@ -192,7 +192,7 @@ type TransitionMotionState = {
   mergedPropsStyles: Array<TransitionStyle>,
 };
 
-export default class TransitionMotion extends React.Component {
+export default class TransitionMotion extends React.Component<TransitionProps, TransitionMotionState> {
   static propTypes = {
     defaultStyles: PropTypes.arrayOf(PropTypes.shape({
       key: PropTypes.string.isRequired,
@@ -223,9 +223,6 @@ export default class TransitionMotion extends React.Component {
     willLeave: () => null,
     didLeave: () => {},
   };
-
-  state: TransitionMotionState;
-  props: TransitionProps;
 
   unmounting: boolean = false;
   animationID: ?number = null;
@@ -550,4 +547,3 @@ export default class TransitionMotion extends React.Component {
     return renderedChildren && React.Children.only(renderedChildren);
   }
 }
-

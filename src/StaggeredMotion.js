@@ -32,16 +32,13 @@ function shouldStopAnimationAll(
   return true;
 }
 
-export default class StaggeredMotion extends React.Component {
+export default class StaggeredMotion extends React.Component<StaggeredProps, StaggeredMotionState> {
   static propTypes = {
     // TOOD: warn against putting a config in here
     defaultStyles: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.number)),
     styles: PropTypes.func.isRequired,
     children: PropTypes.func.isRequired,
   };
-
-  state: StaggeredMotionState;
-  props: StaggeredProps;
 
   constructor(props: StaggeredProps) {
     super(props);
