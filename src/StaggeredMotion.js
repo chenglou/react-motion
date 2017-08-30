@@ -5,10 +5,10 @@ import stepper from './stepper';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
-import * as React from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
-import type {PlainStyle, Style, Velocity, StaggeredProps} from './Types';
+import type {ReactElement, PlainStyle, Style, Velocity, StaggeredProps} from './Types';
 
 const msPerFrame = 1000 / 60;
 
@@ -250,7 +250,7 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
     }
   }
 
-  render(): React.Node {
+  render(): ReactElement {
     const renderedChildren = this.props.children(this.state.currentStyles);
     return renderedChildren && React.Children.only(renderedChildren);
   }

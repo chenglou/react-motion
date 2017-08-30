@@ -6,10 +6,11 @@ import mergeDiff from './mergeDiff';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
-import * as React from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import type {
+  ReactElement,
   PlainStyle,
   Velocity,
   TransitionStyle,
@@ -536,7 +537,7 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
     }
   }
 
-  render(): React.Node {
+  render(): ReactElement {
     const hydratedStyles = rehydrateStyles(
       this.state.mergedPropsStyles,
       this.unreadPropStyles,
