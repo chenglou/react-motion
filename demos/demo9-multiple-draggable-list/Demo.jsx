@@ -11,12 +11,12 @@ function reinsert(arr, from, to) {
 }
 
 function reinsert2(arr, selection, to) {
-  const _arr = arr.slice()
-  const selected = _arr.filter(x => selection.has(x))
-  const nonSelected = _arr.filter(x => !selection.has(x))
-  const left = nonSelected.slice(0, to)
-  const right = nonSelected.filter(x => !left.includes(x))
-  return [].concat(left, selected, right)
+  const _arr = arr.slice();
+  const selected = _arr.filter(x => selection.has(x));
+  const nonSelected = _arr.filter(x => !selection.has(x));
+  const left = nonSelected.slice(0, to);
+  const right = nonSelected.filter(x => !left.includes(x));
+  return [].concat(left, selected, right);
 }
 
 function clamp(n, min, max) {
@@ -33,10 +33,9 @@ export default class Demo extends React.Component {
       topDeltaY: 0,
       mouseY: 0,
       isPressed: false,
-      moved: false,
+      moving: false,
       selection: new Set(),
-      order: [ 'A', 'B', 'C', 'D' ],
-      // order: range(itemsCount),
+      order: range(itemsCount).map(i => String.fromCharCode('A'.charCodeAt(0) + i)),
     };
   };
 
@@ -78,21 +77,21 @@ export default class Demo extends React.Component {
       const selectedValues = order.filter(x => selection.has(x))
       newOrder = reinsert2(order, selection, currentRow);
 
-      this.setState({mouseY: mouseY, order: newOrder, moved: true});
+      this.setState({mouseY: mouseY, order: newOrder, moving: true});
     }
   };
 
   handleMouseUp = () => {
-    const { moved } = this.state
-    if (moved) {
-      this.setState({isPressed: false, moved: false, topDeltaY: 0, selection: new Set()});
+    const { moving } = this.state;
+    if (moving) {
+      this.setState({isPressed: false, moving: false, topDeltaY: 0, selection: new Set()});
     } else {
-      this.setState({isPressed: false, moved: false, topDeltaY: 0});
+      this.setState({isPressed: false, moving: false, topDeltaY: 0});
     }
   };
 
   render() {
-    const {mouseY, isPressed, order, selection, moved} = this.state;
+    const {mouseY, isPressed, order, selection, moving} = this.state;
     const selectedValues = order.filter(x => selection.has(x))
 
     return (
@@ -103,7 +102,7 @@ export default class Demo extends React.Component {
             ? {
                 scale: spring(1.1, springConfig),
                 shadow: spring(16, springConfig),
-                y: moved ? (
+                y: moving ? (
                   spring(mouseY + selectedValues.indexOf(value) * 100, springConfig)
                 ) : (
                   spring(order.indexOf(value) * 100, springConfig)
