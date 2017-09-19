@@ -27,6 +27,7 @@ var entry = {
   'demo5-spring-parameters-chooser': './demos/demo5-spring-parameters-chooser/index.jsx',
   'demo7-water-ripples': './demos/demo7-water-ripples/index.jsx',
   'demo8-draggable-list': './demos/demo8-draggable-list/index.jsx',
+  'demo9-multiple-draggable-list': './demos/demo9-multiple-draggable-list/index.jsx',
 };
 
 if (process.env.NODE_ENV === 'development') {
