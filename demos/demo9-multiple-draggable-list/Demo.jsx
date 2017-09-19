@@ -10,30 +10,18 @@ function reinsert(arr, from, to) {
   return _arr;
 }
 
-function reinsert2(arr, selectedIndex, to) {
-  const _arr = arr.slice(0);
-  // const val = selectedIndex.map(x => _arr[x])
-  const target = _arr[to]
-  const selected = _arr.filter((x, i) => selectedIndex.has(x))
-  const noSelected = _arr.filter((x, i) => !selectedIndex.has(x))
-  console.log('new', target, selected, noSelected);
-  const index = noSelected.findIndex(x => x === target)
-  console.log('index', index);
-  console.log(
-    [ ...noSelected.slice(0, index + 1), ...selected, ...noSelected.slice(index + 1) ]
-  );
-  return [ ...noSelected.slice(0, index + 1), ...selected, ...noSelected.slice(index + 1) ]
-  // const val = _arr[from];
-  // _arr.splice(from, 1);
-  // _arr.splice(to, 0, val);
-  return _arr;
+function reinsert2(arr, selection, to) {
+  const _arr = arr.slice()
+  const selected = _arr.filter(x => selection.has(x))
+  const nonSelected = _arr.filter(x => !selection.has(x))
+  const left = nonSelected.slice(0, to)
+  const right = nonSelected.filter(x => !left.includes(x))
+  return [].concat(left, selected, right)
 }
 
 function clamp(n, min, max) {
   return Math.max(Math.min(n, max), min);
 }
-
-const NAMES = [ 'A', 'B', 'C', 'D' ]
 
 const springConfig = {stiffness: 300, damping: 50};
 const itemsCount = 4;
@@ -45,11 +33,10 @@ export default class Demo extends React.Component {
       topDeltaY: 0,
       mouseY: 0,
       isPressed: false,
-      originalPosOfLastPressed: 0,
-      selection: new Set(),
-      // order: range(itemsCount),
-      order: ['A', 'B', 'C', 'D'],
       moved: false,
+      selection: new Set(),
+      order: [ 'A', 'B', 'C', 'D' ],
+      // order: range(itemsCount),
     };
   };
 
@@ -69,116 +56,78 @@ export default class Demo extends React.Component {
     this.handleMouseMove(e.touches[0]);
   };
 
-  handleMouseDown = (pos, pressY, {pageY}) => {
-    const { selection, order } = this.state
-    const val = order[pos]
-    if (selection.has(val)) {
-      selection.delete(val)
-    } else {
-      selection.add(val)
-    }
+  handleMouseDown = (value, pressY, {pageY}) => {
+    const selection = new Set(this.state.selection)
+    selection.add(value)
     this.setState({
       topDeltaY: pageY - pressY,
       mouseY: pressY,
       isPressed: true,
-      originalPosOfLastPressed: pos,
-      selection
+      selection,
     });
   };
 
   handleMouseMove = ({pageY}) => {
-    const {isPressed, topDeltaY, order, originalPosOfLastPressed, selection} = this.state;
+    const {isPressed, topDeltaY, mouseY, order, selection} = this.state;
 
     if (isPressed) {
       const mouseY = pageY - topDeltaY;
       const currentRow = clamp(Math.round(mouseY / 100), 0, itemsCount - 1);
       let newOrder = order;
 
-      // if (currentRow !== order.indexOf(originalPosOfLastPressed)) {
-      //   newOrder = reinsert(order, order.indexOf(originalPosOfLastPressed), currentRow);
-      // }
-      if (!selection.has(order[currentRow])) {
-        console.log(
-          'ROW',
-          currentRow,
-        );
-        newOrder = reinsert2(order, selection, currentRow);
-      }
+      const selectedValues = order.filter(x => selection.has(x))
+      newOrder = reinsert2(order, selection, currentRow);
 
       this.setState({mouseY: mouseY, order: newOrder, moved: true});
     }
   };
 
   handleMouseUp = () => {
-    const {moved} = this.state
-    if (this.state.moved) {
-      const selection = new Set()
-      this.setState({isPressed: false, topDeltaY: 0, selection, moved: false});
+    const { moved } = this.state
+    if (moved) {
+      this.setState({isPressed: false, moved: false, topDeltaY: 0, selection: new Set()});
     } else {
-      this.setState({isPressed: false, topDeltaY: 0});
+      this.setState({isPressed: false, moved: false, topDeltaY: 0});
     }
   };
 
   render() {
-    const {mouseY, isPressed, originalPosOfLastPressed, order, selection, moved} = this.state;
-    // const selected = [...selection.values()].sort()
-    // console.log([...selected], selected.indexOf(1))
-    const selectedOrder = order.filter(x => selection.has(x))
-    console.log(selectedOrder)
-    // console.log(selectedOrder);
-    // console.log([...selection.values()])
+    const {mouseY, isPressed, order, selection, moved} = this.state;
+    const selectedValues = order.filter(x => selection.has(x))
 
     return (
       <div className="demo9">
-        {range(itemsCount).map(i => {
-          // const style = originalPosOfLastPressed === i && isPressed
-          let style = {}
-          if (selection.has(order[i])) {
-            if (moved) {
-              style = {
+        {range(itemsCount).map(index => {
+          const value = order[index]
+          const style = selection.has(value)
+            ? {
                 scale: spring(1.1, springConfig),
                 shadow: spring(16, springConfig),
-                y: spring(mouseY + selectedOrder.indexOf(i) * 100, springConfig),
+                y: moved ? (
+                  spring(mouseY + selectedValues.indexOf(value) * 100, springConfig)
+                ) : (
+                  spring(order.indexOf(value) * 100, springConfig)
+                )
               }
-            } else {
-              style = {
-                scale: spring(1.1, springConfig),
-                shadow: spring(16, springConfig),
-                y: spring(order.indexOf(i) * 100, springConfig),
-              }
-            }
-          } else {
-            style = {
-              scale: spring(1, springConfig),
-              shadow: spring(1, springConfig),
-              y: spring(order.indexOf(i) * 100, springConfig),
-            }
-          }
-          // const style = selection.has(i) && isPressed
-          //   ? {
-          //       scale: spring(1.1, springConfig),
-          //       shadow: spring(16, springConfig),
-          //       y: mouseY,
-          //     }
-          //   : {
-          //       scale: spring(1, springConfig),
-          //       shadow: spring(1, springConfig),
-          //       y: spring(order.indexOf(i) * 100, springConfig),
-          //     };
+            : {
+                scale: spring(1, springConfig),
+                shadow: spring(1, springConfig),
+                y: spring(order.indexOf(value) * 100, springConfig),
+              };
           return (
-            <Motion style={style} key={i}>
+            <Motion style={style} key={value}>
               {({scale, shadow, y}) =>
                 <div
-                  onMouseDown={this.handleMouseDown.bind(null, i, y)}
-                  onTouchStart={this.handleTouchStart.bind(null, i, y)}
+                  onMouseDown={this.handleMouseDown.bind(null, value, y)}
+                  onTouchStart={this.handleTouchStart.bind(null, value, y)}
                   className="demo9-item"
                   style={{
                     boxShadow: `rgba(0, 0, 0, 0.2) 0px ${shadow}px ${2 * shadow}px 0px`,
                     transform: `translate3d(0, ${y}px, 0) scale(${scale})`,
                     WebkitTransform: `translate3d(0, ${y}px, 0) scale(${scale})`,
-                    zIndex: i === originalPosOfLastPressed ? 99 : i,
+                    zIndex: selection.has(value) ? 99 : index,
                   }}>
-                  {order.indexOf(i) + 1} {[i]}
+                  {order.indexOf(value) + 1} {value}
                 </div>
               }
             </Motion>
