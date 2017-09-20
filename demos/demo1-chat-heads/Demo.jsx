@@ -91,25 +91,27 @@ class Demo extends PureComponent {
     this.setState({ dampingBehaviour: event.target.value });
   }
 
+ 
+
   getStyles(prevStyles) {
     // `prevStyles` is the interpolated value of the last tick
-    let stiffness = this.state.stiffness;
-    let damping = this.state.damping;
-    let precision = this.state.precision;
+    let { stiffness, stiffnessBehaviour, damping, dampingBehaviour, precision } = this.state
+
 
     const endValue = prevStyles.map((_, i) => {
-      if (this.state.stiffnessBehaviour === "linear") {
-        stiffness = this.state.stiffness * i;
+      if (stiffnessBehaviour === "linear") {
+        stiffness = stiffness * i;
       }
-      if (this.state.stiffnessBehaviour === "inverseLinear") {
-        stiffness = this.state.stiffness / i;
+      if (stiffnessBehaviour === "inverseLinear") {
+        stiffness = stiffness / i;
       }
-      if (this.state.dampingBehaviour === "linear") {
-        damping = this.state.damping * i;
+      if (dampingBehaviour === "linear") {
+        damping = damping * i;
       }
-      if (this.state.dampingBehaviour === "inverseLinear") {
-        damping = this.state.damping / i;
+      if (dampingBehaviour === "inverseLinear") {
+        damping = damping / i;
       }
+
       return i === 0
         ? this.state
         : {
@@ -117,6 +119,7 @@ class Demo extends PureComponent {
             y: spring(prevStyles[i - 1].y, { stiffness, damping, precision })
           };
     });
+
     return endValue;
   }
 
