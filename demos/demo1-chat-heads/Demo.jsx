@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import {
   StaggeredMotion,
   spring,
@@ -23,9 +23,10 @@ const options = [
   }
 ];
 
-const Demo = React.createClass({
-  getInitialState() {
-    return {
+class Demo extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
       x: 250,
       y: 300,
       stiffness: 100,
@@ -35,13 +36,22 @@ const Demo = React.createClass({
       dampingBehaviour: "constant",
       headerHeight: 0
     };
-  },
+    
+    this.getStyles = this.getStyles.bind(this)
+    this.handleTouchMove = this.handleTouchMove.bind(this)
+    this.handleMouseMove = this.handleMouseMove.bind(this)
+    this.handleStiffnessChange = this.handleStiffnessChange.bind(this)
+    this.handlePrecisionChange = this.handlePrecisionChange.bind(this)
+    this.handleDampingChange = this.handleDampingChange.bind(this)
+    this.handleStiffnessParamChange = this.handleStiffnessParamChange.bind(this)
+    this.handleDampingParamChange = this.handleDampingParamChange.bind(this)
+  }
 
   componentDidMount() {
     window.addEventListener("mousemove", this.handleMouseMove);
     window.addEventListener("touchmove", this.handleTouchMove);
     this.setState({ headerHeight: this.divRef.clientHeight });
-  },
+  }
 
   shouldComponentUpdate(nextProps, nextState) {
     if (this.state.x !== nextState.x) {
@@ -61,42 +71,43 @@ const Demo = React.createClass({
     }
 
     return false;
-  },
+  }
 
   handleMouseMove({ pageX: x, pageY: y }) {
     const height = this.state.headerHeight;
     const chatHeadRadiusPx = 20;
+
     // chat heads avoid header area
     if (y > height * 3.3 + chatHeadRadiusPx) {
       this.setState({ x, y: y - height * 3.3 });
     }
-  },
+  }
 
   handleTouchMove({ touches }) {
     this.handleMouseMove(touches[0]);
-  },
+  }
 
   handleStiffnessChange(event) {
     this.setState({ stiffness: event.target.value });
-  },
+  }
 
   handlePrecisionChange(event) {
     if (!isNaN(event.target.value)) {
       this.setState({ precision: event.target.value });
     }
-  },
+  }
 
   handleDampingChange(event) {
     this.setState({ damping: event.target.value });
-  },
+  }
 
   handleStiffnessParamChange(event) {
     this.setState({ stiffnessBehaviour: event.target.value });
-  },
+  }
 
   handleDampingParamChange(event) {
     this.setState({ dampingBehaviour: event.target.value });
-  },
+  }
 
   getStyles(prevStyles) {
     // `prevStyles` is the interpolated value of the last tick
@@ -125,7 +136,7 @@ const Demo = React.createClass({
           };
     });
     return endValue;
-  },
+  }
 
   render() {
     const selectOptions = options.map(({ value, description }) =>
@@ -217,6 +228,6 @@ const Demo = React.createClass({
       </div>
     );
   }
-});
+};
 
 export default Demo;
