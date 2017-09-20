@@ -8,20 +8,10 @@ import {
 import range from "lodash.range";
 import Slider from "./Slider";
 
-const options = [
-  {
-    description: "Constant",
-    value: "constant"
-  },
-  {
-    description: "Linear",
-    value: "linear"
-  },
-  {
-    description: "Inverse Linear",
-    value: "invertedLinear"
-  }
-];
+const makeOptions = options => options.map(option => ({ description: option, value: option.replace(' ', '_').toLowerCase() }))
+
+const options = makeOptions([ 'Constant', 'Linear', 'InverseLinear' ]);
+
 
 class Demo extends PureComponent {
   constructor(props){
@@ -52,8 +42,6 @@ class Demo extends PureComponent {
     window.addEventListener("touchmove", this.handleTouchMove);
     this.setState({ headerHeight: this.divRef.clientHeight });
   }
-
-
 
   handleMouseMove({ pageX: x, pageY: y }) {
     const height = this.state.headerHeight;
