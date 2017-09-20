@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import {
   StaggeredMotion,
   spring,
@@ -23,7 +23,7 @@ const options = [
   }
 ];
 
-class Demo extends Component {
+class Demo extends PureComponent {
   constructor(props){
     super(props)
     this.state = {
@@ -36,7 +36,7 @@ class Demo extends Component {
       dampingBehaviour: "constant",
       headerHeight: 0
     };
-    
+
     this.getStyles = this.getStyles.bind(this)
     this.handleTouchMove = this.handleTouchMove.bind(this)
     this.handleMouseMove = this.handleMouseMove.bind(this)
@@ -53,25 +53,7 @@ class Demo extends Component {
     this.setState({ headerHeight: this.divRef.clientHeight });
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.x !== nextState.x) {
-      return true;
-    }
-    if (this.props.y !== nextProps.y) {
-      return true;
-    }
-    if (this.state.stiffness !== nextState.stiffness) {
-      return true;
-    }
-    if (this.state.damping !== nextState.damping) {
-      return true;
-    }
-    if (this.state.precision !== nextState.damping) {
-      return true;
-    }
 
-    return false;
-  }
 
   handleMouseMove({ pageX: x, pageY: y }) {
     const height = this.state.headerHeight;
