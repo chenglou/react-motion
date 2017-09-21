@@ -26,15 +26,6 @@ class Demo extends PureComponent {
       dampingBehaviour: "constant",
       headerHeight: 0
     };
-
-    this.getStyles = this.getStyles.bind(this)
-    this.handleTouchMove = this.handleTouchMove.bind(this)
-    this.handleMouseMove = this.handleMouseMove.bind(this)
-    this.handleStiffnessChange = this.handleStiffnessChange.bind(this)
-    this.handlePrecisionChange = this.handlePrecisionChange.bind(this)
-    this.handleDampingChange = this.handleDampingChange.bind(this)
-    this.handleStiffnessParamChange = this.handleStiffnessParamChange.bind(this)
-    this.handleDampingParamChange = this.handleDampingParamChange.bind(this)
   }
 
   componentDidMount() {
@@ -43,7 +34,7 @@ class Demo extends PureComponent {
     this.setState({ headerHeight: this.divRef.clientHeight });
   }
 
-  handleMouseMove({ pageX: x, pageY: y }) {
+  handleMouseMove = ({ pageX: x, pageY: y }) => {
     const height = this.state.headerHeight;
     const chatHeadRadiusPx = 20;
 
@@ -53,51 +44,48 @@ class Demo extends PureComponent {
     }
   }
 
-  handleTouchMove({ touches }) {
+  handleTouchMove = ({ touches }) => {
     this.handleMouseMove(touches[0]);
   }
 
-  handleStiffnessChange(event) {
-    this.setState({ stiffness: event.target.value });
+  handleStiffnessChange = ({ target }) => {
+    this.setState({ stiffness: target.value });
   }
 
-  handlePrecisionChange(event) {
-    if (!isNaN(event.target.value)) {
-      this.setState({ precision: event.target.value });
+  handlePrecisionChange = ({ target }) => {
+    if (!isNaN(target.value)) {
+      this.setState({ precision: target.value });
     }
   }
 
-  handleDampingChange(event) {
-    this.setState({ damping: event.target.value });
+  handleDampingChange = ({ target }) => {
+    this.setState({ damping: target.value });
   }
 
-  handleStiffnessParamChange(event) {
-    this.setState({ stiffnessBehaviour: event.target.value });
+  handleStiffnessParamChange = ({ target }) => {
+    this.setState({ stiffnessBehaviour: target.value });
   }
 
-  handleDampingParamChange(event) {
-    this.setState({ dampingBehaviour: event.target.value });
+  handleDampingParamChange = ({ target }) => {
+    this.setState({ dampingBehaviour: target.value });
   }
 
- 
-
-  getStyles(prevStyles) {
+  getStyles = (prevStyles) => {
     // `prevStyles` is the interpolated value of the last tick
-    let { stiffness, stiffnessBehaviour, damping, dampingBehaviour, precision } = this.state
-
+    let { stiffness, damping, precision } = this.state;
 
     const endValue = prevStyles.map((_, i) => {
-      if (stiffnessBehaviour === "linear") {
-        stiffness = stiffness * i;
+      if (this.state.stiffnessBehaviour === "linear") {
+        stiffness = this.state.stiffness * i;
       }
-      if (stiffnessBehaviour === "inverseLinear") {
-        stiffness = stiffness / i;
+      if (this.state.stiffnessBehaviour === "inverseLinear") {
+        stiffness = this.state.stiffness / i;
       }
-      if (dampingBehaviour === "linear") {
-        damping = damping * i;
+      if (this.state.dampingBehaviour === "linear") {
+        damping = this.state.damping * i;
       }
-      if (dampingBehaviour === "inverseLinear") {
-        damping = damping / i;
+      if (this.state.dampingBehaviour === "inverseLinear") {
+        damping = this.state.damping / i;
       }
 
       return i === 0
