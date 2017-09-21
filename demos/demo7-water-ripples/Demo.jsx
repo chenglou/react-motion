@@ -1,54 +1,66 @@
-import React from 'react';
-import {TransitionMotion, spring} from '../../src/react-motion';
+import React, { PureComponent } from "react";
+import { TransitionMotion, spring } from "../../src/react-motion";
 
-const leavingSpringConfig = {stiffness: 60, damping: 15};
-const Demo = React.createClass({
-  getInitialState() {
-    return {mouse: [], now: 't' + 0};
-  },
+const leavingSpringConfig = { stiffness: 60, damping: 15 };
 
-  handleMouseMove({pageX, pageY}) {
+class Demo extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      mouse: [],
+      now: "t" + 0
+    };
+  }
+
+  handleMouseMove = ({ pageX, pageY }) => {
     // Make sure the state is queued and not batched.
-    this.setState(() => {
-      return {
-        mouse: [pageX - 25, pageY - 25],
-        now: 't' + Date.now(),
-      };
+    this.setState({
+      mouse: [pageX - 25, pageY - 25],
+      now: "t" + Date.now()
     });
-  },
+  };
 
-  handleTouchMove(e) {
+  handleTouchMove = e => {
     e.preventDefault();
     this.handleMouseMove(e.touches[0]);
-  },
+  };
 
-  willLeave(styleCell) {
-    return {
-      ...styleCell.style,
-      opacity: spring(0, leavingSpringConfig),
-      scale: spring(2, leavingSpringConfig),
-    };
-  },
+  willLeave = styleCell => ({
+    ...styleCell.style,
+    opacity: spring(0, leavingSpringConfig),
+    scale: spring(2, leavingSpringConfig)
+  });
+
+  getStyles = () => {
+    const { mouse: [mouseX, mouseY], now } = this.state;
+    
+    return mouseX == null
+      ? []
+      : [
+          {
+            key: now,
+            style: {
+              opacity: spring(1),
+              scale: spring(0),
+              x: spring(mouseX),
+              y: spring(mouseY)
+            }
+          }
+        ];
+  };
 
   render() {
-    const {mouse: [mouseX, mouseY], now} = this.state;
-    const styles = mouseX == null ? [] : [{
-      key: now,
-      style: {
-        opacity: spring(1),
-        scale: spring(0),
-        x: spring(mouseX),
-        y: spring(mouseY),
-      }
-    }];
+    const styles = this.getStyles();
+    
     return (
       <TransitionMotion willLeave={this.willLeave} styles={styles}>
-        {circles =>
+        {circles => (
           <div
             onMouseMove={this.handleMouseMove}
             onTouchMove={this.handleTouchMove}
-            className="demo7">
-            {circles.map(({key, style: {opacity, scale, x, y}}) =>
+            className="demo7"
+          >
+            {circles.map(({ key, style: { opacity, scale, x, y } }) => (
               <div
                 key={key}
                 className="demo7-ball"
@@ -56,14 +68,15 @@ const Demo = React.createClass({
                   opacity: opacity,
                   scale: scale,
                   transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
-                  WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
-                }} />
-            )}
+                  WebkitTransform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`
+                }}
+              />
+            ))}
           </div>
-        }
+        )}
       </TransitionMotion>
     );
-  },
-});
+  }
+}
 
 export default Demo;
