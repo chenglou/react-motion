@@ -110,6 +110,7 @@ class Demo extends PureComponent {
 
     const stiffnessSelect = (
       <div className="dropdown-container">
+        <label>Stiffness Behaviour</label>
         <select
           value={this.state.stiffnessBehaviour}
           onChange={this.handleStiffnessParamChange}
@@ -121,6 +122,7 @@ class Demo extends PureComponent {
 
     const dampingSelect = (
       <div className="dropdown-container">
+        <label>Damping Behaviour</label>
         <select
           value={this.state.dampingBehaviour}
           onChange={this.handleDampingParamChange}
@@ -147,7 +149,7 @@ class Demo extends PureComponent {
         <div className="slider-container">
           <Slider
             value={this.state.stiffness}
-            label={"Stiffness"}
+            label="Stiffness"
             min={1}
             max={350}
             onChange={this.handleStiffnessChange}
@@ -159,7 +161,7 @@ class Demo extends PureComponent {
         >
           <Slider
             value={this.state.damping}
-            label={"Damping"}
+            label="Damping"
             min={0}
             max={100}
             onChange={this.handleDampingChange}
