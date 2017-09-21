@@ -38,12 +38,13 @@ class Demo extends PureComponent {
   }
 
   handleMouseMove = ({ pageX: x, pageY: y }) => {
-    const height = this.state.headerHeight;
+    const { headerHeight } = this.state;
     const chatHeadRadiusPx = 20;
 
-    // chat heads avoid header area
-    if (y > height * 3.3 + chatHeadRadiusPx) {
-      this.setState({ x, y: y - height * 3.3 });
+    if (y > headerHeight + chatHeadRadiusPx) {
+      this.setState({ x, y: y - headerHeight });
+    } else {
+      this.setState({ x, y: chatHeadRadiusPx });
     }
   };
 
@@ -75,7 +76,7 @@ class Demo extends PureComponent {
 
   getStyles = prevStyles => {
     // `prevStyles` is the interpolated value of the last tick
-    let { stiffness, damping, precision } = this.state;
+    let { stiffness, damping, precision, headerHeight } = this.state;
 
     const endValue = prevStyles.map((_, i) => {
       if (this.state.stiffnessBehaviour === "linear") {
@@ -141,21 +142,8 @@ class Demo extends PureComponent {
       </div>
     );
 
-    return (
-      <div className="header" ref={element => (this.divRef = element)}>
-        <div className="parent-container">
-          {stiffnessSelect}
-          {dampingSelect}
-          {precisionInput}
-        </div>
-      </div>
-    );
-  };
-
-  render() {
-    return (
+    const slider = (
       <div>
-        {this.getHeader()}
         <div className="slider-container">
           <Slider
             value={this.state.stiffness}
@@ -177,6 +165,25 @@ class Demo extends PureComponent {
             onChange={this.handleDampingChange}
           />
         </div>
+      </div>
+    );
+
+    return (
+      <div className="header" ref={element => (this.divRef = element)}>
+        <div className="parent-container">
+          {stiffnessSelect}
+          {dampingSelect}
+          {precisionInput}
+        </div>
+        {slider}
+      </div>
+    );
+  };
+
+  render() {
+    return (
+      <div>
+        {this.getHeader()}
         <StaggeredMotion
           defaultStyles={range(6).map(() => ({ x: 0, y: 0 }))}
           styles={this.getStyles}
