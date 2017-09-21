@@ -133,9 +133,10 @@ class Demo extends PureComponent {
     );
 
     const precisionInput = (
-      <div className="input-container">
+      <div>
         <label>Precision</label>
         <input
+          className="precision-input"
           type="text"
           value={this.state.precision}
           size={4}

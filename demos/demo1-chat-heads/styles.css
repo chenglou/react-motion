@@ -9,27 +9,27 @@
 
 /* Chat heads */
 .ball-0 {
-  background-image: url(0.jpg);
+  background-image: url("0.jpg");
 }
 
 .ball-1 {
-  background-image: url(1.jpg);
+  background-image: url("1.jpg");
 }
 
 .ball-2 {
-  background-image: url(2.jpg);
+  background-image: url("2.jpg");
 }
 
 .ball-3 {
-  background-image: url(3.jpg);
+  background-image: url("3.jpg");
 }
 
 .ball-4 {
-  background-image: url(4.jpg);
+  background-image: url("4.jpg");
 }
 
 .ball-5 {
-  background-image: url(5.jpg);
+  background-image: url("5.jpg");
 }
 
 .demo1 {
@@ -103,16 +103,15 @@ input[type="range"]::-webkit-slider-thumb:active {
   box-shadow: 0px 0px 1px #606060;
 }
 
-input[type='range'],
-input[type='range']:active,
-input[type='range']::-moz-focus-inner,
-input[type='range']:-moz-focusring
-input[type='range']:-webkit-focusring {
+input[type="range"],
+input[type="range"]:active,
+input[type="range"]::-moz-focus-inner,
+input[type="range"]:-moz-focusring input[type="range"]:-webkit-focusring {
   border: 0;
   outline: none;
 }
 
-input[type=range]:focus {
+input[type="range"]:focus {
   outline: none;
 }
 
@@ -176,7 +175,7 @@ select {
   width: 100%;
   height: 5%;
   padding-top: 1%;
-  font-family: 'Roboto-Medium';
+  font-family: "Roboto-Medium";
   font-size: 1rem;
   display: block;
   background: #fff;
@@ -186,6 +185,12 @@ select {
   width: 125px;
   margin-left: 0.3rem;
   margin-right: 0.3rem;
+}
+
+.precision_input {
+  position: relative;
+  top: 80%;
+  left: -50%;
 }
 
 /* Style Select Field */
