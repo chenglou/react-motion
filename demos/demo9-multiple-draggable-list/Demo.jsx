@@ -96,8 +96,7 @@ export default class Demo extends React.Component {
 
     return (
       <div className="demo9">
-        {range(itemsCount).map(index => {
-          const value = order[index]
+        {order.map((value, index) => {
           const style = selection.has(value)
             ? {
                 scale: spring(1.1, springConfig),
