@@ -8,14 +8,17 @@ import {
 import range from "lodash.range";
 import Slider from "./Slider";
 
-const makeOptions = options => options.map(option => ({ description: option, value: option.replace(' ', '_').toLowerCase() }))
+const makeOptions = options =>
+  options.map(option => ({
+    description: option,
+    value: option.replace(" ", "_").toLowerCase()
+  }));
 
-const options = makeOptions([ 'Constant', 'Linear', 'InverseLinear' ]);
-
+const options = makeOptions(["Constant", "Linear", "InverseLinear"]);
 
 class Demo extends PureComponent {
-  constructor(props){
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
       x: 250,
       y: 300,
@@ -42,35 +45,35 @@ class Demo extends PureComponent {
     if (y > height * 3.3 + chatHeadRadiusPx) {
       this.setState({ x, y: y - height * 3.3 });
     }
-  }
+  };
 
   handleTouchMove = ({ touches }) => {
     this.handleMouseMove(touches[0]);
-  }
+  };
 
   handleStiffnessChange = ({ target }) => {
     this.setState({ stiffness: target.value });
-  }
+  };
 
   handlePrecisionChange = ({ target }) => {
     if (!isNaN(target.value)) {
       this.setState({ precision: target.value });
     }
-  }
+  };
 
   handleDampingChange = ({ target }) => {
     this.setState({ damping: target.value });
-  }
+  };
 
   handleStiffnessParamChange = ({ target }) => {
     this.setState({ stiffnessBehaviour: target.value });
-  }
+  };
 
   handleDampingParamChange = ({ target }) => {
     this.setState({ dampingBehaviour: target.value });
-  }
+  };
 
-  getStyles = (prevStyles) => {
+  getStyles = prevStyles => {
     // `prevStyles` is the interpolated value of the last tick
     let { stiffness, damping, precision } = this.state;
 
@@ -97,14 +100,12 @@ class Demo extends PureComponent {
     });
 
     return endValue;
-  }
+  };
 
-  render() {
-    const selectOptions = options.map(({ value, description }) =>
-      <option value={value}>
-        {description}
-      </option>
-    );
+  getHeader = () => {
+    const selectOptions = options.map(({ value, description }) => (
+      <option value={value}>{description}</option>
+    ));
 
     const stiffnessSelect = (
       <div className="dropdown-container">
@@ -141,14 +142,20 @@ class Demo extends PureComponent {
     );
 
     return (
-      <div>
-        <div className="header" ref={element => (this.divRef = element)}>
-          <div className="parent-container">
-            {stiffnessSelect}
-            {dampingSelect}
-            {precisionInput}
-          </div>
+      <div className="header" ref={element => (this.divRef = element)}>
+        <div className="parent-container">
+          {stiffnessSelect}
+          {dampingSelect}
+          {precisionInput}
         </div>
+      </div>
+    );
+  };
+
+  render() {
+    return (
+      <div>
+        {this.getHeader()}
         <div className="slider-container">
           <Slider
             value={this.state.stiffness}
@@ -158,7 +165,10 @@ class Demo extends PureComponent {
             onChange={this.handleStiffnessChange}
           />
         </div>
-        <div className="slider-container" style={{marginBottom:'2em', marginTop: '0'}}>
+        <div
+          className="slider-container"
+          style={{ marginBottom: "2em", marginTop: "0" }}
+        >
           <Slider
             value={this.state.damping}
             label={"Damping"}
@@ -171,9 +181,9 @@ class Demo extends PureComponent {
           defaultStyles={range(6).map(() => ({ x: 0, y: 0 }))}
           styles={this.getStyles}
         >
-          {balls =>
+          {balls => (
             <div className="demo1">
-              {balls.map(({ x, y }, i) =>
+              {balls.map(({ x, y }, i) => (
                 <div
                   key={i}
                   className={`demo1-ball ball-${i}`}
@@ -183,12 +193,13 @@ class Demo extends PureComponent {
                     zIndex: balls.length - i
                   }}
                 />
-              )}
-            </div>}
+              ))}
+            </div>
+          )}
         </StaggeredMotion>
       </div>
     );
   }
-};
+}
 
 export default Demo;
