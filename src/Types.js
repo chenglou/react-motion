@@ -5,7 +5,9 @@
 /* eslint-disable spaced-comment, no-undef */
 /*::
 import type {Element} from 'react';
-export type ReactElement = Element<*>;
+// This is the typing of a single node (not an array)
+// https://flow.org/en/docs/react/types/#toc-react-node
+export type ReactElement = string | boolean | number | void | null | Element<*>;
 */
 
 // === basic reused types ===
