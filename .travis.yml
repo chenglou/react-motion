@@ -1,12 +1,9 @@
 language: node_js
 
 node_js:
-  - 8
+  - 6
 
-install:
-  - yarn install --pure-lockfile
-
-script:
- - yarn lint
- - yarn flow_check
- - yarn test:travis
+script: 
+ - npm run -s lint 
+ - npm run -s flow_check 
+ - npm run -s test:travis
