@@ -75,7 +75,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "performance-now": "^0.2.0",
+    "performance-now": "^2.1.0",
     "prop-types": "^15.5.8",
     "raf": "^3.1.0"
   }
