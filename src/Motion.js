@@ -37,6 +37,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   }
 
   wasAnimating: boolean = false;
+  unmounting: boolean = false;
   animationID: ?number = null;
   prevTime: number = 0;
   accumulatedTime: number = 0;
@@ -94,9 +95,17 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   };
 
   startAnimationIfNecessary = (): void => {
+    if (this.unmounting) {
+      return;
+    }
+
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
     this.animationID = defaultRaf((timestamp) => {
+      if (this.unmounting) {
+        return;
+      }
+
       // check if we need to animate in the first place
       const propsStyle: Style = this.props.style;
       if (shouldStopAnimation(
@@ -224,6 +233,8 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   }
 
   componentWillUnmount() {
+    this.unmounting = true;
+
     if (this.animationID != null) {
       defaultRaf.cancel(this.animationID);
       this.animationID = null;
