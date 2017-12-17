@@ -2,81 +2,68 @@
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 
-// Temporary fix for css-loader/post-css
-// 'Module build failed: ReferenceError: Promise is not defined'
-require('babel/polyfill');
+const fs = require('fs');
+const path = require('path');
+const webpack = require('webpack');
 
-var webpack = require('webpack');
-var path = require('path');
+const dirs = p => fs.readdirSync(p).filter(f => fs.statSync(path.join(p, f)).isDirectory())
+const mergeAll = objects => Object.assign({}, ...objects)
 
-var loaders = ['babel'];
-var port = process.env.PORT || 3000;
+const { NODE_ENV, PORT } = process.env;
+const DEMOS_DIR = 'demos';
 
-var devtool;
-var plugins = [
-  new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-  })
-];
-var entry = {
-  'demo0-simple-transition': './demos/demo0-simple-transition/index.jsx',
-  'demo1-chat-heads': './demos/demo1-chat-heads/index.jsx',
-  'demo2-draggable-balls': './demos/demo2-draggable-balls/index.jsx',
-  'demo3-todomvc-list-transition': './demos/demo3-todomvc-list-transition/index.jsx',
-  'demo4-photo-gallery': './demos/demo4-photo-gallery/index.jsx',
-  'demo5-spring-parameters-chooser': './demos/demo5-spring-parameters-chooser/index.jsx',
-  'demo7-water-ripples': './demos/demo7-water-ripples/index.jsx',
-  'demo8-draggable-list': './demos/demo8-draggable-list/index.jsx',
-};
+const port = PORT || 3000;
 
-if (process.env.NODE_ENV === 'development') {
-  devtool ='eval-source-map';
-  loaders = ['react-hot'].concat(loaders);
-  plugins = plugins.concat([
-    new webpack.HotModuleReplacementPlugin()
-  ]);
-  entry = Object.keys(entry).reduce(function (result, key) {
-    result[key] = [
-      'webpack-dev-server/client?http://0.0.0.0:' + port,
-      'webpack/hot/only-dev-server',
-      entry[key]
-    ];
-    return result;
-  }, {});
-} else {
-  devtool ='source-map';
-  plugins = plugins.concat([
-    new webpack.optimize.OccurenceOrderPlugin()
-  ]);
+const jsLoaders = ['babel-loader']
+
+if (NODE_ENV === 'development') {
+  jsLoaders.push('react-hot-loader/webpack');
 }
 
+const plugins = [
+  new webpack.DefinePlugin({
+    'process.env.NODE_ENV': JSON.stringify(NODE_ENV)
+  })
+];
+
+if (NODE_ENV !== 'development') {
+  plugins.push(new webpack.optimize.ModuleConcatenationPlugin())
+}
+
+const entries = dirs(DEMOS_DIR).map(entryName => {
+  const path = `./${DEMOS_DIR}/${entryName}/index.jsx`;
+
+  if (NODE_ENV !== 'development') {
+    return { [entryName]: path };
+  }
+
+  return {
+    [entryName]: [
+      'react-hot-loader/patch',
+      'webpack-dev-server/client?http://0.0.0.0:' + port,
+      'webpack/hot/only-dev-server',
+      path,
+    ],
+  };
+})
+
 module.exports = {
-  devtool: devtool,
-  entry: entry,
+  devtool: NODE_ENV === 'development' ? 'eval-source-map' : 'source-map',
+  entry: mergeAll(entries),
   output: {
     filename: '[name]/all.js',
-    publicPath: '/demos/',
-    path: __dirname + '/demos/',
+    publicPath: `/${DEMOS_DIR}/`,
+    path: __dirname + `/${DEMOS_DIR}/`,
   },
   module: {
-    loaders: [{
-      test: /\.jsx?$/,
-      exclude: /build|lib|bower_components|node_modules/,
-      loaders: loaders
-    }, {
-      test: /\.css$/,
-      loaders: ['style', 'css']
-    }],
-    preLoaders: [
-      {test: /\.jsx?$/, loader: 'eslint', exclude: /build|lib|bower_components|node_modules/},
-    ],
-    noParse: [
-      path.join(__dirname, 'node_modules', 'babel-core', 'browser.min.js')
-    ],
+    rules: [
+      { test: /\.jsx?$/, loader: 'eslint-loader', enforce: 'pre', exclude: /build|lib|bower_components|node_modules/ },
+      { test: /\.jsx?$/, use: jsLoaders, exclude: /build|lib|bower_components|node_modules/ },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+    ]
   },
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['.js', '.jsx'],
   },
-  plugins: plugins,
-  eslint: {configFile: '.eslintrc'},
+  plugins,
 };

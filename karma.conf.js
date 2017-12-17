@@ -1,6 +1,7 @@
 'use strict';
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+process.env.CHROME_BIN = require('puppeteer').executablePath()
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 
 var path = require('path');
 var webpack = require('webpack');
@@ -10,17 +11,17 @@ var withCoverage = process.argv.indexOf('coverage') !== -1 || process.env.COVERA
 var webpackConfig = {
   devtool: 'eval',
   resolve: {
-    extensions: ['', '.js'],
+    extensions: ['.js'],
   },
   module: {
-    loaders: withCoverage ?
+    rules: withCoverage ?
       [
-        {test: /\.js$/, loader: 'babel', include: [path.resolve('./test')]},
-        {test: /\.js$/, loader: 'isparta', include: [path.resolve('./src')]},
+        {test: /\.js$/, loader: 'babel-loader', include: [path.resolve('./test')]},
+        {test: /\.js$/, loader: 'istanbul-instrumenter-loader', include: [path.resolve('./src')]},
       ] :
       [
         {
-          test: /\.js$/, loader: 'babel', include: [path.resolve('./src'), path.resolve('./test')],
+          test: /\.js$/, loader: 'babel-loader', include: [path.resolve('./src'), path.resolve('./test')],
         },
       ],
   },
@@ -39,7 +40,6 @@ module.exports = function (config) {
     basePath: '',
     frameworks: ['jasmine'],
     files: [
-      'node_modules/babel-core/browser-polyfill.js',
       'test/index.js',
     ],
     webpack: webpackConfig,
@@ -81,7 +81,7 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: false,
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
     singleRun: true,
   });
 };

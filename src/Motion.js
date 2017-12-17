@@ -1,12 +1,13 @@
 /* @flow */
+import React from 'react';
+import PropTypes from 'prop-types';
+import defaultNow from 'performance-now';
+import defaultRaf from 'raf';
+
 import mapToZero from './mapToZero';
 import stripStyle from './stripStyle';
 import stepper from './stepper';
-import defaultNow from 'performance-now';
-import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
-import React from 'react';
-import PropTypes from 'prop-types';
 
 import type {ReactElement, PlainStyle, Style, Velocity, MotionProps} from './Types';
 
@@ -22,6 +23,7 @@ type MotionState = {
 export default class Motion extends React.Component<MotionProps, MotionState> {
   static propTypes = {
     // TOOD: warn against putting a config in here
+    // eslint-disable-next-line react/require-default-props
     defaultStyle: PropTypes.objectOf(PropTypes.number),
     style: PropTypes.objectOf(PropTypes.oneOfType([
       PropTypes.number,
@@ -29,6 +31,10 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
     ])).isRequired,
     children: PropTypes.func.isRequired,
     onRest: PropTypes.func,
+  };
+
+  static defaultProps = {
+    onRest: () => {},
   };
 
   constructor(props: MotionProps) {
@@ -64,7 +70,9 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   // config)
   clearUnreadPropStyle = (destStyle: Style): void => {
     let dirty = false;
-    let {currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity} = this.state;
+    let {
+      currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity,
+    } = this.state;
 
     for (let key in destStyle) {
       if (!Object.prototype.hasOwnProperty.call(destStyle, key)) {
@@ -89,7 +97,9 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
     }
 
     if (dirty) {
-      this.setState({currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity});
+      this.setState({
+        currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity,
+      });
     }
   };
 
@@ -104,7 +114,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
         propsStyle,
         this.state.currentVelocity,
       )) {
-        if (this.wasAnimating && this.props.onRest) {
+        if (this.wasAnimating) {
           this.props.onRest();
         }
 

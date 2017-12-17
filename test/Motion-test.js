@@ -1,12 +1,13 @@
 /* eslint-disable class-methods-use-this */
 import React from 'react';
+import TestUtils from 'react-dom/test-utils';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
-import TestUtils from 'react-dom/test-utils';
 
 const {createSpy} = global.jasmine;
 
-const injector = require('inject!../src/Motion');
+// eslint-disable-next-line import/no-webpack-loader-syntax
+const injector = require('inject-loader!../src/Motion');
 
 // temporarily putting the animation loop test here
 // TODO: put it in the correct file
@@ -512,6 +513,7 @@ describe('Motion', () => {
         super();
 
         this.state = {
+          // eslint-disable-next-line react/no-unused-state
           a: spring(0),
         };
       }

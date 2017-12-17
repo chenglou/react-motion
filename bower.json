@@ -8,7 +8,7 @@
   "description": "A spring that solves your animation problems.",
   "main": [
     "build/react-motion.js",
-    "build/react-motion.map"
+    "build/react-motion.js.map"
   ],
   "dependencies": {
     "react": "^0.14.9 || ^15.3.0"
@@ -33,6 +33,8 @@
     "demo*",
     "server.js",
     "src",
+    "es",
+    "rollup.config.js",
     "webpack.config.js",
     "webpack.prod.config.js",
     "karma.conf.js",

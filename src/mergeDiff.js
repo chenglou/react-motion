@@ -20,7 +20,7 @@ import type {TransitionStyle} from './Types';
 export default function mergeDiff(
   prev: Array<TransitionStyle>,
   next: Array<TransitionStyle>,
-  onRemove: (prevIndex: number, prevStyleCell: TransitionStyle) => ?TransitionStyle
+  onRemove: (prevIndex: number, prevStyleCell: TransitionStyle) => ?TransitionStyle,
 ): Array<TransitionStyle> {
   // bookkeeping for easier access of a key's index below. This is 2 allocations +
   // potentially triggering chrome hash map mode for objs (so it might be faster
