@@ -9,6 +9,7 @@ coverage
 node_modules
 bower_components
 lib
+es
 
 .DS_Store
 

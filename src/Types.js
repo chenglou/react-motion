@@ -36,7 +36,7 @@ export type MotionProps = {
   defaultStyle?: PlainStyle,
   style: Style,
   children: (interpolatedStyle: PlainStyle) => ReactElement,
-  onRest?: () => void,
+  onRest: () => void,
 };
 
 // === StaggeredMotion ===

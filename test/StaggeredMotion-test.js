@@ -1,10 +1,11 @@
 /* eslint-disable class-methods-use-this */
 import React from 'react';
+import TestUtils from 'react-dom/test-utils';
 import {spring} from '../src/react-motion';
 import createMockRaf from './createMockRaf';
-import TestUtils from 'react-dom/test-utils';
 
-const injector = require('inject!../src/StaggeredMotion');
+// eslint-disable-next-line import/no-webpack-loader-syntax
+const injector = require('inject-loader!../src/StaggeredMotion');
 
 describe('StaggeredMotion', () => {
   let StaggeredMotion;
@@ -304,6 +305,7 @@ describe('StaggeredMotion', () => {
         super();
 
         this.state = {
+          // eslint-disable-next-line react/no-unused-state
           a: spring(0),
         };
       }

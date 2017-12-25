@@ -1,12 +1,12 @@
 /* @flow */
+import React from 'react';
+import PropTypes from 'prop-types';
+import defaultNow from 'performance-now';
+import defaultRaf from 'raf';
 import mapToZero from './mapToZero';
 import stripStyle from './stripStyle';
 import stepper from './stepper';
-import defaultNow from 'performance-now';
-import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
-import React from 'react';
-import PropTypes from 'prop-types';
 
 import type {ReactElement, PlainStyle, Style, Velocity, StaggeredProps} from './Types';
 
@@ -35,6 +35,7 @@ function shouldStopAnimationAll(
 export default class StaggeredMotion extends React.Component<StaggeredProps, StaggeredMotionState> {
   static propTypes = {
     // TOOD: warn against putting a config in here
+    // eslint-disable-next-line react/require-default-props
     defaultStyles: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.number)),
     styles: PropTypes.func.isRequired,
     children: PropTypes.func.isRequired,
@@ -71,7 +72,9 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
   // non-interpolating values (those that are a number, without a spring
   // config)
   clearUnreadPropStyle = (unreadPropStyles: Array<Style>): void => {
-    let {currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities} = this.state;
+    let {
+      currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities,
+    } = this.state;
 
     let someDirty = false;
     for (let i = 0; i < unreadPropStyles.length; i++) {
@@ -102,7 +105,9 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
     }
 
     if (someDirty) {
-      this.setState({currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities});
+      this.setState({
+        currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities,
+      });
     }
   }
 
@@ -114,10 +119,10 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
 
       // check if we need to animate in the first place
       if (shouldStopAnimationAll(
-          this.state.currentStyles,
-          destStyles,
-          this.state.currentVelocities,
-        )) {
+        this.state.currentStyles,
+        destStyles,
+        this.state.currentVelocities,
+      )) {
         // no need to cancel animationID here; shouldn't have any in flight
         this.animationID = null;
         this.accumulatedTime = 0;

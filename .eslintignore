@@ -1,6 +1,7 @@
 build
 coverage
 lib
+es
 node_modules
 **/*/all.js
 webpack.*.js

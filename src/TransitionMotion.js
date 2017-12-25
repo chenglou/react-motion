@@ -1,13 +1,13 @@
 /* @flow */
+import React from 'react';
+import PropTypes from 'prop-types';
+import defaultNow from 'performance-now';
+import defaultRaf from 'raf';
 import mapToZero from './mapToZero';
 import stripStyle from './stripStyle';
 import stepper from './stepper';
 import mergeDiff from './mergeDiff';
-import defaultNow from 'performance-now';
-import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
-import React from 'react';
-import PropTypes from 'prop-types';
 
 import type {
   ReactElement,
@@ -80,9 +80,10 @@ function shouldStopAnimationAll(
   // mergeAndSync comment for more info
   for (let i = 0; i < mergedPropsStyles.length; i++) {
     if (!shouldStopAnimation(
-        currentStyles[i],
-        destStyles[i].style,
-        currentVelocities[i])) {
+      currentStyles[i],
+      destStyles[i].style,
+      currentVelocities[i],
+    )) {
       return false;
     }
   }
@@ -126,9 +127,10 @@ function mergeAndSync(
         return null;
       }
       if (shouldStopAnimation(
-          oldCurrentStyles[oldIndex],
-          leavingStyle,
-          oldCurrentVelocities[oldIndex])) {
+        oldCurrentStyles[oldIndex],
+        leavingStyle,
+        oldCurrentVelocities[oldIndex],
+      )) {
         didLeave({ key: oldMergedPropsStyle.key, data: oldMergedPropsStyle.data });
         return null;
       }
@@ -194,6 +196,7 @@ type TransitionMotionState = {
 
 export default class TransitionMotion extends React.Component<TransitionProps, TransitionMotionState> {
   static propTypes = {
+    // eslint-disable-next-line react/require-default-props
     defaultStyles: PropTypes.arrayOf(PropTypes.shape({
       key: PropTypes.string.isRequired,
       data: PropTypes.any,
@@ -208,8 +211,7 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
           PropTypes.number,
           PropTypes.object,
         ])).isRequired,
-      }),
-      )]).isRequired,
+      }))]).isRequired,
     children: PropTypes.func.isRequired,
     willEnter: PropTypes.func,
     willLeave: PropTypes.func,
@@ -241,7 +243,9 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
   }
 
   defaultState(): TransitionMotionState {
-    const {defaultStyles, styles, willEnter, willLeave, didLeave} = this.props;
+    const {
+      defaultStyles, styles, willEnter, willLeave, didLeave,
+    } = this.props;
     const destStyles: Array<TransitionStyle> = typeof styles === 'function' ? styles(defaultStyles) : styles;
 
     // this is special. for the first time around, we don't have a comparison
@@ -380,11 +384,11 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
 
       // check if we need to animate in the first place
       if (shouldStopAnimationAll(
-          this.state.currentStyles,
-          destStyles,
-          this.state.currentVelocities,
-          this.state.mergedPropsStyles,
-        )) {
+        this.state.currentStyles,
+        destStyles,
+        this.state.currentVelocities,
+        this.state.mergedPropsStyles,
+      )) {
         // no need to cancel animationID here; shouldn't have any in flight
         this.animationID = null;
         this.accumulatedTime = 0;
@@ -422,6 +426,7 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
         this.state.lastIdealStyles,
         this.state.lastIdealVelocities,
       );
+
       for (let i = 0; i < newMergedPropsStyles.length; i++) {
         const newMergedPropsStyle = newMergedPropsStyles[i].style;
         let newCurrentStyle: PlainStyle = {};
@@ -504,21 +509,18 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
     this.startAnimationIfNecessary();
   }
 
-  componentWillReceiveProps(props: TransitionProps) {
+  componentWillReceiveProps({ styles }: TransitionProps) {
     if (this.unreadPropStyles) {
       // previous props haven't had the chance to be set yet; set them here
       this.clearUnreadPropStyle(this.unreadPropStyles);
     }
 
-    const styles = props.styles;
     if (typeof styles === 'function') {
-      this.unreadPropStyles = styles(
-        rehydrateStyles(
-          this.state.mergedPropsStyles,
-          this.unreadPropStyles,
-          this.state.lastIdealStyles,
-        )
-      );
+      this.unreadPropStyles = styles(rehydrateStyles(
+        this.state.mergedPropsStyles,
+        this.unreadPropStyles,
+        this.state.lastIdealStyles,
+      ));
     } else {
       this.unreadPropStyles = styles;
     }
