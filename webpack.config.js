@@ -31,12 +31,12 @@ var entry = {
 
 if (process.env.NODE_ENV === 'development') {
   devtool ='eval-source-map';
-  loaders = ['react-hot'].concat(loaders);
   plugins = plugins.concat([
     new webpack.HotModuleReplacementPlugin()
   ]);
   entry = Object.keys(entry).reduce(function (result, key) {
     result[key] = [
+      'react-hot-loader/patch',
       'webpack-dev-server/client?http://0.0.0.0:' + port,
       'webpack/hot/only-dev-server',
       entry[key]
