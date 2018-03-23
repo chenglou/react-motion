@@ -18,7 +18,8 @@ import type {
   WillEnter,
   WillLeave,
   DidLeave,
-  TransitionProps,
+  TransitionMotionProps,
+  TransitionMotionDefaultProps,
 } from './Types';
 
 const msPerFrame = 1000 / 60;
@@ -30,11 +31,11 @@ const msPerFrame = 1000 / 60;
 // TransitionMotionState). So when children function and others ask for such
 // data we need to generate them on the fly by combining mergedPropsStyles and
 // currentStyles/lastIdealStyles
-function rehydrateStyles(
-  mergedPropsStyles: Array<TransitionStyle>,
-  unreadPropStyles: ?Array<TransitionStyle>,
+function rehydrateStyles<T>(
+  mergedPropsStyles: Array<TransitionStyle<T>>,
+  unreadPropStyles: ?Array<TransitionStyle<T>>,
   plainStyles: Array<PlainStyle>,
-): Array<TransitionPlainStyle> {
+): Array<TransitionPlainStyle<T>> {
   // Copy the value to a `const` so that Flow understands that the const won't
   // change and will be non-nullable in the callback below.
   const cUnreadPropStyles = unreadPropStyles;
@@ -59,11 +60,11 @@ function rehydrateStyles(
   });
 }
 
-function shouldStopAnimationAll(
+function shouldStopAnimationAll<T>(
   currentStyles: Array<PlainStyle>,
-  destStyles: Array<TransitionStyle>,
+  destStyles: Array<TransitionStyle<T>>,
   currentVelocities: Array<Velocity>,
-  mergedPropsStyles: Array<TransitionStyle>,
+  mergedPropsStyles: Array<TransitionStyle<T>>,
 ): boolean {
   if (mergedPropsStyles.length !== destStyles.length) {
     return false;
@@ -105,17 +106,17 @@ function shouldStopAnimationAll(
 //    certainly add c, value of c is willEnter(c)
 // loop over merged and construct new current
 // dest doesn't change, that's owner's
-function mergeAndSync(
-  willEnter: WillEnter,
-  willLeave: WillLeave,
-  didLeave: DidLeave,
-  oldMergedPropsStyles: Array<TransitionStyle>,
-  destStyles: Array<TransitionStyle>,
+function mergeAndSync<T>(
+  willEnter: WillEnter<T>,
+  willLeave: WillLeave<T>,
+  didLeave: DidLeave<T>,
+  oldMergedPropsStyles: Array<TransitionStyle<T>>,
+  destStyles: Array<TransitionStyle<T>>,
   oldCurrentStyles: Array<PlainStyle>,
   oldCurrentVelocities: Array<Velocity>,
   oldLastIdealStyles: Array<PlainStyle>,
   oldLastIdealVelocities: Array<Velocity>,
-): [Array<TransitionStyle>, Array<PlainStyle>, Array<Velocity>, Array<PlainStyle>, Array<Velocity>] {
+): [Array<TransitionStyle<T>>, Array<PlainStyle>, Array<Velocity>, Array<PlainStyle>, Array<Velocity>] {
   const newMergedPropsStyles = mergeDiff(
     oldMergedPropsStyles,
     destStyles,
@@ -169,13 +170,7 @@ function mergeAndSync(
   return [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities];
 }
 
-type TransitionMotionDefaultProps = {
-  willEnter: WillEnter,
-  willLeave: WillLeave,
-  didLeave: DidLeave
-}
-
-type TransitionMotionState = {
+type TransitionMotionState<T> = {
   // list of styles, each containing interpolating values. Part of what's passed
   // to children function. Notice that this is
   // Array<ActualInterpolatingStyleObject>, without the wrapper that is {key: ...,
@@ -189,10 +184,10 @@ type TransitionMotionState = {
   lastIdealVelocities: Array<Velocity>,
   // the array that keeps track of currently rendered stuff! Including stuff
   // that you've unmounted but that's still animating. This is where it lives
-  mergedPropsStyles: Array<TransitionStyle>,
+  mergedPropsStyles: Array<TransitionStyle<T>>,
 };
 
-export default class TransitionMotion extends React.Component<TransitionProps, TransitionMotionState> {
+export default class TransitionMotion<T> extends React.Component<TransitionMotionProps<T>, TransitionMotionState<T>> {
   static propTypes = {
     defaultStyles: PropTypes.arrayOf(PropTypes.shape({
       key: PropTypes.string.isRequired,
@@ -216,7 +211,7 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
     didLeave: PropTypes.func,
   };
 
-  static defaultProps: TransitionMotionDefaultProps = {
+  static defaultProps: TransitionMotionDefaultProps<T> = {
     willEnter: styleThatEntered => stripStyle(styleThatEntered.style),
     // recall: returning null makes the current unmounting TransitionStyle
     // disappear immediately
@@ -233,26 +228,26 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
   // at 0 (didn't have time to tick and interpolate even once). If we naively
   // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
   // In reality currentStyle should be 400
-  unreadPropStyles: ?Array<TransitionStyle> = null;
+  unreadPropStyles: ?Array<TransitionStyle<T>> = null;
 
-  constructor(props: TransitionProps) {
+  constructor(props: TransitionMotionProps<T>) {
     super(props);
     this.state = this.defaultState();
   }
 
-  defaultState(): TransitionMotionState {
+  defaultState(): TransitionMotionState<T> {
     const {defaultStyles, styles, willEnter, willLeave, didLeave} = this.props;
-    const destStyles: Array<TransitionStyle> = typeof styles === 'function' ? styles(defaultStyles) : styles;
+    const destStyles: Array<TransitionStyle<T>> = typeof styles === 'function' ? styles(defaultStyles) : styles;
 
     // this is special. for the first time around, we don't have a comparison
     // between last (no last) and current merged props. we'll compute last so:
     // say default is {a, b} and styles (dest style) is {b, c}, we'll
     // fabricate last as {a, b}
-    let oldMergedPropsStyles: Array<TransitionStyle>;
+    let oldMergedPropsStyles: Array<TransitionStyle<T>>;
     if (defaultStyles == null) {
       oldMergedPropsStyles = destStyles;
     } else {
-      oldMergedPropsStyles = (defaultStyles: any).map(defaultStyleCell => {
+      oldMergedPropsStyles = defaultStyles.map(defaultStyleCell => {
         // TODO: key search code
         for (let i = 0; i < destStyles.length; i++) {
           if (destStyles[i].key === defaultStyleCell.key) {
@@ -264,7 +259,7 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
     }
     const oldCurrentStyles = defaultStyles == null
       ? destStyles.map(s => stripStyle(s.style))
-      : (defaultStyles: any).map(s => stripStyle(s.style));
+      : defaultStyles.map(s => stripStyle(s.style));
     const oldCurrentVelocities = defaultStyles == null
       ? destStyles.map(s => mapToZero(s.style))
       : defaultStyles.map(s => mapToZero(s.style));
@@ -272,9 +267,9 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
       // Because this is an old-style createReactClass component, Flow doesn't
       // understand that the willEnter and willLeave props have default values
       // and will always be present.
-      (willEnter: any),
-      (willLeave: any),
-      (didLeave: any),
+      willEnter,
+      willLeave,
+      didLeave,
       oldMergedPropsStyles,
       destStyles,
       oldCurrentStyles,
@@ -295,11 +290,16 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
   // after checking for unreadPropStyles != null, we manually go set the
   // non-interpolating values (those that are a number, without a spring
   // config)
-  clearUnreadPropStyle = (unreadPropStyles: Array<TransitionStyle>): void => {
+  clearUnreadPropStyle = () => {
+    const unreadPropStyles = this.unreadPropStyles;
+    if (!unreadPropStyles) {
+      return;
+    }
+
     let [mergedPropsStyles, currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities] = mergeAndSync(
-      (this.props.willEnter: any),
-      (this.props.willLeave: any),
-      (this.props.didLeave: any),
+      this.props.willEnter,
+      this.props.willLeave,
+      this.props.didLeave,
       this.state.mergedPropsStyles,
       unreadPropStyles,
       this.state.currentStyles,
@@ -370,7 +370,7 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
       }
 
       const propStyles = this.props.styles;
-      let destStyles: Array<TransitionStyle> = typeof propStyles === 'function'
+      let destStyles: Array<TransitionStyle<T>> = typeof propStyles === 'function'
         ? propStyles(rehydrateStyles(
           this.state.mergedPropsStyles,
           this.unreadPropStyles,
@@ -412,9 +412,9 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
       const framesToCatchUp = Math.floor(this.accumulatedTime / msPerFrame);
 
       let [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities] = mergeAndSync(
-        (this.props.willEnter: any),
-        (this.props.willLeave: any),
-        (this.props.didLeave: any),
+        this.props.willEnter,
+        this.props.willLeave,
+        this.props.didLeave,
         this.state.mergedPropsStyles,
         destStyles,
         this.state.currentStyles,
@@ -504,11 +504,9 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
     this.startAnimationIfNecessary();
   }
 
-  componentWillReceiveProps(props: TransitionProps) {
-    if (this.unreadPropStyles) {
-      // previous props haven't had the chance to be set yet; set them here
-      this.clearUnreadPropStyle(this.unreadPropStyles);
-    }
+  componentWillReceiveProps(props: TransitionMotionProps<T>) {
+    // If previous props haven't had the chance to be set yet; set them here
+    this.clearUnreadPropStyle();
 
     const styles = props.styles;
     if (typeof styles === 'function') {

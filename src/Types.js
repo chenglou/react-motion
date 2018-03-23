@@ -23,10 +23,10 @@ export type OpaqueConfig = {
   precision: number,
 };
 // your typical style object given in props. Maps to a number or a spring config
-export type Style = {[key: string]: number | OpaqueConfig};
+export type Style = $Shape<{[key: string]: OpaqueConfig | number}>;
 // the interpolating style object, with the same keys as the above Style object,
 // with the values mapped to numbers, naturally
-export type PlainStyle = {[key: string]: number};
+export type PlainStyle = $Shape<{[key: string]: number}>;
 // internal velocity object. Similar to PlainStyle, but whose numbers represent
 // speed. Might be exposed one day.
 export type Velocity = {[key: string]: number};
@@ -47,26 +47,34 @@ export type StaggeredProps = {
 };
 
 // === TransitionMotion ===
-export type TransitionStyle = {
+export type TransitionStyle<T> = {
   key: string, // unique ID to identify component across render animations
-  data?: any, // optional data you want to carry along the style, e.g. itemText
+  data: T, // optional data you want to carry along the style, e.g. itemText
   style: Style, // actual style you're passing
-};
-export type TransitionPlainStyle = {
+}
+export type TransitionPlainStyle<T> = {
   key: string,
-  data?: any,
+  data: T,
   // same as TransitionStyle, passed as argument to style/children function
   style: PlainStyle,
-};
-export type WillEnter = (styleThatEntered: TransitionStyle) => PlainStyle;
-export type WillLeave = (styleThatLeft: TransitionStyle) => ?Style;
-export type DidLeave = (styleThatLeft: { key: string, data?: any }) => void;
+}
+export type WillEnter<T> = (styleThatEntered: TransitionStyle<T>) => PlainStyle;
+export type WillLeave<T> = (styleThatLeft: TransitionStyle<T>) => ?Style;
+export type DidLeave<T> = (styleThatLeft: { key: string, data: T }) => void;
 
-export type TransitionProps = {
-  defaultStyles?: Array<TransitionPlainStyle>,
-  styles: Array<TransitionStyle> | (previousInterpolatedStyles: ?Array<TransitionPlainStyle>) => Array<TransitionStyle>,
-  children: (interpolatedStyles: Array<TransitionPlainStyle>) => ReactElement,
-  willEnter?: WillEnter,
-  willLeave?: WillLeave,
-  didLeave?: DidLeave
+export type TransitionMotionProps<T> = {
+  defaultStyles?: Array<TransitionPlainStyle<T>>,
+  styles: Array<TransitionStyle<T>>| (previousInterpolatedStyles: ?Array<TransitionPlainStyle<T>>) => Array<TransitionStyle<T>>,
+  children: (interpolatedStyles: Array<TransitionPlainStyle<T>>) => ReactElement,
+  willEnter: WillEnter<T>,
+  willLeave: WillLeave<T>,
+  didLeave: DidLeave<T>
 };
+
+export type TransitionMotionDefaultProps<T> = {
+  willEnter: WillEnter<T>,
+  willLeave: WillLeave<T>,
+  didLeave: DidLeave<T>
+};
+
+export type TransitionProps<T> = $Shape<TransitionMotionProps<T>> & $Diff<TransitionProps<T>, TransitionMotionDefaultProps<T>>;

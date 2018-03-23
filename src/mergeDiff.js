@@ -17,11 +17,11 @@ import type {TransitionStyle} from './Types';
 // work well with js bc of the amount of allocation, and isn't optimized for our
 // current use-case bc the runtime is linear in terms of edges (see wiki for
 // meaning), which is huge when two lists have many common elements
-export default function mergeDiff(
-  prev: Array<TransitionStyle>,
-  next: Array<TransitionStyle>,
-  onRemove: (prevIndex: number, prevStyleCell: TransitionStyle) => ?TransitionStyle
-): Array<TransitionStyle> {
+export default function mergeDiff<T>(
+  prev: Array<TransitionStyle<T>>,
+  next: Array<TransitionStyle<T>>,
+  onRemove: (prevIndex: number, prevStyleCell: TransitionStyle<T>) => ?TransitionStyle<T>
+): Array<TransitionStyle<T>> {
   // bookkeeping for easier access of a key's index below. This is 2 allocations +
   // potentially triggering chrome hash map mode for objs (so it might be faster
   // to loop through and find a key's index each time), but I no longer care
