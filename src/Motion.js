@@ -5,6 +5,7 @@ import stepper from './stepper';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
+import arePropsEqual from './arePropsEqual';
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -210,13 +211,17 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
     this.startAnimationIfNecessary();
   }
 
-  componentWillReceiveProps(props: MotionProps) {
+  componentDidUpdate(prevProps: MotionProps) {
+    if (arePropsEqual(prevProps, this.props)) {
+      return;
+    }
+
     if (this.unreadPropStyle != null) {
       // previous props haven't had the chance to be set yet; set them here
       this.clearUnreadPropStyle(this.unreadPropStyle);
     }
 
-    this.unreadPropStyle = props.style;
+    this.unreadPropStyle = this.props.style;
     if (this.animationID == null) {
       this.prevTime = defaultNow();
       this.startAnimationIfNecessary();
