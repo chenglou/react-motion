@@ -307,4 +307,4 @@ React string refs won't work:
 <Motion style={...}>{currentValue => <div ref="stuff" />}</Motion>
 ```
 
-This is how React works. Here's the [callback ref solution](https://facebook.github.io/react/docs/more-about-refs.html#the-ref-callback-attribute).
+This is how React works. Here's the [callback ref solution](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs).
