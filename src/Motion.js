@@ -106,6 +106,11 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
       )) {
         if (this.wasAnimating && this.props.onRest) {
           this.props.onRest();
+          if (this.unreadPropStyle && !shouldStopAnimation(this.state.currentStyle, this.unreadPropStyle, this.state.currentVelocity)) {
+            this.clearUnreadPropStyle(this.unreadPropStyle);
+            this.unreadPropStyle = null;
+            this.startAnimationIfNecessary();
+          }
         }
 
         // no need to cancel animationID here; shouldn't have any in flight
