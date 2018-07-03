@@ -353,7 +353,7 @@ export default class TransitionMotion extends React.Component<TransitionProps, T
   }
 
   startAnimationIfNecessary = (): void => {
-    if (this.unmounting) {
+    if (this.unmounting || this.animationID != null) {
       return;
     }
 

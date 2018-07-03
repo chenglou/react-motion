@@ -36,6 +36,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
     this.state = this.defaultState();
   }
 
+  unmounting: boolean = false;
   wasAnimating: boolean = false;
   animationID: ?number = null;
   prevTime: number = 0;
@@ -94,9 +95,22 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   };
 
   startAnimationIfNecessary = (): void => {
+    if (this.unmounting || this.animationID != null) {
+      return;
+    }
+
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
     this.animationID = defaultRaf((timestamp) => {
+      // https://github.com/chenglou/react-motion/pull/420
+      // > if execution passes the conditional if (this.unmounting), then
+      // executes async defaultRaf and after that component unmounts and after
+      // that the callback of defaultRaf is called, then setState will be called
+      // on unmounted component.
+      if (this.unmounting) {
+        return;
+      }
+
       // check if we need to animate in the first place
       const propsStyle: Style = this.props.style;
       if (shouldStopAnimation(
@@ -224,6 +238,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   }
 
   componentWillUnmount() {
+    this.unmounting = true;
     if (this.animationID != null) {
       defaultRaf.cancel(this.animationID);
       this.animationID = null;

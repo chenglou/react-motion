@@ -57,6 +57,7 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
     };
   }
 
+  unmounting: boolean = false;
   animationID: ?number = null;
   prevTime = 0;
   accumulatedTime = 0;
@@ -107,9 +108,22 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
   }
 
   startAnimationIfNecessary = (): void => {
+    if (this.unmounting || this.animationID != null) {
+      return;
+    }
+
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
     this.animationID = defaultRaf((timestamp) => {
+      // https://github.com/chenglou/react-motion/pull/420
+      // > if execution passes the conditional if (this.unmounting), then
+      // executes async defaultRaf and after that component unmounts and after
+      // that the callback of defaultRaf is called, then setState will be called
+      // on unmounted component.
+      if (this.unmounting) {
+        return;
+      }
+
       const destStyles: Array<Style> = this.props.styles(this.state.lastIdealStyles);
 
       // check if we need to animate in the first place
@@ -244,6 +258,7 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
   }
 
   componentWillUnmount() {
+    this.unmounting = true;
     if (this.animationID != null) {
       defaultRaf.cancel(this.animationID);
       this.animationID = null;
