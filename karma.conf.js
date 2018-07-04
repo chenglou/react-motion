@@ -1,37 +1,36 @@
 'use strict';
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
 var path = require('path');
-var webpack = require('webpack');
 
 var withCoverage = process.argv.indexOf('coverage') !== -1 || process.env.COVERAGE;
 
 var webpackConfig = {
-  devtool: 'eval',
-  resolve: {
-    extensions: ['', '.js'],
-  },
+  mode: 'development',
   module: {
-    loaders: withCoverage ?
+    rules: withCoverage ?
       [
-        {test: /\.js$/, loader: 'babel', include: [path.resolve('./test')]},
-        {test: /\.js$/, loader: 'isparta', include: [path.resolve('./src')]},
+        {
+          test: /\.js$/,
+          loader: 'babel-loader',
+          include: [path.resolve('./test')]
+        },
+        {
+          test: /\.js$/,
+          loader: 'isparta-loader',
+          include: [path.resolve('./src')]
+        },
       ] :
       [
         {
-          test: /\.js$/, loader: 'babel', include: [path.resolve('./src'), path.resolve('./test')],
+          test: /\.js$/,
+          loader: 'babel-loader',
+          include: [path.resolve('./src'), path.resolve('./test')],
         },
       ],
   },
   stats: {
     colors: true,
-  },
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-    })
-  ],
+  }
 };
 
 module.exports = function (config) {
@@ -39,7 +38,7 @@ module.exports = function (config) {
     basePath: '',
     frameworks: ['jasmine'],
     files: [
-      'node_modules/babel-core/browser-polyfill.js',
+      './node_modules/@babel/polyfill/browser.js',
       'test/index.js',
     ],
     webpack: webpackConfig,

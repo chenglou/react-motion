@@ -1,12 +1,8 @@
 {
-  "stage": 0,
-  "loose": "all",
-  "env": {
-    "production": {
-      "optional": [
-        "optimisation.react.inlineElements",
-        "optimisation.react.constantElements"
-      ]
-    }
-  }
+  "presets": [
+    "@babel/env",
+    "@babel/stage-3",
+    "@babel/flow",
+    "@babel/react"
+  ]
 }

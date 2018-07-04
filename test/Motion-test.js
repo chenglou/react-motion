@@ -6,7 +6,7 @@ import TestUtils from 'react-dom/test-utils';
 
 const {createSpy} = global.jasmine;
 
-const injector = require('inject!../src/Motion');
+const injector = require('inject-loader!../src/Motion');
 
 // temporarily putting the animation loop test here
 // TODO: put it in the correct file
@@ -19,7 +19,7 @@ describe('animation loop', () => {
     Motion = injector({
       raf: mockRaf.raf,
       'performance-now': mockRaf.now,
-    });
+    }).default;
   });
 
   it('should interpolate correctly when the timer is perfect', () => {
@@ -136,7 +136,7 @@ describe('Motion', () => {
     Motion = injector({
       raf: mockRaf.raf,
       'performance-now': mockRaf.now,
-    });
+    }).default;
   });
 
   it('should allow returning null from children function', () => {
