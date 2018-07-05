@@ -11,6 +11,8 @@
 .*/node_modules/kefir/kefir.js.flow
 .*/node_modules/kefir/dist/kefir.js.flow
 .*/test/.*
+.*/node_modules/@webassemblyjs/.*
+.*/node_modules/eslint-plugin-jsx-a11y/.*
 
 [include]
 

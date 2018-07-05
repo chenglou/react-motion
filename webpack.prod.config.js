@@ -6,7 +6,8 @@ var webpack = require('webpack');
 var path = require('path');
 
 // currently, this is for bower
-var config = {
+module.exports = {
+  mode: 'development',
   devtool: 'sourcemap',
   entry: {
     index: './src/react-motion.js'
@@ -20,14 +21,14 @@ var config = {
     libraryTarget: 'umd'
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.(js|jsx)/,
-      loader: 'babel'
+      loader: 'babel-loader'
     }]
   },
   plugins: [],
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['.js', '.jsx']
   },
   externals: {
     'react': {
@@ -38,5 +39,3 @@ var config = {
     }
   },
 };
-
-module.exports = config;

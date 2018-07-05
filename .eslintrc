@@ -14,7 +14,20 @@
     "prefer-const": 0,
     "no-multiple-empty-lines": 0,
     "no-useless-escape": 0,
+    "no-else-return": 0,
+    "comma-dangle": 0,
+    "lines-between-class-members": 0,
+    "indent": 0,
+    "operator-linebreak": 0,
+    "object-curly-newline": 0,
+    "function-paren-newline": 0,
+    "prefer-destructuring": 0,
 
+    "react/jsx-wrap-multilines": 0,
+    "react/jsx-one-expression-per-line": 0,
+    "react/no-unused-state": 0,
+    "react/require-default-props": 0,
+    "react/destructuring-assignment": 0,
     "react/no-did-mount-set-state": 2,
     "react/no-multi-comp": 0,
     "react/jsx-boolean-value": [2, "always"],
@@ -64,6 +77,8 @@
     "object-curly-spacing": 0,
     "import/imports-first": 0,
     "import/no-unresolved": 0,
-    "import/no-extraneous-dependencies": 0
+    "import/no-extraneous-dependencies": 0,
+    "import/order": 0,
+    "import/no-webpack-loader-syntax": 0,
   }
 }
