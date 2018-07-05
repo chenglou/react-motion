@@ -13,6 +13,7 @@
 .*/test/.*
 .*/node_modules/@webassemblyjs/.*
 .*/node_modules/eslint-plugin-jsx-a11y/.*
+.*/node_modules/rollup-plugin-size-snapshot/.*
 
 [include]
 

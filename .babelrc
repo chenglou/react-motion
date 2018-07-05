@@ -1,8 +1,20 @@
 {
   "presets": [
-    "@babel/env",
+    ["@babel/env", { "modules": false }],
     "@babel/stage-3",
     "@babel/flow",
     "@babel/react"
-  ]
+  ],
+  "env": {
+    "cjs": {
+      "plugins": [
+        "@babel/transform-modules-commonjs"
+      ]
+    },
+    "test": {
+      "plugins": [
+        "@babel/transform-modules-commonjs"
+      ]
+    }
+  }
 }
