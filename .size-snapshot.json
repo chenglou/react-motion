@@ -1,0 +1,12 @@
+{
+  "build/react-motion.js": {
+    "bundled": 83107,
+    "minified": 24575,
+    "gzipped": 7184
+  },
+  "build/react-motion.min.js": {
+    "bundled": 59713,
+    "minified": 17814,
+    "gzipped": 5188
+  }
+}
