@@ -195,14 +195,20 @@ type TransitionMotionState = {
 export default class TransitionMotion extends React.Component<TransitionProps, TransitionMotionState> {
   static propTypes = {
     defaultStyles: PropTypes.arrayOf(PropTypes.shape({
-      key: PropTypes.string.isRequired,
+      key: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number,
+      ]).isRequired,
       data: PropTypes.any,
       style: PropTypes.objectOf(PropTypes.number).isRequired,
     })),
     styles: PropTypes.oneOfType([
       PropTypes.func,
       PropTypes.arrayOf(PropTypes.shape({
-        key: PropTypes.string.isRequired,
+        key: PropTypes.oneOfType([
+          PropTypes.string,
+          PropTypes.number,
+        ]).isRequired,
         data: PropTypes.any,
         style: PropTypes.objectOf(PropTypes.oneOfType([
           PropTypes.number,
