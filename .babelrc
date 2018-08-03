@@ -1,9 +1,11 @@
 {
   "presets": [
     ["@babel/env", { "modules": false }],
-    "@babel/stage-3",
     "@babel/flow",
     "@babel/react"
+  ],
+  "plugins": [
+    ["@babel/plugin-proposal-class-properties", { "loose": false }]
   ],
   "env": {
     "cjs": {
