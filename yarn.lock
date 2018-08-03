@@ -354,13 +354,6 @@
     "@babel/helper-replace-supers" "7.0.0-beta.54"
     "@babel/plugin-syntax-class-properties" "7.0.0-beta.54"
 
-"@babel/plugin-proposal-json-strings@7.0.0-beta.54":
-  version "7.0.0-beta.54"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-json-strings/-/plugin-proposal-json-strings-7.0.0-beta.54.tgz#35292e0716b35ac8c279d6430836ce741c32fe5d"
-  dependencies:
-    "@babel/helper-plugin-utils" "7.0.0-beta.54"
-    "@babel/plugin-syntax-json-strings" "7.0.0-beta.54"
-
 "@babel/plugin-proposal-object-rest-spread@7.0.0-beta.51":
   version "7.0.0-beta.51"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-object-rest-spread/-/plugin-proposal-object-rest-spread-7.0.0-beta.51.tgz#5bc469e5e6d1b84a5d6046b59e90ca016c2086d6"
@@ -395,27 +388,9 @@
   dependencies:
     "@babel/helper-plugin-utils" "7.0.0-beta.54"
 
-"@babel/plugin-syntax-dynamic-import@7.0.0-beta.54":
-  version "7.0.0-beta.54"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-dynamic-import/-/plugin-syntax-dynamic-import-7.0.0-beta.54.tgz#c962627f4e1a15da6d0842306d421e7b1e52f587"
-  dependencies:
-    "@babel/helper-plugin-utils" "7.0.0-beta.54"
-
 "@babel/plugin-syntax-flow@7.0.0-beta.54":
   version "7.0.0-beta.54"
   resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-flow/-/plugin-syntax-flow-7.0.0-beta.54.tgz#8d38fffa6da16e2d327f5fee4f90913b14d43d14"
-  dependencies:
-    "@babel/helper-plugin-utils" "7.0.0-beta.54"
-
-"@babel/plugin-syntax-import-meta@7.0.0-beta.54":
-  version "7.0.0-beta.54"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-import-meta/-/plugin-syntax-import-meta-7.0.0-beta.54.tgz#3c54d07aafe09714303b995ac4ad6b10b0fdbc30"
-  dependencies:
-    "@babel/helper-plugin-utils" "7.0.0-beta.54"
-
-"@babel/plugin-syntax-json-strings@7.0.0-beta.54":
-  version "7.0.0-beta.54"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-json-strings/-/plugin-syntax-json-strings-7.0.0-beta.54.tgz#7f53c35362f359e5881e21278ca3359dc0bb7055"
   dependencies:
     "@babel/helper-plugin-utils" "7.0.0-beta.54"
 
