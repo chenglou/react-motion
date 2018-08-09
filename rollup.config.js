@@ -16,13 +16,15 @@ const globals = {
 const external = id =>
   !id.startsWith('\0') && !id.startsWith('.') && !id.startsWith('/');
 
-const getBabelOptions = () => ({
+const getBabelOptions = ({ useESModules }) => ({
   exclude: '**/node_modules/**',
+  runtimeHelpers: true,
+  plugins: [['@babel/transform-runtime', { useESModules }]],
 });
 
-const getCommonjsOptions = () => ({
+const commonjsOptions = {
   include: '**/node_modules/**',
-});
+};
 
 export default [
   {
@@ -31,8 +33,8 @@ export default [
     external: Object.keys(globals),
     plugins: [
       nodeResolve(),
-      babel(getBabelOptions()),
-      commonjs(getCommonjsOptions()),
+      babel(getBabelOptions({ useESModules: true })),
+      commonjs(commonjsOptions),
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       sizeSnapshot(),
     ],
@@ -44,8 +46,8 @@ export default [
     external: Object.keys(globals),
     plugins: [
       nodeResolve(),
-      babel(getBabelOptions()),
-      commonjs(getCommonjsOptions()),
+      babel(getBabelOptions({ useESModules: true })),
+      commonjs(commonjsOptions),
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(),
       uglify(),
@@ -56,13 +58,13 @@ export default [
     input,
     output: { file: pkg.module, format: 'esm' },
     external,
-    plugins: [babel(getBabelOptions()), sizeSnapshot()],
+    plugins: [babel(getBabelOptions({ useESModules: true })), sizeSnapshot()],
   },
 
   {
     input,
     output: { file: pkg.main, format: 'cjs' },
     external,
-    plugins: [babel(getBabelOptions())],
+    plugins: [babel(getBabelOptions({ useESModules: false }))],
   },
 ];

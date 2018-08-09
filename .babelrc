@@ -1,11 +1,11 @@
 {
   "presets": [
-    ["@babel/env", { "modules": false }],
+    ["@babel/env", { "modules": false, "loose": true }],
     "@babel/flow",
     "@babel/react"
   ],
   "plugins": [
-    "@babel/proposal-class-properties"
+    ["@babel/proposal-class-properties", { "loose": true }]
   ],
   "env": {
     "test": {
