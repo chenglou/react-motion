@@ -8,9 +8,8 @@ pids
 coverage
 node_modules
 bower_components
-lib
 
 .DS_Store
 
 /demos/**/all.*
-/build/
+dist
