@@ -9,18 +9,19 @@ import pkg from './package.json';
 const input = './src/react-motion.js';
 const name = 'ReactMotion';
 const globals = {
-  react: 'React'
+  react: 'React',
 };
 
 // treat as external "module/path" modules and reserved rollup paths
-const external = id => !id.startsWith('\0') && !id.startsWith('.') && !id.startsWith('/');
+const external = id =>
+  !id.startsWith('\0') && !id.startsWith('.') && !id.startsWith('/');
 
 const getBabelOptions = () => ({
-  exclude: '**/node_modules/**'
+  exclude: '**/node_modules/**',
 });
 
 const getCommonjsOptions = () => ({
-  include: '**/node_modules/**'
+  include: '**/node_modules/**',
 });
 
 export default [
@@ -33,8 +34,8 @@ export default [
       babel(getBabelOptions()),
       commonjs(getCommonjsOptions()),
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
-      sizeSnapshot()
-    ]
+      sizeSnapshot(),
+    ],
   },
 
   {
@@ -47,26 +48,21 @@ export default [
       commonjs(getCommonjsOptions()),
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(),
-      uglify()
-    ]
+      uglify(),
+    ],
   },
 
   {
     input,
     output: { file: pkg.module, format: 'esm' },
     external,
-    plugins: [
-      babel(getBabelOptions()),
-      sizeSnapshot(),
-    ]
+    plugins: [babel(getBabelOptions()), sizeSnapshot()],
   },
 
   {
     input,
     output: { file: pkg.main, format: 'cjs' },
     external,
-    plugins: [
-      babel(getBabelOptions()),
-    ]
+    plugins: [babel(getBabelOptions())],
   },
 ];

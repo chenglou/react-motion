@@ -8,7 +8,13 @@ import shouldStopAnimation from './shouldStopAnimation';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import type {ReactElement, PlainStyle, Style, Velocity, StaggeredProps} from './Types';
+import type {
+  ReactElement,
+  PlainStyle,
+  Style,
+  Velocity,
+  StaggeredProps,
+} from './Types';
 
 const msPerFrame = 1000 / 60;
 
@@ -25,14 +31,19 @@ function shouldStopAnimationAll(
   currentVelocities: Array<Velocity>,
 ): boolean {
   for (let i = 0; i < currentStyles.length; i++) {
-    if (!shouldStopAnimation(currentStyles[i], styles[i], currentVelocities[i])) {
+    if (
+      !shouldStopAnimation(currentStyles[i], styles[i], currentVelocities[i])
+    ) {
       return false;
     }
   }
   return true;
 }
 
-export default class StaggeredMotion extends React.Component<StaggeredProps, StaggeredMotionState> {
+export default class StaggeredMotion extends React.Component<
+  StaggeredProps,
+  StaggeredMotionState,
+> {
   static propTypes = {
     // TOOD: warn against putting a config in here
     defaultStyles: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.number)),
@@ -46,9 +57,12 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
   }
 
   defaultState(): StaggeredMotionState {
-    const {defaultStyles, styles} = this.props;
-    const currentStyles: Array<PlainStyle> = defaultStyles || styles().map(stripStyle);
-    const currentVelocities = currentStyles.map(currentStyle => mapToZero(currentStyle));
+    const { defaultStyles, styles } = this.props;
+    const currentStyles: Array<PlainStyle> =
+      defaultStyles || styles().map(stripStyle);
+    const currentVelocities = currentStyles.map(currentStyle =>
+      mapToZero(currentStyle),
+    );
     return {
       currentStyles,
       currentVelocities,
@@ -72,7 +86,12 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
   // non-interpolating values (those that are a number, without a spring
   // config)
   clearUnreadPropStyle = (unreadPropStyles: Array<Style>): void => {
-    let {currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities} = this.state;
+    let {
+      currentStyles,
+      currentVelocities,
+      lastIdealStyles,
+      lastIdealVelocities,
+    } = this.state;
 
     let someDirty = false;
     for (let i = 0; i < unreadPropStyles.length; i++) {
@@ -89,10 +108,10 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
           if (!dirty) {
             dirty = true;
             someDirty = true;
-            currentStyles[i] = {...currentStyles[i]};
-            currentVelocities[i] = {...currentVelocities[i]};
-            lastIdealStyles[i] = {...lastIdealStyles[i]};
-            lastIdealVelocities[i] = {...lastIdealVelocities[i]};
+            currentStyles[i] = { ...currentStyles[i] };
+            currentVelocities[i] = { ...currentVelocities[i] };
+            lastIdealStyles[i] = { ...lastIdealStyles[i] };
+            lastIdealVelocities[i] = { ...lastIdealVelocities[i] };
           }
           currentStyles[i][key] = styleValue;
           currentVelocities[i][key] = 0;
@@ -103,9 +122,14 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
     }
 
     if (someDirty) {
-      this.setState({currentStyles, currentVelocities, lastIdealStyles, lastIdealVelocities});
+      this.setState({
+        currentStyles,
+        currentVelocities,
+        lastIdealStyles,
+        lastIdealVelocities,
+      });
     }
-  }
+  };
 
   startAnimationIfNecessary = (): void => {
     if (this.unmounting || this.animationID != null) {
@@ -114,7 +138,7 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
 
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
-    this.animationID = defaultRaf((timestamp) => {
+    this.animationID = defaultRaf(timestamp => {
       // https://github.com/chenglou/react-motion/pull/420
       // > if execution passes the conditional if (this.unmounting), then
       // executes async defaultRaf and after that component unmounts and after
@@ -124,14 +148,18 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
         return;
       }
 
-      const destStyles: Array<Style> = this.props.styles(this.state.lastIdealStyles);
+      const destStyles: Array<Style> = this.props.styles(
+        this.state.lastIdealStyles,
+      );
 
       // check if we need to animate in the first place
-      if (shouldStopAnimationAll(
+      if (
+        shouldStopAnimationAll(
           this.state.currentStyles,
           destStyles,
           this.state.currentVelocities,
-        )) {
+        )
+      ) {
         // no need to cancel animationID here; shouldn't have any in flight
         this.animationID = null;
         this.accumulatedTime = 0;
@@ -155,7 +183,9 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
       }
 
       let currentFrameCompletion =
-        (this.accumulatedTime - Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
+        (this.accumulatedTime -
+          Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) /
+        msPerFrame;
       const framesToCatchUp = Math.floor(this.accumulatedTime / msPerFrame);
 
       let newLastIdealStyles = [];
@@ -183,7 +213,9 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
             newLastIdealVelocity[key] = 0;
           } else {
             let newLastIdealStyleValue = this.state.lastIdealStyles[i][key];
-            let newLastIdealVelocityValue = this.state.lastIdealVelocities[i][key];
+            let newLastIdealVelocityValue = this.state.lastIdealVelocities[i][
+              key
+            ];
             for (let j = 0; j < framesToCatchUp; j++) {
               [newLastIdealStyleValue, newLastIdealVelocityValue] = stepper(
                 msPerFrame / 1000,
@@ -237,7 +269,7 @@ export default class StaggeredMotion extends React.Component<StaggeredProps, Sta
 
       this.startAnimationIfNecessary();
     });
-  }
+  };
 
   componentDidMount() {
     this.prevTime = defaultNow();

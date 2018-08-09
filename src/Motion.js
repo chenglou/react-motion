@@ -8,7 +8,13 @@ import shouldStopAnimation from './shouldStopAnimation';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import type {ReactElement, PlainStyle, Style, Velocity, MotionProps} from './Types';
+import type {
+  ReactElement,
+  PlainStyle,
+  Style,
+  Velocity,
+  MotionProps,
+} from './Types';
 
 const msPerFrame = 1000 / 60;
 
@@ -23,10 +29,9 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   static propTypes = {
     // TOOD: warn against putting a config in here
     defaultStyle: PropTypes.objectOf(PropTypes.number),
-    style: PropTypes.objectOf(PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.object,
-    ])).isRequired,
+    style: PropTypes.objectOf(
+      PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+    ).isRequired,
     children: PropTypes.func.isRequired,
     onRest: PropTypes.func,
   };
@@ -43,7 +48,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   accumulatedTime: number = 0;
 
   defaultState(): MotionState {
-    const {defaultStyle, style} = this.props;
+    const { defaultStyle, style } = this.props;
     const currentStyle = defaultStyle || stripStyle(style);
     const currentVelocity = mapToZero(currentStyle);
     return {
@@ -65,7 +70,12 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   // config)
   clearUnreadPropStyle = (destStyle: Style): void => {
     let dirty = false;
-    let {currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity} = this.state;
+    let {
+      currentStyle,
+      currentVelocity,
+      lastIdealStyle,
+      lastIdealVelocity,
+    } = this.state;
 
     for (let key in destStyle) {
       if (!Object.prototype.hasOwnProperty.call(destStyle, key)) {
@@ -76,10 +86,10 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
       if (typeof styleValue === 'number') {
         if (!dirty) {
           dirty = true;
-          currentStyle = {...currentStyle};
-          currentVelocity = {...currentVelocity};
-          lastIdealStyle = {...lastIdealStyle};
-          lastIdealVelocity = {...lastIdealVelocity};
+          currentStyle = { ...currentStyle };
+          currentVelocity = { ...currentVelocity };
+          lastIdealStyle = { ...lastIdealStyle };
+          lastIdealVelocity = { ...lastIdealVelocity };
         }
 
         currentStyle[key] = styleValue;
@@ -90,7 +100,12 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
     }
 
     if (dirty) {
-      this.setState({currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity});
+      this.setState({
+        currentStyle,
+        currentVelocity,
+        lastIdealStyle,
+        lastIdealVelocity,
+      });
     }
   };
 
@@ -101,7 +116,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
 
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
-    this.animationID = defaultRaf((timestamp) => {
+    this.animationID = defaultRaf(timestamp => {
       // https://github.com/chenglou/react-motion/pull/420
       // > if execution passes the conditional if (this.unmounting), then
       // executes async defaultRaf and after that component unmounts and after
@@ -113,11 +128,13 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
 
       // check if we need to animate in the first place
       const propsStyle: Style = this.props.style;
-      if (shouldStopAnimation(
-        this.state.currentStyle,
-        propsStyle,
-        this.state.currentVelocity,
-      )) {
+      if (
+        shouldStopAnimation(
+          this.state.currentStyle,
+          propsStyle,
+          this.state.currentVelocity,
+        )
+      ) {
         if (this.wasAnimating && this.props.onRest) {
           this.props.onRest();
         }
@@ -148,7 +165,9 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
       }
 
       let currentFrameCompletion =
-        (this.accumulatedTime - Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
+        (this.accumulatedTime -
+          Math.floor(this.accumulatedTime / msPerFrame) * msPerFrame) /
+        msPerFrame;
       const framesToCatchUp = Math.floor(this.accumulatedTime / msPerFrame);
 
       let newLastIdealStyle: PlainStyle = {};
