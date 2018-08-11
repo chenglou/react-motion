@@ -23,12 +23,14 @@
     "css-loader": "^0.28.11",
     "eslint": "^5.0.1",
     "eslint-config-airbnb": "^17.0.0",
+    "eslint-config-prettier": "^2.9.0",
     "eslint-loader": "^2.0.0",
     "eslint-plugin-flowtype": "^2.49.3",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.1.0",
     "eslint-plugin-react": "^7.10.0",
     "flow-bin": "^0.53.1",
+    "husky": "^0.14.3",
     "inject-loader": "^4.0.1",
     "isparta-loader": "^2.0.0",
     "jasmine-core": "^3.1.0",
@@ -38,8 +40,10 @@
     "karma-jasmine-diff-reporter": "^1.2.0",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-webpack": "^3.0.0",
+    "lint-staged": "^7.2.0",
     "lodash.range": "^3.0.1",
     "phantomjs": "^2.1.7",
+    "prettier": "^1.14.2",
     "react": ">=15.5.0",
     "react-codemirror": ">=0.1.2",
     "react-dom": ">=15.5.0",
@@ -68,7 +72,18 @@
     "test:travis": "cross-env NODE_ENV=test karma start ./karma.conf.js --single-run",
     "test:dev": "cross-env NODE_ENV=test karma start ./karma.conf.js --no-single-run --auto-watch",
     "test:cov": "cross-env NODE_ENV=test karma start ./karma.conf.js --single-run --reporters coverage",
-    "gh-pages": "git fetch origin && git checkout gh-pages && git reset --hard origin/gh-pages && git rebase origin/master --force-rebase && npm run build-demos && git add . && git commit --amend --no-edit && git push origin gh-pages --force && git checkout master"
+    "gh-pages": "git fetch origin && git checkout gh-pages && git reset --hard origin/gh-pages && git rebase origin/master --force-rebase && npm run build-demos && git add . && git commit --amend --no-edit && git push origin gh-pages --force && git checkout master",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
   },
   "repository": {
     "type": "git",

@@ -12,7 +12,8 @@ export default function stepper(
   destX: number,
   k: number,
   b: number,
-  precision: number): [number, number] {
+  precision: number,
+): [number, number] {
   // Spring stiffness, in kg / s^2
 
   // for animations, destX is really spring length (spring at rest). initial

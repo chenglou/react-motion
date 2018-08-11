@@ -1,5 +1,5 @@
 /* @flow */
-import type {TransitionStyle} from './Types';
+import type { TransitionStyle } from './Types';
 
 // core keys merging algorithm. If previous render's keys are [a, b], and the
 // next render's [c, b, d], what's the final merged keys and ordering?
@@ -20,16 +20,19 @@ import type {TransitionStyle} from './Types';
 export default function mergeDiff(
   prev: Array<TransitionStyle>,
   next: Array<TransitionStyle>,
-  onRemove: (prevIndex: number, prevStyleCell: TransitionStyle) => ?TransitionStyle
+  onRemove: (
+    prevIndex: number,
+    prevStyleCell: TransitionStyle,
+  ) => ?TransitionStyle,
 ): Array<TransitionStyle> {
   // bookkeeping for easier access of a key's index below. This is 2 allocations +
   // potentially triggering chrome hash map mode for objs (so it might be faster
   // to loop through and find a key's index each time), but I no longer care
-  let prevKeyIndex: {[key: string]: number} = {};
+  let prevKeyIndex: { [key: string]: number } = {};
   for (let i = 0; i < prev.length; i++) {
     prevKeyIndex[prev[i].key] = i;
   }
-  let nextKeyIndex: {[key: string]: number} = {};
+  let nextKeyIndex: { [key: string]: number } = {};
   for (let i = 0; i < next.length; i++) {
     nextKeyIndex[next[i].key] = i;
   }
@@ -78,9 +81,15 @@ export default function mergeDiff(
           continue;
         }
 
-        if (nextOrderA < nextKeyIndex[pivot] && prevOrderB > prevKeyIndex[pivot]) {
+        if (
+          nextOrderA < nextKeyIndex[pivot] &&
+          prevOrderB > prevKeyIndex[pivot]
+        ) {
           return -1;
-        } else if (nextOrderA > nextKeyIndex[pivot] && prevOrderB < prevKeyIndex[pivot]) {
+        } else if (
+          nextOrderA > nextKeyIndex[pivot] &&
+          prevOrderB < prevKeyIndex[pivot]
+        ) {
           return 1;
         }
       }
@@ -93,9 +102,15 @@ export default function mergeDiff(
       if (!Object.prototype.hasOwnProperty.call(prevKeyIndex, pivot)) {
         continue;
       }
-      if (nextOrderB < nextKeyIndex[pivot] && prevOrderA > prevKeyIndex[pivot]) {
+      if (
+        nextOrderB < nextKeyIndex[pivot] &&
+        prevOrderA > prevKeyIndex[pivot]
+      ) {
         return 1;
-      } else if (nextOrderB > nextKeyIndex[pivot] && prevOrderA < prevKeyIndex[pivot]) {
+      } else if (
+        nextOrderB > nextKeyIndex[pivot] &&
+        prevOrderA < prevKeyIndex[pivot]
+      ) {
         return -1;
       }
     }

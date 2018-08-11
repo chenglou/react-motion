@@ -6,7 +6,7 @@ export default function reorderKeys() {
     if (!hasWarned) {
       hasWarned = true;
       console.error(
-        '`reorderKeys` has been removed, since it is no longer needed for TransitionMotion\'s new styles array API.'
+        "`reorderKeys` has been removed, since it is no longer needed for TransitionMotion's new styles array API.",
       );
     }
   }

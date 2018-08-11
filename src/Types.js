@@ -23,13 +23,13 @@ export type OpaqueConfig = {
   precision: number,
 };
 // your typical style object given in props. Maps to a number or a spring config
-export type Style = {[key: string]: number | OpaqueConfig};
+export type Style = { [key: string]: number | OpaqueConfig };
 // the interpolating style object, with the same keys as the above Style object,
 // with the values mapped to numbers, naturally
-export type PlainStyle = {[key: string]: number};
+export type PlainStyle = { [key: string]: number };
 // internal velocity object. Similar to PlainStyle, but whose numbers represent
 // speed. Might be exposed one day.
-export type Velocity = {[key: string]: number};
+export type Velocity = { [key: string]: number };
 
 // === Motion ===
 export type MotionProps = {
@@ -64,9 +64,13 @@ export type DidLeave = (styleThatLeft: { key: string, data?: any }) => void;
 
 export type TransitionProps = {
   defaultStyles?: Array<TransitionPlainStyle>,
-  styles: Array<TransitionStyle> | (previousInterpolatedStyles: ?Array<TransitionPlainStyle>) => Array<TransitionStyle>,
+  styles:
+    | Array<TransitionStyle>
+    | ((
+        previousInterpolatedStyles: ?Array<TransitionPlainStyle>,
+      ) => Array<TransitionStyle>),
   children: (interpolatedStyles: Array<TransitionPlainStyle>) => ReactElement,
   willEnter?: WillEnter,
   willLeave?: WillLeave,
-  didLeave?: DidLeave
+  didLeave?: DidLeave,
 };
