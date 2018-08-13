@@ -14,6 +14,7 @@
 .*/node_modules/@webassemblyjs/.*
 .*/node_modules/eslint-plugin-jsx-a11y/.*
 .*/node_modules/rollup-plugin-size-snapshot/.*
+.*/node_modules/babel-plugin-transform-react-remove-prop-types
 
 [include]
 
