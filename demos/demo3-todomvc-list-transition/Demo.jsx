@@ -109,6 +109,10 @@ export default class Demo extends React.Component {
     };
   };
 
+  onRest() {
+    console.log('todos list transition completed');
+  }
+
   render() {
     const {todos, value, selected} = this.state;
     const itemsLeft = todos.filter(({data: {isDone}}) => !isDone).length;
@@ -136,7 +140,8 @@ export default class Demo extends React.Component {
             defaultStyles={this.getDefaultStyles()}
             styles={this.getStyles()}
             willLeave={this.willLeave}
-            willEnter={this.willEnter}>
+            willEnter={this.willEnter}
+            onRest={this.onRest}>
             {styles =>
               <ul className="todo-list">
                 {styles.map(({key, style, data: {isDone, text}}) =>

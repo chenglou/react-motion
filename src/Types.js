@@ -73,4 +73,5 @@ export type TransitionProps = {
   willEnter?: WillEnter,
   willLeave?: WillLeave,
   didLeave?: DidLeave,
+  onRest?: () => void,
 };

@@ -281,7 +281,8 @@ Optional. Defaults to `styleThatEntered => stripStyle(styleThatEntered.style)`. 
 
 **Note** that `willEnter` and `defaultStyles` serve different purposes. `willEnter` only triggers when a previously inexistent `TransitionStyle` inside `styles` comes into the new render.
 
-(No `onRest` for TransitionMotion because we haven't found a good semantics for it yet. Voice your support in the issues section.)
+##### - onRest?: () => void
+Optional. The callback that fires when all the animations come to a rest.
 
 ---
 
