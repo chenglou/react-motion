@@ -5,6 +5,7 @@ import stepper from './stepper';
 import defaultNow from 'performance-now';
 import defaultRaf from 'raf';
 import shouldStopAnimation from './shouldStopAnimation';
+import arePropsEqual from './arePropsEqual';
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -276,13 +277,17 @@ export default class StaggeredMotion extends React.Component<
     this.startAnimationIfNecessary();
   }
 
-  componentWillReceiveProps(props: StaggeredProps) {
+  componentDidUpdate(prevProps: StaggeredProps) {
+    if (arePropsEqual(prevProps, this.props)) {
+      return;
+    }
+
     if (this.unreadPropStyles != null) {
       // previous props haven't had the chance to be set yet; set them here
       this.clearUnreadPropStyle(this.unreadPropStyles);
     }
 
-    this.unreadPropStyles = props.styles(this.state.lastIdealStyles);
+    this.unreadPropStyles = this.props.styles(this.state.lastIdealStyles);
     if (this.animationID == null) {
       this.prevTime = defaultNow();
       this.startAnimationIfNecessary();

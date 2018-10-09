@@ -331,6 +331,7 @@ describe('StaggeredMotion', () => {
     mockRaf.step(2);
     expect(count).toEqual([
       {a: 0},
+      {a: 0},
       {a: 0}, // this new 0 comes from owner update, causing StaggeredMotion to re-render
       {a: 400},
       {a: 385.8333333333333},
@@ -340,9 +341,9 @@ describe('StaggeredMotion', () => {
       {a: 350.02047519790233},
     ]);
     mockRaf.step(999);
-    expect(count.length).toBe(85);
+    expect(count.length).toBe(86);
     setState({a: spring(400)});
     // make sure we're still updating children even if there's nothing to interp
-    expect(count.length).toBe(86);
+    expect(count.length).toBe(87);
   });
 });
