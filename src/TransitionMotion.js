@@ -252,6 +252,7 @@ export default class TransitionMotion extends React.Component<
     willEnter: PropTypes.func,
     willLeave: PropTypes.func,
     didLeave: PropTypes.func,
+    onRest: PropTypes.func,
   };
 
   static defaultProps: TransitionMotionDefaultProps = {
@@ -272,6 +273,7 @@ export default class TransitionMotion extends React.Component<
   // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
   // In reality currentStyle should be 400
   unreadPropStyles: ?Array<TransitionStyle> = null;
+  wasAnimating: boolean = false;
 
   constructor(props: TransitionProps) {
     super(props);
@@ -449,12 +451,17 @@ export default class TransitionMotion extends React.Component<
           this.state.mergedPropsStyles,
         )
       ) {
+        if (this.wasAnimating && this.props.onRest) {
+          this.props.onRest();
+        }
         // no need to cancel animationID here; shouldn't have any in flight
         this.animationID = null;
         this.accumulatedTime = 0;
+        this.wasAnimating = false;
         return;
       }
 
+      this.wasAnimating = true;
       const currentTime = timestamp || defaultNow();
       const timeDelta = currentTime - this.prevTime;
       this.prevTime = currentTime;
