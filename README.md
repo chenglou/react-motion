@@ -5,6 +5,8 @@
 [![Bower version](https://badge.fury.io/bo/react-motion.svg)](http://badge.fury.io/bo/react-motion)
 [![react-motion channel on discord](https://img.shields.io/badge/discord-react--motion%40reactiflux-738bd7.svg?style=flat)](https://discordapp.com/invite/0ZcbPKXt5bYzmcI0)
 
+![Live Demo](https://media.giphy.com/media/mz8Y3zn2ZPMMA95BIp/giphy.gif)
+
 ```js
 import {Motion, spring} from 'react-motion';
 // In your render...
