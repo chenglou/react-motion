@@ -73,7 +73,7 @@ export default class StaggeredMotion extends React.Component<
 
   unmounting: boolean = false;
   animationID: ?number = null;
-  prevTime: ?number = null;
+  prevTime: number | null = null;
   accumulatedTime = 0;
   // it's possible that currentStyle's value is stale: if props is immediately
   // changed from 0 to 400 to spring(0) again, the async currentStyle is still

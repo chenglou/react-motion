@@ -44,7 +44,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   unmounting: boolean = false;
   wasAnimating: boolean = false;
   animationID: ?number = null;
-  prevTime: ?number = null;
+  prevTime: number | null = null;
   accumulatedTime: number = 0;
 
   defaultState(): MotionState {
