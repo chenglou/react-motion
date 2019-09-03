@@ -44,7 +44,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   unmounting: boolean = false;
   wasAnimating: boolean = false;
   animationID: ?number = null;
-  prevTime: number = 0;
+  prevTime: ?number = null;
   accumulatedTime: number = 0;
 
   defaultState(): MotionState {
@@ -149,6 +149,9 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
       this.wasAnimating = true;
 
       const currentTime = timestamp || defaultNow();
+      if (this.prevTime === null) {
+        this.prevTime = currentTime;
+      }
       const timeDelta = currentTime - this.prevTime;
       this.prevTime = currentTime;
       this.accumulatedTime = this.accumulatedTime + timeDelta;
@@ -239,7 +242,6 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   };
 
   componentDidMount() {
-    this.prevTime = defaultNow();
     this.startAnimationIfNecessary();
   }
 
@@ -251,7 +253,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
 
     this.unreadPropStyle = props.style;
     if (this.animationID == null) {
-      this.prevTime = defaultNow();
+      this.prevTime = null;
       this.startAnimationIfNecessary();
     }
   }

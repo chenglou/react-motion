@@ -73,7 +73,7 @@ export default class StaggeredMotion extends React.Component<
 
   unmounting: boolean = false;
   animationID: ?number = null;
-  prevTime = 0;
+  prevTime: ?number = null;
   accumulatedTime = 0;
   // it's possible that currentStyle's value is stale: if props is immediately
   // changed from 0 to 400 to spring(0) again, the async currentStyle is still
@@ -167,6 +167,9 @@ export default class StaggeredMotion extends React.Component<
       }
 
       const currentTime = timestamp || defaultNow();
+      if (this.prevTime === null) {
+        this.prevTime = currentTime;
+      }
       const timeDelta = currentTime - this.prevTime;
       this.prevTime = currentTime;
       this.accumulatedTime = this.accumulatedTime + timeDelta;
@@ -272,7 +275,6 @@ export default class StaggeredMotion extends React.Component<
   };
 
   componentDidMount() {
-    this.prevTime = defaultNow();
     this.startAnimationIfNecessary();
   }
 
@@ -284,7 +286,7 @@ export default class StaggeredMotion extends React.Component<
 
     this.unreadPropStyles = props.styles(this.state.lastIdealStyles);
     if (this.animationID == null) {
-      this.prevTime = defaultNow();
+      this.prevTime = null;
       this.startAnimationIfNecessary();
     }
   }
