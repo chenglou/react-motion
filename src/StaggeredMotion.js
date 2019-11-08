@@ -276,7 +276,7 @@ export default class StaggeredMotion extends React.Component<
     this.startAnimationIfNecessary();
   }
 
-  componentWillReceiveProps(props: StaggeredProps) {
+  UNSAFE_componentWillReceiveProps(props: StaggeredProps) {
     if (this.unreadPropStyles != null) {
       // previous props haven't had the chance to be set yet; set them here
       this.clearUnreadPropStyle(this.unreadPropStyles);
