@@ -576,7 +576,7 @@ export default class TransitionMotion extends React.Component<
     this.startAnimationIfNecessary();
   }
 
-  componentWillReceiveProps(props: TransitionProps) {
+  UNSAFE_componentWillReceiveProps(props: TransitionProps) {
     if (this.unreadPropStyles) {
       // previous props haven't had the chance to be set yet; set them here
       this.clearUnreadPropStyle(this.unreadPropStyles);
