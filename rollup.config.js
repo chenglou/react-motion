@@ -29,7 +29,7 @@ const commonjsOptions = {
 export default [
   {
     input,
-    output: { file: 'dist/react-motion.js', format: 'umd', name, globals },
+    output: { file: 'build/react-motion.js', format: 'umd', name, globals },
     external: Object.keys(globals),
     plugins: [
       nodeResolve(),
@@ -42,7 +42,7 @@ export default [
 
   {
     input,
-    output: { file: 'dist/react-motion.min.js', format: 'umd', name, globals },
+    output: { file: 'build/react-motion.min.js', format: 'umd', name, globals },
     external: Object.keys(globals),
     plugins: [
       nodeResolve(),
@@ -59,12 +59,5 @@ export default [
     output: { file: pkg.module, format: 'esm' },
     external,
     plugins: [babel(getBabelOptions({ useESModules: true })), sizeSnapshot()],
-  },
-
-  {
-    input,
-    output: { file: pkg.main, format: 'cjs' },
-    external,
-    plugins: [babel(getBabelOptions({ useESModules: false }))],
   },
 ];
