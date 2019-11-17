@@ -1,6 +1,7 @@
-node_modules
+build
 coverage
-dist
+lib
+node_modules
 **/*/all.js
 webpack.*.js
 server.js
