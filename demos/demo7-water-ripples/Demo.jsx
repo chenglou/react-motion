@@ -38,7 +38,7 @@ export default class Demo extends React.Component {
       key: now,
       style: {
         opacity: spring(1),
-        scale: spring(0),
+        scale: 1,
         x: spring(mouseX),
         y: spring(mouseY),
       }
