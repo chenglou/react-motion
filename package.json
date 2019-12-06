@@ -1,11 +1,11 @@
 {
   "name": "react-motion",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "A spring that solves your animation problems.",
   "main": "lib/react-motion.js",
   "module": "lib/react-motion.esm.js",
   "peerDependencies": {
-    "react": "^0.14.9 || ^15.3.0 || ^16.0.0"
+    "react": "^16.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-rc.1",
