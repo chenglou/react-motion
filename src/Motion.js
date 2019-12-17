@@ -243,7 +243,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
     this.startAnimationIfNecessary();
   }
 
-  componentWillReceiveProps(props: MotionProps) {
+  UNSAFE_componentWillReceiveProps(props: MotionProps) {
     if (this.unreadPropStyle != null) {
       // previous props haven't had the chance to be set yet; set them here
       this.clearUnreadPropStyle(this.unreadPropStyle);

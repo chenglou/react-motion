@@ -13,3 +13,5 @@
 # sublime
 /*.sublime-project
 /*.sublime-workspace
+
+/rollup.config.js

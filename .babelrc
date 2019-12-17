@@ -1,6 +1,6 @@
 {
   "presets": [
-    ["@babel/env", { "modules": false, "loose": true }],
+    ["@babel/env", { "modules": "commonjs", "loose": true }],
     "@babel/flow",
     "@babel/react"
   ],
