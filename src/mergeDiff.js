@@ -28,11 +28,11 @@ export default function mergeDiff(
   // bookkeeping for easier access of a key's index below. This is 2 allocations +
   // potentially triggering chrome hash map mode for objs (so it might be faster
   // to loop through and find a key's index each time), but I no longer care
-  let prevKeyIndex: { [key: string]: number } = {};
+  let prevKeyIndex: { [key: string]: number, ... } = {};
   for (let i = 0; i < prev.length; i++) {
     prevKeyIndex[prev[i].key] = i;
   }
-  let nextKeyIndex: { [key: string]: number } = {};
+  let nextKeyIndex: { [key: string]: number, ... } = {};
   for (let i = 0; i < next.length; i++) {
     nextKeyIndex[next[i].key] = i;
   }
