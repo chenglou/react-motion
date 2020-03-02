@@ -18,12 +18,12 @@ import type {
 
 const msPerFrame = 1000 / 60;
 
-type StaggeredMotionState = {
+type StaggeredMotionState = {|
   currentStyles: Array<PlainStyle>,
   currentVelocities: Array<Velocity>,
   lastIdealStyles: Array<PlainStyle>,
   lastIdealVelocities: Array<Velocity>,
-};
+|};
 
 function shouldStopAnimationAll(
   currentStyles: Array<PlainStyle>,

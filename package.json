@@ -31,7 +31,7 @@
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.1.0",
     "eslint-plugin-react": "^7.10.0",
-    "flow-bin": "^0.53.1",
+    "flow-bin": "^0.119.1",
     "flow-copy-source": "^1.1.0",
     "husky": "^0.14.3",
     "inject-loader": "^4.0.1",

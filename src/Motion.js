@@ -18,12 +18,12 @@ import type {
 
 const msPerFrame = 1000 / 60;
 
-type MotionState = {
+type MotionState = {|
   currentStyle: PlainStyle,
   currentVelocity: Velocity,
   lastIdealStyle: PlainStyle,
   lastIdealVelocity: Velocity,
-};
+|};
 
 export default class Motion extends React.Component<MotionProps, MotionState> {
   static propTypes = {

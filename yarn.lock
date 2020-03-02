@@ -3817,9 +3817,10 @@ flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
 
-flow-bin@^0.53.1:
-  version "0.53.1"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.53.1.tgz#9b22b63a23c99763ae533ebbab07f88c88c97d84"
+flow-bin@^0.119.1:
+  version "0.119.1"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.119.1.tgz#b6d763b386ec9f1085848ca7df98909d80a16bd0"
+  integrity sha512-mX6qjJVi7aLqR9sDf8QIHt8yYEWQbkMLw7qFoC7sM/AbJwvqFm3pATPN96thsaL9o1rrshvxJpSgoj1PJSC3KA==
 
 flow-copy-source@^1.1.0:
   version "1.3.0"

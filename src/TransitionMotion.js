@@ -201,13 +201,13 @@ function mergeAndSync(
   ];
 }
 
-type TransitionMotionDefaultProps = {
+type TransitionMotionDefaultProps = {|
   willEnter: WillEnter,
   willLeave: WillLeave,
   didLeave: DidLeave,
-};
+|};
 
-type TransitionMotionState = {
+type TransitionMotionState = {|
   // list of styles, each containing interpolating values. Part of what's passed
   // to children function. Notice that this is
   // Array<ActualInterpolatingStyleObject>, without the wrapper that is {key: ...,
@@ -222,7 +222,7 @@ type TransitionMotionState = {
   // the array that keeps track of currently rendered stuff! Including stuff
   // that you've unmounted but that's still animating. This is where it lives
   mergedPropsStyles: Array<TransitionStyle>,
-};
+|};
 
 export default class TransitionMotion extends React.Component<
   TransitionProps,

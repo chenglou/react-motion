@@ -20,4 +20,8 @@
 
 [libs]
 
+[lints]
+ambiguous-object-type=error
+deprecated-type=error
+
 [options]
