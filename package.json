@@ -1,11 +1,11 @@
 {
   "name": "react-motion",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "A spring that solves your animation problems.",
   "main": "lib/react-motion.js",
   "module": "lib/react-motion.esm.js",
   "peerDependencies": {
-    "react": "^0.14.9 || ^15.3.0 || ^16.0.0"
+    "react": "^16.0.0 || ^17.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-rc.1",
@@ -45,7 +45,7 @@
     "karma-webpack": "^3.0.0",
     "lint-staged": "^7.2.0",
     "lodash.range": "^3.0.1",
-    "prettier": "^1.14.2",
+    "prettier": "^2.1.2",
     "react": ">=15.5.0",
     "react-codemirror": ">=0.1.2",
     "react-dom": ">=15.5.0",
