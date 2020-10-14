@@ -1,5 +1,5 @@
 {
-  "name": "react-motion",
+  "name": "@serprex/react-motion",
   "version": "0.6.0",
   "description": "A spring that solves your animation problems.",
   "main": "lib/react-motion.js",
