@@ -2,7 +2,6 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
-import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import { uglify } from 'rollup-plugin-uglify';
 import pkg from './package.json';
 
@@ -13,7 +12,7 @@ const globals = {
 };
 
 // treat as external "module/path" modules and reserved rollup paths
-const external = id =>
+const external = (id) =>
   !id.startsWith('\0') && !id.startsWith('.') && !id.startsWith('/');
 
 const getBabelOptions = () => ({
@@ -46,7 +45,6 @@ export default [
       babel(getBabelOptions()),
       commonjs(commonjsOptions),
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
-      sizeSnapshot(),
     ],
   },
 
@@ -59,7 +57,6 @@ export default [
       babel(getBabelOptions()),
       commonjs(commonjsOptions),
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
-      sizeSnapshot(),
       uglify(),
     ],
   },
@@ -68,6 +65,6 @@ export default [
     input,
     output: { file: pkg.module, format: 'esm' },
     external,
-    plugins: [babel(getBabelOptions()), sizeSnapshot()],
+    plugins: [babel(getBabelOptions())],
   },
 ];
