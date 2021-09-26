@@ -25,7 +25,10 @@ const getBabelOptions = () => ({
     ['@babel/transform-runtime', { useESModules: true }],
   ],
   presets: [
-    ['@babel/env', { modules: false, loose: true }],
+    [
+      '@babel/env',
+      { modules: false, loose: true, useBuiltIns: 'usage', corejs: '3' },
+    ],
     '@babel/flow',
     '@babel/react',
   ],

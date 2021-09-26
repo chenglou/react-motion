@@ -1,12 +1,30 @@
 {
   "presets": [
-    ["@babel/env", { "modules": "commonjs", "loose": true }],
+    [
+      "@babel/env",
+      {
+        "modules": "commonjs",
+        "loose": true,
+        "useBuiltIns": "usage",
+        "corejs": "3"
+      }
+    ],
     "@babel/flow",
     "@babel/react"
   ],
   "plugins": [
-    ["@babel/proposal-class-properties", { "loose": true }],
-    ["transform-react-remove-prop-types", { "mode": "unsafe-wrap" }]
+    [
+      "@babel/proposal-class-properties",
+      {
+        "loose": true
+      }
+    ],
+    [
+      "transform-react-remove-prop-types",
+      {
+        "mode": "unsafe-wrap"
+      }
+    ]
   ],
   "env": {
     "test": {
