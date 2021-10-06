@@ -26,16 +26,6 @@ type MotionState = {
 };
 
 export default class Motion extends React.Component<MotionProps, MotionState> {
-  static propTypes = {
-    // TOOD: warn against putting a config in here
-    defaultStyle: PropTypes.objectOf(PropTypes.number),
-    style: PropTypes.objectOf(
-      PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
-    ).isRequired,
-    children: PropTypes.func.isRequired,
-    onRest: PropTypes.func,
-  };
-
   constructor(props: MotionProps) {
     super(props);
     this.state = this.defaultState();
@@ -68,16 +58,15 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
   // after checking for unreadPropStyle != null, we manually go set the
   // non-interpolating values (those that are a number, without a spring
   // config)
-  clearUnreadPropStyle = (destStyle: Style): void => {
+  clearUnreadPropStyle: (destStyle: Style) => void = (
+    destStyle: Style,
+  ): void => {
     let dirty = false;
-    let {
-      currentStyle,
-      currentVelocity,
-      lastIdealStyle,
-      lastIdealVelocity,
-    } = this.state;
+    let { currentStyle, currentVelocity, lastIdealStyle, lastIdealVelocity } =
+      this.state;
 
     for (let key in destStyle) {
+      // $FlowFixMe: suppressing this error until we can refactor
       if (!Object.prototype.hasOwnProperty.call(destStyle, key)) {
         continue;
       }
@@ -109,14 +98,14 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
     }
   };
 
-  startAnimationIfNecessary = (): void => {
+  startAnimationIfNecessary: () => void = (): void => {
     if (this.unmounting || this.animationID != null) {
       return;
     }
 
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
-    this.animationID = defaultRaf(timestamp => {
+    this.animationID = defaultRaf((timestamp) => {
       // https://github.com/chenglou/react-motion/pull/420
       // > if execution passes the conditional if (this.unmounting), then
       // executes async defaultRaf and after that component unmounts and after
@@ -151,7 +140,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
       const currentTime = timestamp || defaultNow();
       const timeDelta = currentTime - this.prevTime;
       this.prevTime = currentTime;
-      this.accumulatedTime = this.accumulatedTime + timeDelta;
+      this.accumulatedTime += timeDelta;
       // more than 10 frames? prolly switched browser tab. Restart
       if (this.accumulatedTime > msPerFrame * 10) {
         this.accumulatedTime = 0;
@@ -176,6 +165,7 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
       let newCurrentVelocity: Velocity = {};
 
       for (let key in propsStyle) {
+        // $FlowFixMe: suppressing this error until we can refactor
         if (!Object.prototype.hasOwnProperty.call(propsStyle, key)) {
           continue;
         }
@@ -269,3 +259,13 @@ export default class Motion extends React.Component<MotionProps, MotionState> {
     return renderedChildren && React.Children.only(renderedChildren);
   }
 }
+
+Motion.propTypes = {
+  // TOOD: warn against putting a config in here
+  defaultStyle: PropTypes.objectOf(PropTypes.number),
+  style: PropTypes.objectOf(
+    PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+  ).isRequired,
+  children: PropTypes.func.isRequired,
+  onRest: PropTypes.func,
+};

@@ -2,6 +2,7 @@
 
 type Callback = (now: number) => void;
 
+// eslint-disable-next-line func-names
 export default function (): Object {
   let allCallbacks = [];
   let prevTime = 0;

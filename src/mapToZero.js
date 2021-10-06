@@ -5,6 +5,7 @@ import type { PlainStyle, Style } from './Types';
 export default function mapToZero(obj: Style | PlainStyle): PlainStyle {
   let ret = {};
   for (const key in obj) {
+    // $FlowFixMe: suppressing this error until we can refactor
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       ret[key] = 0;
     }

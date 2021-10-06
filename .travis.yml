@@ -1,9 +1,0 @@
-language: node_js
-
-node_js:
-  - 10
-
-script:
- - npm run -s lint
- - npm run -s flow_check
- - npm run -s test:travis

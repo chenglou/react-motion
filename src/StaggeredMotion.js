@@ -44,13 +44,6 @@ export default class StaggeredMotion extends React.Component<
   StaggeredProps,
   StaggeredMotionState,
 > {
-  static propTypes = {
-    // TOOD: warn against putting a config in here
-    defaultStyles: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.number)),
-    styles: PropTypes.func.isRequired,
-    children: PropTypes.func.isRequired,
-  };
-
   constructor(props: StaggeredProps) {
     super(props);
     this.state = this.defaultState();
@@ -60,7 +53,7 @@ export default class StaggeredMotion extends React.Component<
     const { defaultStyles, styles } = this.props;
     const currentStyles: Array<PlainStyle> =
       defaultStyles || styles().map(stripStyle);
-    const currentVelocities = currentStyles.map(currentStyle =>
+    const currentVelocities = currentStyles.map((currentStyle) =>
       mapToZero(currentStyle),
     );
     return {
@@ -73,8 +66,8 @@ export default class StaggeredMotion extends React.Component<
 
   unmounting: boolean = false;
   animationID: ?number = null;
-  prevTime = 0;
-  accumulatedTime = 0;
+  prevTime: number = 0;
+  accumulatedTime: number = 0;
   // it's possible that currentStyle's value is stale: if props is immediately
   // changed from 0 to 400 to spring(0) again, the async currentStyle is still
   // at 0 (didn't have time to tick and interpolate even once). If we naively
@@ -85,7 +78,9 @@ export default class StaggeredMotion extends React.Component<
   // after checking for unreadPropStyles != null, we manually go set the
   // non-interpolating values (those that are a number, without a spring
   // config)
-  clearUnreadPropStyle = (unreadPropStyles: Array<Style>): void => {
+  clearUnreadPropStyle: (unreadPropStyles: Array<Style>) => void = (
+    unreadPropStyles: Array<Style>,
+  ): void => {
     let {
       currentStyles,
       currentVelocities,
@@ -99,6 +94,7 @@ export default class StaggeredMotion extends React.Component<
       let dirty = false;
 
       for (let key in unreadPropStyle) {
+        // $FlowFixMe: suppressing this error until we can refactor
         if (!Object.prototype.hasOwnProperty.call(unreadPropStyle, key)) {
           continue;
         }
@@ -131,14 +127,14 @@ export default class StaggeredMotion extends React.Component<
     }
   };
 
-  startAnimationIfNecessary = (): void => {
+  startAnimationIfNecessary: () => void = (): void => {
     if (this.unmounting || this.animationID != null) {
       return;
     }
 
     // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
     // call cb? No, otherwise accidental parent rerender causes cb trigger
-    this.animationID = defaultRaf(timestamp => {
+    this.animationID = defaultRaf((timestamp) => {
       // https://github.com/chenglou/react-motion/pull/420
       // > if execution passes the conditional if (this.unmounting), then
       // executes async defaultRaf and after that component unmounts and after
@@ -169,7 +165,7 @@ export default class StaggeredMotion extends React.Component<
       const currentTime = timestamp || defaultNow();
       const timeDelta = currentTime - this.prevTime;
       this.prevTime = currentTime;
-      this.accumulatedTime = this.accumulatedTime + timeDelta;
+      this.accumulatedTime += timeDelta;
       // more than 10 frames? prolly switched browser tab. Restart
       if (this.accumulatedTime > msPerFrame * 10) {
         this.accumulatedTime = 0;
@@ -201,6 +197,7 @@ export default class StaggeredMotion extends React.Component<
         let newLastIdealVelocity: Velocity = {};
 
         for (let key in destStyle) {
+          // $FlowFixMe: suppressing this error until we can refactor
           if (!Object.prototype.hasOwnProperty.call(destStyle, key)) {
             continue;
           }
@@ -213,9 +210,8 @@ export default class StaggeredMotion extends React.Component<
             newLastIdealVelocity[key] = 0;
           } else {
             let newLastIdealStyleValue = this.state.lastIdealStyles[i][key];
-            let newLastIdealVelocityValue = this.state.lastIdealVelocities[i][
-              key
-            ];
+            let newLastIdealVelocityValue =
+              this.state.lastIdealVelocities[i][key];
             for (let j = 0; j < framesToCatchUp; j++) {
               [newLastIdealStyleValue, newLastIdealVelocityValue] = stepper(
                 msPerFrame / 1000,
@@ -302,3 +298,10 @@ export default class StaggeredMotion extends React.Component<
     return renderedChildren && React.Children.only(renderedChildren);
   }
 }
+
+StaggeredMotion.propTypes = {
+  // TOOD: warn against putting a config in here
+  defaultStyles: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.number)),
+  styles: PropTypes.func.isRequired,
+  children: PropTypes.func.isRequired,
+};

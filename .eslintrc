@@ -84,5 +84,12 @@
     "import/no-extraneous-dependencies": 0,
     "import/order": 0,
     "import/no-webpack-loader-syntax": 0,
-  }
+  },
+  "overrides": [{
+    "files": ["test/**/*test.js"],
+    "rules": {
+      "max-classes-per-file": 0,
+      "react/no-deprecated": 0
+    }
+  }]
 }

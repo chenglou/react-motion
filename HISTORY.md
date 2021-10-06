@@ -3,6 +3,9 @@ Legend:
 - [F]: Fix
 - [I]: Improvement
 
+### 1.0.0 (October 6th 2021)
+- [I] Support React 17
+
 ### 0.5.1 (August 28th 2017)
 - [F] New flow definitions, fixes children typing.
 

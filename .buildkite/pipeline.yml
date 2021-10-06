@@ -1,0 +1,48 @@
+common: &common
+  branches: '!HEAD'
+  timeout_in_minutes: 60
+  agents:
+    queue: t2-large
+steps:
+  - name: security-check
+    <<: *common
+    branches: '*'
+    command: bin/docker-node.sh yarn security-check
+    agents:
+      queue: default
+    retry:
+      automatic:
+        exit_status: '*'
+        limit: 3
+
+  - name: build
+    <<: *common
+    timeout_in_minutes: 5
+    command: bin/artifacts-build.sh
+    artifact_paths: ci/artifacts/*.tar.gz
+
+  - wait
+
+  - name: lint
+    <<: *common
+    command: >
+      bin/artifacts-download.sh &&
+      bin/docker-node.sh yarn lint
+    agents:
+      queue: default
+
+#  TODO: add test and types check pipeline
+#  - name: flow_check
+#    <<: *common
+#    timeout_in_minutes: 5
+#    command: >
+#      bin/artifacts-download.sh &&
+#      bin/docker-node.sh yarn flow_check
+#
+#  - name: unit
+#    <<: *common
+#    timeout_in_minutes: 5
+#    command: >
+#      bin/artifacts-download.sh &&
+#      bin/docker-test.sh yarn test
+

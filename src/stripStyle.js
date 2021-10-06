@@ -7,6 +7,7 @@ import type { Style, PlainStyle } from './Types';
 export default function stripStyle(style: Style): PlainStyle {
   let ret = {};
   for (const key in style) {
+    // $FlowFixMe: suppressing this error until we can refactor
     if (!Object.prototype.hasOwnProperty.call(style, key)) {
       continue;
     }

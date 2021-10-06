@@ -1,8 +1,7 @@
-import nodeResolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import babel from 'rollup-plugin-babel';
-import replace from 'rollup-plugin-replace';
-import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
+import nodeResolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import babel from '@rollup/plugin-babel';
+import replace from '@rollup/plugin-replace';
 import { uglify } from 'rollup-plugin-uglify';
 import pkg from './package.json';
 
@@ -13,20 +12,23 @@ const globals = {
 };
 
 // treat as external "module/path" modules and reserved rollup paths
-const external = id =>
+const external = (id) =>
   !id.startsWith('\0') && !id.startsWith('.') && !id.startsWith('/');
 
 const getBabelOptions = () => ({
   babelrc: false,
   exclude: '**/node_modules/**',
-  runtimeHelpers: true,
+  babelHelpers: 'runtime',
   plugins: [
     ['@babel/proposal-class-properties', { loose: true }],
     ['transform-react-remove-prop-types', { mode: 'unsafe-wrap' }],
     ['@babel/transform-runtime', { useESModules: true }],
   ],
   presets: [
-    ['@babel/env', { modules: false, loose: true }],
+    [
+      '@babel/env',
+      { modules: false, loose: true, useBuiltIns: 'usage', corejs: '3' },
+    ],
     '@babel/flow',
     '@babel/react',
   ],
@@ -45,8 +47,10 @@ export default [
       nodeResolve(),
       babel(getBabelOptions()),
       commonjs(commonjsOptions),
-      replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
-      sizeSnapshot(),
+      replace({
+        'process.env.NODE_ENV': JSON.stringify('development'),
+        preventAssignment: true,
+      }),
     ],
   },
 
@@ -58,8 +62,10 @@ export default [
       nodeResolve(),
       babel(getBabelOptions()),
       commonjs(commonjsOptions),
-      replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
-      sizeSnapshot(),
+      replace({
+        'process.env.NODE_ENV': JSON.stringify('production'),
+        preventAssignment: true,
+      }),
       uglify(),
     ],
   },
@@ -68,6 +74,6 @@ export default [
     input,
     output: { file: pkg.module, format: 'esm' },
     external,
-    plugins: [babel(getBabelOptions()), sizeSnapshot()],
+    plugins: [babel(getBabelOptions())],
   },
 ];

@@ -45,6 +45,7 @@ export default function mergeDiff(
     ret[i] = next[i];
   }
   for (let i = 0; i < prev.length; i++) {
+    // $FlowFixMe: suppressing this error until we can refactor
     if (!Object.prototype.hasOwnProperty.call(nextKeyIndex, prev[i].key)) {
       // this is called my TM's `mergeAndSync`, which calls willLeave. We don't
       // merge in keys that the user desires to kill
@@ -77,6 +78,7 @@ export default function mergeDiff(
       // d, b's (the only) pivot
       for (let i = 0; i < next.length; i++) {
         const pivot = next[i].key;
+        // $FlowFixMe: suppressing this error until we can refactor
         if (!Object.prototype.hasOwnProperty.call(prevKeyIndex, pivot)) {
           continue;
         }
@@ -99,6 +101,7 @@ export default function mergeDiff(
     // prevOrderA, nextOrderB
     for (let i = 0; i < next.length; i++) {
       const pivot = next[i].key;
+      // $FlowFixMe: suppressing this error until we can refactor
       if (!Object.prototype.hasOwnProperty.call(prevKeyIndex, pivot)) {
         continue;
       }

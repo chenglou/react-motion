@@ -9,6 +9,7 @@ export default function shouldStopAnimation(
   currentVelocity: Velocity,
 ): boolean {
   for (let key in style) {
+    // $FlowFixMe: suppressing this error until we can refactor
     if (!Object.prototype.hasOwnProperty.call(style, key)) {
       continue;
     }
