@@ -2,11 +2,13 @@
 
 /bin/
 /chrome.json
+/renovate.json
 
 /bower_components/
 
 /coverage/
 /demos/
+/src/
 /test/
 
 /karma.conf.js
