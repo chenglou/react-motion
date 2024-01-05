@@ -19,7 +19,7 @@ Animate a counter from `0` to `10`. For more advanced usage, see below.
 
 - Npm: `npm install --save react-motion`
 
-- Bower: **do not install with `bower install react-motion`, it won't work**. Use `bower install --save https://unpkg.com/react-motion/bower.zip`. Or in `bower.json`:
+- Bower: **Do not install with `bower install react-motion`, it won't work**. Use `bower install --save https://unpkg.com/react-motion/bower.zip`. Or in `bower.json`:
 ```json
 {
   "dependencies": {
@@ -68,14 +68,14 @@ To build the repo yourself: `npm run prepublish`.
 
 [My React-Europe talk](https://www.youtube.com/watch?v=1tavDv5hXpo)
 
-For 95% of use-cases of animating components, we don't have to resort to using hard-coded easing curves and duration. Set up a stiffness and damping for your UI element, and let the magic of physics take care of the rest. This way, you don't have to worry about petty situations such as interrupted animation behavior. It also greatly simplifies the API.
+For 95% of use cases of animating components, we don't have to resort to using hard-coded easing curves and duration. Set up a stiffness and damping for your UI element, and let the magic of physics take care of the rest. This way, you don't have to worry about petty situations such as interrupted animation behavior. It also greatly simplifies the API.
 
 This library also provides an alternative, more powerful API for React's `TransitionGroup`.
 
 ## API
 
 Exports:
-- `spring`
+- `Spring`
 - `Motion`
 - `StaggeredMotion`
 - `TransitionMotion`
@@ -83,14 +83,14 @@ Exports:
 
 [Here](https://github.com/chenglou/react-motion/blob/9cb90eca20ecf56e77feb816d101a4a9110c7d70/src/Types.js)'s the well-annotated public [Flow type](http://flowtype.org) definition file (you don't have to use Flow with React-motion, but the types help document the API below).
 
-P.S. using TypeScript? [Here](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-motion/index.d.ts) are the React-motion TypeScript definitions!
+P.S. Using TypeScript? [Here](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-motion/index.d.ts) are the React-motion TypeScript definitions!
 
 ---
 
 ### Helpers
 
 ##### - spring: (val: number, config?: SpringHelperConfig) => OpaqueConfig
-Used in conjunction with the components below. Specifies the how to animate to the destination value, e.g. `spring(10, {stiffness: 120, damping: 17})` means "animate to value 10, with a spring of stiffness 120 and damping 17".
+Used in conjunction with the components below. Specifies how to animate to the destination value, e.g. `spring(10, {stiffness: 120, damping: 17})` means "animate to value 10, with a spring of stiffness 120 and damping 17".
 
 - `val`: the value.
 - `config`: optional, for further adjustments. Possible fields:
@@ -117,7 +117,7 @@ Commonly used spring configurations used like so: `spring(10, presets.wobbly)` o
 
 ##### - style: Style
 
-Required. The `Style` type is an object that maps to either a `number` or an `OpaqueConfig` returned by `spring()` above. Must keep the same keys throughout component's existence. The meaning of the values:
+Required. The `Style` type is an object that maps to either a `number` or an `OpaqueConfig` returned by `spring()` above. Must keep the same keys throughout the component's existence. The meaning of the values:
 
 - an `OpaqueConfig` returned from `spring(x)`: interpolate to `x`.
 - a `number` `x`: jump to `x`, do not interpolate.
@@ -187,9 +187,9 @@ Required **function**. Similar to `Motion`'s `children`, but accepts the array o
 
 You have items `a`, `b`, `c`, with their respective style configuration, given to `TransitionMotion`'s `styles`. In its `children` function, you're passed the three interpolated styles as params; you map over them and produce three components. All is good.
 
-During next render, you give only `a` and `b`, indicating that you want `c` gone, but that you'd like to animate it reaching value `0`, before killing it for good.
+During the next render, you give only `a` and `b`, indicating that you want `c` gone, but that you'd like to animate it to reach the value `0`, before killing it for good.
 
-Fortunately, `TransitionMotion` has kept `c` around and still passes it into the `children` function param. So when you're mapping over these three interpolated styles, you're still producing three components. It'll keep interpolating, while checking `c`'s current value at every frame. Once `c` reaches the specified `0`, `TransitionMotion` will remove it for good (from the interpolated styles passed to your `children` function).
+Fortunately, `TransitionMotion` has kept `c` around and still passes it into the `children` function param. So when you're mapping over these three interpolated styles, you're still producing three components. It'll keep interpolating while checking `c`'s current value at every frame. Once `c` reaches the specified `0`, `TransitionMotion` will remove it for good (from the interpolated styles passed to your `children` function).
 
 This time, when mapping through the two remaining interpolated styles, you'll produce only two components. `c` is gone for real.
 
@@ -235,7 +235,7 @@ const Demo = createReactClass({
 
 #### Props
 
-First, two type definitions to ease the comprehension.
+First, two types of definitions to ease comprehension.
 
 - `TransitionStyle`: an object of the format `{key: string, data?: any, style: Style}`.
 
@@ -243,7 +243,7 @@ First, two type definitions to ease the comprehension.
 
   - `data`: optional. Anything you'd like to carry along. This is so that when the previous section example's `c` disappears, you still get to access `c`'s related data, such as the text to display along with it.
 
-  - `style`: required. The actual starting style configuration, similar to what you provide for `Motion`'s `style`. Maps keys to either a number or an `OpaqueConfig` returned by `spring()`.
+  - `style`: required. The actual starting style configuration is similar to what you provide for `Motion`'s `style`. Maps keys to either a number or an `OpaqueConfig` returned by `spring()`.
 
 - `TransitionPlainStyle`: similar to above, except the `style` field's value is of type `PlainStyle`, aka an object that maps to numbers.
 
@@ -252,13 +252,13 @@ Required. Accepts either:
 
   - an array of `TransitionStyle` configs, e.g. `[{key: 'a', style: {x: spring(0)}}, {key: 'b', style: {x: spring(10)}}]`.
 
-  - a function similar to `StaggeredMotion`, taking the previously interpolating styles (`undefined` at first call, unless `defaultStyles` is provided), and returning the previously mentioned array of configs. __You can do staggered mounting animation with this__.
+  - a function similar to `StaggeredMotion`, taking the previously interpolating styles (`undefined` at the first call, unless `defaultStyles` is provided), and returning the previously mentioned array of configs. __You can do staggered mounting animation with this__.
 
 ##### - defaultStyles?: Array&lt;TransitionPlainStyle>
 Optional. Similar to the other components' `defaultStyle`/`defaultStyles`.
 
 ##### - children: (interpolatedStyles: Array&lt;TransitionPlainStyle>) => ReactElement
-Required **function**. Similar to other two components' `children`. Receive back an array similar to what you provided for `defaultStyles`, only that each `style` object's number value represent the currently interpolating value.
+Required **function**. Similar to the other two components' `children`. Receive back an array similar to what you provided for `defaultStyles`, only that each `style` object's number value represent the currently interpolating value.
 
 ##### - willLeave?: (styleThatLeft: TransitionStyle) => ?Style
 Optional. Defaults to `() => null`. **The magic sauce property**.
@@ -299,7 +299,7 @@ You don't. Unless you put it in another `TransitionMotion`...
 
 See [`StaggeredMotion`](#staggeredmotion-)
 
-- My `ref` doesn't work in the children function.
+- My `ref` doesn't work in the children's function.
 
 React string refs won't work:
 
